@@ -1,0 +1,7 @@
+# Classification approaches
+
+## Manual labelling of cells
+
+## Training a classifier
+
+## Classification of new data

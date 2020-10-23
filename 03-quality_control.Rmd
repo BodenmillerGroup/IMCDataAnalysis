@@ -1,0 +1,3 @@
+# Image and cell-level quality control
+
+Overview on possible quality indicators

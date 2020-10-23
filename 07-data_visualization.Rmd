@@ -1,0 +1,3 @@
+# Visualizing single-cell data
+
+Using the `dittoSeq` package.
