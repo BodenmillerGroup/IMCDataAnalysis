@@ -1,0 +1,32 @@
+# Preprocessing IMC data
+
+To follow the code in this section, please install [imcRtools](https://github.com/BodenmillerGroup/imcRtools) from Github.
+
+```{r install-dependencies, message = FALSE}
+library(devtools)
+
+install_github("BodenmillerGroup/imcRtools")
+```
+
+To test the scripts, please also access the raw data via:
+
+```{r access-data, message=FALSE}
+sm_url <- "https://data.mendeley.com/public-files/datasets/v58yj49pfr/files/b39223d2-2825-4e79-9875-86fa0e1c55d2/file_downloaded?dl=1"
+
+
+```
+
+## Read in the data
+
+Overview on how to read in pre-processed data.
+
+## Generate a spillover matrix
+
+In this section, we will highlight the use of `imcRtools` and `CATALYST` to generate a spillover matrix for IMC data.
+
+```{r}
+library(imcRtools)
+
+# Read txt files
+
+```
