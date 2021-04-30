@@ -3,12 +3,12 @@ on:
      branches:
        - main
 
-name: renderbook
+name: Build
 
 jobs:
   bookdown:
     name: Render-Book
-    runs-on: macOS-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
       - uses: r-lib/actions/setup-r@v1
@@ -16,7 +16,7 @@ jobs:
       - name: Install CRAN dependencies
         run: Rscript -e 'install.packages(c("rmarkdown", "bookdown", "tidyverse", "pheatmap", "viridis", "zoo", "BiocManager"))'
       - name: Install Bioconductor dependencies
-        run: Rscript -e 'BiocManager::install(c("CATALYST"))'
+        run: Rscript -e 'BiocManager::install("CATALYST")'
       - name: Render Book
         run: Rscript -e 'bookdown::render_book("index.Rmd")'
       - uses: actions/upload-artifact@v1
