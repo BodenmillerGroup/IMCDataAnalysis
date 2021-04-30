@@ -150,7 +150,6 @@ Next, we will write out the spillover matrix as csv.
 ### Sanity check that spillover matrix is correct
 
 ```{r integration-test}
-library(testthat)
 correct_sm <- read.csv("data/Figure_S5/paper_version_Spillover_Matrix_1_sm.csv")
 rownames(correct_sm) <- correct_sm[,1]
 correct_sm <- as.matrix(correct_sm[,-1])
