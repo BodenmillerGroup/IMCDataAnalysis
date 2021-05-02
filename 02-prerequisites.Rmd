@@ -1,0 +1,25 @@
+# Prerequisites
+
+Before we get started on IMC data analysis, we will need to make sure that
+software dependencies are installed and the needed example data is downloaded.
+
+## Software requirements
+
+## Download example data
+
+Throughout this tutorial, we will access a number of different data types. 
+To declutter the analysis scripts, we will already download all needed data here.
+
+### Files for spillover matrix estimation
+
+To highlight the generation of a spillover matrix, we will use files that were 
+provided in the original publication [@Chevrier2017].
+
+```{r dowload-chevrier2017, message=FALSE}
+sm_url <- "https://data.mendeley.com/public-files/datasets/v58yj49pfr/files/b39223d2-2825-4e79-9875-86fa0e1c55d2/file_downloaded?dl=1"
+
+download.file(sm_url, "data/Figure_S5.zip")
+unzip("data/Figure_S5.zip", exdir="data", overwrite=TRUE)
+unlink("data/Figure_S5.zip")
+```
+
