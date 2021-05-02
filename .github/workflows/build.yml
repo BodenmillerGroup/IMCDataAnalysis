@@ -9,22 +9,21 @@ name: build
 jobs:
   bookdown:
     runs-on: ubuntu-latest
-    container: rocker/r-ver:latest
+    container: rocker/verse:latest
     
     steps:
       - uses: actions/checkout@v2
-      - uses: r-lib/actions/setup-pandoc@v1
       
       - name: Install system requirements
         run: |
           apt-get update 
           apt-get install -y --no-install-recommends apt-utils 
-          apt-get install -y --no-install-recommends zlib1g-dev libfftw3-dev libxml2-dev libxt-dev curl
+          apt-get install -y --no-install-recommends zlib1g-dev libfftw3-dev libxml2-dev libxt-dev curl libcairo2-dev
           apt-get clean
           rm -rf /var/lib/apt/ilists/*
           
       - name: Install CRAN dependencies
-        run: Rscript -e 'install.packages(c("rmarkdown", "bookdown", "tidyverse", "pheatmap", "viridis", "zoo", "BiocManager"))'
+        run: Rscript -e 'install.packages(c("rmarkdown", "bookdown", "pheatmap", "viridis", "zoo", "BiocManager"))'
       - name: Install Bioconductor dependencies
         run: Rscript -e 'BiocManager::install("CATALYST")'
       - name: Render Book
