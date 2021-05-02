@@ -43,6 +43,9 @@ cur_txts_names <- list.files("data/Figure_S5/Spillover_Matrix_1/", full.names = 
 cur_txts <- lapply(cur_txts_names, read_delim, delim = "\t")
 
 names(cur_txts) <- str_match(cur_txts_names, "[A-Za-z]{2}[0-9]{2,3}")
+
+# Create SingleCellExperiment
+sce <- 
 ```
 
 ## Quality control
