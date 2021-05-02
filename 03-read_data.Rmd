@@ -1,0 +1,4 @@
+### Read in the data
+
+First, we need to read in the txt files.
+

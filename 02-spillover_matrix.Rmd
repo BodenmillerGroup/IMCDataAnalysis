@@ -1,4 +1,6 @@
-# Preprocessing IMC data
+# Generate a spillover matrix
+
+In this section, we will highlight the use of `imcRtools` and `CATALYST` to generate a spillover matrix for IMC data.
 
 To test the scripts, please access the raw data via:
 
@@ -9,14 +11,6 @@ download.file(sm_url, "data/Figure_S5.zip")
 unzip("data/Figure_S5.zip", exdir="data", overwrite=TRUE)
 unlink("data/Figure_S5.zip")
 ```
-
-## Read in the data
-
-Overview on how to read in pre-processed data.
-
-## Generate a spillover matrix
-
-In this section, we will highlight the use of `imcRtools` and `CATALYST` to generate a spillover matrix for IMC data.
 
 ### Read in the data
 
