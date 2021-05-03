@@ -30,14 +30,14 @@ Tidy R:
 
 For the detailed version numbers, please refer to the following `sessionInfo`:
 
-```{r sessionInfo, message=FALSE, echo=FALSE}
+```{r sessionInfo-all, message=FALSE, echo=FALSE}
 library(CATALYST)
 library(SingleCellExperiment)
-library(scuttle)
-library(scater)
+#library(scuttle)
+#library(scater)
 library(imcRtools)
-library(cytomapper)
-library(dittoSeq)
+#library(cytomapper)
+#library(dittoSeq)
 library(tidyverse)
 
 sessionInfo()

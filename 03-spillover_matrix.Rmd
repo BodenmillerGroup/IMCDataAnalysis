@@ -55,7 +55,13 @@ sce <- prepareSCEfromTXT(cur_txts)
 ## Quality control
 
 In the next step, we will observe the median pixel intensities per spot.
-This is crucial as low intensities 
+This type of visualization serves two purposes:
+
+1. Small median pixel intensities (< 200 counts) might hinder the robust
+estimation of the channel spillover. In that case, consecutive pixels can be
+summed (see [Optional pixel binning](#pixel_binning)).
+
+2. 
 
 ```{r QC, message = FALSE}
 library(pheatmap)
@@ -83,7 +89,7 @@ pheatmap(1 * (cur_medians > 200),
          cluster_rows = FALSE, cluster_cols = FALSE)
 ```
 
-## Optional binning
+## Optional pixel binning {#pixel_binning}
 
 If the signals are too low, pixels can be summed:
 
@@ -184,6 +190,6 @@ current_sm <- current_sm[rownames(correct_sm),colnames(correct_sm)]
 stopifnot(all.equal(correct_sm, current_sm, tolerance = 0.01))
 ```
 
-```{r sessionInfo}
+```{r sessionInfo-1}
 sessionInfo()
 ```
