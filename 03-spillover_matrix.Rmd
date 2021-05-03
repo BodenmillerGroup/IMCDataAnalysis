@@ -27,15 +27,17 @@ In brief, the highlighted workflow comprises 5 steps:
 
 ## Read in the data
 
-Here, we will read in the individual .txt files. The `imcRtools` package exports
-the `prepareSCEfromTXT` function, which creates a `SingleCellExperiment` object
-form the data contained in the .txt files. This object can be used directly by
-the `CATALYST` package to estimate the spillover.
+Here, we will read in the individual .txt files into a named list. The
+`imcRtools` package exports the `prepareSCEfromTXT` function, which creates a
+`SingleCellExperiment` object form the data contained in the .txt files. This
+object can be used directly by the `CATALYST` package to estimate the spillover.
 
-Here, one crucial step is to name the list of .txt files correctly. The `prepareSCEfromTXT` function
-expects a names list, where each name represents the metal spot in the format `(mt)(mass)` (e.g. `Sm152` for Samarium isotope with the atomic mass 152).
+One crucial step is to name the list of .txt files correctly. The
+`prepareSCEfromTXT` function expects a names list, where each name represents
+the metal spot in the format `(mt)(mass)` (e.g. `Sm152` for Samarium isotope
+with the atomic mass 152).
 
-```{r, message=FALSE}
+```{r read-txts, message=FALSE}
 library(imcRtools)
 library(readr)
 library(stringr)
@@ -47,12 +49,13 @@ cur_txts <- lapply(cur_txts_names, read_delim, delim = "\t")
 names(cur_txts) <- str_extract(cur_txts_names, "[A-Za-z]{1,2}[0-9]{2,3}")
 
 # Create SingleCellExperiment
-#sce <- prepareSCEfromTXT(cur_txts) 
+sce <- prepareSCEfromTXT(cur_txts) 
 ```
 
 ## Quality control
 
-Visualize median expression
+In the next step, we will observe the median pixel intensities per spot.
+This is crucial as low intensities 
 
 ```{r QC, message = FALSE}
 library(pheatmap)
@@ -179,4 +182,8 @@ current_sm <- metadata(sce)$spillover_matrix
 current_sm <- current_sm[rownames(correct_sm),colnames(correct_sm)]
 
 stopifnot(all.equal(correct_sm, current_sm, tolerance = 0.01))
+```
+
+```{r sessionInfo}
+sessionInfo()
 ```
