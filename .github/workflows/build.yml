@@ -28,7 +28,7 @@ jobs:
         run: Rscript -e 'BiocManager::install("CATALYST")'
       - name: Render Book
         run: Rscript -e 'bookdown::render_book("index.Rmd")'
-      - uses: actions/upload-artifact@v1
+      - uses: actions/upload-artifact@v2
         with:
           name: _book
           path: _book/
