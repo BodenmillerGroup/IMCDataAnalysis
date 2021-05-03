@@ -42,7 +42,7 @@ library(tidyverse)
 cur_txts_names <- list.files("data/Figure_S5/Spillover_Matrix_1/", full.names = TRUE)
 cur_txts <- lapply(cur_txts_names, read_delim, delim = "\t")
 
-names(cur_txts) <- str_match(cur_txts_names, "[A-Za-z]{2}[0-9]{2,3}")
+names(cur_txts) <- str_extract(cur_txts_names, "[A-Za-z]{1,2}[0-9]{2,3}")
 
 # Create SingleCellExperiment
 # sce <- 
@@ -67,8 +67,8 @@ cur_medians <- lapply(cur_txts, function(x){
 cur_medians <- do.call(rbind, cur_medians)
 
 # Order matrix by metal
-cur_medians <- cur_medians[order(as.numeric(str_match(rownames(cur_medians), "[0-9]{2,3}"))),
-                           order(as.numeric(str_match(colnames(cur_medians), "[0-9]{2,3}")))]
+cur_medians <- cur_medians[order(as.numeric(str_extract(rownames(cur_medians), "[0-9]{2,3}"))),
+                           order(as.numeric(str_extract(colnames(cur_medians), "[0-9]{2,3}")))]
 
 pheatmap(log10(cur_medians + 1), cluster_rows = FALSE, cluster_cols = FALSE,
          color = viridis(100))
@@ -103,8 +103,8 @@ cur_medians <- lapply(cur_txts_binned, function(x){
 cur_medians <- do.call(rbind, cur_medians)
 
 # Order matrix by metal
-cur_medians <- cur_medians[order(as.numeric(str_match(rownames(cur_medians), "[0-9]{2,3}"))),
-                           order(as.numeric(str_match(colnames(cur_medians), "[0-9]{2,3}")))]
+cur_medians <- cur_medians[order(as.numeric(str_extract(rownames(cur_medians), "[0-9]{2,3}"))),
+                           order(as.numeric(str_extract(colnames(cur_medians), "[0-9]{2,3}")))]
 
 pheatmap(log10(cur_medians + 1), cluster_rows = FALSE, cluster_cols = FALSE,
          color = viridis(100))
@@ -123,7 +123,7 @@ library(CATALYST)
 
 cur_counts <- do.call(rbind, cur_txts) %>%
     select(-c(Start_push, End_push, Pushes_duration, X, Y, Z)) %>%
-    rename_with(~ str_match(string = .x, pattern = "[A-Za-z]{2}[0-9]{2,3}Di")) %>%
+    rename_with(~ str_match(string = .x, pattern = "[A-Za-z]{1,2}[0-9]{2,3}Di")) %>%
     as.matrix()
 
 sce <- SingleCellExperiment(assays = list(counts = t(cur_counts),
