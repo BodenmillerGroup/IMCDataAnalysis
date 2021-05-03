@@ -36,7 +36,9 @@ Here, one crucial step is to name the list of .txt files correctly. The `prepare
 expects a names list, where each name represents the metal spot in the format `(mt)(mass)` (e.g. `Sm152` for Samarium isotope with the atomic mass 152).
 
 ```{r, message=FALSE}
-library(tidyverse)
+library(imcRtools)
+library(readr)
+library(stringr)
 
 # Read txt files
 cur_txts_names <- list.files("data/Figure_S5/Spillover_Matrix_1/", full.names = TRUE)
@@ -45,7 +47,7 @@ cur_txts <- lapply(cur_txts_names, read_delim, delim = "\t")
 names(cur_txts) <- str_extract(cur_txts_names, "[A-Za-z]{1,2}[0-9]{2,3}")
 
 # Create SingleCellExperiment
-# sce <- 
+#sce <- prepareSCEfromTXT(cur_txts) 
 ```
 
 ## Quality control

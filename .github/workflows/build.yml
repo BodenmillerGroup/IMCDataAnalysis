@@ -23,9 +23,12 @@ jobs:
           rm -rf /var/lib/apt/ilists/*
           
       - name: Install CRAN dependencies
-        run: Rscript -e 'install.packages(c("rmarkdown", "bookdown", "pheatmap", "viridis", "zoo", "BiocManager"))'
+        run: Rscript -e 'install.packages(c("rmarkdown", "bookdown", "pheatmap", "viridis", 
+                                            "zoo", "BiocManager", "devtools"))'
       - name: Install Bioconductor dependencies
         run: Rscript -e 'BiocManager::install("CATALYST")'
+      - name: Install Github dependencies
+        run: Rscript -e 'devools::install_github("BodenmillerGroup/imcRtools")'    
       - name: Render Book
         run: Rscript -e 'bookdown::render_book("index.Rmd")'
       - uses: actions/upload-artifact@v2
@@ -45,7 +48,7 @@ jobs:
          name: docs # optional
          path: docs # optional
      - name: Deploy to GitHub Pages
-       uses: Cecilapp/GitHub-Pages-deploy@master
+       uses: Cecilapp/GitHub-Pages-deploy@v2
        env:
           EMAIL: ${{ secrets.EMAIL }}               # must be a verified email
           GH_TOKEN: ${{ secrets.GH_PAT }} # https://github.com/settings/tokens
