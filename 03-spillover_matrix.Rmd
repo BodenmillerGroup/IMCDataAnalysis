@@ -78,62 +78,42 @@ plotSpotHeatmap(sce)
 plotSpotHeatmap(sce, log = FALSE, threshold = 200)
 ```
 
+As we can see, all median pixel intensities are > 200 counts for each spot.
+Channels for which no spot was placed (Xe134, Eu153, Ir191, Ir193), show either
+no spillover (Ir191, Ir193), constant signal (Xe134) or spillover from
+neighboring channels (Eu153).
+
 ## Optional pixel binning {#pixel_binning}
 
-If the signals are too low, pixels can be summed:
+In cases where median pixel intensities are low (< 200 counts), consecutive
+pixels can be binned to increase the robustness of the spillover estimation.
+The `imcRtools` package provides the `binAcrossPixels` function,
+which performs aggregation for each channel within pixel-level grouping.
 
-```{r binning, message=FALSE,}
-library(zoo)
-
+```{r binning, message=FALSE, fig.width=7, fig.height=7}
+# Define grouping
 bin_size = 10
 
-cur_txts_binned <- lapply(cur_txts, function(x){
-        cur_txt <- x %>% select(-c(Start_push, End_push, Pushes_duration, X, Y, Z)) %>%
-            as.matrix()
-        cur_txt <- apply(cur_txt, 2, function(y){rollapply(y, width = bin_size, FUN = sum, by = bin_size)})
-        return(cur_txt)
-})
+sce2 <- binAcrossPixels(sce, bin_size = bin_size)
 
-cur_medians <- lapply(cur_txts_binned, function(x){
-    cur_m <- colMedians(as.matrix(x))
-    names(cur_m) <- colnames(x)
-    return(cur_m)
-})
+# Log10 median pixel counts per spot and channel
+plotSpotHeatmap(sce2)
 
-cur_medians <- do.call(rbind, cur_medians)
-
-# Order matrix by metal
-cur_medians <- cur_medians[order(as.numeric(str_extract(rownames(cur_medians), "[0-9]{2,3}"))),
-                           order(as.numeric(str_extract(colnames(cur_medians), "[0-9]{2,3}")))]
-
-pheatmap(log10(cur_medians + 1), cluster_rows = FALSE, cluster_cols = FALSE,
-         color = viridis(100))
-
-# Visualize a threshold - multiplication with 1 to change logical to numeric
-pheatmap(1 * (cur_medians > 200), 
-         cluster_rows = FALSE, cluster_cols = FALSE)
+# Thresholded on 200 pixel counts
+plotSpotHeatmap(sce2, log = FALSE, threshold = 200)
 ```
 
-## Format the SingleCellExperiment
+## Assign preliminary
 
 Here, we will reformat the raw data into a `SingleCellExperiment` container that can be used with CATALYST.
 
 ```{r make-SingleCellExperiment, message=FALSE}
 library(CATALYST)
 
-cur_counts <- do.call(rbind, cur_txts) %>%
-    select(-c(Start_push, End_push, Pushes_duration, X, Y, Z)) %>%
-    rename_with(~ str_match(string = .x, pattern = "[A-Za-z]{1,2}[0-9]{2,3}Di")) %>%
-    as.matrix()
+bc_key <- as.numeric(str_match(rownames(sce), pattern = "[0-9]{2,3}"))
+assay(sce, "exprs") <- asinh(counts(sce)/5)
 
-sce <- SingleCellExperiment(assays = list(counts = t(cur_counts),
-                                          exprs = t(asinh(cur_counts/5))))
-rowData(sce) <- DataFrame(channel_name = rownames(sce),
-                          marker_name = rownames(sce))
-colData(sce) <- DataFrame(sample_id = rep(names(cur_txts), times = sapply(cur_txts, nrow)))
-sce$sample_mass <- str_match(sce$sample_id, pattern = "[0-9]{2,3}")
-
-sce <- assignPrelim(sce, bc_key = as.numeric(str_match(rownames(sce), pattern = "[0-9]{2,3}")))
+sce <- assignPrelim(sce, bc_key = bc_key)
 sce <- estCutoffs(sce)
 sce <- applyCutoffs(sce)
 ```
@@ -153,7 +133,7 @@ sce$bc_id[sce$bc_id %in% nonfreq] <- 0
 
 ## Compute spillover matrix
 
-```{r compute-spillover}
+```{r compute-spillover, fig.width=7, fig.height=7}
 sce <- computeSpillmat(sce)
 
 plotSpillmat(sce)
