@@ -1,3 +1,55 @@
+--- 
+title: "Imaging mass cytometry data analysis"
+author: "Nils Eling"
+date: "`r Sys.Date()`"
+site: bookdown::bookdown_site
+documentclass: book
+bibliography: [book.bib, packages.bib]
+biblio-style: apalike
+link-citations: yes
+description: "This bookdown project highlights possible down-stream analyses performed on imaging mass cytometry data."
+---
+--- 
+title: "Imaging mass cytometry data analysis"
+author: "Nils Eling"
+date: "`r Sys.Date()`"
+site: bookdown::bookdown_site
+documentclass: book
+bibliography: [book.bib, packages.bib]
+biblio-style: apalike
+link-citations: yes
+description: "This bookdown project highlights possible down-stream analyses performed on imaging mass cytometry data."
+---
+
+# Prerequisites
+
+```{r include=FALSE}
+# automatically create a bib database for R packages
+knitr::write_bib(c(
+  .packages(), 'bookdown', 'knitr', 'rmarkdown'
+), 'packages.bib')
+```
+
+<!--chapter:end:index.Rmd-->
+
+# Introduction {#intro}
+
+Introduction to imaging mass cytometry
+
+<!--chapter:end:01-intro.Rmd-->
+
+
+# Prerequisites
+
+Placeholder
+
+
+## Software requirements
+## Download example data
+### Files for spillover matrix estimation
+
+<!--chapter:end:02-prerequisites.Rmd-->
+
 ---
 title: "Generate a spillover matrix"
 author: 
@@ -70,12 +122,28 @@ summed (see [Optional pixel binning](#pixel_binning)).
 corresponding channel (row). If this is not the case, either the naming of the
 .txt files was incorrect or the incorrect metal was spotted.
 
-```{r QC-heatmap, message = FALSE, fig.width=7, fig.height=7}
-# Log10 median pixel counts per spot and channel
-plotSpotHeatmap(sce)
+```{r QC-heatmap, message = FALSE}
+cur_medians <- lapply(cur_txts, function(x){
+    cur_txt <- x %>% select(-c(Start_push, End_push, Pushes_duration, X, Y, Z)) 
+    cur_m <- colMedians(as.matrix(cur_txt))
+    names(cur_m) <- colnames(cur_txt)
+    return(cur_m)
+})
 
-# Thresholded on 200 pixel counts
-plotSpotHeatmap(sce, log = FALSE, threshold = 200)
+cur_medians <- do.call(rbind, cur_medians)
+
+# Order matrix by metal
+cur_medians <- cur_medians[order(as.numeric(str_extract(rownames(cur_medians), "[0-9]{2,3}"))),
+                           order(as.numeric(str_extract(colnames(cur_medians), "[0-9]{2,3}")))]
+
+plotMedianHeatmap(sce)
+
+pheatmap(log10(cur_medians + 1), cluster_rows = FALSE, cluster_cols = FALSE,
+         color = viridis(100))
+
+# Visualize a threshold - multiplication with 1 to change logical to numeric
+pheatmap(1 * (cur_medians > 200), 
+         cluster_rows = FALSE, cluster_cols = FALSE)
 ```
 
 ## Optional pixel binning {#pixel_binning}
@@ -182,3 +250,69 @@ stopifnot(all.equal(correct_sm, current_sm, tolerance = 0.01))
 ```{r sessionInfo-1}
 sessionInfo()
 ```
+
+<!--chapter:end:03-spillover_matrix.Rmd-->
+
+### Read in the data
+
+First, we need to read in the txt files.
+
+
+<!--chapter:end:04-read_data.Rmd-->
+
+# Image and cell-level quality control
+
+Overview on possible quality indicators
+
+<!--chapter:end:05-quality_control.Rmd-->
+
+# Clustering approaches
+
+## Rphenograph
+
+## Shared nearest neighbour graph
+
+## FlowSOM
+
+<!--chapter:end:06-clustering.Rmd-->
+
+# Classification approaches
+
+## Manual labelling of cells
+
+## Training a classifier
+
+## Classification of new data
+
+<!--chapter:end:07-classification.Rmd-->
+
+# Visualizing the images
+
+Using the `cytomapper` package.
+
+<!--chapter:end:08-image_visualization.Rmd-->
+
+# Visualizing single-cell data
+
+Using the `dittoSeq` package.
+
+<!--chapter:end:09-data_visualization.Rmd-->
+
+# Performing spatial analysis
+
+## Interaction analysis
+
+Based on Denis' and Vitos work
+
+## Spatial domains
+
+Based on Tobis work
+
+<!--chapter:end:10-spatial_analysis.Rmd-->
+
+`r if (knitr::is_html_output()) '
+# References {-}
+'`
+
+<!--chapter:end:11-references.Rmd-->
+
