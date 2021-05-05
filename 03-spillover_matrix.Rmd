@@ -83,7 +83,8 @@ neighboring channels (Eu153).
 In cases where median pixel intensities are low (< 200 counts), consecutive
 pixels can be binned to increase the robustness of the spillover estimation.
 The `imcRtools` package provides the `binAcrossPixels` function,
-which performs aggregation for each channel within pixel-level grouping.
+which performs aggregation for each channel across `bin_size` consecutive pixels 
+per spotted metal.
 
 ```{r binning, message=FALSE, fig.width=7, fig.height=7}
 # Define grouping
@@ -97,6 +98,9 @@ plotSpotHeatmap(sce2)
 # Thresholded on 200 pixel counts
 plotSpotHeatmap(sce2, log = FALSE, threshold = 200)
 ```
+
+Here, we can see an increase in the median pixel intensities and accumulation of
+off-diagonal signal. To avoid 
 
 ## Assign preliminary
 
@@ -151,7 +155,7 @@ correct_sm <- as.matrix(correct_sm[,-1])
 current_sm <- metadata(sce)$spillover_matrix
 current_sm <- current_sm[rownames(correct_sm),colnames(correct_sm)]
 
-stopifnot(all.equal(correct_sm, current_sm, tolerance = 0.01))
+stopifnot(all.equal(correct_sm, current_sm, tolerance = 0.0001))
 ```
 
 ```{r sessionInfo-1}
