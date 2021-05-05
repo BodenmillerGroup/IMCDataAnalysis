@@ -1,6 +1,15 @@
 --- 
 title: "Imaging mass cytometry data analysis"
-author: "Nils Eling"
+author:
+- name: Nils Eling
+  affiliation: 
+  - Department for Quantitative Biomedicine, University of Zurich
+  - Institute for Molecular Health Sciences, ETH Zurich
+  email: nils.eling@dqbm.uzh.ch
+- name: Vito Zanotelli
+  affiliation: 
+  - Department for Quantitative Biomedicine, University of Zurich
+  - Institute for Molecular Health Sciences, ETH Zurich
 date: "`r Sys.Date()`"
 site: bookdown::bookdown_site
 documentclass: book

@@ -1,9 +1,4 @@
----
-title: "Generate a spillover matrix"
-author: 
-  - Vito Zanotelli^[DQBM, University of Zurich]
-  - Nils Eling^[DQBM, University of Zurich; IMHS, ETH Zurich; nils.eling@dqbm.uzh.ch]
----
+# Spillover correction
 
 This section highlights how to generate a spillover matrix from individually
 acquired single metal spots on an agarose slide. Each spot needs to be imaged as
