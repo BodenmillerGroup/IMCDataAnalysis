@@ -5,7 +5,7 @@ acquired single metal spots on an agarose slide. Each spot needs to be imaged as
 its own acquisition/ROI and individual .txt files containing the pixel
 intensities per spot need to be available. For complete details on the spillover
 correction approach, please refer to [the original
-publication](https://www.cell.com/cell-systems/fulltext/S2405-4712(18)30063-2)[@Chevrier2017].
+publication](https://www.cell.com/cell-systems/fulltext/S2405-4712(18)30063-2) [@Chevrier2017].
 
 The original code is available on Github
 [here](https://github.com/BodenmillerGroup/cyTOFcompensation), however, due to
@@ -37,6 +37,9 @@ One crucial step is to name the list of .txt files correctly. The
 the metal spot in the format `(mt)(mass)` (e.g. `Sm152` for Samarium isotope
 with the atomic mass 152).
 
+For further downstream analysis, we will asinh-transform the data using a
+cofactor of 5; a common transformation for CyTOF data [@Bendall2011].
+
 ```{r read-txts, message=FALSE}
 library(imcRtools)
 library(readr)
@@ -50,6 +53,7 @@ names(cur_txts) <- str_extract(cur_txts_names, "[A-Za-z]{1,2}[0-9]{2,3}")
 
 # Create SingleCellExperiment
 sce <- prepareSCEfromTXT(cur_txts) 
+assay(sce, "exprs") <- asinh(counts(sce)/5)
 ```
 
 ## Quality control
@@ -100,43 +104,87 @@ plotSpotHeatmap(sce2, log = FALSE, threshold = 200)
 ```
 
 Here, we can see an increase in the median pixel intensities and accumulation of
-off-diagonal signal. To avoid 
+off-diagonal signal. Due to already high original pixel intensities, we will
+refrain from aggregating across consecutive pixels for this demonstration.
 
-## Assign preliminary
+## Filtering incorrectly assigned pixels
 
-Here, we will reformat the raw data into a `SingleCellExperiment` container that can be used with CATALYST.
+The following step uses functions provided by the `CATALYST` package to
+"debarcode" the pixels. Based on the intensity distribution of all channel,
+pixels are assigned to their corresponding barcode; here this is the already
+known metal spot. This procedure serves the purpose to identify pixels that
+cannot be robustly assigned to the spotted metal. Pixels of such kind can be
+regarded as "noisy", "background" or "artefacts" that should be removed prior to
+spillover estimation.
 
-```{r make-SingleCellExperiment, message=FALSE}
+We will also need to specify which channels were spotted (argument `bc_key`).
+This information is directly contained in the `colData(sce)` slot.
+
+The general workflow for pixel debarcoding is as follows:
+
+1. assign preliminary metal mass to each pixel
+2. for each pixel, estimate a cutoff parameter for the distance between 
+positive and negative pixel sets
+3. apply the estimated cutoffs to identify truly positive pixels
+
+```{r debarcoding, message=TRUE}
 library(CATALYST)
 
-bc_key <- as.numeric(str_match(rownames(sce), pattern = "[0-9]{2,3}"))
-assay(sce, "exprs") <- asinh(counts(sce)/5)
+bc_key <- as.numeric(unique(sce$sample_mass))
 
 sce <- assignPrelim(sce, bc_key = bc_key)
 sce <- estCutoffs(sce)
 sce <- applyCutoffs(sce)
 ```
 
-## Remove pixels with incorrect labels and stains with few correctly identified pixels
+The obtained `SingleCellExperiment` now contains the additional `bc_id` entry.
+For each pixel, this numeric vector indicates the assigned mass (e.g. `161`) or
+`0`, meaning unassigned. 
 
-```{r correct-estimates}
-# Remove incorrectly labelled pixels
-sce$bc_id[sce$bc_id != 0 & sce$bc_id != sce$sample_mass] <- 0
+This information can be visualized in form of a heatmap:
 
-# Remove small populations - not applicable in this dataset
-minevent <- 40
-cur_stats <- table(sce$bc_id)
-nonfreq <- names(cur_stats)[cur_stats < minevent]
-sce$bc_id[sce$bc_id %in% nonfreq] <- 0
+```{r assignment-heatmap, fig.width=7, fig.height=7}
+library(pheatmap)
+cur_table <- table(sce$bc_id, sce$sample_mass)
+
+pheatmap(log10(cur_table + 1),
+         cluster_rows = FALSE,
+         cluster_cols = FALSE)
+```
+
+We can see here, that all pixels were assigned to the right mass and that all
+pixel sets are made up if > 1000 pixels.
+
+However, in cases where incorrect assignment occurred or where few pixels were
+measured for some spots, the `imcRtools` package exports a simple helper
+function to exclude pixels based on these criteria:
+
+```{r pixel-filtering}
+sce <- filterPixels(sce)
 ```
 
 ## Compute spillover matrix
 
+Based on the single-positive pixels, we use the `CATALYST::computeSpillmat()`
+function to computes the spillover matrix and `CATALYST::plotSpillmat()` to
+visualize it:
+
 ```{r compute-spillover, fig.width=7, fig.height=7}
 sce <- computeSpillmat(sce)
 
-plotSpillmat(sce)
+plotSpillmat(sce, isotope_list = isotope_list2)
 ```
+
+As we can see, the largest spillover appears in `In113 --> In115` and we also
+observe the `+16` oxide impurities for e.g. `Nd148 --> Dy164`.
+
+Please follow the [CATALYST vignette](https://bioconductor.org/packages/release/bioc/vignettes/CATALYST/inst/doc/preprocessing.html#compensation)
+to learn how to apply this spillover matrix for single-cell based spillover
+compensation. Here, we will save the spillover matrix as .csv and as image for
+use in the [IMC segmentation
+pipeline](https://github.com/BodenmillerGroup/ImcSegmentationPipeline) as part
+of the `CorrectSpilloverApply` and `CorrectSpilloverMeasurements` module
+[here](https://github.com/BodenmillerGroup/ImcPluginsCP).
 
 ### Save spillover matrix as csv
 
@@ -144,20 +192,24 @@ Next, we will write out the spillover matrix as csv.
 
 ### Save spillover matrix as image
 
+TODO
 
-### Sanity check that spillover matrix is correct
-
-```{r integration-test}
+```{r integration-test, include = FALSE}
+library(testthat)
 correct_sm <- read.csv("data/Figure_S5/paper_version_Spillover_Matrix_1_sm.csv")
 rownames(correct_sm) <- correct_sm[,1]
 correct_sm <- as.matrix(correct_sm[,-1])
 
 current_sm <- metadata(sce)$spillover_matrix
-current_sm <- current_sm[rownames(correct_sm),colnames(correct_sm)]
 
-stopifnot(all.equal(correct_sm, current_sm, tolerance = 0.0001))
+expect_equal(correct_sm, current_sm, tolerance = 0.001)
 ```
 
-```{r sessionInfo-1}
+<details>
+   <summary>SessionInfo</summary>
+   
+```{r sessionInfo-1, echo = FALSE}
 sessionInfo()
 ```
+</details>
+
