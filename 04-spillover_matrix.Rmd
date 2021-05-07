@@ -134,7 +134,7 @@ The general workflow for pixel debarcoding is as follows:
 positive and negative pixel sets
 3. apply the estimated cutoffs to identify truly positive pixels
 
-```{r debarcoding, message=TRUE, warning=TRUE}
+```{r debarcoding, message=FALSE}
 library(CATALYST)
 
 bc_key <- as.numeric(unique(sce$sample_mass))

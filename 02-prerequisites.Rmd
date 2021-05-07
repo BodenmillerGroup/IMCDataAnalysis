@@ -62,7 +62,7 @@ unlink("data/Figure_4.zip")
 <details>
    <summary>SessionInfo</summary>
    
-```{r, echo = FALSE}
+```{r, echo = FALSE, message = FALSE}
 library(CATALYST)
 library(SingleCellExperiment)
 #library(scuttle)

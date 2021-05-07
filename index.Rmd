@@ -1,15 +1,8 @@
 --- 
 title: "Analysis workflow for imaging mass cytometry data"
 author:
-- name: Nils Eling
-  affiliation: 
-  - Department for Quantitative Biomedicine, University of Zurich
-  - Institute for Molecular Health Sciences, ETH Zurich
-  email: nils.eling@dqbm.uzh.ch
-- name: Vito Zanotelli
-  affiliation: 
-  - Department for Quantitative Biomedicine, University of Zurich
-  - Institute for Molecular Health Sciences, ETH Zurich
+- Nils Eling ^[Department for Quantitative Biomedicine, University of Zurich] ^[Institute for Molecular Health Sciences, ETH Zurich] ^[nils.eling@dqbm.uzh.ch]
+- Vito Zanotelli ^[Department for Quantitative Biomedicine, University of Zurich] ^[Institute for Molecular Health Sciences, ETH Zurich]
 date: "`r Sys.Date()`"
 site: bookdown::bookdown_site
 documentclass: book
@@ -19,7 +12,7 @@ link-citations: yes
 description: "This bookdown project highlights possible down-stream analyses performed on imaging mass cytometry data."
 ---
 
-# Introduction {#intro}
+# Preamble {#preamble}
 
 **This project is under development and will change on a regular basis**
 
