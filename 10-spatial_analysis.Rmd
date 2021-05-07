@@ -2,8 +2,7 @@
 
 ## Interaction analysis
 
-Based on Denis' and Vitos work
 
 ## Spatial domains
 
-Based on Tobis work
+

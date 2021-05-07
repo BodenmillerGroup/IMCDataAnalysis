@@ -24,7 +24,8 @@ jobs:
           
       - name: Install CRAN dependencies
         run: Rscript -e 'install.packages(c("rmarkdown", "bookdown", "pheatmap", "viridis", 
-                                            "zoo", "BiocManager", "devtools", "testthat", "tiff"))'
+                                            "zoo", "BiocManager", "devtools", "testthat", "tiff",
+                                            "distill"))'
       - name: Install Bioconductor dependencies
         run: Rscript -e 'BiocManager::install("CATALYST")'
       - name: Install Github dependencies

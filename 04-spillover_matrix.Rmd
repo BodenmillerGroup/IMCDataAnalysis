@@ -1,6 +1,6 @@
 # Spillover correction
 
-Original scripts: __Vito Zanotelli__, adapted/maintained by: __Nils Eling__
+**Original scripts:** *Vito Zanotelli*, **adapted/maintained by:** *Nils Eling*
 
 This section highlights how to generate a spillover matrix from individually
 acquired single metal spots on an agarose slide. Each spot needs to be imaged as
@@ -13,9 +13,9 @@ The original code is available on Github
 [here](https://github.com/BodenmillerGroup/cyTOFcompensation), however, due to
 changes in the
 [CATALYST](https://bioconductor.org/packages/release/bioc/html/CATALYST.html)
-package, the analysis was not reproducible using the newest version. The
-following workflow uses the newest package versions to generate a spillover
-matrix.
+package, users were not able to reproduce the analysis using the newest software
+versions. The following workflow uses the newest package versions to generate a
+spillover matrix.
 
 In brief, the highlighted workflow comprises 5 steps:
 
@@ -40,7 +40,7 @@ Here, we will read in the individual .txt files into a named list. The
 object can be used directly by the `CATALYST` package to estimate the spillover.
 
 One crucial step is to name the list of .txt files correctly. The
-`prepareSCEfromTXT` function expects a names list, where each name represents
+`prepareSCEfromTXT` function expects a named list, where each name represents
 the metal spot in the format `(mt)(mass)` (e.g. `Sm152` for Samarium isotope
 with the atomic mass 152).
 
@@ -65,15 +65,16 @@ assay(sce, "exprs") <- asinh(counts(sce)/5)
 
 ### Quality control
 
-In the next step, we will observe the median pixel intensities per spot.
-This type of visualization serves two purposes:
+In the next step, we will observe the median pixel intensities per spot and
+threshold on medians < 200 counts.
+These types of visualization serve two purposes:
 
 1. Small median pixel intensities (< 200 counts) might hinder the robust
 estimation of the channel spillover. In that case, consecutive pixels can be
 summed (see [Optional pixel binning](#pixel_binning)).
 
-2. Each spotted metal (column) should show the highest median pixel intensity in its
-corresponding channel (row). If this is not the case, either the naming of the
+2. Each spotted metal (row) should show the highest median pixel intensity in its
+corresponding channel (column). If this is not the case, either the naming of the
 .txt files was incorrect or the incorrect metal was spotted.
 
 ```{r QC-heatmap, message = FALSE, fig.width=7, fig.height=7}
@@ -85,14 +86,12 @@ plotSpotHeatmap(sce, log = FALSE, threshold = 200)
 ```
 
 As we can see, all median pixel intensities are > 200 counts for each spot.
-Channels for which no spot was placed (Xe134, Eu153, Ir191, Ir193), show either
-no spillover (Ir191, Ir193), constant signal (Xe134) or spillover from
-neighboring channels (Eu153).
+We also observe acquired channels for which no spot was placed (Xe134, Ir191, Ir193). 
 
 ### Optional pixel binning {#pixel_binning}
 
 In cases where median pixel intensities are low (< 200 counts), consecutive
-pixels can be binned to increase the robustness of the spillover estimation.
+pixels can be summed to increase the robustness of the spillover estimation.
 The `imcRtools` package provides the `binAcrossPixels` function,
 which performs aggregation for each channel across `bin_size` consecutive pixels 
 per spotted metal.
@@ -130,12 +129,12 @@ To facilitate visualization, we will order the `bc_key` by mass.
 
 The general workflow for pixel debarcoding is as follows:
 
-1. assign preliminary metal mass to each pixel
+1. assign a preliminary metal mass to each pixel
 2. for each pixel, estimate a cutoff parameter for the distance between 
 positive and negative pixel sets
 3. apply the estimated cutoffs to identify truly positive pixels
 
-```{r debarcoding, message=TRUE}
+```{r debarcoding, message=TRUE, warning=TRUE}
 library(CATALYST)
 
 bc_key <- as.numeric(unique(sce$sample_mass))
@@ -147,7 +146,7 @@ sce <- applyCutoffs(sce)
 ```
 
 The obtained `SingleCellExperiment` now contains the additional `bc_id` entry.
-For each pixel, this numeric vector indicates the assigned mass (e.g. `161`) or
+For each pixel, this vector indicates the assigned mass (e.g. `161`) or
 `0`, meaning unassigned. 
 
 This information can be visualized in form of a heatmap:
@@ -169,13 +168,13 @@ measured for some spots, the `imcRtools` package exports a simple helper
 function to exclude pixels based on these criteria:
 
 ```{r pixel-filtering}
-sce <- filterPixels(sce)
+sce <- filterPixels(sce, minevents = 40, correct_pixels = TRUE)
 ```
 
 ### Compute spillover matrix
 
 Based on the single-positive pixels, we use the `CATALYST::computeSpillmat()`
-function to computes the spillover matrix and `CATALYST::plotSpillmat()` to
+function to compute the spillover matrix and `CATALYST::plotSpillmat()` to
 visualize it:
 
 ```{r compute-spillover, fig.width=7, fig.height=7}
@@ -265,6 +264,8 @@ dimnames(current_sm) <- NULL
 
 expect_equal(correct_sm, current_sm, tolerance = 0.0005)
 ```
+
+## Session Info
 
 <details>
    <summary>SessionInfo</summary>
