@@ -54,11 +54,19 @@ To highlight the generation of a spillover matrix, we will use files that were
 provided in the original publication [@Chevrier2017].
 
 ```{r dowload-chevrier2017, message=FALSE}
+# Figure_S5
 sm_url <- "https://data.mendeley.com/public-files/datasets/v58yj49pfr/files/b39223d2-2825-4e79-9875-86fa0e1c55d2/file_downloaded?dl=1"
 
 download.file(sm_url, "data/Figure_S5.zip")
 unzip("data/Figure_S5.zip", exdir="data", overwrite=TRUE)
 unlink("data/Figure_S5.zip")
+
+# Figure_4
+sm_url <- "https://data.mendeley.com/public-files/datasets/v58yj49pfr/files/fad34c02-8a26-4291-814a-dc3bd4d980a2/file_downloaded?dl=1"
+
+download.file(sm_url, "data/Figure_4.zip")
+unzip("data/Figure_4.zip", exdir="data", overwrite=TRUE)
+unlink("data/Figure_4.zip")
 ```
 
 
