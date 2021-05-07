@@ -1,5 +1,7 @@
 # Spillover correction
 
+Original scripts: __Vito Zanotelli__, adapted/maintained by: __Nils Eling__
+
 This section highlights how to generate a spillover matrix from individually
 acquired single metal spots on an agarose slide. Each spot needs to be imaged as
 its own acquisition/ROI and individual .txt files containing the pixel
@@ -25,7 +27,12 @@ In brief, the highlighted workflow comprises 5 steps:
 6. Spillover matrix generation
 7. Saving the results
 
-## Read in the data
+## Generate the spillover matrix
+
+In the first step, we will generate a spillover matrix based on the single-metal
+spots and save it for later use.
+
+### Read in the data
 
 Here, we will read in the individual .txt files into a named list. The
 `imcRtools` package exports the `prepareSCEfromTXT` function, which creates a
@@ -46,7 +53,7 @@ library(readr)
 library(stringr)
 
 # Read txt files
-cur_txts_names <- list.files("data/Figure_S5/Spillover_Matrix_1/", full.names = TRUE)
+cur_txts_names <- list.files("data/Figure_S5/Spillover_Matrix_2/", full.names = TRUE)
 cur_txts <- lapply(cur_txts_names, read_delim, delim = "\t")
 
 names(cur_txts) <- str_extract(cur_txts_names, "[A-Za-z]{1,2}[0-9]{2,3}")
@@ -56,7 +63,7 @@ sce <- prepareSCEfromTXT(cur_txts)
 assay(sce, "exprs") <- asinh(counts(sce)/5)
 ```
 
-## Quality control
+### Quality control
 
 In the next step, we will observe the median pixel intensities per spot.
 This type of visualization serves two purposes:
@@ -82,7 +89,7 @@ Channels for which no spot was placed (Xe134, Eu153, Ir191, Ir193), show either
 no spillover (Ir191, Ir193), constant signal (Xe134) or spillover from
 neighboring channels (Eu153).
 
-## Optional pixel binning {#pixel_binning}
+### Optional pixel binning {#pixel_binning}
 
 In cases where median pixel intensities are low (< 200 counts), consecutive
 pixels can be binned to increase the robustness of the spillover estimation.
@@ -107,7 +114,7 @@ Here, we can see an increase in the median pixel intensities and accumulation of
 off-diagonal signal. Due to already high original pixel intensities, we will
 refrain from aggregating across consecutive pixels for this demonstration.
 
-## Filtering incorrectly assigned pixels
+### Filtering incorrectly assigned pixels
 
 The following step uses functions provided by the `CATALYST` package to
 "debarcode" the pixels. Based on the intensity distribution of all channel,
@@ -119,6 +126,7 @@ spillover estimation.
 
 We will also need to specify which channels were spotted (argument `bc_key`).
 This information is directly contained in the `colData(sce)` slot.
+To facilitate visualization, we will order the `bc_key` by mass.
 
 The general workflow for pixel debarcoding is as follows:
 
@@ -131,6 +139,7 @@ positive and negative pixel sets
 library(CATALYST)
 
 bc_key <- as.numeric(unique(sce$sample_mass))
+bc_key <- bc_key[order(bc_key)]
 
 sce <- assignPrelim(sce, bc_key = bc_key)
 sce <- estCutoffs(sce)
@@ -163,7 +172,7 @@ function to exclude pixels based on these criteria:
 sce <- filterPixels(sce)
 ```
 
-## Compute spillover matrix
+### Compute spillover matrix
 
 Based on the single-positive pixels, we use the `CATALYST::computeSpillmat()`
 function to computes the spillover matrix and `CATALYST::plotSpillmat()` to
@@ -188,21 +197,73 @@ of the `CorrectSpilloverApply` and `CorrectSpilloverMeasurements` module
 
 ### Save spillover matrix as csv
 
-Next, we will write out the spillover matrix as csv.
+Next, we will write out the spillover matrix as .csv file for possible later use.
+
+```{r write_sm_csv}
+cur_sm <- metadata(sce)$spillover_matrix
+write.csv(cur_sm, "data/Figure_S5/new_version_Spillover_Matrix_2_sm.csv")
+```
 
 ### Save spillover matrix as image
 
-TODO
+When using the [ImcPluginsCP](https://github.com/BodenmillerGroup/ImcPluginsCP)
+CellProfiler modules for spillover correction, the spillover matrix needs to 
+be saved as 32-bit .tiff image.
 
-```{r integration-test, include = FALSE}
+For this to work, the channels need to be ordered in the same way that
+CellProfiler orders them. When using the [IMC segmentation pipeline](https://github.com/BodenmillerGroup/ImcSegmentationPipeline), for each
+image, the order of the channels is written out as .csv file. This file contains
+a single column listing the metal isotopes in the correct order. Here, we will
+read this file in. 
+
+```{r read-metal-order}
+ordered_chs <- read.csv("data/Figure_4/IMC_image/analysis/imc_example_image_a0_full.csv",
+                        header = FALSE)
+ordered_chs$V1 <- paste0(ordered_chs$V1, "Di")
+head(ordered_chs)
+```
+
+The `CATALYST` package provides the `adaptSpillmat` function that corrects the
+spillover matrix in a way that rows and columns match a predefined set of metals.
+Please refer to `?compCytof` for more information how metals in the spillover
+matrix are matched to acquired channels in the `SingleCellExperiment` object.
+
+```{r adaptSM}
+adapted_sm <- CATALYST::adaptSpillmat(cur_sm, 
+                                      out_chs = as.character(ordered_chs$V1))
+```
+
+The adapted spillover matrix can now be saved as .tiff image for the use with CellProfiler.
+
+```{r save-sm-as-tiff, message=FALSE}
+library(tiff)
+writeTIFF(adapted_sm, "data/Figure_4/new_imc_full_sm.tiff", 
+          bits.per.sample = 32)
+```
+
+## Compensate the mean pixel intensities
+
+**This section is under development**
+
+## Compensate images
+
+**This section is under development**
+
+```{r integration-test-original_sm, include = FALSE}
 library(testthat)
-correct_sm <- read.csv("data/Figure_S5/paper_version_Spillover_Matrix_1_sm.csv")
-rownames(correct_sm) <- correct_sm[,1]
-correct_sm <- as.matrix(correct_sm[,-1])
-
+correct_sm <- as.matrix(read.csv("data/Figure_S5/paper_version_Spillover_Matrix_2_sm.csv", row.names = 1))
 current_sm <- metadata(sce)$spillover_matrix
+correct_sm <- correct_sm[rownames(current_sm), colnames(current_sm)]
 
 expect_equal(correct_sm, current_sm, tolerance = 0.001)
+```
+
+```{r integration-test-tiff_sm, include = FALSE}
+correct_sm <- readTIFF("data/Figure_4/IMC_image/analysis/imc_full_sm.tiff")
+current_sm <- adapted_sm
+dimnames(current_sm) <- NULL
+
+expect_equal(correct_sm, current_sm, tolerance = 0.0005)
 ```
 
 <details>
