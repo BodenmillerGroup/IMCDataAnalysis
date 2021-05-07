@@ -19,6 +19,8 @@ link-citations: yes
 description: "This bookdown project highlights possible down-stream analyses performed on imaging mass cytometry data."
 ---
 
+# Introduction {#intro}
+
 **This project is under development and will change on a regular basis**
 
 Upon release, this workflow highlights the use of common R/Bioconductor packages

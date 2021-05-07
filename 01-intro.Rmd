@@ -1,3 +1,0 @@
-# Introduction {#intro}
-
-Introduction to imaging mass cytometry
