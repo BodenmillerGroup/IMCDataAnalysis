@@ -181,7 +181,7 @@ visualize it:
 ```{r compute-spillover, fig.width=7, fig.height=7}
 sce <- computeSpillmat(sce)
 
-plotSpillmat(sce, isotope_list = isotope_list2)
+plotSpillmat(sce)
 ```
 
 As we can see, the largest spillover appears in `In113 --> In115` and we also
