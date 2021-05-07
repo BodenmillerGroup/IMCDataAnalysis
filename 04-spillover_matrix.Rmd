@@ -270,7 +270,7 @@ expect_equal(correct_sm, current_sm, tolerance = 0.0005)
 <details>
    <summary>SessionInfo</summary>
    
-```{r sessionInfo-1, echo = FALSE}
+```{r, echo = FALSE}
 sessionInfo()
 ```
 </details>
