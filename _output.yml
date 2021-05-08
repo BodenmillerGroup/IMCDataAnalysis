@@ -1,4 +1,6 @@
 bookdown::gitbook:
+  github-repo: "BodenmillerGroup/IMCDataAnalysis"
+  base_format: distill::distill_article
   css: style.css
   config:
     toc:

@@ -1,19 +1,9 @@
 --- 
 title: "Analysis workflow for imaging mass cytometry data"
-author:
-- name: Nils Eling
-  affiliation: 
-  - Department for Quantitative Biomedicine, University of Zurich
-  - Institute for Molecular Health Sciences, ETH Zurich
-  email: nils.eling@dqbm.uzh.ch
-- name: Vito Zanotelli
-  affiliation: 
-  - Department for Quantitative Biomedicine, University of Zurich
-  - Institute for Molecular Health Sciences, ETH Zurich
-date: "`r Sys.Date()`"
+author: "**Authors:** Nils Eling [<sup>1</sup>](#DQBM)<sup>,</sup>[<sup>2</sup>](#IMHS)<sup>,</sup>[<sup>*</sup>](#email), Vito Zanotelli [<sup>1</sup>](#DQBM)<sup>,</sup>[<sup>2</sup>](#IMHS)"
+date: "**Compiled:** `r Sys.Date()`"
 site: bookdown::bookdown_site
-output:
-    BiocStyle::html_document
+github-repo: "BodenmillerGroup/IMCDataAnalysis"
 documentclass: book
 bibliography: [book.bib, packages.bib]
 biblio-style: apalike
@@ -36,3 +26,9 @@ workflow can be largely divided into the following parts:
 3. Low-dimensional visualization, clustering and/or cell-type classification
 4. Visualization of cell- and pixel-level information
 5. Spatial analyses
+
+---
+
+<a name="email"><sup>*</sup></a> nils.eling@uzh.ch  
+<a name="DQBM">1:</a> Department for Quantitative Biomedicine, University of Zurich  
+<a name="IMHS">2:</a> Institute for Molecular Health Sciences, ETH Zurich  

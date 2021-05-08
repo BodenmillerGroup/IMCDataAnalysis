@@ -4,3 +4,6 @@
 .Ruserdata
 *.DS_Store
 data/*
+docs/
+IMCDataAnalysis.Rmd
+IMCDataAnalysis_files/
