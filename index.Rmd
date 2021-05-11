@@ -11,7 +11,7 @@ link-citations: yes
 description: "This bookdown project highlights possible down-stream analyses performed on imaging mass cytometry data."
 ---
 
-# Preamble {#preamble}
+# IMC Data Analysis Workflow {#preamble}
 
 **This project is under development and will change on a regular basis**
 
@@ -26,6 +26,14 @@ workflow can be largely divided into the following parts:
 3. Low-dimensional visualization, clustering and/or cell-type classification
 4. Visualization of cell- and pixel-level information
 5. Spatial analyses
+
+## Feedback and contributing
+
+If you notice an issue or missing information, please report an issue [here](https://github.com/BodenmillerGroup/IMCDataAnalysis/issues).
+We also welcome contributions in form of pull requests or feature requests in form of issues.
+Have a look at the source code at:
+
+[https://github.com/BodenmillerGroup/IMCDataAnalysis](https://github.com/BodenmillerGroup/IMCDataAnalysis)
 
 ---
 
