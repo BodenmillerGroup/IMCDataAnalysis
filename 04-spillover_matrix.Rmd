@@ -34,32 +34,24 @@ spots and save it for later use.
 
 ### Read in the data
 
-Here, we will read in the individual .txt files into a named list. The
-`imcRtools` package exports the `prepareSCEfromTXT` function, which creates a
-`SingleCellExperiment` object form the data contained in the .txt files. This
-object can be used directly by the `CATALYST` package to estimate the spillover.
+Here, we will read in the individual .txt files into a `SingleCellExperiment`
+object. This object can be used directly by the `CATALYST` package to estimate
+the spillover.
 
-One crucial step is to name the list of .txt files correctly. The
-`prepareSCEfromTXT` function expects a named list, where each name represents
-the metal spot in the format `(mt)(mass)` (e.g. `Sm152` for Samarium isotope
-with the atomic mass 152).
+For this to work, the .txt file names need to contain the spotted metal isotope
+name. By default, the first occurrence of the isotope in the format `(mt)(mass)`
+(e.g. `Sm152` for Samarium isotope with the atomic mass 152) will be used as
+spot identifier. Alternatively, a named list of already read-in pixel intensities
+can be provided. For more inforation, please refer to the man page `?readSCEfromTXT`.
 
 For further downstream analysis, we will asinh-transform the data using a
 cofactor of 5; a common transformation for CyTOF data [@Bendall2011].
 
 ```{r read-txts, message=FALSE}
 library(imcRtools)
-library(readr)
-library(stringr)
 
-# Read txt files
-cur_txts_names <- list.files("data/Figure_S5/Spillover_Matrix_2/", full.names = TRUE)
-cur_txts <- lapply(cur_txts_names, read_delim, delim = "\t")
-
-names(cur_txts) <- str_extract(cur_txts_names, "[A-Za-z]{1,2}[0-9]{2,3}")
-
-# Create SingleCellExperiment
-sce <- prepareSCEfromTXT(cur_txts) 
+# Create SingleCellExperiment from .txt files
+sce <- readSCEfromTXT("data/Figure_S5/Spillover_Matrix_2/") 
 assay(sce, "exprs") <- asinh(counts(sce)/5)
 ```
 
