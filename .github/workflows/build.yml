@@ -12,6 +12,8 @@ jobs:
   bookdown:
     runs-on: ubuntu-latest
     container: rocker/verse:latest
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     
     steps:
       - uses: actions/checkout@v2
