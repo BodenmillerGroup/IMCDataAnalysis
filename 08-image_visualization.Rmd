@@ -1,3 +1,0 @@
-# Visualizing the images
-
-Using the `cytomapper` package.

@@ -1,0 +1,15 @@
+name: "Multiplexed image analysis"
+output_dir: ../docs
+navbar:
+  title: "Multiplexed image analysis"
+  left:
+  - text: Home
+    href: index.html
+  - text: Figure 3
+    href: cytomapper_visualization.html
+output:
+  workflowr::wflow_html:
+    toc: yes
+    toc_float: yes
+    theme: cosmo
+    highlight: textmate
