@@ -1,7 +1,7 @@
 ---
 title: "cytomapper_visualization"
 author: "Nils Eling"
-date: "`r Sys.date()`"
+date: "`r Sys.Date()`"
 output: workflowr::wflow_html
 editor_options:
   chunk_output_type: console
