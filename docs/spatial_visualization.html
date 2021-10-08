@@ -13,7 +13,7 @@
 
 <meta name="date" content="2021-10-08" />
 
-<title>cytomapper_visualization</title>
+<title>Spatial visualization</title>
 
 <script src="site_libs/header-attrs-2.11/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
@@ -347,7 +347,7 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">cytomapper_visualization</h1>
+<h1 class="title toc-ignore">Spatial visualization</h1>
 <h4 class="author">Nils Eling</h4>
 <h4 class="date">2021-10-08</h4>
 
@@ -398,7 +398,7 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 </div>
 <div id="strongRMarkdownfilestronguncommittedchanges" class="panel-collapse collapse">
 <div class="panel-body">
-<p>The R Markdown file has unstaged changes. To know which version of the R Markdown file created these results, you’ll want to first commit it to the Git repo. If you’re still working on the analysis, you can ignore this warning. When you’re finished, you can run <code>wflow_publish</code> to commit the R Markdown file and build the HTML.</p>
+<p>The R Markdown is untracked by Git. To know which version of the R Markdown file created these results, you’ll want to first commit it to the Git repo. If you’re still working on the analysis, you can ignore this warning. When you’re finished, you can run <code>wflow_publish</code> to commit the R Markdown file and build the HTML.</p>
 </div>
 </div>
 </div>
@@ -503,241 +503,62 @@ Note that any generated files, e.g. HTML, png, CSS, etc., are not included in t
 <hr>
 </div>
 <div id="versions" class="tab-pane fade">
-
 <p>
-These are the previous versions of the repository in which changes were made to the R Markdown (<code>analysis/cytomapper_visualization.Rmd</code>) and HTML (<code>docs/cytomapper_visualization.html</code>) files. If you’ve configured a remote Git repository (see <code>?wflow_git_remote</code>), click on the hyperlinks in the table below to view the files as they were in that past version.
+There are no past versions. Publish this analysis with <code>wflow_publish()</code> to start tracking its development.
 </p>
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-File
-</th>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-<th>
-Message
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-Rmd
-</td>
-<td>
-<a href="https://github.com/BodenmillerGroup/IMCDataAnalysis/blob/97e3a83d02659542d795eedb7b449468e3b213c8/analysis/cytomapper_visualization.Rmd" target="_blank">97e3a83</a>
-</td>
-<td>
-nilseling
-</td>
-<td>
-2021-10-07
-</td>
-<td>
-Cytomapper visualization
-</td>
-</tr>
-<tr>
-<td>
-html
-</td>
-<td>
-<a href="https://rawcdn.githack.com/BodenmillerGroup/IMCDataAnalysis/97e3a83d02659542d795eedb7b449468e3b213c8/docs/cytomapper_visualization.html" target="_blank">97e3a83</a>
-</td>
-<td>
-nilseling
-</td>
-<td>
-2021-10-07
-</td>
-<td>
-Cytomapper visualization
-</td>
-</tr>
-<tr>
-<td>
-Rmd
-</td>
-<td>
-<a href="https://github.com/BodenmillerGroup/IMCDataAnalysis/blob/23f1ec6aff46fdd0082a421f79931a4117844ecb/analysis/cytomapper_visualization.Rmd" target="_blank">23f1ec6</a>
-</td>
-<td>
-nilseling
-</td>
-<td>
-2021-10-07
-</td>
-<td>
-Initial commit for bioRxiv scripts
-</td>
-</tr>
-</tbody>
-</table>
-</div>
 <hr>
 </div>
 </div>
 </div>
-<div id="visualization-of-segmentation-results" class="section level2">
-<h2>Visualization of segmentation results</h2>
-<p>Here, we will highlight the use of cytomapper to visualize mutlichannel images and outline segmented cells on composite images.</p>
+<div id="visualization-of-spatial-location-and-interactions" class="section level2">
+<h2>Visualization of spatial location and interactions</h2>
+<p>This script highlights the usability of imcRtools to visualize the spatial location of cells and their interaction in form of edges.</p>
 <p>For this, we will use a publicly available dataset provided by the <a href="https://bioconductor.org/packages/release/data/experiment/html/imcdatasets.html">imcdatasets</a> R/Bioconductor package:</p>
-<pre class="r"><code>library(cytomapper)
-library(imcdatasets)</code></pre>
-<p>Next, we will read in the multichannel images and segmentation masks:</p>
-<pre class="r"><code>masks &lt;- DamondPancreas2019_masks()</code></pre>
+<pre class="r"><code>library(imcdatasets)
+library(imcRtools)</code></pre>
+<p>Here, we will read in the <code>SingleCellExperiment</code> object provided in the</p>
+<pre class="r"><code>sce &lt;- DamondPancreas2019_sce()</code></pre>
 <pre><code>see ?imcdatasets and browseVignettes(&#39;imcdatasets&#39;) for documentation</code></pre>
 <pre><code>loading from cache</code></pre>
-<pre class="r"><code>images &lt;- DamondPancreas2019_images()</code></pre>
-<pre><code>see ?imcdatasets and browseVignettes(&#39;imcdatasets&#39;) for documentation
-loading from cache</code></pre>
-<p>We can now visualize example images in form of composites.</p>
-<pre class="r"><code># Select the 3 largest images
-cur_size &lt;- unlist(lapply(images, function(x){dim(x)[1] * dim(x)[2]}))
-cur_images &lt;- images[order(cur_size, decreasing = TRUE)[1:3]]
+</div>
+<div id="build-spatial-graph" class="section level2">
+<h2>Build spatial graph</h2>
+<p>The SingleCellExperiment object does not contain an interaction graph. For this, we will build one from scratch. For simplicity, we will build a graph based on the 5 nearest neighbors in 2 dimensions.</p>
+<pre class="r"><code>sce &lt;- buildSpatialGraph(sce, img_id = &quot;ImageNumber&quot;, 
+                         type = &quot;knn&quot;, k = 5)</code></pre>
+<p>To stay in line with the previous figures, we will select the same example images.</p>
+<pre class="r"><code>cur_images &lt;- sce[,sce$ImageFullName %in% c(&quot;G11_a0_full_clean.tiff&quot;,
+                                            &quot;G07_a0_full_clean.tiff&quot;,
+                                            &quot;G09_a0_full_clean.tiff&quot;)]</code></pre>
+<p>Now, we can visualize the data.</p>
+<pre class="r"><code>library(ggplot2)
+color_vector &lt;- unique(cur_images$CellType)
+names(color_vector) &lt;- color_vector
 
-cur_images</code></pre>
-<pre><code>CytoImageList containing 3 image(s)
-names(3): G11_a0_full_clean G07_a0_full_clean G09_a0_full_clean 
-Each image contains 38 channel(s)
-channelNames(38): H3 SMA INS CD38 CD44 PCSK2 CD99 CD68 MPO SLC2A1 CD20 AMY2A CD3e PPY PIN PD-1 GCG PDX1 SST SYP KRT19 CD45 FOXP3 CD45RA CD8a CA9 IAPP KI-67 NKX6-1 pH3 CD4 CD31 CDH PTPRN pRB cPARP1 Ir191 Ir193 </code></pre>
-<pre class="r"><code>plotPixels(cur_images, 
-           colour_by = c(&quot;H3&quot;, &quot;CDH&quot;, &quot;CD99&quot;), 
-           bcg = list(H3 = c(0, 10, 1),
-                      CDH = c(0, 5, 1),
-                      CD99 = c(0, 5, 1)),
-           colour = list(H3 = c(&quot;black&quot;, &quot;blue&quot;),
-                        CDH = c(&quot;black&quot;, &quot;green&quot;),
-                        CD99 = c(&quot;black&quot;, &quot;red&quot;)),
-           image_title = NULL,
-           scale_bar = list(frame = 3))</code></pre>
-<p><img src="figure/cytomapper_visualization.Rmd/composites-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-composites-1">
-Past versions of composites-1.png
-</button>
-</p>
-<div id="fig-composites-1" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/BodenmillerGroup/IMCDataAnalysis/blob/97e3a83d02659542d795eedb7b449468e3b213c8/docs/figure/cytomapper_visualization.Rmd/composites-1.png" target="_blank">97e3a83</a>
-</td>
-<td>
-nilseling
-</td>
-<td>
-2021-10-07
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<pre class="r"><code>plotPixels(cur_images, 
-           colour_by = c(&quot;H3&quot;, &quot;CDH&quot;, &quot;CD99&quot;), 
-           bcg = list(H3 = c(0, 10, 1),
-                      CDH = c(0, 5, 1),
-                      CD99 = c(0, 5, 1)),
-           colour = list(H3 = c(&quot;black&quot;, &quot;blue&quot;),
-                        CDH = c(&quot;black&quot;, &quot;green&quot;),
-                        CD99 = c(&quot;black&quot;, &quot;red&quot;)),
-           image_title = NULL,
-           scale_bar = list(frame = 3),
-           save_plot = list(filename = &quot;~/switchdrive/Institution/IMCWorkflow/biorxiv_submission/Figures/Figure_3/composite.png&quot;,
-                            scale = 2))</code></pre>
-<p>And outline the segmented cells:</p>
-<pre class="r"><code>cur_masks &lt;- masks[order(cur_size, decreasing = TRUE)[1:3]]
-plotPixels(cur_images, 
-           mask = cur_masks,
-           img_id = &quot;ImageName&quot;,
-           colour_by = c(&quot;H3&quot;, &quot;CDH&quot;, &quot;CD99&quot;), 
-           bcg = list(H3 = c(0, 10, 1),
-                      CDH = c(0, 5, 1),
-                      CD99 = c(0, 5, 1)),
-           colour = list(H3 = c(&quot;black&quot;, &quot;blue&quot;),
-                        CDH = c(&quot;black&quot;, &quot;green&quot;),
-                        CD99 = c(&quot;black&quot;, &quot;red&quot;)),
-           image_title = NULL,
-           legend = NULL,
-           scale_bar = list(frame = 3))</code></pre>
-<p><img src="figure/cytomapper_visualization.Rmd/composites-masks-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-composites-masks-1">
-Past versions of composites-masks-1.png
-</button>
-</p>
-<div id="fig-composites-masks-1" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/BodenmillerGroup/IMCDataAnalysis/blob/97e3a83d02659542d795eedb7b449468e3b213c8/docs/figure/cytomapper_visualization.Rmd/composites-masks-1.png" target="_blank">97e3a83</a>
-</td>
-<td>
-nilseling
-</td>
-<td>
-2021-10-07
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<pre class="r"><code>plotPixels(cur_images, 
-           mask = cur_masks,
-           img_id = &quot;ImageName&quot;,
-           colour_by = c(&quot;H3&quot;, &quot;CDH&quot;, &quot;CD99&quot;), 
-           bcg = list(H3 = c(0, 10, 1),
-                      CDH = c(0, 5, 1),
-                      CD99 = c(0, 5, 1)),
-           colour = list(H3 = c(&quot;black&quot;, &quot;blue&quot;),
-                        CDH = c(&quot;black&quot;, &quot;green&quot;),
-                        CD99 = c(&quot;black&quot;, &quot;red&quot;)),
-           image_title = NULL,
-           legend = NULL,
-           scale_bar = list(frame = 3),
-           save_plot = list(filename = &quot;~/switchdrive/Institution/IMCWorkflow/biorxiv_submission/Figures/Figure_3/composite_masks.png&quot;,
-                            scale = 2))</code></pre>
+color_vector[c(&quot;neutrophil&quot;, &quot;macrophage&quot;, &quot;otherimmune&quot;, &quot;naiveTc&quot;)] &lt;- &quot;pink&quot;
+color_vector[c(&quot;alpha&quot;, &quot;beta&quot;, &quot;delta&quot;, &quot;gamma&quot;)] &lt;- &quot;dark red&quot;
+color_vector[c(&quot;acinar&quot;)] &lt;- &quot;dark green&quot;
+color_vector[c(&quot;ductal&quot;)] &lt;- &quot;light green&quot;
+color_vector[c(&quot;endothelial&quot;)] &lt;- &quot;firebrick2&quot;
+color_vector[c(&quot;stromal&quot;)] &lt;- &quot;yellow&quot;
+color_vector[c(&quot;Tc&quot;)] &lt;- &quot;aquamarine3&quot;
+color_vector[c(&quot;Th&quot;)] &lt;- &quot;coral4&quot;
+color_vector[c(&quot;unknown&quot;)] &lt;- &quot;gray&quot;
+color_vector[c(&quot;B&quot;)] &lt;- &quot;firebrick4&quot;
+
+plotSpatial(cur_images, img_id = &quot;ImageFullName&quot;, 
+            node_color_by = &quot;CellType&quot;, node_size_fix = 0.5) + 
+  scale_color_manual(values = color_vector)</code></pre>
+<p><img src="figure/spatial_visualization.Rmd/viz-nodes-1.png" width="960" style="display: block; margin: auto;" /></p>
+<p>And also add the graph. For this, we will subset the object.</p>
+<pre class="r"><code>cur_images_2 &lt;- cur_images[,cur_images$CellCat == &quot;islet&quot;]
+
+plotSpatial(cur_images_2, img_id = &quot;ImageFullName&quot;, 
+            node_color_by = &quot;CellType&quot;, node_size_fix = 2,
+            draw_edges = TRUE, colPairName = &quot;knn_interaction_graph&quot;,
+            edge_color_by = &quot;CellType&quot;, directed = FALSE) + 
+  scale_color_manual(values = color_vector)</code></pre>
+<p><img src="figure/spatial_visualization.Rmd/viz-graph-1.png" width="960" style="display: block; margin: auto;" /></p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -762,70 +583,88 @@ attached base packages:
 [8] base     
 
 other attached packages:
- [1] imcdatasets_1.0.1           cytomapper_1.5.5           
- [3] SingleCellExperiment_1.15.2 SummarizedExperiment_1.23.5
- [5] Biobase_2.53.0              GenomicRanges_1.45.0       
- [7] GenomeInfoDb_1.29.8         IRanges_2.27.2             
- [9] S4Vectors_0.31.5            BiocGenerics_0.39.2        
-[11] MatrixGenerics_1.5.4        matrixStats_0.61.0         
-[13] EBImage_4.35.0              workflowr_1.6.2            
+ [1] ggplot2_3.3.5               imcRtools_0.99.0           
+ [3] SpatialExperiment_1.3.4     imcdatasets_1.0.1          
+ [5] cytomapper_1.5.5            EBImage_4.35.0             
+ [7] SingleCellExperiment_1.15.2 SummarizedExperiment_1.23.5
+ [9] Biobase_2.53.0              GenomicRanges_1.45.0       
+[11] GenomeInfoDb_1.29.8         IRanges_2.27.2             
+[13] S4Vectors_0.31.5            BiocGenerics_0.39.2        
+[15] MatrixGenerics_1.5.4        matrixStats_0.61.0         
+[17] workflowr_1.6.2            
 
 loaded via a namespace (and not attached):
-  [1] ggbeeswarm_0.6.0              colorspace_2.0-2             
-  [3] ellipsis_0.3.2                rprojroot_2.0.2              
-  [5] XVector_0.33.0                fftwtools_0.9-11             
-  [7] fs_1.5.0                      bit64_4.0.5                  
-  [9] AnnotationDbi_1.55.1          interactiveDisplayBase_1.31.2
- [11] fansi_0.5.0                   codetools_0.2-18             
- [13] cachem_1.0.6                  knitr_1.36                   
- [15] jsonlite_1.7.2                dbplyr_2.1.1                 
- [17] png_0.1-7                     shinydashboard_0.7.2         
- [19] shiny_1.7.1                   HDF5Array_1.21.0             
- [21] BiocManager_1.30.16           compiler_4.1.0               
- [23] httr_1.4.2                    assertthat_0.2.1             
- [25] Matrix_1.3-4                  fastmap_1.1.0                
- [27] svgPanZoom_0.3.4              later_1.3.0                  
- [29] htmltools_0.5.2               tools_4.1.0                  
- [31] gtable_0.3.0                  glue_1.4.2                   
- [33] GenomeInfoDbData_1.2.7        dplyr_1.0.7                  
- [35] rappdirs_0.3.3                Rcpp_1.0.7                   
- [37] jquerylib_0.1.4               raster_3.4-13                
- [39] Biostrings_2.61.2             vctrs_0.3.8                  
- [41] rhdf5filters_1.5.0            svglite_2.0.0                
- [43] ExperimentHub_2.1.4           xfun_0.26                    
- [45] stringr_1.4.0                 mime_0.12                    
- [47] lifecycle_1.0.1               AnnotationHub_3.1.5          
- [49] zlibbioc_1.39.0               scales_1.1.1                 
- [51] promises_1.2.0.1              parallel_4.1.0               
- [53] rhdf5_2.37.3                  RColorBrewer_1.1-2           
- [55] yaml_2.2.1                    curl_4.3.2                   
- [57] memoise_2.0.0                 gridExtra_2.3                
- [59] ggplot2_3.3.5                 sass_0.4.0                   
- [61] stringi_1.7.5                 RSQLite_2.2.8                
- [63] highr_0.9                     BiocVersion_3.14.0           
- [65] tiff_0.1-8                    filelock_1.0.2               
- [67] BiocParallel_1.27.16          rlang_0.4.11                 
- [69] pkgconfig_2.0.3               systemfonts_1.0.2            
- [71] bitops_1.0-7                  evaluate_0.14                
- [73] lattice_0.20-44               purrr_0.3.4                  
- [75] Rhdf5lib_1.15.2               htmlwidgets_1.5.4            
- [77] bit_4.0.4                     tidyselect_1.1.1             
- [79] magrittr_2.0.1                R6_2.5.1                     
- [81] generics_0.1.0                DelayedArray_0.19.4          
- [83] DBI_1.1.1                     withr_2.4.2                  
- [85] pillar_1.6.3                  whisker_0.4                  
- [87] KEGGREST_1.33.0               abind_1.4-5                  
- [89] RCurl_1.98-1.5                sp_1.4-5                     
- [91] tibble_3.1.5                  crayon_1.4.1                 
- [93] utf8_1.2.2                    BiocFileCache_2.1.1          
- [95] rmarkdown_2.11                viridis_0.6.1                
- [97] jpeg_0.1-9                    locfit_1.5-9.4               
- [99] grid_4.1.0                    blob_1.2.2                   
-[101] git2r_0.28.0                  digest_0.6.28                
-[103] xtable_1.8-4                  httpuv_1.6.3                 
-[105] munsell_0.5.0                 beeswarm_0.4.0               
-[107] viridisLite_0.4.0             vipor_0.4.5                  
-[109] bslib_0.3.1                  </code></pre>
+  [1] AnnotationHub_3.1.5           BiocFileCache_2.1.1          
+  [3] systemfonts_1.0.2             igraph_1.2.6                 
+  [5] sp_1.4-5                      shinydashboard_0.7.2         
+  [7] BiocParallel_1.27.16          digest_0.6.28                
+  [9] htmltools_0.5.2               viridis_0.6.1                
+ [11] magick_2.7.3                  tiff_0.1-8                   
+ [13] fansi_0.5.0                   magrittr_2.0.1               
+ [15] memoise_2.0.0                 tzdb_0.1.2                   
+ [17] limma_3.49.4                  readr_2.0.2                  
+ [19] graphlayouts_0.7.1            Biostrings_2.61.2            
+ [21] svgPanZoom_0.3.4              vroom_1.5.5                  
+ [23] R.utils_2.11.0                svglite_2.0.0                
+ [25] jpeg_0.1-9                    colorspace_2.0-2             
+ [27] ggrepel_0.9.1                 blob_1.2.2                   
+ [29] rappdirs_0.3.3                xfun_0.26                    
+ [31] dplyr_1.0.7                   crayon_1.4.1                 
+ [33] RCurl_1.98-1.5                jsonlite_1.7.2               
+ [35] glue_1.4.2                    polyclip_1.10-0              
+ [37] gtable_0.3.0                  zlibbioc_1.39.0              
+ [39] XVector_0.33.0                DelayedArray_0.19.4          
+ [41] DropletUtils_1.13.4           Rhdf5lib_1.15.2              
+ [43] HDF5Array_1.21.0              abind_1.4-5                  
+ [45] scales_1.1.1                  pheatmap_1.0.12              
+ [47] DBI_1.1.1                     edgeR_3.35.1                 
+ [49] Rcpp_1.0.7                    viridisLite_0.4.0            
+ [51] xtable_1.8-4                  dqrng_0.3.0                  
+ [53] bit_4.0.4                     DT_0.19                      
+ [55] htmlwidgets_1.5.4             httr_1.4.2                   
+ [57] RColorBrewer_1.1-2            ellipsis_0.3.2               
+ [59] farver_2.1.0                  pkgconfig_2.0.3              
+ [61] R.methodsS3_1.8.1             scuttle_1.3.1                
+ [63] sass_0.4.0                    dbplyr_2.1.1                 
+ [65] locfit_1.5-9.4                utf8_1.2.2                   
+ [67] labeling_0.4.2                RTriangle_1.6-0.10           
+ [69] tidyselect_1.1.1              rlang_0.4.11                 
+ [71] later_1.3.0                   AnnotationDbi_1.55.1         
+ [73] munsell_0.5.0                 BiocVersion_3.14.0           
+ [75] tools_4.1.0                   cachem_1.0.6                 
+ [77] generics_0.1.0                RSQLite_2.2.8                
+ [79] ExperimentHub_2.1.4           evaluate_0.14                
+ [81] stringr_1.4.0                 fastmap_1.1.0                
+ [83] fftwtools_0.9-11              yaml_2.2.1                   
+ [85] knitr_1.36                    bit64_4.0.5                  
+ [87] fs_1.5.0                      tidygraph_1.2.0              
+ [89] purrr_0.3.4                   KEGGREST_1.33.0              
+ [91] ggraph_2.0.5                  sparseMatrixStats_1.5.3      
+ [93] mime_0.12                     R.oo_1.24.0                  
+ [95] compiler_4.1.0                beeswarm_0.4.0               
+ [97] filelock_1.0.2                curl_4.3.2                   
+ [99] png_0.1-7                     interactiveDisplayBase_1.31.2
+[101] tweenr_1.0.2                  tibble_3.1.5                 
+[103] bslib_0.3.1                   stringi_1.7.5                
+[105] highr_0.9                     lattice_0.20-44              
+[107] Matrix_1.3-4                  vctrs_0.3.8                  
+[109] pillar_1.6.3                  lifecycle_1.0.1              
+[111] rhdf5filters_1.5.0            BiocManager_1.30.16          
+[113] jquerylib_0.1.4               BiocNeighbors_1.11.0         
+[115] data.table_1.14.2             bitops_1.0-7                 
+[117] raster_3.4-13                 httpuv_1.6.3                 
+[119] R6_2.5.1                      promises_1.2.0.1             
+[121] gridExtra_2.3                 vipor_0.4.5                  
+[123] codetools_0.2-18              MASS_7.3-54                  
+[125] assertthat_0.2.1              rhdf5_2.37.3                 
+[127] rprojroot_2.0.2               rjson_0.2.20                 
+[129] withr_2.4.2                   GenomeInfoDbData_1.2.7       
+[131] hms_1.1.1                     parallel_4.1.0               
+[133] grid_4.1.0                    beachmat_2.9.1               
+[135] tidyr_1.1.4                   rmarkdown_2.11               
+[137] DelayedMatrixStats_1.15.4     git2r_0.28.0                 
+[139] ggforce_0.3.3                 shiny_1.7.1                  
+[141] ggbeeswarm_0.6.0             </code></pre>
 </div>
 </div>
 

@@ -1,0 +1,84 @@
+---
+title: "Spatial visualization"
+author: "Nils Eling"
+date: "`r Sys.Date()`"
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: console
+---
+
+## Visualization of spatial location and interactions
+
+This script highlights the usability of imcRtools to visualize the spatial 
+location of cells and their interaction in form of edges.  
+
+For this, we will use a publicly available dataset provided by the 
+[imcdatasets](https://bioconductor.org/packages/release/data/experiment/html/imcdatasets.html) 
+R/Bioconductor package:
+
+```{r load-libraries, message=FALSE, warning=FALSE}
+library(imcdatasets)
+library(imcRtools)
+```
+
+Here, we will read in the `SingleCellExperiment` object provided in the 
+
+```{r read-data}
+sce <- DamondPancreas2019_sce()
+```
+
+## Build spatial graph
+
+The SingleCellExperiment object does not contain an interaction graph.
+For this, we will build one from scratch.
+For simplicity, we will build a graph based on the 5 nearest neighbors in 
+2 dimensions.
+
+```{r build-graph}
+sce <- buildSpatialGraph(sce, img_id = "ImageNumber", 
+                         type = "knn", k = 5)
+```
+
+To stay in line with the previous figures, we will select the same example 
+images.
+
+```{r select-images}
+cur_images <- sce[,sce$ImageFullName %in% c("G11_a0_full_clean.tiff",
+                                            "G07_a0_full_clean.tiff",
+                                            "G09_a0_full_clean.tiff")]
+```
+
+Now, we can visualize the data.
+
+```{r viz-nodes, fig.width=10, fig.height=10}
+library(ggplot2)
+color_vector <- unique(cur_images$CellType)
+names(color_vector) <- color_vector
+
+color_vector[c("neutrophil", "macrophage", "otherimmune", "naiveTc")] <- "pink"
+color_vector[c("alpha", "beta", "delta", "gamma")] <- "dark red"
+color_vector[c("acinar")] <- "dark green"
+color_vector[c("ductal")] <- "light green"
+color_vector[c("endothelial")] <- "firebrick2"
+color_vector[c("stromal")] <- "yellow"
+color_vector[c("Tc")] <- "aquamarine3"
+color_vector[c("Th")] <- "coral4"
+color_vector[c("unknown")] <- "gray"
+color_vector[c("B")] <- "firebrick4"
+
+plotSpatial(cur_images, img_id = "ImageFullName", 
+            node_color_by = "CellType", node_size_fix = 0.5) + 
+  scale_color_manual(values = color_vector)
+```
+
+And also add the graph. For this, we will subset the object.
+
+```{r viz-graph, fig.width=10, fig.height=10}
+cur_images_2 <- cur_images[,cur_images$CellCat == "islet"]
+
+plotSpatial(cur_images_2, img_id = "ImageFullName", 
+            node_color_by = "CellType", node_size_fix = 2,
+            draw_edges = TRUE, colPairName = "knn_interaction_graph",
+            edge_color_by = "CellType", directed = FALSE) + 
+  scale_color_manual(values = color_vector)
+```

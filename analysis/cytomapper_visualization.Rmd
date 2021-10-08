@@ -34,6 +34,9 @@ We can now visualize example images in form of composites.
 # Select the 3 largest images
 cur_size <- unlist(lapply(images, function(x){dim(x)[1] * dim(x)[2]}))
 cur_images <- images[order(cur_size, decreasing = TRUE)[1:3]]
+
+cur_images
+
 plotPixels(cur_images, 
            colour_by = c("H3", "CDH", "CD99"), 
            bcg = list(H3 = c(0, 10, 1),
