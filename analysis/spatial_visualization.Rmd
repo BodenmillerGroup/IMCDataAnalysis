@@ -55,20 +55,21 @@ library(ggplot2)
 color_vector <- unique(cur_images$CellType)
 names(color_vector) <- color_vector
 
-color_vector[c("neutrophil", "macrophage", "otherimmune", "naiveTc")] <- "pink"
+color_vector[c("neutrophil", "macrophage", "otherimmune", "naiveTc")] <- "dark blue"
 color_vector[c("alpha", "beta", "delta", "gamma")] <- "dark red"
 color_vector[c("acinar")] <- "dark green"
 color_vector[c("ductal")] <- "light green"
 color_vector[c("endothelial")] <- "firebrick2"
 color_vector[c("stromal")] <- "yellow"
-color_vector[c("Tc")] <- "aquamarine3"
-color_vector[c("Th")] <- "coral4"
+color_vector[c("Tc")] <- "darkorchid1"
+color_vector[c("Th")] <- "cadetblue2"
 color_vector[c("unknown")] <- "gray"
-color_vector[c("B")] <- "firebrick4"
+color_vector[c("B")] <- "dodgerblue4"
 
 plotSpatial(cur_images, img_id = "ImageFullName", 
-            node_color_by = "CellType", node_size_fix = 0.5) + 
-  scale_color_manual(values = color_vector)
+            node_color_by = "CellType", node_size_fix = 0.7) + 
+  scale_color_manual(values = color_vector) +
+  theme(text = element_text(size=20))
 ```
 
 And also add the graph. For this, we will subset the object.
@@ -80,5 +81,6 @@ plotSpatial(cur_images_2, img_id = "ImageFullName",
             node_color_by = "CellType", node_size_fix = 2,
             draw_edges = TRUE, colPairName = "knn_interaction_graph",
             edge_color_by = "CellType", directed = FALSE) + 
-  scale_color_manual(values = color_vector)
+  scale_color_manual(values = color_vector) +
+  theme(text = element_text(size=20))
 ```
