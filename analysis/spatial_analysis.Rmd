@@ -27,9 +27,9 @@ sce <- DamondPancreas2019_sce()
 
 ## Build spatial graph
 
-The SingleCellExperiment object does not contain an interaction graph.
+The `SingleCellExperiment` object does not contain an interaction graph.
 For this, we will build one from scratch.
-For simplicity, we will build a graph based on the 5 nearest neighbors in 
+For simplicity, we will build a graph based on the 10 nearest neighbors in 
 2 dimensions.
 
 ```{r build-graph}
@@ -95,16 +95,32 @@ Here, as a demonstration, we can apply this function to detect islet cells and
 clusters of immune cells. 
 
 ```{r patch-detection}
-sce <- patchDetection(sce, patch_cells = sce$CellType %in% c("alpha", "beta", "gamma", "delta"), 
-                      colPairName = "knn_interaction_graph", name = "islets")
-
-cur_images <- sce[,sce$ImageFullName %in% c("G11_a0_full_clean.tiff",
-                                            "G07_a0_full_clean.tiff",
-                                            "G09_a0_full_clean.tiff")]
+cur_images <- patchDetection(cur_images, 
+                      patch_cells = cur_images$CellType %in% c("alpha", "beta", "gamma", "delta"), 
+                      colPairName = "knn_interaction_graph", 
+                      name = "islets", 
+                      min_patch_size = 5,
+                      expand_by = 10,
+                      img_id = "ImageNumber")
 
 plotSpatial(cur_images, img_id = "ImageFullName", 
-            node_color_by = "islet", node_size_fix = 0.7)  +
+            node_color_by = "islets", node_size_fix = 0.7)  +
   theme(text = element_text(size=20)) 
+
+cur_images <- patchDetection(cur_images, 
+                      patch_cells = cur_images$CellType %in% c("otherimmune", "Tc", 
+                                      "neutrophil", "Th", "macrophage", "naiveTc", "B"), 
+                      colPairName = "knn_interaction_graph", 
+                      name = "immune",
+                      img_id = "ImageNumber",
+                      min_patch_size = 4)
+
+plotSpatial(cur_images, img_id = "ImageFullName", 
+            node_color_by = "immune", node_size_fix = 0.7)  +
+  theme(text = element_text(size=20))
 ```
 
 ## Spatial interaction testing
+
+Finally, we will test if certain cell-types interact more or less frequently 
+compared to what would be expected from a random distribution.
