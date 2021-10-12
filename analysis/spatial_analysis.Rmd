@@ -1,0 +1,110 @@
+---
+title: "Spatial analysis"
+author: "Nils Eling"
+date: "`r Sys.Date()`"
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: console
+---
+
+This script highlights the usability of imcRtools to perform spatial data
+analysis.
+
+For this, we will use a publicly available dataset provided by the 
+[imcdatasets](https://bioconductor.org/packages/release/data/experiment/html/imcdatasets.html) 
+R/Bioconductor package:
+
+```{r load-libraries, message=FALSE, warning=FALSE}
+library(imcdatasets)
+library(imcRtools)
+```
+
+Here, we will read in the `SingleCellExperiment` object provided in the 
+
+```{r read-data}
+sce <- DamondPancreas2019_sce()
+```
+
+## Build spatial graph
+
+The SingleCellExperiment object does not contain an interaction graph.
+For this, we will build one from scratch.
+For simplicity, we will build a graph based on the 5 nearest neighbors in 
+2 dimensions.
+
+```{r build-graph}
+sce <- buildSpatialGraph(sce, img_id = "ImageNumber", 
+                         type = "knn", k = 10)
+```
+
+## Aggregate neighors and cluster spatial clustering
+
+Here, we will aggregate the celltype information of each cells neighborhood.
+
+```{r aggregate-neighbors}
+sce <- aggregateNeighbors(sce, colPairName = "knn_interaction_graph",
+                          aggregate_by = "metadata", count_by = "CellType",
+                          proportions = TRUE)
+sce$aggregatedNeighbors
+```
+
+We can now use this information to cluster across all cells. 
+
+```{r cluster-cells, message=FALSE}
+library(ggplot2)
+library(pheatmap)
+
+set.seed(123)
+cur_res <- kmeans(sce$aggregatedNeighbors, centers = 10)
+sce$clustered_neighborhood <- as.character(cur_res$cluster)
+
+# Color clusters by similar cell-types
+pheatmap(proportions(x = table(sce$clustered_neighborhood, sce$CellType), 
+                     margin = 2))
+
+col_vector <- unique(sce$clustered_neighborhood)
+names(col_vector) <- col_vector
+
+col_vector["1"] <- "dark red"
+col_vector["2"] <- "dodgerblue"
+col_vector["3"] <- "darkolivegreen1"
+col_vector["4"] <- "coral"
+col_vector["5"] <- "brown2"
+col_vector["6"] <- "darkolivegreen4"
+col_vector["7"] <- "darkseagreen3"
+col_vector["8"] <- "forestgreen"
+col_vector["9"] <- "greenyellow"
+col_vector["10"] <- "light blue"
+
+cur_images <- sce[,sce$ImageFullName %in% c("G11_a0_full_clean.tiff",
+                                            "G07_a0_full_clean.tiff",
+                                            "G09_a0_full_clean.tiff")]
+
+plotSpatial(cur_images, img_id = "ImageFullName", 
+            node_color_by = "clustered_neighborhood", node_size_fix = 0.7)  +
+  theme(text = element_text(size=20)) + 
+  scale_color_manual(values = col_vector)
+```
+
+## Patch detection
+
+As an alternative way of detecting tissue areas which contain cells of similar
+types, the `patchDetection` function can be used.
+
+Here, as a demonstration, we can apply this function to detect islet cells and
+clusters of immune cells. 
+
+```{r patch-detection}
+sce <- patchDetection(sce, patch_cells = sce$CellType %in% c("alpha", "beta", "gamma", "delta"), 
+                      colPairName = "knn_interaction_graph", name = "islets")
+
+cur_images <- sce[,sce$ImageFullName %in% c("G11_a0_full_clean.tiff",
+                                            "G07_a0_full_clean.tiff",
+                                            "G09_a0_full_clean.tiff")]
+
+plotSpatial(cur_images, img_id = "ImageFullName", 
+            node_color_by = "islet", node_size_fix = 0.7)  +
+  theme(text = element_text(size=20)) 
+```
+
+## Spatial interaction testing
