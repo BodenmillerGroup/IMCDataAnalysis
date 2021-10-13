@@ -465,16 +465,16 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomBodenmillerGroupIMCDataAnalysistree3878351a3b34683d07866b2d5c6b7a739e781368targetblank3878351a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/BodenmillerGroup/IMCDataAnalysis/tree/3878351a3b34683d07866b2d5c6b7a739e781368" target="_blank">3878351</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomBodenmillerGroupIMCDataAnalysistreee6dd3880853c9395c16f44a77c390fdd4c0842catargetblanke6dd388a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/BodenmillerGroup/IMCDataAnalysis/tree/e6dd3880853c9395c16f44a77c390fdd4c0842ca" target="_blank">e6dd388</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomBodenmillerGroupIMCDataAnalysistree3878351a3b34683d07866b2d5c6b7a739e781368targetblank3878351a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomBodenmillerGroupIMCDataAnalysistreee6dd3880853c9395c16f44a77c390fdd4c0842catargetblanke6dd388a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/BodenmillerGroup/IMCDataAnalysis/tree/3878351a3b34683d07866b2d5c6b7a739e781368" target="_blank">3878351</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/BodenmillerGroup/IMCDataAnalysis/tree/e6dd3880853c9395c16f44a77c390fdd4c0842ca" target="_blank">e6dd388</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -485,6 +485,9 @@ Ignored files:
     Ignored:    .Rproj.user/
     Ignored:    analysis/.DS_Store
     Ignored:    data/
+
+Untracked files:
+    Untracked:  analysis/figure/
 
 Unstaged changes:
     Modified:   analysis/spatial_analysis.Rmd
@@ -526,6 +529,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/BodenmillerGroup/IMCDataAnalysis/blob/e6dd3880853c9395c16f44a77c390fdd4c0842ca/analysis/spatial_analysis.Rmd" target="_blank">e6dd388</a>
+</td>
+<td>
+nilseling
+</td>
+<td>
+2021-10-13
+</td>
+<td>
+Final changes to analysis scripts
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/BodenmillerGroup/IMCDataAnalysis/e6dd3880853c9395c16f44a77c390fdd4c0842ca/docs/spatial_analysis.html" target="_blank">e6dd388</a>
+</td>
+<td>
+nilseling
+</td>
+<td>
+2021-10-13
+</td>
+<td>
+Final changes to analysis scripts
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -640,6 +677,43 @@ sce$clustered_neighborhood &lt;- as.character(cur_res$cluster)
 pheatmap(proportions(x = table(sce$clustered_neighborhood, sce$CellType), 
                      margin = 2))</code></pre>
 <p><img src="figure/spatial_analysis.Rmd/cluster-cells-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-cluster-cells-1">
+Past versions of cluster-cells-1.png
+</button>
+</p>
+<div id="fig-cluster-cells-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/BodenmillerGroup/IMCDataAnalysis/blob/e6dd3880853c9395c16f44a77c390fdd4c0842ca/docs/figure/spatial_analysis.Rmd/cluster-cells-1.png" target="_blank">e6dd388</a>
+</td>
+<td>
+nilseling
+</td>
+<td>
+2021-10-13
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>And visualize the patches on the tissue.</p>
 <pre class="r"><code>col_vector &lt;- unique(sce$clustered_neighborhood)
 names(col_vector) &lt;- col_vector
@@ -662,8 +736,45 @@ cur_images &lt;- sce[,sce$ImageFullName %in% c(&quot;G11_a0_full_clean.tiff&quot
 plotSpatial(cur_images, img_id = &quot;ImageFullName&quot;, 
             node_color_by = &quot;clustered_neighborhood&quot;, node_size_fix = 0.7)  +
   theme(text = element_text(size=20)) + 
-  scale_color_manual(values = col_vector)</code></pre>
+  scale_color_manual(values = col_vector, name = &quot;clust&quot;)</code></pre>
 <p><img src="figure/spatial_analysis.Rmd/visualize-patches,%20-1.png" width="1248" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-no-spaces-visualize-patches,--1">
+Past versions of “visualize-patches, -1.png”
+</button>
+</p>
+<div id="fig-no-spaces-visualize-patches,--1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/BodenmillerGroup/IMCDataAnalysis/blob/e6dd3880853c9395c16f44a77c390fdd4c0842ca/docs/figure/spatial_analysis.Rmd/visualize-patches, -1.png" target="_blank">e6dd388</a>
+</td>
+<td>
+nilseling
+</td>
+<td>
+2021-10-13
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 <div id="patch-detection" class="section level2">
 <h2>Patch detection</h2>
@@ -683,6 +794,43 @@ plotSpatial(cur_images, img_id = &quot;ImageFullName&quot;,
   theme(text = element_text(size=20),
         legend.position = &quot;none&quot;) </code></pre>
 <p><img src="figure/spatial_analysis.Rmd/patch-detection-islet-1.png" width="960" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-patch-detection-islet-1">
+Past versions of patch-detection-islet-1.png
+</button>
+</p>
+<div id="fig-patch-detection-islet-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/BodenmillerGroup/IMCDataAnalysis/blob/e6dd3880853c9395c16f44a77c390fdd4c0842ca/docs/figure/spatial_analysis.Rmd/patch-detection-islet-1.png" target="_blank">e6dd388</a>
+</td>
+<td>
+nilseling
+</td>
+<td>
+2021-10-13
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Next, we will detect aggregations of immune cells.</p>
 <pre class="r"><code>cur_images &lt;- patchDetection(cur_images, 
                       patch_cells = cur_images$CellType %in% c(&quot;otherimmune&quot;, &quot;Tc&quot;, 
@@ -696,7 +844,44 @@ plotSpatial(cur_images, img_id = &quot;ImageFullName&quot;,
             node_color_by = &quot;immune&quot;, node_size_fix = 0.7)  +
   theme(text = element_text(size=20),
         legend.position = &quot;none&quot;)</code></pre>
-<p><img src="figure/spatial_analysis.Rmd/patch-detection-immune-1.png" width="1248" style="display: block; margin: auto;" /></p>
+<p><img src="figure/spatial_analysis.Rmd/patch-detection-immune-1.png" width="960" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-patch-detection-immune-1">
+Past versions of patch-detection-immune-1.png
+</button>
+</p>
+<div id="fig-patch-detection-immune-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/BodenmillerGroup/IMCDataAnalysis/blob/e6dd3880853c9395c16f44a77c390fdd4c0842ca/docs/figure/spatial_analysis.Rmd/patch-detection-immune-1.png" target="_blank">e6dd388</a>
+</td>
+<td>
+nilseling
+</td>
+<td>
+2021-10-13
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 <div id="spatial-interaction-testing" class="section level2">
 <h2>Spatial interaction testing</h2>
@@ -721,12 +906,50 @@ ggplot(cur_df) +
     geom_text(aes(from_label, to_label, label = ifelse(sigval == 1 | sigval == -1, &quot;*&quot;, &quot;&quot;), 
                   color = as.character(sigval)), size = 5) +
     facet_wrap(~ group_by) + 
-    scale_fill_gradientn(colours = inferno(100)) +
-    scale_colour_manual(values = c(&quot;1&quot; = &quot;green&quot;, &quot;-1&quot; = &quot;red&quot;, &quot;0&quot; = &quot;black&quot;))  +
+    scale_fill_gradientn(colours = viridis(100), name = &quot;count&quot;) +
+    scale_colour_manual(values = c(&quot;1&quot; = &quot;green&quot;, &quot;-1&quot; = &quot;red&quot;, &quot;0&quot; = &quot;black&quot;), 
+                        labels = c(&quot;interaction&quot;, &quot;avoidance&quot;, &quot;none&quot;), name = &quot;sig&quot;)  +
     theme(panel.background = element_blank(), axis.text.x = element_text(angle = 45, hjust = 1),
-          text = element_text(size=20))</code></pre>
+          text = element_text(size=18))</code></pre>
 <pre><code>Warning: Removed 30 rows containing missing values (geom_text).</code></pre>
 <p><img src="figure/spatial_analysis.Rmd/test-interactions-1.png" width="1440" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-test-interactions-1">
+Past versions of test-interactions-1.png
+</button>
+</p>
+<div id="fig-test-interactions-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/BodenmillerGroup/IMCDataAnalysis/blob/e6dd3880853c9395c16f44a77c390fdd4c0842ca/docs/figure/spatial_analysis.Rmd/test-interactions-1.png" target="_blank">e6dd388</a>
+</td>
+<td>
+nilseling
+</td>
+<td>
+2021-10-13
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">

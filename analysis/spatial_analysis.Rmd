@@ -87,7 +87,7 @@ cur_images <- sce[,sce$ImageFullName %in% c("G11_a0_full_clean.tiff",
 plotSpatial(cur_images, img_id = "ImageFullName", 
             node_color_by = "clustered_neighborhood", node_size_fix = 0.7)  +
   theme(text = element_text(size=20)) + 
-  scale_color_manual(values = col_vector)
+  scale_color_manual(values = col_vector, name = "clust")
 ```
 
 ## Patch detection
@@ -158,8 +158,9 @@ ggplot(cur_df) +
     geom_text(aes(from_label, to_label, label = ifelse(sigval == 1 | sigval == -1, "*", ""), 
                   color = as.character(sigval)), size = 5) +
     facet_wrap(~ group_by) + 
-    scale_fill_gradientn(colours = inferno(100)) +
-    scale_colour_manual(values = c("1" = "green", "-1" = "red", "0" = "black"))  +
+    scale_fill_gradientn(colours = viridis(100), name = "count") +
+    scale_colour_manual(values = c("1" = "green", "-1" = "red", "0" = "black"), 
+                        labels = c("interaction", "avoidance", "none"), name = "sig")  +
     theme(panel.background = element_blank(), axis.text.x = element_text(angle = 45, hjust = 1),
           text = element_text(size=18))
 ```
