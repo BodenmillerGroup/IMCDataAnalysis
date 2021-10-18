@@ -465,16 +465,16 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomBodenmillerGroupIMCDataAnalysistree6d726fe22642803c71d63c23fe8c46348000797atargetblank6d726fea"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/BodenmillerGroup/IMCDataAnalysis/tree/6d726fe22642803c71d63c23fe8c46348000797a" target="_blank">6d726fe</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomBodenmillerGroupIMCDataAnalysistree42d5ac06c475e5248975520edc7f89ae6d973707targetblank42d5ac0a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/BodenmillerGroup/IMCDataAnalysis/tree/42d5ac06c475e5248975520edc7f89ae6d973707" target="_blank">42d5ac0</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomBodenmillerGroupIMCDataAnalysistree6d726fe22642803c71d63c23fe8c46348000797atargetblank6d726fea" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomBodenmillerGroupIMCDataAnalysistree42d5ac06c475e5248975520edc7f89ae6d973707targetblank42d5ac0a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/BodenmillerGroup/IMCDataAnalysis/tree/6d726fe22642803c71d63c23fe8c46348000797a" target="_blank">6d726fe</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/BodenmillerGroup/IMCDataAnalysis/tree/42d5ac06c475e5248975520edc7f89ae6d973707" target="_blank">42d5ac0</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -486,9 +486,6 @@ Ignored files:
     Ignored:    .github/.DS_Store
     Ignored:    analysis/.DS_Store
     Ignored:    data/
-
-Untracked files:
-    Untracked:  analysis/figure/
 
 Unstaged changes:
     Modified:   analysis/spatial_analysis.Rmd
@@ -530,6 +527,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/BodenmillerGroup/IMCDataAnalysis/blob/42d5ac06c475e5248975520edc7f89ae6d973707/analysis/spatial_analysis.Rmd" target="_blank">42d5ac0</a>
+</td>
+<td>
+nilseling
+</td>
+<td>
+2021-10-18
+</td>
+<td>
+Adjusted figure size
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/BodenmillerGroup/IMCDataAnalysis/42d5ac06c475e5248975520edc7f89ae6d973707/docs/spatial_analysis.html" target="_blank">42d5ac0</a>
+</td>
+<td>
+nilseling
+</td>
+<td>
+2021-10-18
+</td>
+<td>
+Adjusted figure size
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -703,14 +734,35 @@ sce$aggregatedNeighbors</code></pre>
 <p>We can now use this information to cluster across all cells.</p>
 <pre class="r"><code>library(ggplot2)
 library(pheatmap)
+library(viridis)
 
 set.seed(123)
 cur_res &lt;- kmeans(sce$aggregatedNeighbors, centers = 10)
 sce$clustered_neighborhood &lt;- as.character(cur_res$cluster)
 
+col_vector &lt;- unique(sce$clustered_neighborhood)
+names(col_vector) &lt;- col_vector
+
+col_vector[&quot;1&quot;] &lt;- &quot;dark red&quot;
+col_vector[&quot;2&quot;] &lt;- &quot;dodgerblue&quot;
+col_vector[&quot;3&quot;] &lt;- &quot;darkolivegreen1&quot;
+col_vector[&quot;4&quot;] &lt;- &quot;coral&quot;
+col_vector[&quot;5&quot;] &lt;- &quot;brown2&quot;
+col_vector[&quot;6&quot;] &lt;- &quot;darkolivegreen4&quot;
+col_vector[&quot;7&quot;] &lt;- &quot;darkseagreen3&quot;
+col_vector[&quot;8&quot;] &lt;- &quot;forestgreen&quot;
+col_vector[&quot;9&quot;] &lt;- &quot;greenyellow&quot;
+col_vector[&quot;10&quot;] &lt;- &quot;light blue&quot;
+
+
 # Color clusters by similar cell-types
-pheatmap(proportions(x = table(sce$clustered_neighborhood, sce$CellType), 
-                     margin = 2))</code></pre>
+cur_tab &lt;- proportions(x = table(sce$clustered_neighborhood, sce$CellType), 
+                     margin = 1)
+
+pheatmap(cur_tab, color = colorRampPalette(c(&quot;dark blue&quot;, &quot;white&quot;, &quot;dark red&quot;))(100), 
+         annotation_row = data.frame(row.names = rownames(cur_tab),
+                                     clust = rownames(cur_tab)),
+         annotation_colors = list(clust = col_vector), scale = &quot;column&quot;)</code></pre>
 <p><img src="figure/spatial_analysis.Rmd/cluster-cells-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-cluster-cells-1">
@@ -750,21 +802,7 @@ nilseling
 </div>
 </div>
 <p>And visualize the patches on the tissue.</p>
-<pre class="r"><code>col_vector &lt;- unique(sce$clustered_neighborhood)
-names(col_vector) &lt;- col_vector
-
-col_vector[&quot;1&quot;] &lt;- &quot;dark red&quot;
-col_vector[&quot;2&quot;] &lt;- &quot;dodgerblue&quot;
-col_vector[&quot;3&quot;] &lt;- &quot;darkolivegreen1&quot;
-col_vector[&quot;4&quot;] &lt;- &quot;coral&quot;
-col_vector[&quot;5&quot;] &lt;- &quot;brown2&quot;
-col_vector[&quot;6&quot;] &lt;- &quot;darkolivegreen4&quot;
-col_vector[&quot;7&quot;] &lt;- &quot;darkseagreen3&quot;
-col_vector[&quot;8&quot;] &lt;- &quot;forestgreen&quot;
-col_vector[&quot;9&quot;] &lt;- &quot;greenyellow&quot;
-col_vector[&quot;10&quot;] &lt;- &quot;light blue&quot;
-
-cur_images &lt;- sce[,sce$ImageFullName %in% c(&quot;G11_a0_full_clean.tiff&quot;,
+<pre class="r"><code>cur_images &lt;- sce[,sce$ImageFullName %in% c(&quot;G11_a0_full_clean.tiff&quot;,
                                             &quot;G07_a0_full_clean.tiff&quot;,
                                             &quot;G09_a0_full_clean.tiff&quot;)]
 
@@ -795,6 +833,17 @@ Date
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+<a href="https://github.com/BodenmillerGroup/IMCDataAnalysis/blob/42d5ac06c475e5248975520edc7f89ae6d973707/docs/figure/spatial_analysis.Rmd/visualize-patches, -1.png" target="_blank">42d5ac0</a>
+</td>
+<td>
+nilseling
+</td>
+<td>
+2021-10-18
+</td>
+</tr>
 <tr>
 <td>
 <a href="https://github.com/BodenmillerGroup/IMCDataAnalysis/blob/6d726fe22642803c71d63c23fe8c46348000797a/docs/figure/spatial_analysis.Rmd/visualize-patches, -1.png" target="_blank">6d726fe</a>
@@ -946,7 +995,6 @@ nilseling
 <pre class="r"><code>library(BiocParallel)</code></pre>
 <pre><code>Warning: package &#39;BiocParallel&#39; was built under R version 4.1.1</code></pre>
 <pre class="r"><code>library(tidyverse)
-library(viridis)
 cur_out &lt;- testInteractions(sce, group_by = &quot;ImageFullName&quot;,
                             colPairName = &quot;knn_interaction_graph&quot;, 
                             label = &quot;CellType&quot;, method = &quot;classic&quot;, 
@@ -1042,12 +1090,12 @@ attached base packages:
 [8] base     
 
 other attached packages:
- [1] viridis_0.6.1               viridisLite_0.4.0          
- [3] forcats_0.5.1               stringr_1.4.0              
- [5] dplyr_1.0.7                 purrr_0.3.4                
- [7] readr_2.0.2                 tidyr_1.1.4                
- [9] tibble_3.1.5                tidyverse_1.3.1            
-[11] BiocParallel_1.27.16        pheatmap_1.0.12            
+ [1] forcats_0.5.1               stringr_1.4.0              
+ [3] dplyr_1.0.7                 purrr_0.3.4                
+ [5] readr_2.0.2                 tidyr_1.1.4                
+ [7] tibble_3.1.5                tidyverse_1.3.1            
+ [9] BiocParallel_1.27.16        viridis_0.6.1              
+[11] viridisLite_0.4.0           pheatmap_1.0.12            
 [13] ggplot2_3.3.5               imcRtools_0.99.8           
 [15] SpatialExperiment_1.3.4     imcdatasets_1.0.1          
 [17] cytomapper_1.5.5            EBImage_4.35.0             
