@@ -65,7 +65,7 @@ pheatmap(proportions(x = table(sce$clustered_neighborhood, sce$CellType),
 
 And visualize the patches on the tissue.
 
-```{r visualize-patches, , fig.width=13, fig.height=10}
+```{r visualize-patches, , fig.width=10, fig.height=10}
 col_vector <- unique(sce$clustered_neighborhood)
 names(col_vector) <- col_vector
 
