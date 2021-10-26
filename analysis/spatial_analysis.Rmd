@@ -78,10 +78,13 @@ col_vector["10"] <- "light blue"
 cur_tab <- proportions(x = table(sce$clustered_neighborhood, sce$CellType), 
                      margin = 1)
 
-pheatmap(cur_tab, color = colorRampPalette(c("dark blue", "white", "dark red"))(100), 
+# Scale between 0 and 1
+cur_tab <- t( ( t(cur_tab) - colMins(cur_tab) ) / ( colMaxs(cur_tab) - colMins(cur_tab) ) )
+
+pheatmap(cur_tab, color = inferno(100), 
          annotation_row = data.frame(row.names = rownames(cur_tab),
                                      clust = rownames(cur_tab)),
-         annotation_colors = list(clust = col_vector), scale = "column")
+         annotation_colors = list(clust = col_vector))
 ```
 
 And visualize the patches on the tissue.
