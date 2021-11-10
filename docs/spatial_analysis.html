@@ -11,7 +11,7 @@
 
 <meta name="author" content="Nils Eling" />
 
-<meta name="date" content="2021-10-26" />
+<meta name="date" content="2021-11-10" />
 
 <title>Spatial analysis</title>
 
@@ -349,7 +349,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">Spatial analysis</h1>
 <h4 class="author">Nils Eling</h4>
-<h4 class="date">2021-10-26</h4>
+<h4 class="date">2021-11-10</h4>
 
 </div>
 
@@ -374,7 +374,7 @@ div.tocify {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2021-10-26
+<strong>Last updated:</strong> 2021-11-10
 </p>
 <p>
 <strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
@@ -465,16 +465,16 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomBodenmillerGroupIMCDataAnalysistree6152f34c94ac2c02fbf39ef63e7c0dd72a9f748ctargetblank6152f34a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/BodenmillerGroup/IMCDataAnalysis/tree/6152f34c94ac2c02fbf39ef63e7c0dd72a9f748c" target="_blank">6152f34</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomBodenmillerGroupIMCDataAnalysistree066834484cf3e82dda1536529aa0b290abfa485ctargetblank0668344a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/BodenmillerGroup/IMCDataAnalysis/tree/066834484cf3e82dda1536529aa0b290abfa485c" target="_blank">0668344</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomBodenmillerGroupIMCDataAnalysistree6152f34c94ac2c02fbf39ef63e7c0dd72a9f748ctargetblank6152f34a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomBodenmillerGroupIMCDataAnalysistree066834484cf3e82dda1536529aa0b290abfa485ctargetblank0668344a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/BodenmillerGroup/IMCDataAnalysis/tree/6152f34c94ac2c02fbf39ef63e7c0dd72a9f748c" target="_blank">6152f34</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/BodenmillerGroup/IMCDataAnalysis/tree/066834484cf3e82dda1536529aa0b290abfa485c" target="_blank">0668344</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -524,6 +524,23 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/BodenmillerGroup/IMCDataAnalysis/066834484cf3e82dda1536529aa0b290abfa485c/docs/spatial_analysis.html" target="_blank">0668344</a>
+</td>
+<td>
+nilseling
+</td>
+<td>
+2021-10-26
+</td>
+<td>
+Recompiled workflow
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -839,6 +856,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/BodenmillerGroup/IMCDataAnalysis/blob/066834484cf3e82dda1536529aa0b290abfa485c/docs/figure/spatial_analysis.Rmd/cluster-cells-1.png" target="_blank">0668344</a>
+</td>
+<td>
+nilseling
+</td>
+<td>
+2021-10-26
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/BodenmillerGroup/IMCDataAnalysis/blob/4c551b83cf567470e3602f94f3801e005766509e/docs/figure/spatial_analysis.Rmd/cluster-cells-1.png" target="_blank">4c551b8</a>
 </td>
 <td>
@@ -1054,9 +1082,8 @@ nilseling
 <div id="spatial-interaction-testing" class="section level2">
 <h2>Spatial interaction testing</h2>
 <p>Finally, we will test if certain cell-types interact more or less frequently compared to what would be expected from a random distribution. For this, the <code>testInteractions</code> function can be used.</p>
-<pre class="r"><code>library(BiocParallel)</code></pre>
-<pre><code>Warning: package &#39;BiocParallel&#39; was built under R version 4.1.1</code></pre>
-<pre class="r"><code>library(tidyverse)
+<pre class="r"><code>library(BiocParallel)
+library(tidyverse)
 cur_out &lt;- testInteractions(sce, group_by = &quot;ImageFullName&quot;,
                             colPairName = &quot;knn_interaction_graph&quot;, 
                             label = &quot;CellType&quot;, method = &quot;classic&quot;, 
@@ -1136,12 +1163,12 @@ nilseling
 </p>
 <div id="workflowr-sessioninfo" class="collapse">
 <pre class="r"><code>sessionInfo()</code></pre>
-<pre><code>R version 4.1.0 (2021-05-18)
+<pre><code>R version 4.1.2 (2021-11-01)
 Platform: x86_64-apple-darwin17.0 (64-bit)
 Running under: macOS Catalina 10.15.7
 
 Matrix products: default
-BLAS:   /Library/Frameworks/R.framework/Versions/4.1/Resources/lib/libRblas.dylib
+BLAS:   /Library/Frameworks/R.framework/Versions/4.1/Resources/lib/libRblas.0.dylib
 LAPACK: /Library/Frameworks/R.framework/Versions/4.1/Resources/lib/libRlapack.dylib
 
 locale:
@@ -1155,25 +1182,25 @@ other attached packages:
  [1] forcats_0.5.1               stringr_1.4.0              
  [3] dplyr_1.0.7                 purrr_0.3.4                
  [5] readr_2.0.2                 tidyr_1.1.4                
- [7] tibble_3.1.5                tidyverse_1.3.1            
- [9] BiocParallel_1.27.16        viridis_0.6.1              
+ [7] tibble_3.1.6                tidyverse_1.3.1            
+ [9] BiocParallel_1.28.0         viridis_0.6.2              
 [11] viridisLite_0.4.0           pheatmap_1.0.12            
-[13] ggplot2_3.3.5               imcRtools_0.99.8           
-[15] SpatialExperiment_1.3.4     imcdatasets_1.0.1          
-[17] cytomapper_1.5.5            EBImage_4.35.0             
-[19] SingleCellExperiment_1.15.2 SummarizedExperiment_1.23.5
-[21] Biobase_2.53.0              GenomicRanges_1.45.0       
-[23] GenomeInfoDb_1.29.8         IRanges_2.27.2             
-[25] S4Vectors_0.31.5            BiocGenerics_0.39.2        
-[27] MatrixGenerics_1.5.4        matrixStats_0.61.0         
+[13] ggplot2_3.3.5               imcRtools_1.0.0            
+[15] SpatialExperiment_1.4.0     imcdatasets_1.2.0          
+[17] cytomapper_1.6.0            EBImage_4.36.0             
+[19] SingleCellExperiment_1.16.0 SummarizedExperiment_1.24.0
+[21] Biobase_2.54.0              GenomicRanges_1.46.0       
+[23] GenomeInfoDb_1.30.0         IRanges_2.28.0             
+[25] S4Vectors_0.32.2            BiocGenerics_0.40.0        
+[27] MatrixGenerics_1.6.0        matrixStats_0.61.0         
 [29] workflowr_1.6.2            
 
 loaded via a namespace (and not attached):
   [1] utf8_1.2.2                    shinydashboard_0.7.2         
   [3] R.utils_2.11.0                tidyselect_1.1.1             
-  [5] RSQLite_2.2.8                 AnnotationDbi_1.55.1         
-  [7] htmlwidgets_1.5.4             grid_4.1.0                   
-  [9] DropletUtils_1.13.4           munsell_0.5.0                
+  [5] RSQLite_2.2.8                 AnnotationDbi_1.56.1         
+  [7] htmlwidgets_1.5.4             grid_4.1.2                   
+  [9] DropletUtils_1.14.1           munsell_0.5.0                
  [11] codetools_0.2-18              units_0.7-2                  
  [13] DT_0.19                       withr_2.4.2                  
  [15] colorspace_2.0-2              filelock_1.0.2               
@@ -1181,28 +1208,28 @@ loaded via a namespace (and not attached):
  [19] rstudioapi_0.13               labeling_0.4.2               
  [21] git2r_0.28.0                  GenomeInfoDbData_1.2.7       
  [23] polyclip_1.10-0               bit64_4.0.5                  
- [25] farver_2.1.0                  rhdf5_2.37.3                 
+ [25] farver_2.1.0                  rhdf5_2.38.0                 
  [27] rprojroot_2.0.2               vctrs_0.3.8                  
- [29] generics_0.1.0                xfun_0.26                    
- [31] BiocFileCache_2.1.1           R6_2.5.1                     
+ [29] generics_0.1.1                xfun_0.28                    
+ [31] BiocFileCache_2.2.0           R6_2.5.1                     
  [33] ggbeeswarm_0.6.0              graphlayouts_0.7.1           
  [35] locfit_1.5-9.4                concaveman_1.1.0             
- [37] bitops_1.0-7                  rhdf5filters_1.5.0           
+ [37] bitops_1.0-7                  rhdf5filters_1.6.0           
  [39] cachem_1.0.6                  RTriangle_1.6-0.10           
- [41] DelayedArray_0.19.4           assertthat_0.2.1             
+ [41] DelayedArray_0.20.0           assertthat_0.2.1             
  [43] promises_1.2.0.1              scales_1.1.1                 
- [45] vroom_1.5.5                   ggraph_2.0.5                 
+ [45] vroom_1.5.6                   ggraph_2.0.5                 
  [47] beeswarm_0.4.0                gtable_0.3.0                 
- [49] beachmat_2.9.1                tidygraph_1.2.0              
- [51] rlang_0.4.11                  systemfonts_1.0.2            
- [53] broom_0.7.9                   modelr_0.1.8                 
+ [49] beachmat_2.10.0               tidygraph_1.2.0              
+ [51] rlang_0.4.12                  systemfonts_1.0.3            
+ [53] broom_0.7.10                  modelr_0.1.8                 
  [55] BiocManager_1.30.16           yaml_2.2.1                   
- [57] abind_1.4-5                   backports_1.2.1              
- [59] httpuv_1.6.3                  tools_4.1.0                  
+ [57] abind_1.4-5                   backports_1.3.0              
+ [59] httpuv_1.6.3                  tools_4.1.2                  
  [61] ellipsis_0.3.2                raster_3.5-2                 
  [63] jquerylib_0.1.4               RColorBrewer_1.1-2           
  [65] proxy_0.4-26                  Rcpp_1.0.7                   
- [67] sparseMatrixStats_1.5.3       zlibbioc_1.39.0              
+ [67] sparseMatrixStats_1.6.0       zlibbioc_1.40.0              
  [69] classInt_0.4-3                RCurl_1.98-1.5               
  [71] haven_2.4.3                   ggrepel_0.9.1                
  [73] fs_1.5.0                      magrittr_2.0.1               
@@ -1212,39 +1239,39 @@ loaded via a namespace (and not attached):
  [81] fftwtools_0.9-11              evaluate_0.14                
  [83] xtable_1.8-4                  jpeg_0.1-9                   
  [85] readxl_1.3.1                  gridExtra_2.3                
- [87] compiler_4.1.0                KernSmooth_2.23-20           
- [89] V8_3.4.2                      crayon_1.4.1                 
+ [87] compiler_4.1.2                KernSmooth_2.23-20           
+ [89] V8_3.4.2                      crayon_1.4.2                 
  [91] R.oo_1.24.0                   htmltools_0.5.2              
- [93] later_1.3.0                   tzdb_0.1.2                   
- [95] tiff_0.1-8                    lubridate_1.7.10             
+ [93] later_1.3.0                   tzdb_0.2.0                   
+ [95] tiff_0.1-10                   lubridate_1.8.0              
  [97] DBI_1.1.1                     tweenr_1.0.2                 
- [99] ExperimentHub_2.1.4           dbplyr_2.1.1                 
+ [99] ExperimentHub_2.2.0           dbplyr_2.1.1                 
 [101] MASS_7.3-54                   rappdirs_0.3.3               
 [103] sf_1.0-3                      Matrix_1.3-4                 
-[105] cli_3.0.1                     R.methodsS3_1.8.1            
-[107] parallel_4.1.0                igraph_1.2.6                 
+[105] cli_3.1.0                     R.methodsS3_1.8.1            
+[107] parallel_4.1.2                igraph_1.2.8                 
 [109] pkgconfig_2.0.3               sp_1.4-5                     
-[111] terra_1.4-11                  scuttle_1.3.1                
+[111] terra_1.4-11                  scuttle_1.4.0                
 [113] xml2_1.3.2                    svglite_2.0.0                
 [115] vipor_0.4.5                   bslib_0.3.1                  
-[117] dqrng_0.3.0                   XVector_0.33.0               
-[119] rvest_1.0.1                   digest_0.6.28                
-[121] Biostrings_2.61.2             cellranger_1.1.0             
-[123] rmarkdown_2.11                edgeR_3.35.1                 
-[125] DelayedMatrixStats_1.15.4     curl_4.3.2                   
+[117] dqrng_0.3.0                   XVector_0.34.0               
+[119] rvest_1.0.2                   digest_0.6.28                
+[121] Biostrings_2.62.0             cellranger_1.1.0             
+[123] rmarkdown_2.11                edgeR_3.36.0                 
+[125] DelayedMatrixStats_1.16.0     curl_4.3.2                   
 [127] shiny_1.7.1                   rjson_0.2.20                 
 [129] lifecycle_1.0.1               jsonlite_1.7.2               
-[131] Rhdf5lib_1.15.2               BiocNeighbors_1.11.0         
-[133] limma_3.49.4                  fansi_0.5.0                  
-[135] pillar_1.6.3                  lattice_0.20-44              
-[137] KEGGREST_1.33.0               fastmap_1.1.0                
-[139] httr_1.4.2                    interactiveDisplayBase_1.31.2
-[141] glue_1.4.2                    png_0.1-7                    
+[131] Rhdf5lib_1.16.0               BiocNeighbors_1.12.0         
+[133] limma_3.50.0                  fansi_0.5.0                  
+[135] pillar_1.6.4                  lattice_0.20-45              
+[137] KEGGREST_1.34.0               fastmap_1.1.0                
+[139] httr_1.4.2                    interactiveDisplayBase_1.32.0
+[141] glue_1.5.0                    png_0.1-7                    
 [143] svgPanZoom_0.3.4              BiocVersion_3.14.0           
 [145] bit_4.0.4                     ggforce_0.3.3                
 [147] class_7.3-19                  stringi_1.7.5                
-[149] sass_0.4.0                    HDF5Array_1.21.0             
-[151] blob_1.2.2                    AnnotationHub_3.1.5          
+[149] sass_0.4.0                    HDF5Array_1.22.0             
+[151] blob_1.2.2                    AnnotationHub_3.2.0          
 [153] memoise_2.0.0                 e1071_1.7-9                  </code></pre>
 </div>
 </div>
