@@ -1,6 +1,0 @@
-# Read in the data
-
-## Read in single-cell information
-
-## Read in images
-

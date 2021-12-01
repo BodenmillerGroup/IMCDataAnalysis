@@ -1,0 +1,57 @@
+---
+title: "Select cores"
+author: "Nils Eling"
+date: "`R Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+Here, we will select interesting cores for the [Hoch et al.](https://www.biorxiv.org/content/10.1101/2021.07.29.454093v1) dataset of 
+metastatic melanoma. We will use the protein dataset to select channels and 
+ROIs with immune infiltration as well as a high variety of cell types. 
+
+```{r load-data}
+sce <- readRDS("/Volumes/sh_thoch/Git/MelanomaIMC/data/data_for_analysis/sce_protein.rds")
+image_meta <- read.csv("/Volumes/sh_thoch/Git/MelanomaIMC/data/full_data/protein/cpout/Image.csv")
+
+# Link core ID to image number
+image_meta <- image_meta[,c("ImageNumber", "Metadata_Description")]
+
+# Remove cores that were already measured
+cores <- c("E5","H9","F9","L8","N10","F2","D8","E4","J4","G11","L4","O9","E2",
+           "D4","D3","G9","B6","O2","M10","B3","N8","A4","I11","K2","I5","M9")
+
+images <- image_meta$ImageNumber[match(cores, image_meta$Metadata_Description)]
+
+sce <- sce[,!sce$ImageNumber %in% images]
+```
+
+## Select cores of interest
+
+Next, we will visualize the cell type fraction per core.
+
+```{r cell-types, message=FALSE}
+library(tidyverse)
+library(pheatmap)
+library(viridis)
+
+cur_tab <- prop.table(table(sce$ImageNumber, sce$celltype), margin = 1)
+cur_tab <- t((t(cur_tab) - colMins(cur_tab)) / (colMaxs(cur_tab) - colMins(cur_tab)))
+
+rownames(cur_tab) <- image_meta$Metadata_Description[match(rownames(cur_tab), image_meta$ImageNumber)]
+
+pheatmap(cur_tab, 
+         color = viridis(100), cellwidth = 8, cellheight = 8, 
+         filename = "celltype_heatmap.pdf")
+```
+
+From this heatmap we pick the following samples:
+
+```{r show-sample-metadata}
+selected_samples <- c("C9", "J9", "A5", "K8", "I9", "J11", "B10", "L10",
+                      "O8", "P8", "L7", "J7")
+```
