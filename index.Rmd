@@ -1,6 +1,6 @@
 --- 
 title: "Analysis workflow for imaging mass cytometry data"
-author: "**Authors:** Nils Eling [<sup>1</sup>](#DQBM)<sup>,</sup>[<sup>2</sup>](#IMHS)<sup>,</sup>[<sup>*</sup>](#email), Vito Zanotelli [<sup>1</sup>](#DQBM)<sup>,</sup>[<sup>2</sup>](#IMHS)"
+author: "**Authors:** Nils Eling [<sup>1</sup>](#DQBM)<sup>,</sup>[<sup>2</sup>](#IMHS)<sup>,</sup>[<sup>*</sup>](#email), Vito Zanotelli [<sup>1</sup>](#DQBM)<sup>,</sup>[<sup>2</sup>](#IMHS), Daniel Schulz [<sup>1</sup>](#DQBM)<sup>,</sup>[<sup>2</sup>](#IMHS)"
 date: "**Compiled:** `r Sys.Date()`"
 site: bookdown::bookdown_site
 github-repo: "BodenmillerGroup/IMCDataAnalysis"
@@ -18,8 +18,8 @@ description: "This bookdown project highlights possible down-stream analyses per
 Upon release, this workflow highlights the use of common R/Bioconductor packages
 to pre-process and analyze single-cell data obtained from segmented IMC images.
 While we use IMC data as an example, the concepts presented here can be applied
-to images obtained by other technologies (e.g. CODEX, MIBI, mIF, etc.). The
-workflow can be largely divided into the following parts:
+to images obtained by other highly-multiplexed imaging technologies (e.g. CODEX,
+MIBI, mIF, etc.). The workflow can be largely divided into the following parts:
 
 1. Pre-processing (reading in the data, spillover correction)
 2. Metrics for quality control
