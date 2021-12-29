@@ -1,4 +1,4 @@
-# Prerequisites
+# Prerequisites {#prerequisites}
 
 Before we get started on IMC data analysis, we will need to make sure that
 software dependencies are installed and the needed example data is downloaded.

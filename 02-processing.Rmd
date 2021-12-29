@@ -1,14 +1,17 @@
 # Multi-channel image processing {#processing}
 
-The following sections describe the processing of IMC raw data, including file
-type conversion, image segmentation, feature extraction and data export. More
-detailed information can be found in the individual repositories:
+This book describes common analysis steps of spatially-resolved single-cell data
+**after** image segmentation and feature extraction. The following sections
+describe the processing of IMC raw data, including file type conversion, image
+segmentation, feature extraction and data export. To obtain more detailed
+information on the individual image processing approaches, please visit their
+repositories:
 
 [IMC segmentation
 pipeline](https://github.com/BodenmillerGroup/ImcSegmentationPipeline): Raw IMC
 data pre-processing is performed using the
 [imctools](https://github.com/BodenmillerGroup/imctools) Python package to
-convert raw `.mcd` files into `.ome.tiff` and `.tiff` files. After image
+convert raw MCD files into OME-TIFF and TIFF files. After image
 cropping, an [ilastik](https://www.ilastik.org/) pixel classifier is trained for
 image classification prior to image segmentation using
 [CellProfiler](https://cellprofiler.org/). Features (e.g. mean pixel intensity)
@@ -17,31 +20,29 @@ of segmented objects (e.g. cells) are quantified and exported. Read more in the
 
 [steinbock](https://github.com/BodenmillerGroup/steinbock): The `steinbock`
 framework offers tools for multi-channel image processing using the command-line
-or Python code. Supported tasks include IMC data preprocessing, supervised
-multi-channel image segmentation, object quantification and data export to a
-variety of file formats. It supports functionality similar to those of the IMC
-Segmentation Pipeline and further allows deep-leaarning enabled image
+or Python code [@Windhager2021]. Supported tasks include IMC data preprocessing,
+supervised multi-channel image segmentation, object quantification and data
+export to a variety of file formats. It supports functionality similar to those
+of the IMC Segmentation Pipeline and further allows deep-learning enabled image
 segmentation. The framework is available as platform-independent Docker
 container, ensuring reproducibility and user-friendly installation. Read more in
-the [Docs](https://bodenmillergroup.github.io/steinbock/latest/) and the
-[paper](https://www.biorxiv.org/content/10.1101/2021.11.12.468357v1).
+the [Docs](https://bodenmillergroup.github.io/steinbock/latest/).
 
 ## Image pre-processing 
 
 To facilitate IMC data pre-processing, the
 [readimc](https://github.com/BodenmillerGroup/readimc) and
-[imctools](https://github.com/BodenmillerGroup/imctools), open-source Python
+[imctools](https://github.com/BodenmillerGroup/imctools) open-source Python
 packages allow extracting the multi-modal (IMC acquisitions, panoramas),
 multi-region, multi-channel information contained in raw IMC images. While
 `imctools` contains functionality specific to the IMC Segmentation Pipeline, the
 `readimc` package contains reader functions for IMC raw data and should be used
-for this purpose. A common first step of IMC pre-processing is the conversion of
-raw data from MCD files to multi-channel TIFF files.
+for this purpose. 
 
 Starting from IMC raw data and a "panel" file, individual acquisitions are
 extracted as TIFF and OME-TIFF files. The panel contains information of
 antibodies used in the experiment and the user can specify which channels to
-keep for downstream analysis. In the case pixel classification-based image
+keep for downstream analysis. When pixel classification-based image
 segmentation is performed (see next section), random tiles are cropped from
 images for convenience of pixel labelling.
 
@@ -59,7 +60,7 @@ pipeline, the probabilities are then thresholded for segmenting nuclei, and
 nuclei are expanded into cytoplasmic regions to obtain cell masks.
 
 **Deep learning-based** image segmentation is performed as presented by
-Greenwald _et al._[^fn1]. Briefly, `steinbock` first aggregates user-defined
+[@Greenwald2021]. Briefly, `steinbock` first aggregates user-defined
 image channels to generate two-channel images representing nuclear and
 cytoplasmic signals. Next, the
 [DeepCell](https://github.com/vanvalenlab/intro-to-deepcell) Python package is
@@ -73,12 +74,12 @@ size, with non-zero grayscale values indicating the IDs of segmented objects
 
 ## Feature extraction
 
-Using the segmentation masks together with the multi-channel images, the IMC
-Segmentation Pipeline as well as `steinbock` extract object-specific features.
-These include the mean pixel intensity per object and channel, morphological
-features (e.g. object area) and the objects' locations. Object-specific features
-are written out as CSV files where rows represent individual objects and columns
-represent features.
+Using the segmentation masks together with their corresponding multi-channel
+images, the IMC Segmentation Pipeline as well as `steinbock` extract
+object-specific features. These include the mean pixel intensity per object and
+channel, morphological features (e.g. object area) and the objects' locations.
+Object-specific features are written out as CSV files where rows represent
+individual objects and columns represent features.
 
 Furthermore, the IMC Segmentation Pipeline and `steinbock` compute _spatial
 object graphs_, in which nodes correspond to objects, and nodes in spatial
@@ -93,15 +94,20 @@ as CSV file.
 
 To further facilitate compatibility with downstream analysis, `steinbock`
 exports data to a variety of file formats such as OME-TIFF for images, FCS for
-single-cell data, the _anndata_[^fn2] format for data analysis in Python, and
-various graph file formats for network analysis using software such as
-[CytoScape](https://cytoscape.org/)[^fn3]. For export to OME-TIFF, steinbock
-uses [xtiff](https://github.com/BodenmillerGroup/xtiff), a Python package
-developed for writing multi-channel TIFF stacks.
+single-cell data, the _anndata_ [@Wolf2018] format for data analysis in Python,
+and various graph file formats for network analysis using software such as
+[CytoScape](https://cytoscape.org/) [@Shannon2003]. For export to OME-TIFF,
+steinbock uses [xtiff](https://github.com/BodenmillerGroup/xtiff), a Python
+package developed for writing multi-channel TIFF stacks.
 
 ## Data import into R
 
-Link to next section
+In Section \@ref(read-data), we will highlight the use of the
+[imcRtools](https://github.com/BodenmillerGroup/imcRtools) and
+[cytomapper](https://github.com/BodenmillerGroup/cytomapper) packages to read in
+single-cell and image data generated by the IMC Segmentation Pipeline and
+`steinbock`. All further downstream analyses are performed in R and detailed in
+the following sections.
 
 
 
