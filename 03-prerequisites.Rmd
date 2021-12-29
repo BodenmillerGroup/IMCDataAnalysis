@@ -1,35 +1,43 @@
-# Prerequisites
+# Prerequisites {#prerequisites}
 
 Before we get started on IMC data analysis, we will need to make sure that
 software dependencies are installed and the needed example data is downloaded.
 
 ## Software requirements
 
+```{r load-libraries, echo = FALSE, message = FALSE}
+library(CATALYST)
+library(SingleCellExperiment)
+library(scuttle)
+library(scater)
+library(imcRtools)
+library(cytomapper)
+library(dittoSeq)
+library(tidyverse)
+```
+
 Throughout the analysis, we rely on different R software packages.
 This section lists the most commonly used packages in this workflow.
 
 Data containers:
 
-* [SingleCellExperiment](https://bioconductor.org/packages/release/bioc/html/SingleCellExperiment.html)
+* [SingleCellExperiment](https://bioconductor.org/packages/release/bioc/html/SingleCellExperiment.html) version `r packageVersion("SingleCellExperiment")`
 
 Data processing:
 
-* [CATALYST](https://bioconductor.org/packages/release/bioc/html/CATALYST.html)
-* [imcRtools](https://github.com/BodenmillerGroup/imcRtools)
-* [scuttle](https://bioconductor.org/packages/release/bioc/html/scuttle.html)
-* [scater](https://bioconductor.org/packages/release/bioc/html/scater.html)
+* [CATALYST](https://bioconductor.org/packages/release/bioc/html/CATALYST.html) version `r packageVersion("SingleCellExperiment")`
+* [imcRtools](https://github.com/BodenmillerGroup/imcRtools) version `r packageVersion("imcRtools")` from [Github](https://github.com/BodenmillerGroup/imcRtools)
+* [scuttle](https://bioconductor.org/packages/release/bioc/html/scuttle.html) version `r packageVersion("scuttle")`
+* [scater](https://bioconductor.org/packages/release/bioc/html/scater.html) version `r packageVersion("scater")`
 
 Data visualization:
 
-* [cytomapper](https://bioconductor.org/packages/release/bioc/html/cytomapper.html)
-* [dittoSeq](https://bioconductor.org/packages/release/bioc/html/dittoSeq.html)
+* [cytomapper](https://bioconductor.org/packages/release/bioc/html/cytomapper.html) version `r packageVersion("cytomapper")` from [Github](https://github.com/BodenmillerGroup/cytomapper)
+* [dittoSeq](https://bioconductor.org/packages/release/bioc/html/dittoSeq.html) version `r packageVersion("dittoSeq")`
 
 Tidy R:
 
 * [tidyverse](https://www.tidyverse.org/)
-
-For the detailed version numbers, please refer to the [package
-versions](#sessionInfo) section below.
 
 ## Download example data
 
@@ -63,15 +71,6 @@ unlink("data/Figure_4.zip")
    <summary>SessionInfo</summary>
    
 ```{r, echo = FALSE, message = FALSE}
-library(CATALYST)
-library(SingleCellExperiment)
-#library(scuttle)
-#library(scater)
-library(imcRtools)
-#library(cytomapper)
-#library(dittoSeq)
-library(tidyverse)
-
 sessionInfo()
 ```
 </details>

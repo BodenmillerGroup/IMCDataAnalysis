@@ -1,0 +1,3 @@
+# Visualizing the images {#image-visualization}
+
+Using the `cytomapper` package.
