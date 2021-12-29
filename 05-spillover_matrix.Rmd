@@ -26,6 +26,8 @@ In brief, the highlighted workflow comprises 5 steps:
 5. Pixel selection for spillover matrix estimation
 6. Spillover matrix generation
 7. Saving the results
+8. Single-cell compensation
+9. Image compensation
 
 ## Generate the spillover matrix
 
@@ -238,7 +240,49 @@ writeTIFF(adapted_sm, "data/Figure_4/new_imc_full_sm.tiff",
 
 ## Compensate images
 
-**This section is under development**
+The [cytomapper](https://github.com/BodenmillerGroup/cytomapper) allows channel
+spillover compensation directly on multi-channel images. 
+The `compImage` function takes a `CytoImageList` object and the estimated
+spillover matrix as input. More info on how to work with `CytoImageList`
+objects can be seen in Section \@ref(image-visualization).
+
+For demonstration purposes, we read in a multi-channel image.
+The `channelNames` need to be set according to their order.
+
+```{r read-in-image, message=FALSE}
+library(cytomapper)
+
+img <- loadImages("data/Figure_4/IMC_image/analysis/imc_example_image_a0_full.tiff")
+channelNames(img) <- ordered_chs$V1
+img
+```
+
+We can now use the correclty ordered spillover matrix to compensate the 
+multi-channel image:
+
+```{r image-compensation, message = FALSE}
+img_comp <- compImage(img, adapted_sm)
+```
+
+As a sanity check, we will visualize the image before and after compensation:
+
+```{r image-visualization}
+# Before compensation
+plotPixels(img, colour_by = "Er166Di", 
+           image_title = list(text = "Er166 - before", position = "topleft"), 
+           legend = NULL)
+plotPixels(img, colour_by = "Er167Di", 
+           image_title = list(text = "Er167 - before", position = "topleft"), 
+           legend = NULL)
+
+# After compensation
+plotPixels(img_comp, colour_by = "Er166Di",
+           image_title = list(text = "Er166 - after", position = "topleft"), 
+           legend = NULL)
+plotPixels(img_comp, colour_by = "Er167Di", 
+           image_title = list(text = "Er167 - after", position = "topleft"),
+           legend = NULL)
+```
 
 ```{r integration-test-original_sm, include = FALSE}
 library(testthat)
@@ -255,6 +299,14 @@ current_sm <- adapted_sm
 dimnames(current_sm) <- NULL
 
 expect_equal(correct_sm, current_sm, tolerance = 0.0005)
+```
+
+```{r integration-test-img-comp, include = FALSE}
+correct_img <- loadImages("data/Figure_4/IMC_image/cpoutput/imc_example_image_a0_full_spillcorr_nnls.tif")
+
+expect_equal(as.array(correct_img$imc_example_image_a0_full_spillcorr_nnls),
+             as.array(img_comp$imc_example_image_a0_full), 
+             check.attributes = FALSE, tolerance = 0.0005)
 ```
 
 ## Session Info
