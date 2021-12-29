@@ -31,9 +31,9 @@ jobs:
                                             "zoo", "BiocManager", "devtools", "testthat", "tiff",
                                             "distill"))'
       - name: Install Bioconductor dependencies
-        run: Rscript -e 'BiocManager::install("CATALYST")'
+        run: Rscript -e 'BiocManager::install(c("CATALYST", "scuttle", "scater", "dittoSeq", "tidyverse"))'
       - name: Install Github dependencies
-        run: Rscript -e 'devtools::install_github("BodenmillerGroup/imcRtools")'    
+        run: Rscript -e 'devtools::install_github(c("BodenmillerGroup/imcRtools", "BodenmillerGroup/cytomapper"))'    
       - name: Render Book
         run: Rscript -e 'bookdown::render_book("index.Rmd")'
       - uses: actions/upload-artifact@v2
