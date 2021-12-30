@@ -5,4 +5,14 @@
 
 ## Spatial domains
 
+## Session Info
+
+<details>
+   <summary>SessionInfo</summary>
+   
+```{r, echo = FALSE}
+sessionInfo()
+```
+</details>
+
 

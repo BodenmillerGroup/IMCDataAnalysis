@@ -1,3 +1,13 @@
 # Image and cell-level quality control
 
 Overview on possible quality indicators
+
+## Session Info
+
+<details>
+   <summary>SessionInfo</summary>
+   
+```{r, echo = FALSE}
+sessionInfo()
+```
+</details>

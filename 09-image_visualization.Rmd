@@ -1,3 +1,13 @@
 # Visualizing the images {#image-visualization}
 
 Using the `cytomapper` package.
+
+## Session Info
+
+<details>
+   <summary>SessionInfo</summary>
+   
+```{r, echo = FALSE}
+sessionInfo()
+```
+</details>

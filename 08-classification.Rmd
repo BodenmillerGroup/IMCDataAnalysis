@@ -5,3 +5,13 @@
 ## Training a classifier
 
 ## Classification of new data
+
+## Session Info
+
+<details>
+   <summary>SessionInfo</summary>
+   
+```{r, echo = FALSE}
+sessionInfo()
+```
+</details>

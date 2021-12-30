@@ -139,3 +139,13 @@ cur_ids <- str_split_fixed(cur_names, "_", 4)[,4]
 mcols(images) <- mcols(masks) <- DataFrame(ImageName = names(images))
 ```
 
+## Session Info
+
+<details>
+   <summary>SessionInfo</summary>
+   
+```{r, echo = FALSE}
+sessionInfo()
+```
+</details>
+

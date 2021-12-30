@@ -79,7 +79,7 @@ unzip("data/Figure_4.zip", exdir="data", overwrite=TRUE)
 unlink("data/Figure_4.zip")
 ```
 
-### Software versions {#sessionInfo}
+## Software versions {#sessionInfo}
 
 <details>
    <summary>SessionInfo</summary>
