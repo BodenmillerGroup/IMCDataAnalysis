@@ -1,6 +1,64 @@
 # Read in the data {#read-data}
 
+This section describes how to read in single-cell data and images *after*
+image processing and segmentation (see Section \@ref(processing)). 
+
+We provide already processed data at: TODO
+
+We use the [imcRtools]() package to read in single-cell data and the [cytomapper]() package to read in images.
+
+```{r load-libraries, message=FALSE}
+library(imcRtools)
+library(cytomapper)
+```
+
 ## Read in single-cell information
 
+### steinbock generated data
+
+```{r read-steinbock}
+sce <- read_steinbock("data/steinbock/")
+```
+
+```{r counts}
+counts(sce)[1:5,1:5]
+```
+
+```{r colData}
+head(colData(sce))
+```
+
+```{r rowData}
+head(rowData(sce))
+```
+
+**Transform counts**
+
+```{r transform-counts}
+assay(sce, "exprs") <- asinh(counts(sce))
+```
+
+**Add additional metadata**
+
+Indication
+
+### IMC Segmentation Pipeline generated data
+
+**This section is under development**
+
 ## Read in images
+
+```{r read-images}
+images <- loadImages("data/steinbock/img/")
+masks <- loadImages("data/steinbock/masks_deepcell/")
+
+channelNames(images) <- rownames(sce)
+
+library(stringr)
+
+cur_names <- names(images)
+cur_ids <- str_split_fixed(cur_names, "_", 4)[,4]
+    
+mcols(images) <- mcols(masks) <- DataFrame(ImageName = names(images))
+```
 
