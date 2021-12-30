@@ -1,5 +1,15 @@
 # Prerequisites {#prerequisites}
 
+The analysis presented in this book requires a basic understanding of the 
+`R` programing language. An introduction to `R` can be found [here](https://cran.r-project.org/doc/manuals/r-release/R-intro.pdf) and
+in the book [R for Data Science](https://r4ds.had.co.nz/index.html).
+
+Furthermore, it is beneficial to be familiar with single-cell data analysis
+using the [Bioconductor](https://www.bioconductor.org/) framework. The 
+[Orchestrating Single-Cell Analysis with Bioconductor](https://bioconductor.org/books/release/OSCA/) 
+gives an excellent overview on data containers and basic analysis that are being
+used here.
+
 Before we get started on IMC data analysis, we will need to make sure that
 software dependencies are installed and the needed example data is downloaded.
 
@@ -7,6 +17,7 @@ software dependencies are installed and the needed example data is downloaded.
 
 ```{r load-libraries, echo = FALSE, message = FALSE}
 library(CATALYST)
+library(SpatialExperiment)
 library(SingleCellExperiment)
 library(scuttle)
 library(scater)
@@ -21,11 +32,12 @@ This section lists the most commonly used packages in this workflow.
 
 Data containers:
 
+* [SpatialExperiment](https://bioconductor.org/packages/release/bioc/html/SpatialExperiment.html) version `r packageVersion("SpatialExperiment")`
 * [SingleCellExperiment](https://bioconductor.org/packages/release/bioc/html/SingleCellExperiment.html) version `r packageVersion("SingleCellExperiment")`
 
 Data processing:
 
-* [CATALYST](https://bioconductor.org/packages/release/bioc/html/CATALYST.html) version `r packageVersion("SingleCellExperiment")`
+* [CATALYST](https://bioconductor.org/packages/release/bioc/html/CATALYST.html) version `r packageVersion("CATALYST")`
 * [imcRtools](https://github.com/BodenmillerGroup/imcRtools) version `r packageVersion("imcRtools")` from [Github](https://github.com/BodenmillerGroup/imcRtools)
 * [scuttle](https://bioconductor.org/packages/release/bioc/html/scuttle.html) version `r packageVersion("scuttle")`
 * [scater](https://bioconductor.org/packages/release/bioc/html/scater.html) version `r packageVersion("scater")`
@@ -37,9 +49,11 @@ Data visualization:
 
 Tidy R:
 
-* [tidyverse](https://www.tidyverse.org/)
+* [tidyverse](https://www.tidyverse.org/) version `r packageVersion("tidyverse")`
 
-## Download example data
+## Download example data {#download-data}
+
+TODO: Explain what the example data is (raw data, processed data).
 
 Throughout this tutorial, we will access a number of different data types. 
 To declutter the analysis scripts, we will already download all needed data here.
