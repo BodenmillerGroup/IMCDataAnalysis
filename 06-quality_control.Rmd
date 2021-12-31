@@ -2,6 +2,12 @@
 
 Overview on possible quality indicators
 
+## Segmentation quality control
+
+## Image-level quality control
+
+## Cell-level quality control
+
 ## Session Info
 
 <details>
