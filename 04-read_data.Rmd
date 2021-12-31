@@ -109,17 +109,55 @@ head(rowData(spe))
 
 **This section is under development**
 
-## Further single-cell processing
+## Single-cell processing
 
-**Transform counts**
-
-```{r transform-counts}
-assay(spe, "exprs") <- asinh(counts(spe))
-```
+After reading in the single-cell data, few further processing steps need to be
+taken.
 
 **Add additional metadata**
 
-Indication
+We can set the `colnames` of the object to generate unique identifiers per cell:
+
+```{r, set-colnames}
+colnames(spe) <- paste0(spe$sample_id, "_", spe$ObjectNumber)
+```
+
+It is also often the case that sample-specific metadata are available externally.
+For the current data, we need to link the cancer type (also referred to as "Indication")
+to each sample. This metadata is availabel as external excel file:
+
+```{r, add-indication}
+library(openxlsx)
+library(stringr)
+meta <- read.xlsx("data/sample_metadata.xlsx")
+
+spe$patient_id <- str_extract_all(spe$sample_id, "[0-9]+", simplify = TRUE)[,2]
+spe$indication <- meta$Indication[match(spe$patient_id, meta$Sample.ID)]
+```
+
+**Transform counts**
+
+The distribution of expression counts across cells is often observed to be
+skewed towards the right side meaning lots of cells display low counts and few
+cells have high counts. To avoid analysis biases from these high-expressing
+cells, the expression counts are commonly transformed or clipped.
+
+Here, we perform counts transformation using an inverse hyperbolic sine
+function. This transformation is commonly applied to [flow cytometry
+data](https://support.cytobank.org/hc/en-us/articles/206148057-About-the-Arcsinh-transform).
+The `cofactor` here defines the expression range on which no scaling is
+performed. While the `cofactor` for CyTOF data is often set to `5`, IMC data
+usually display much lower counts. We therefore apply a `cofactor` of `1`.
+
+However, other transformations such as `log(counts(spe) + 0.01)` should be
+tested when analysing IMC data.
+
+```{r, transform-counts, message=FALSE}
+library(dittoSeq)
+dittoRidgePlot(spe, var = "CD3", group.by = "patient_id", assay = "counts")
+assay(spe, "exprs") <- asinh(counts(spe)/1)
+dittoRidgePlot(spe, var = "CD3", group.by = "patient_id", assay = "exprs")
+```
 
 ## Read in images {#read-images}
 
