@@ -1,143 +1,139 @@
 # Introduction {#intro}
 
-Imaging mass cytometry (IMC) utilizes metal-tagged antibodies to detect up to 40
-proteins, or other molecules which may be labelled in biological samples. As
-such, it is a leading technology to perform highly-multiplexed imaging (HMI)
-particularly suited to profile small (1 mm$^2$) areas of tissue slices
-across hundreds of samples.
+Imaging mass cytometry (IMC) utilizes metal-tagged antibodies to detect over 40
+proteins and other metal-tagged molecules in biological samples. IMC can be used
+to perform highly multiplexed imaging and is particularly suited to profiling
+selected areas of tissues across many samples.
 
 ![IMC_workflow](img/IMC_workflow.png)
 *Overview of imaging mass cytometry data acquisition. Taken from [@Giesen2014]*
 
-IMC has first been published in 2014 [@Giesen2014] and has been commercialised by
+IMC has first been published in 2014 [@Giesen2014] and has been commercialized by
 Fluidigm<sup>&reg;</sup> to be distributed as the Hyperion<sup><font size="1">TM</font></sup> imaging
 system (documentation is available
 [here](https://www.fluidigm.com/products-services/instruments/hyperion)).
 Similar to other HMI technologies such as MIBI [@Angelo2014], CyCIF [@Lin2018],
 4i [@Gut2018], CODEX [@Goltsev2018] and SABER [@Saka2019], IMC captures the spatial
-expression of multiple proteins in parallel. With 1 &mu;m resolution, IMC is able to
-detect cytoplasmic and nuclear localization of proteins. The default ablation
-frequency of IMC is set to 200Hz, meaning a 1 mm$^2$ area can be imaged
-within ~2 hours.
+expression of multiple proteins in parallel. With a nominal 1 &mu;m resolution,
+IMC is able to detect cytoplasmic and nuclear localization of proteins. The
+current ablation frequency of IMC is 200Hz, meaning that a 1 mm$^2$ area
+can be imaged within about 2 hours.
 
 ## Technical details
 
 Technical aspects of how data acquisition works can be found in the original
 publication [@Giesen2014]. Briefly, antibodies to detect targets in biological
-material are labeled with heavy metals (e.g. lanthanides) which do not occur in
-biological systems and can therefore be used as a readout similar to
-fluorophores in fluorescence microscopy. Thin sections of the biological sample
-on a glass slide are stained with an antibody cocktail and dried after staining.
-Stained microscopy slides are mounted on a precise motor driven stage inside the
-ablation chamber of the IMC. A high energy UV laser is focused on the tissue and
-any individual laser shot will ablate tissue from an area of roughly 1
-&mu;m$^2$. The energy of the laser is absorbed by the tissue which leads
-to vaporization and partial ionization followed by condensation of the ablated
-material. The ablated material from each laser shot is transported in the gas
-phase into the plasma of the CyTOF where exhaustive ionization of the particles
-occurs. The ionized particle cloud is then focused into a vacuum and all ions
-below a mass of 80 Da are filtered via a quadrupole mass analyzer. The remaining
-ions (mostly those used to tag antibodies) are analyzed in a time of flight mass
-spectrometer to obtain an accumulated mass spectrum from all ions that
-correspond to a single laser shot. One can regard this spectra as the underlying
-information for a 1&nbsp;&mu;m$^2$ pixel. With repetitive laser shots (e.g.
-200 Hz) and a simultaneous lateral sample movement a tissue can be ablated pixel
-by pixel and ultimately an image is reconstructed from each pixel mass spectra.
+material are labeled with heavy metals (e.g., lanthanides) that do not occur in
+biological systems and thus can be used upon binding to their target as a
+readout similar to fluorophores in fluorescence microscopy. Thin sections of the
+biological sample on a glass slide are stained with an antibody cocktail.
+Stained microscopy slides are mounted on a precise motor-driven stage inside the
+ablation chamber of the IMC instrument. A high-energy UV laser is focused on the
+tissue, and each individual laser shot ablates tissue from an area of roughly 1
+&mu;m$^2$. The energy of the laser is absorbed by the tissue resulting
+in vaporization followed by condensation of the ablated material. The ablated
+material from each laser shot is transported in the gas phase into the plasma of
+the mass cytometer, where first atomization of the particles and then ionization
+of the atoms occurs. The ion cloud is then transferred into a vacuum, and all
+ions below a mass of 80 m/z are filtered using a quadrupole mass filter. The
+remaining ions (mostly those used to tag antibodies) are analyzed in a
+time-of-flight mass spectrometer to ultimately obtain an accumulated mass
+spectrum from all ions that correspond to a single laser shot. One can regard
+this spectrum as the information underlying a 1 &mu;m$^2$ pixel. With
+repetitive laser shots (e.g., at 200 Hz) and a simultaneous lateral sample
+movement, a tissue can be ablated pixel by pixel. Ultimately an image is
+reconstructed from each pixel mass spectrum.
 
-In principle IMC can be applied to the same type of samples as conventional
+In principle, IMC can be applied to the same type of samples as conventional
 fluorescence microscopy. The largest distinction from fluorescence microscopy is
-that for IMC primary labelled antibodies are commonly used while in fluorescence
-microscopy secondary antibodies carrying fluorophores are widely applied.
-Additionally, for IMC samples are dried before acquisition. Formalin-fixed and
-paraffin-embedded (FFPE) samples are most widely used where FFPE blocks are cut
-to 2-5 &mu;m thick sections for subsequent staining. Once the sections are
-stained and dried slides are ready for acquisition with IMC.
+that for IMC primary-labeled antibodies are commonly used, whereas in
+fluorescence microscopy secondary antibodies carrying fluorophores are widely
+applied. Additionally, for IMC, samples are dried before acquisition and can be
+stored for years. Formalin-fixed and paraffin-embedded (FFPE) samples are widely
+used for IMC. The FFPE blocks are cut to 2-5 &mu;m thick sections and are
+stained, dried, and analyzed with IMC.
 
 
 ### Metal-conjugated antobodies and staining
 
-Metal-labeled antibodies are used to stain tissue structures, cells and
-molecules within cells. Metal conjugated antibodies can either be purchased
-directly from Fluidigm ([MaxPar IMC Antibodies](
-https://store.fluidigm.com/Cytometry/ConsumablesandReagentsCytometry/MaxparAntibodies?cclcl=en_US))
+Metal-labeled antibodies are used to stain molecules in tissues enabling to
+delineate tissue structures, cells, and subcellular structures. Metal-conjugated
+antibodies can either be purchased directly from Fluidigm ([MaxPar IMC Antibodies](https://store.fluidigm.com/Cytometry/ConsumablesandReagentsCytometry/MaxparAntibodies?cclcl=en_US)),
 or antibodies can be purchased and labeled individually ([MaxPar Antibody
-Labelling](https://store.fluidigm.com/Cytometry/ConsumablesandReagentsCytometry/MaxparAntibodyLabelingKits?cclcl=en_US)).
-Of general note: antibody labeling using the MaxPar kits is performed via TCEP
-antibody reduction followed by crosslinking with sulfhydryl-reactive
-maleimide-bearing metal polymers. Not all antibodies are functional after
-labeling and it is crucial to use those antibodies that provide sufficient
-signal intensity and specificity after conjugation. To facilitate antibody
-handling a database is almost mandatory for any IMC or other HMI users.
-[Airlab](https://github.com/BodenmillerGroup/airlab-web) is such a platform and
-allows antibody lot tracking, validation data uploads and panel generation for
+Labeling](https://store.fluidigm.com/Cytometry/ConsumablesandReagentsCytometry/MaxparAntibodyLabelingKits?cclcl=en_US)).
+Antibody labeling using the MaxPar kits is performed via TCEP antibody reduction
+followed by crosslinking with sulfhydryl-reactive maleimide-bearing metal
+polymers. For each antibody it is essential to validate its functionality,
+specificity and optimize its usage to provide optimal signal to noise. To
+facilitate antibody handling, a database is highly useful.
+[Airlab](https://github.com/BodenmillerGroup/airlab-web) is such a platform; it
+allows antibody lot tracking, validation data uploads, and panel generation for
 subsequent upload to the IMC acquisition software from Fluidigm.
 
 Depending on the sample type, different staining protocols can be used.
-Generally, once antibodies of choice have been found and conjugated, titration
-experiments are commonly performed to identify the optimal staining
-concentration. Even for FFPE samples different staining protocols exist and
-different antibodies show variable staining based on the applied protocol. For a
-start, protocols such as the one provided by Fluidigm ([Fluidigm staining
-protocol]()) or the one describe by [@Ijsselsteijn2019] are recommended. Briefly,
-for FFPE tissues, a dewaxing step is performed to dissolve the paraffin used to
-embed the material, followed by a graded re-hydration of the samples.
-Thereafter, heat induced epitope retrieval (HIER), a step aiming at the reversal
-of formalin based fixation, is used to unmask epitopes within tissues and make
-them accessible to antibodies. Epitope unmasking is generally performed in
-either basic, EDTA based buffers (pH 9.2) or acidic, citrate based buffers  (pH
-6). Next, a bovine serum albumin containing buffer is used to block unspecific
-binding. This buffer is also used to dilute antibody stocks for the actual
-antibody staining. Staining time and temperature may vary and
-optimisation/testing is inevitable. However, over night staining at 4&deg;C or
-3-5 hours at room temperature seem to be suited in many cases.
+Generally, once antibodies of choice have been conjugated to a metal tag,
+titration experiments are performed to identify the optimal staining
+concentration. For FFPE samples, different staining protocols have been
+described, and different antibodies show variable staining with different
+protocols. Protocols such as the one provided by Fluidigm or the one describe by
+[@Ijsselsteijn2019] are recommended. Briefly, for FFPE tissues, a dewaxing
+step is performed to remove the paraffin used to embed the material, followed by
+a graded re-hydration of the samples. Thereafter, heat-induced epitope retrieval
+(HIER), a step aiming at the reversal of formalin-based fixation, is used to
+unmask epitopes within tissues and make them accessible to antibodies. Epitope
+unmasking is generally performed in either basic, EDTA-based buffers (pH 9.2) or
+acidic, citrate-based buffers (pH 6). Next, a buffer containing bovine serum
+albumin (BSA) is used to block non-specific binding. This buffer is also used to
+dilute antibody stocks for the actual antibody staining. Staining time and
+temperature may vary and optimization must be performed to ensure that each
+single antibody performs well. However, overnight staining at 4&deg;C or 3-5
+hours at room temperature seem to be suitable in many cases.
 
 Following antibody incubation, unbound antibodies are washed away and a
 counterstain comparable to DAPI is applied to enable the identification of
-nuclei. The [Iridium
-intercalator](https://store.fluidigm.com/Cytometry/ConsumablesandReagentsCytometry/MassCytometryReagents/Cell-ID%E2%84%A2%20Intercalator-Ir%E2%80%94125%20%C2%B5M)
+nuclei. The [Iridium intercalator](https://store.fluidigm.com/Cytometry/ConsumablesandReagentsCytometry/MassCytometryReagents/Cell-ID%E2%84%A2%20Intercalator-Ir%E2%80%94125%20%C2%B5M)
 from Fluidigm is a reagent of choice and applied in a brief 5 minute staining.
 Finally, the samples are washed again and then dried under an airflow. Once
-dried, the samples are read for acquisition and usually stable for a long period
-of time (at least one year).
+dried, the samples are ready for analysis on the imaging mass cytometer and and
+usually stable for a long period of time (at least one year).
 
 ### Data acquisition
 
-Data is acuired using the CyTOF software from Fluidigm (see manuals
+Data is acquired using the CyTOF software from Fluidigm (see manuals
 [here](https://go.fluidigm.com/hyperion-support-documents)).
 
-Important notes up front: the IMC cannot access roughly 5 mm from each of the
-slide edges due to meachnical properties of the build. Currently, the IMC can
-also only process one slide at a time and usually one MCD file per sample
-slide is generated to contain data (see [below](#data-format)). The regions of
-interest to be acquired need to be selected by providing coordinates for
-ablation. Since the field of view in the IMC is only about 200 &mu;m in
-diameter, so called "panoramas" can be generated. These are stitched images of
-single fields of view. Panoramas provide an optical overview of the tissue with
-a resolution similar to 10x in microscopy and are intended to help with the
-selection of regions of interest for ablation.
+The regions of interest are selected by providing coordinates for ablation. To
+determine the region to be imaged, so called "panoramas" can be generated. These
+are stitched images of single fields of views of about 200 &mu;m in diameter.
+Panoramas provide an optical overview of the tissue with a resolution similar to
+10x in microscopy and are intended to help with the selection of regions of
+interest for ablation. The tissue should be centered on the glass side, since
+the imaging mass cytometer cannot access roughly 5 mm from each of the slide
+edges. Currently, the instruments can process one slide at a time and one `.mcd`
+file per sample slide is generated.
 
 Many regions of interest can be defined on a single slide and acquisition
-parameters such as channels to acquire, acquisition speed (100 Hz, 200 HZ and
-400 HZ - only in Service mode), ablation energy and more have to be defined. Of
-note: it is recommended to record all isotope channels and also some channels
-pointing towards potential contaminations of the argon gas (e.g. Xenon) or of
-the samples (e.g. Lead, Barium). However, the generated raw data will be larger
-in size.
+parameters such as channels to acquire, acquisition speed (100 Hz, or 200 Hz),
+ablation energy, and other parameters are user-defined. It is recommended that
+all isotope channels are recorded. Some channels provide information on
+potential contamination of the argon gas (e.g., Xenon) or of the samples (e.g.,
+lead, barium). This results in a raw data file larger in size than if only
+channels corresponding to metals used are acquired.
 
-To process a large number of slides or to select regions on whole slide samples
-sometimes panoramas are not informative enough. For that purpose multi-color
-immunofluorescence of the same slide prior to staining with metal-labelled
-antibodies may be performed. To allow for region selection based on
-immunofluorescence images and also align those images with a Panorama of the
-same or consecutive sections of this sample we developed
+To process a large number of slides or to select regions on whole-slide samples,
+panoramas may not  provide sufficient information. If this is the case,
+multi-color immunofluorescence of the same slide prior to staining with
+metal-labeled antibodies may be performed. To allow for region selection based
+on immunofluorescence images and to align those images with a panorama of the
+same or consecutive sections of the sample, we developed
 [napping](https://github.com/BodenmillerGroup/napping).
 
-Acquisition time is directly proportional to the total size of ablation and
-considerable run times for large samples or large sample numbers are to be taken
-into account. Additionally, besides the proprietary MCD file format `.txt`
-files can also be generated for each region of interest which is recommended as
-a back up option in case of errors which may render MCD files corrupt but not
-`.txt` files.
+Acquisition time is directly proportional to the total size of ablation, and run
+times for samples of large area or for large sample numbers can be calculated by
+dividing the ablation area in square micrometer by the ablation speed (e.g.,
+200Hz). In addition to the proprietary `.mcd` file format, `.txt` files can also
+be generated for each region of interest. This is recommended as a back-up
+option in case of errors that may corrupt `.mcd` files but not `.txt` files.
 
 ## Data format {#data-format}
 

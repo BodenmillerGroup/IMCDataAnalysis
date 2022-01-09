@@ -50,10 +50,11 @@ For further downstream analysis, we will asinh-transform the data using a
 cofactor of 5; a common transformation for CyTOF data [@Bendall2011].
 
 ```{r read-txts, message=FALSE}
+### TODO: remove the empty In115 acquisitions...
 library(imcRtools)
 
 # Create SingleCellExperiment from .txt files
-sce <- readSCEfromTXT("data/Figure_S5/Spillover_Matrix_2/") 
+sce <- readSCEfromTXT("data/compensation/IMMUcan_Batch20201113_compensation_corrected/") 
 assay(sce, "exprs") <- asinh(counts(sce)/5)
 ```
 
@@ -174,7 +175,10 @@ visualize it:
 ```{r compute-spillover, fig.width=7, fig.height=7}
 sce <- computeSpillmat(sce)
 
-plotSpillmat(sce)
+isotope_list <- CATALYST::isotope_list
+isotope_list$Ar <- 80
+
+plotSpillmat(sce, isotope_list = isotope_list)
 ```
 
 As we can see, the largest spillover appears in `In113 --> In115` and we also
@@ -194,7 +198,7 @@ Next, we will write out the spillover matrix as .csv file for possible later use
 
 ```{r write_sm_csv}
 cur_sm <- metadata(sce)$spillover_matrix
-write.csv(cur_sm, "data/Figure_S5/new_version_Spillover_Matrix_2_sm.csv")
+write.csv(cur_sm, "data/spillover_matrix.csv")
 ```
 
 ### Save spillover matrix as image
@@ -210,10 +214,11 @@ a single column listing the metal isotopes in the correct order. Here, we will
 read this file in. 
 
 ```{r read-metal-order}
-ordered_chs <- read.csv("data/Figure_4/IMC_image/analysis/imc_example_image_a0_full.csv",
-                        header = FALSE)
-ordered_chs$V1 <- paste0(ordered_chs$V1, "Di")
-head(ordered_chs)
+# Rewrite this section!
+#ordered_chs <- read.csv("data/Figure_4/IMC_image/analysis/imc_example_image_a0_full.csv",
+#                        header = FALSE)
+#ordered_chs$V1 <- paste0(ordered_chs$V1, "Di")
+#head(ordered_chs)
 ```
 
 The `CATALYST` package provides the `adaptSpillmat` function that corrects the
@@ -222,16 +227,16 @@ Please refer to `?compCytof` for more information how metals in the spillover
 matrix are matched to acquired channels in the `SingleCellExperiment` object.
 
 ```{r adaptSM}
-adapted_sm <- CATALYST::adaptSpillmat(cur_sm, 
-                                      out_chs = as.character(ordered_chs$V1))
+#adapted_sm <- CATALYST::adaptSpillmat(cur_sm, 
+#                                      out_chs = as.character(ordered_chs$V1))
 ```
 
 The adapted spillover matrix can now be saved as .tiff image for the use with CellProfiler.
 
 ```{r save-sm-as-tiff, message=FALSE}
-library(tiff)
-writeTIFF(adapted_sm, "data/Figure_4/new_imc_full_sm.tiff", 
-          bits.per.sample = 32)
+#library(tiff)
+#writeTIFF(adapted_sm, "data/Figure_4/new_imc_full_sm.tiff", 
+#          bits.per.sample = 32)
 ```
 
 ## Compensate the mean pixel intensities
@@ -250,63 +255,63 @@ For demonstration purposes, we read in a multi-channel image.
 The `channelNames` need to be set according to their order.
 
 ```{r read-in-image, message=FALSE}
-library(cytomapper)
+#library(cytomapper)
 
-img <- loadImages("data/Figure_4/IMC_image/analysis/imc_example_image_a0_full.tiff")
-channelNames(img) <- ordered_chs$V1
-img
+#img <- loadImages("data/Figure_4/IMC_image/analysis/imc_example_image_a0_full.tiff")
+#channelNames(img) <- ordered_chs$V1
+#img
 ```
 
 We can now use the correclty ordered spillover matrix to compensate the 
 multi-channel image:
 
 ```{r image-compensation, message = FALSE}
-img_comp <- compImage(img, adapted_sm)
+#img_comp <- compImage(img, adapted_sm)
 ```
 
 As a sanity check, we will visualize the image before and after compensation:
 
 ```{r image-visualization}
 # Before compensation
-plotPixels(img, colour_by = "Er166Di", 
-           image_title = list(text = "Er166 - before", position = "topleft"), 
-           legend = NULL)
-plotPixels(img, colour_by = "Er167Di", 
-           image_title = list(text = "Er167 - before", position = "topleft"), 
-           legend = NULL)
+#plotPixels(img, colour_by = "Er166Di", 
+#           image_title = list(text = "Er166 - before", position = "topleft"), 
+#           legend = NULL)
+#plotPixels(img, colour_by = "Er167Di", 
+#           image_title = list(text = "Er167 - before", position = "topleft"), 
+#           legend = NULL)
 
 # After compensation
-plotPixels(img_comp, colour_by = "Er166Di",
-           image_title = list(text = "Er166 - after", position = "topleft"), 
-           legend = NULL)
-plotPixels(img_comp, colour_by = "Er167Di", 
-           image_title = list(text = "Er167 - after", position = "topleft"),
-           legend = NULL)
+#plotPixels(img_comp, colour_by = "Er166Di",
+#           image_title = list(text = "Er166 - after", position = "topleft"), 
+#           legend = NULL)
+#plotPixels(img_comp, colour_by = "Er167Di", 
+#           image_title = list(text = "Er167 - after", position = "topleft"),
+#           legend = NULL)
 ```
 
 ```{r integration-test-original_sm, include = FALSE}
-library(testthat)
-correct_sm <- as.matrix(read.csv("data/Figure_S5/paper_version_Spillover_Matrix_2_sm.csv", row.names = 1))
-current_sm <- metadata(sce)$spillover_matrix
-correct_sm <- correct_sm[rownames(current_sm), colnames(current_sm)]
+#library(testthat)
+#correct_sm <- as.matrix(read.csv("data/Figure_S5/paper_version_Spillover_Matrix_2_sm.csv", row.names = 1))
+#current_sm <- metadata(sce)$spillover_matrix
+#correct_sm <- correct_sm[rownames(current_sm), colnames(current_sm)]
 
-expect_equal(correct_sm, current_sm, tolerance = 0.001)
+#expect_equal(correct_sm, current_sm, tolerance = 0.001)
 ```
 
 ```{r integration-test-tiff_sm, include = FALSE}
-correct_sm <- readTIFF("data/Figure_4/IMC_image/analysis/imc_full_sm.tiff")
-current_sm <- adapted_sm
-dimnames(current_sm) <- NULL
+#correct_sm <- readTIFF("data/Figure_4/IMC_image/analysis/imc_full_sm.tiff")
+#current_sm <- adapted_sm
+#dimnames(current_sm) <- NULL
 
-expect_equal(correct_sm, current_sm, tolerance = 0.0005)
+#expect_equal(correct_sm, current_sm, tolerance = 0.0005)
 ```
 
 ```{r integration-test-img-comp, include = FALSE}
-correct_img <- loadImages("data/Figure_4/IMC_image/cpoutput/imc_example_image_a0_full_spillcorr_nnls.tif")
+#correct_img <- loadImages("data/Figure_4/IMC_image/cpoutput/imc_example_image_a0_full_spillcorr_nnls.tif")
 
-expect_equal(as.array(correct_img$imc_example_image_a0_full_spillcorr_nnls),
-             as.array(img_comp$imc_example_image_a0_full), 
-             check.attributes = FALSE, tolerance = 0.0005)
+#expect_equal(as.array(correct_img$imc_example_image_a0_full_spillcorr_nnls),
+#             as.array(img_comp$imc_example_image_a0_full), 
+#             check.attributes = FALSE, tolerance = 0.0005)
 ```
 
 ## Session Info
