@@ -212,7 +212,12 @@ mcols(images) <- mcols(masks) <- DataFrame(sample_id = names(images),
                                            indication = indication)
 ```
 
-```{r save-objects-read-data, include = FALSE}
+## Save objects
+
+Finally, the generated data objects can be saved for further downstream 
+processing and analysis.
+
+```{r save-objects-read-data}
 saveRDS(spe, "data/spe.rds")
 saveRDS(images, "data/images.rds")
 saveRDS(masks, "data/masks.rds")
