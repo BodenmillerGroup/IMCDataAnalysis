@@ -50,7 +50,6 @@ For further downstream analysis, we will asinh-transform the data using a
 cofactor of 5; a common transformation for CyTOF data [@Bendall2011].
 
 ```{r read-txts, message=FALSE}
-### TODO: remove the empty In115 acquisitions...
 library(imcRtools)
 
 # Create SingleCellExperiment from .txt files
@@ -170,7 +169,11 @@ sce <- filterPixels(sce, minevents = 40, correct_pixels = TRUE)
 
 Based on the single-positive pixels, we use the `CATALYST::computeSpillmat()`
 function to compute the spillover matrix and `CATALYST::plotSpillmat()` to
-visualize it:
+visualize it. The `plotSpillmat` function checks the spotted and acquired
+metal isotopes against a pre-defined `CATALYST::isotope_list()`. In this data,
+the `Ar80` channel was additionally acquired to check for deviations in signal
+intensity. `Ar80` needs to be added to a custom `isotope_list` object for
+visualization.
 
 ```{r compute-spillover, fig.width=7, fig.height=7}
 sce <- computeSpillmat(sce)
@@ -184,9 +187,7 @@ plotSpillmat(sce, isotope_list = isotope_list)
 As we can see, the largest spillover appears in `In113 --> In115` and we also
 observe the `+16` oxide impurities for e.g. `Nd148 --> Dy164`.
 
-Please follow the [CATALYST vignette](https://bioconductor.org/packages/release/bioc/vignettes/CATALYST/inst/doc/preprocessing.html#compensation)
-to learn how to apply this spillover matrix for single-cell based spillover
-compensation. Here, we will save the spillover matrix as .csv and as image for
+Here, we will save the spillover matrix as .csv and as image for
 use in the [IMC segmentation
 pipeline](https://github.com/BodenmillerGroup/ImcSegmentationPipeline) as part
 of the `CorrectSpilloverApply` and `CorrectSpilloverMeasurements` module
@@ -201,47 +202,38 @@ cur_sm <- metadata(sce)$spillover_matrix
 write.csv(cur_sm, "data/spillover_matrix.csv")
 ```
 
-### Save spillover matrix as image
+### Save spillover matrix as image (optional)
 
-When using the [ImcPluginsCP](https://github.com/BodenmillerGroup/ImcPluginsCP)
-CellProfiler modules for spillover correction, the spillover matrix needs to 
-be saved as 32-bit .tiff image.
+When using the **[ImcPluginsCP](https://github.com/BodenmillerGroup/ImcPluginsCP)
+CellProfiler modules** for spillover correction, the spillover matrix needs to 
+be saved as 32-bit .tiff image. This is not needed when using the `steinbock` framework.
 
 For this to work, the channels need to be ordered in the same way that
 CellProfiler orders them. When using the [IMC segmentation pipeline](https://github.com/BodenmillerGroup/ImcSegmentationPipeline), for each
 image, the order of the channels is written out as .csv file. This file contains
-a single column listing the metal isotopes in the correct order. Here, we will
-read this file in. 
-
-```{r read-metal-order}
-# Rewrite this section!
-#ordered_chs <- read.csv("data/Figure_4/IMC_image/analysis/imc_example_image_a0_full.csv",
-#                        header = FALSE)
-#ordered_chs$V1 <- paste0(ordered_chs$V1, "Di")
-#head(ordered_chs)
-```
+a single column listing the metal isotopes in the correct order. 
+The `steinbock` framework however orders the channels as they appear in the panel
+file. 
 
 The `CATALYST` package provides the `adaptSpillmat` function that corrects the
 spillover matrix in a way that rows and columns match a predefined set of metals.
 Please refer to `?compCytof` for more information how metals in the spillover
 matrix are matched to acquired channels in the `SingleCellExperiment` object.
 
-```{r adaptSM}
-#adapted_sm <- CATALYST::adaptSpillmat(cur_sm, 
-#                                      out_chs = as.character(ordered_chs$V1))
-```
+In the current setting, the channel ordering already matches the channel order
+used by the `steinbock` framework: channels are ordered by mass.
 
-The adapted spillover matrix can now be saved as .tiff image for the use with CellProfiler.
+The spillover matrix can now be saved as .tiff image for the use with `CellProfiler`.
 
 ```{r save-sm-as-tiff, message=FALSE}
-#library(tiff)
-#writeTIFF(adapted_sm, "data/Figure_4/new_imc_full_sm.tiff", 
-#          bits.per.sample = 32)
+library(tiff)
+writeTIFF(cur_sm, "data/spillover_matrix.tiff", 
+          bits.per.sample = 32)
 ```
 
 ## Compensate the mean pixel intensities
 
-**This section is under development**
+
 
 ## Compensate images
 
