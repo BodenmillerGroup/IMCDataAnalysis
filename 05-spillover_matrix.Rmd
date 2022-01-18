@@ -337,6 +337,12 @@ plotPixels(images_comp[5], colour_by = "Yb174Di",
            legend = NULL, bcg = list(Yb174Di = c(0, 4, 1)))
 ```
 
+For convenience, we will re-set the `channelNames` to their biological targtes:
+
+```{r re-set-channels}
+channelNames(images_comp) <- rownames(spe)
+```
+
 ## Save objects
 
 For further downstream analysis, the compensated `SpatialExperiment` and

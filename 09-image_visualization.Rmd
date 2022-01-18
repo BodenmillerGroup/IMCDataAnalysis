@@ -2,6 +2,14 @@
 
 Using the `cytomapper` package.
 
+## Normalization
+
+Explain normalization and clipping
+
+## Pixel visualization
+
+## Cell visualization
+
 ## Session Info
 
 <details>

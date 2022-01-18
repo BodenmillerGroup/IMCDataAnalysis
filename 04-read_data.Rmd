@@ -160,6 +160,18 @@ assay(spe, "exprs") <- asinh(counts(spe)/1)
 dittoRidgePlot(spe, var = "CD3", group.by = "patient_id", assay = "exprs")
 ```
 
+**Define interesting channels**
+
+For downstream analysis such as visualization, dimensionality reduction and
+clustering, only a subset of markers should be used. As convenience,
+we can store an additional entry in the `rowData` slot that specifies the 
+markers of interest. Here, we deselect the nuclear markers and keep all other
+biological targets.
+
+```{r select-features}
+rowData(spe)$use_channel <- !grepl("DNA|Histone", rownames(spe))
+```
+
 ## Read in images {#read-images}
 
 The `cytomapper` package allows multi-channel image handling and visualization
@@ -249,7 +261,7 @@ expect_equal(colData(spe)[1:5, ], new("DFrame", rownames = c("IMMUcan_WFLOW_Batc
     metadata = list()))
 expect_equal(names(rowData(spe)), c("channel", "name", "keep", "ilastik", "deepcell", "Tube.Number", 
 "Target", "Antibody.Clone", "Stock.Concentration", "Final.Concentration...Dilution", 
-"uL.to.add", "tumorMask"))
+"uL.to.add", "tumorMask", "use_channel"))
 expect_equal(rowData(spe)[1:5,], new("DFrame", rownames = c("MPO", "HistoneH3", "SMA", "CD16", 
 "CD38"), nrows = 5L, listData = list(channel = c("Y89", "In113", 
 "In115", "Pr141", "Nd142"), name = c("MPO", "HistoneH3", "SMA", 
@@ -260,8 +272,9 @@ NA, NA, NA), deepcell = c(NA, 1, NA, NA, NA), Tube.Number = c(2101,
 "D1H2", "1A4", "EPR16784", "EPR4106"), Stock.Concentration = c(500, 
 500, 500, 500, 500), Final.Concentration...Dilution = c("4 ug/mL", 
 "1 ug/mL", "0.25 ug/mL", "5 ug/mL", "2.5 ug/mL"), uL.to.add = c("0.8", 
-"0.2", "0.05", "1", "0.5"), tumorMask = c(0, 1, 1, 0, 0)), elementType = "ANY", 
-    elementMetadata = NULL, metadata = list()))
+"0.2", "0.05", "1", "0.5"), tumorMask = c(0, 1, 1, 0, 0), use_channel = c(TRUE, 
+FALSE, TRUE, TRUE, TRUE)), elementType = "ANY", elementMetadata = NULL, 
+    metadata = list()))
 expect_equal(rownames(spe), c("MPO", "HistoneH3", "SMA", "CD16", "CD38", "HLADR", "CD27", 
 "CD15", "CD45RA", "CD163", "B2M", "CD20", "CD68", "Ido1", "CD3", 
 "LAG3 / LAG33", "CD11c", "PD1", "PDGFRb", "CD7", "GrzB", "PDL1", 
@@ -446,7 +459,6 @@ expect_equal(as.array(masks$`IMMUcan_WFLOW_Batch20210304_10043241-GI-VAR-TIS-UNS
 11L, 11L, 11L, 11L, 11L, 11L, 11L, 11L, 11L, 11L, 11L, 11L, 11L, 
 11L, 11L), .Dim = c(5L, 5L)))
 ```
-
 
 ## Session Info
 

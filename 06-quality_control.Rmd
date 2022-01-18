@@ -1,12 +1,99 @@
 # Image and cell-level quality control
 
-Overview on possible quality indicators
+The following section discusses possible quality indicators for data obtained
+by IMC and other highly multiplexed imaging technologies.
+Due to the complexity of the data, the quality metric range across the image
+and single-cell levels and the chapter is sectioned as such.
+In general, we commonly do not exclude individual cells from images but rather
+whole images to keep the spatial structure of the tissue intact.
+
+## Read in the data
+
+We will first read in the data processed in previous sections:
+
+```{r read-data, message=FALSE}
+images <- readRDS("data/images.rds")
+masks <- readRDS("data/masks.rds")
+spe <- readRDS("data/spe.rds")
+```
 
 ## Segmentation quality control
 
+The first step after image segmentation is to observe its accuracy.
+Without having ground-truth data readily available, a common approach to 
+segmentation quality control is to overlay segmentation masks on composite images
+displaying channels that were used for segmentation. 
+The [cytomapper](https://www.bioconductor.org/packages/release/bioc/html/cytomapper.html) 
+Bioconductor package supports exactly this tasks by using the `plotPixels` function.
+
+Here, we select 3 random images and perform image- and channel-wise
+normalization (channels are first min-max normalized and scaled to a range of
+0-1 before clipping the maximum intensity to 0.2). For more information to image
+normalization, refer to Section \@ref(read-data).
+
+```{r overlay-masks, message=FALSE}
+library(cytomapper)
+set.seed(20220118)
+img_ids <- sample(seq_len(length(images)), 3)
+
+# Normalize and clip images
+cur_images <- images[img_ids]
+cur_images <- normalize(cur_images, separateImages = TRUE)
+cur_images <- normalize(cur_images, inputRange = c(0, 0.2))
+
+plotPixels(cur_images,
+           mask = masks[img_ids],
+           img_id = "sample_id",
+           missing_colour = "white",
+           colour_by = c("CD163", "CD20", "CD3", "Ecad", "DNA1"),
+           colour = list(CD163 = c("black", "yellow"),
+                         CD20 = c("black", "red"),
+                         CD3 = c("black", "green"),
+                         Ecad = c("black", "cyan"),
+                         DNA1 = c("black", "blue")),
+           image_title = NULL,
+           legend = list(colour_by.title.cex = 0.7,
+                         colour_by.labels.cex = 0.7))
+```
+
+We can see that nuclei are centered within the segmentation masks and all cell
+types are correctly segmented, A common challenge here is to segment large (e.g.
+epithelial cells - in cyan) _versus_ small (e.g. B cells - in red). However, the
+segmentation approach here appears to correctly segment cells across different
+sizes.
+
+An additional approach to observe cell segmentation quality and potentially also
+antibody specificity issues is to visualize single-cell expression in form of a
+heatmap. Here, we sub-sample the dataset to 2000 cells for visualization
+purposes and overlay the cancer type from which the cells were extracted.
+
+```{r segmentation-heatmap, message=FALSE}
+library(dittoSeq)
+library(viridis)
+cur_cells <- sample(seq_len(ncol(spe)), 2000)
+
+dittoHeatmap(spe[,cur_cells], genes = rownames(spe)[rowData(spe)$use_channel],
+             assay = "exprs", cluster_cols = TRUE, scale = "none",
+             heatmap.colors = viridis(100), annot.by = "indication")
+```
+
+We can differentiate between epithelial cells (Ecad+) and immune cells (CD45RO).
+Some of the markers are specifically detected (e.g., Ki67, CD20, Ecad) and markers
+that are more broadly detected (e.g. HLADR, B2M, CD4). 
+
 ## Image-level quality control
 
+Signal to noise
+
+Density of cells
+
 ## Cell-level quality control
+
+Signal-to-noise
+
+Size
+
+Staining differences
 
 ## Session Info
 
