@@ -83,6 +83,14 @@ that are more broadly detected (e.g. HLADR, B2M, CD4).
 
 ## Image-level quality control
 
+Image-level quality control is often performed using tools that offer a
+graphical user interface such as [QuPath](https://qupath.github.io/) and
+[FIJI](https://imagej.net/software/fiji/). Viewers that were specifically
+developed for IMC data can be seen
+[here](https://bodenmillergroup.github.io/IMCWorkflow/viewers.html). In this
+section, we will specificaly focus on quantitative metrics to assess image
+quality.
+
 It is often of interest to calculate the signal-to-noise ratio (SNR) for
 individual channels and markers. Here, we define the SNR as:
 
@@ -141,15 +149,39 @@ meaning that in general these markers are not abundantly expressed. The Iridium
 intercalator (here marked as DNA1 and DNA2) has the highest signal intensity 
 but low SNR. This might be due to staining differences between individual nuclei
 where some nuclei are considered as background. We do however observe high
-SNR and sufficiant signal intensity for the majority of markers.
+SNR and sufficient signal intensity for the majority of markers.
 
-Density of cells
+Another quality indicator is the image area covered by cells (or biological tissue).
+This metric identifies ROIs where little cells are present, possibly hinting
+at incorrect selection of the ROI. We can compute the percentage of image 
+are covered by cells using the metadata contained in the `SpatialExperiment`
+object:
+
+```{r cell-density, fig.height=7}
+colData(spe) %>%
+    as.data.frame() %>%
+    group_by(sample_id) %>%
+    summarize(cell_area = sum(area),
+           no_pixels = mean(width_px) * mean(height_px)) %>%
+    mutate(covered_area = cell_area / no_pixels) %>%
+    ggplot() +
+        geom_point(aes(sample_id, covered_area)) + 
+        theme_minimal(base_size = 15) +
+        ylim(c(0.5, 1)) + 
+        theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 8)) +
+        ylab("% covered area") + xlab("")
+```
+
+We observe that all images contain a similar percentage of covered area of 
+around 80%. 
 
 ## Cell-level quality control
 
 Signal-to-noise
 
 Size
+
+No cells per image
 
 Staining differences
 
