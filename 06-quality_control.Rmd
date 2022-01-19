@@ -83,7 +83,65 @@ that are more broadly detected (e.g. HLADR, B2M, CD4).
 
 ## Image-level quality control
 
-Signal to noise
+It is often of interest to calculate the signal-to-noise ratio (SNR) for
+individual channels and markers. Here, we define the SNR as:
+
+$$SNR = I_s/I_n$$
+
+where $I_s$ is the intensity of the signal (mean intensity of pixels with true
+signal) and $I_n$ is the intensity of the noise (mean intensity of pixels
+containing noise). Finding a threshold that separates pixels containing signal
+and pixels containing noise is not trivial and different approaches can be
+chosen. Here, we use the `otsu` thresholding approach to find pixels of the
+"foreground" (i.e., signal) and "background" (i.e., noise). The SNR is then
+defined as the mean intensity of foreground pixels divided by the mean intensity
+of background pixels. We then plot the SNR versus mean signal intensity
+(together with their 95% confidence interval).
+
+```{r image-snr, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(ggrepel)
+library(EBImage)
+cur_snr <- lapply(images, function(img){
+    mat <- apply(img, 3, function(ch){
+        # Otsu threshold
+        thres <- otsu(ch, range = c(min(ch), max(ch)))
+        # Signal-to-noise ratio
+        snr <- mean(ch[ch > thres]) / mean(ch[ch <= thres])
+        # Signal intensity
+        ps <- mean(ch[ch > thres])
+        
+        return(c(snr = snr, ps = ps))
+    })
+    t(mat) %>% as.data.frame() %>% 
+        mutate(marker = colnames(mat)) %>% 
+        pivot_longer(cols = c(snr, ps))
+})
+
+cur_snr <- do.call(rbind, cur_snr)
+
+cur_snr %>% 
+    group_by(marker, name) %>%
+    summarize(mean = mean(value),
+              ci = qnorm(0.975)*sd(value)/sqrt(n())) %>%
+    pivot_wider(names_from = name, values_from = c(mean, ci)) %>%
+    ggplot() +
+    geom_errorbar(aes(y = log2(mean_snr), xmin = log2(mean_ps - ci_ps), 
+                      xmax = log2(mean_ps + ci_ps))) +
+    geom_errorbar(aes(x = log2(mean_ps), ymin = log2(mean_snr - ci_snr), 
+                      ymax = log2(mean_snr + ci_snr))) +
+    geom_point(aes(log2(mean_ps), log2(mean_snr))) +
+    geom_label_repel(aes(log2(mean_ps), log2(mean_snr), label = marker)) +
+    theme_minimal(base_size = 15) + ylab("Signal-to-noise ratio") +
+    xlab("Signal intensity")
+```
+
+We observe PD1, LAG3 and cleaved PARP to have high SNR but low signal intensity
+meaning that in general these markers are not abundantly expressed. The Iridium
+intercalator (here marked as DNA1 and DNA2) has the highest signal intensity 
+but low SNR. This might be due to staining differences between individual nuclei
+where some nuclei are considered as background. We do however observe high
+SNR and sufficiant signal intensity for the majority of markers.
 
 Density of cells
 
