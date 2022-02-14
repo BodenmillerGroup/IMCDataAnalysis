@@ -53,7 +53,7 @@ cofactor of 5; a common transformation for CyTOF data [@Bendall2011].
 library(imcRtools)
 
 # Create SingleCellExperiment from .txt files
-sce <- readSCEfromTXT("data/compensation/compensation/") 
+sce <- readSCEfromTXT("data/compensation/") 
 assay(sce, "exprs") <- asinh(counts(sce)/5)
 ```
 
