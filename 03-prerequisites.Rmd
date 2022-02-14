@@ -83,11 +83,13 @@ extraction.
 
 **steinbock output**
 
-The needed output of the `steinbock` framework includes the single-cell
-mean intensity files, the single-cell morphological features and spatial locations,
+The needed output of the `steinbock` framework includes the single-cell mean
+intensity files, the single-cell morphological features and spatial locations,
 spatial object graphs in form of edge lists indication cells in close proximity,
-hot pixel filtered multi-channel images, segmentation masks, image metadata
-and channel metadata. All these files will be downloaded here for easy access.
+hot pixel filtered multi-channel images, segmentation masks, image metadata and
+channel metadata. All these files will be downloaded here for easy access. The
+commands which were used to process the data can be found in
+`data/steinbock/steinbock.sh`.
 
 ```{r steinbock-results}
 options(timeout=10000)
@@ -119,7 +121,7 @@ unlink("data/steinbock/masks_deepcell.zip")
 # download individual files
 download.file("https://zenodo.org/record/6043600/files/panel.csv", "data/steinbock/panel.csv")
 download.file("https://zenodo.org/record/6043600/files/images.csv", "data/steinbock/images.csv")
-download.file("https://zenodo.org/record/6043600/files/images.csv", "data/steinbock/steinbock.sh")
+download.file("https://zenodo.org/record/6043600/files/steinbock.sh", "data/steinbock/steinbock.sh")
 ```
 
 **IMC Segmentation Pipeline output**
