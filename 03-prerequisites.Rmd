@@ -10,6 +10,9 @@ using the [Bioconductor](https://www.bioconductor.org/) framework. The
 gives an excellent overview on data containers and basic analysis that are being
 used here.
 
+An overview on IMC as technologie and necessary image processing steps can be
+found on the [IMC workflow website](https://bodenmillergroup.github.io/IMCWorkflow/). 
+
 Before we get started on IMC data analysis, we will need to make sure that
 software dependencies are installed and the needed example data is downloaded.
 
@@ -44,7 +47,7 @@ Data processing:
 
 Data visualization:
 
-* [cytomapper](https://bioconductor.org/packages/release/bioc/html/cytomapper.html) version `r packageVersion("cytomapper")` from [Github](https://github.com/BodenmillerGroup/cytomapper)
+* [cytomapper](https://github.com/BodenmillerGroup/cytomapper) version `r packageVersion("cytomapper")` from [Github](https://github.com/BodenmillerGroup/cytomapper)
 * [dittoSeq](https://bioconductor.org/packages/release/bioc/html/dittoSeq.html) version `r packageVersion("dittoSeq")`
 
 Tidy R:
@@ -53,18 +56,38 @@ Tidy R:
 
 ## Download example data {#download-data}
 
-TODO: Explain what the example data is (raw data, processed data).
-
-```{r}
-download.file("https://zenodo.org/record/5949116/files/sample_metadata.xlsx", "data/sample_metadata.xlsx")
-```
-
 Throughout this tutorial, we will access a number of different data types. 
 To declutter the analysis scripts, we will already download all needed data here.
 
+To highlight the basic steps of IMC data analysis, we provide example data that
+were acquired as part of the *I*ntegrated i*MMU*noprofiling of large adaptive
+*CAN*cer patient cohorts projects ([immucan.eu/](https://immucan.eu/)). The
+raw data of 4 patients can be accessed online at 
+[zenodo.org/record/5949116](https://zenodo.org/record/5949116).
+Image processing and segmentation has been performed using `steinbock` and
+the IMC segmentation pipeline (see below) and we will only need to access the
+sample/patient information here:
+
+```{r download-sample-data}
+download.file("https://zenodo.org/record/5949116/files/sample_metadata.xlsx", 
+              destfile = "data/sample_metadata.xlsx")
+```
+
 ### Processed multiplexed imaging data
 
-**Steinbock output**
+The IMC raw data was either processed using the 
+[steinbock](https://github.com/BodenmillerGroup/steinbock) framework or the
+[IMC Segmentation Pipeline](https://github.com/BodenmillerGroup/ImcSegmentationPipeline).
+Image processing included file type conversion, cell segmentation and feature
+extraction. 
+
+**steinbock output**
+
+The needed output of the `steinbock` framework includes the single-cell
+mean intensity files, the single-cell morphological features and spatial locations,
+spatial object graphs in form of edge lists indication cells in close proximity,
+hot pixel filtered multi-channel images, segmentation masks, image metadata
+and channel metadata. All these files will be downloaded here for easy access.
 
 ```{r steinbock-results}
 options(timeout=10000)
@@ -101,12 +124,12 @@ download.file("https://zenodo.org/record/6043600/files/images.csv", "data/steinb
 
 **IMC Segmentation Pipeline output**
 
+Under development
+
 ### Files for spillover matrix estimation
 
 To highlight the estimation and correction of channel-spillover as described by
 [@Chevrier2017], we can access an example spillover-acquisition from:
-
-TODO: enter link here
 
 ```{r download-spillover-data}
 download.file("https://zenodo.org/record/5949116/files/compensation.zip", "data/compensation.zip")

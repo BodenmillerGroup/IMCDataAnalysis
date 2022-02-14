@@ -125,7 +125,7 @@ colnames(spe) <- paste0(spe$sample_id, "_", spe$ObjectNumber)
 
 It is also often the case that sample-specific metadata are available externally.
 For the current data, we need to link the cancer type (also referred to as "Indication")
-to each sample. This metadata is availabel as external excel file:
+to each sample. This metadata is available as external excel file:
 
 ```{r add-indication}
 library(openxlsx)
@@ -134,7 +134,16 @@ meta <- read.xlsx("data/sample_metadata.xlsx")
 
 spe$patient_id <- str_extract_all(spe$sample_id, "Patient[1-4]", simplify = TRUE)
 spe$indication <- meta$Indication[match(spe$patient_id, meta$Sample.ID)]
+
+unique(spe$indication)
 ```
+
+The selected patients were diagnosed with different cancer types:
+
+* SCCHN - head and neck cancer  
+* BCC - breast cancer  
+* NSCLC - lung cancer  
+* CRC - colorectal cancer
 
 **Transform counts**
 
