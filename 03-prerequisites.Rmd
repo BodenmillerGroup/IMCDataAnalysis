@@ -92,37 +92,41 @@ channel metadata. All these files will be downloaded here for easy access. The
 commands which were used to process the data can be found in
 `data/steinbock/steinbock.sh`.
 
-```{r, echo = FALSE, message = FALSE}
-# To trigger download
-Sys.sleep(10)
-```
-
 ```{r steinbock-results}
 # download intensities
-download.file("https://zenodo.org/record/6043600/files/intensities.zip", "data/steinbock/intensities.zip")
-unzip("data/steinbock/intensities.zip", exdir="data/steinbock", overwrite=TRUE)
-unlink("data/steinbock/intensities.zip")
+url <- "https://zenodo.org/record/6043600/files/intensities.zip"
+destfile <- "data/steinbock/intensities.zip"
+download.file(url, destfile)
+unzip(destfile, exdir="data/steinbock", overwrite=TRUE)
+unlink(destfile)
 
 # download regionprops
-download.file("https://zenodo.org/record/6043600/files/regionprops.zip", "data/steinbock/regionprops.zip")
-unzip("data/steinbock/regionprops.zip", exdir="data/steinbock", overwrite=TRUE)
-unlink("data/steinbock/regionprops.zip")
+url <- "https://zenodo.org/record/6043600/files/regionprops.zip"
+destfile <- "data/steinbock/regionprops.zip"
+download.file(url, destfile)
+unzip(destfile, exdir="data/steinbock", overwrite=TRUE)
+unlink(destfile)
 
 
 # download neighbors
-download.file("https://zenodo.org/record/6043600/files/neighbors.zip", "data/steinbock/neighbors.zip")
-unzip("data/steinbock/neighbors.zip", exdir="data/steinbock", overwrite=TRUE)
-unlink("data/steinbock/neighbors.zip")
+url <- "https://zenodo.org/record/6043600/files/neighbors.zip"
+destfile <- "data/steinbock/neighbors.zip"
+download.file(url, destfile)
+unzip(destfile, exdir="data/steinbock", overwrite=TRUE)
+unlink(destfile)
 
 # download images
-download.file("https://zenodo.org/record/6043600/files/img.zip", "data/steinbock/img.zip")
-unzip("data/steinbock/img.zip", exdir="data/steinbock", overwrite=TRUE)
-unlink("data/steinbock/img.zip")
+url <- "https://zenodo.org/record/6043600/files/img.zip"
+destfile <- "data/steinbock/img.zip"
+download.file(url, destfile)
+unzip(destfile, exdir="data/steinbock", overwrite=TRUE)
+unlink(destfile)
 
 # download masks
-download.file("https://zenodo.org/record/6043600/files/masks_deepcell.zip", "data/steinbock/masks_deepcell.zip")
-unzip("data/steinbock/masks_deepcell.zip", exdir="data/steinbock", overwrite=TRUE)
-unlink("data/steinbock/masks_deepcell.zip")
+destfile <- "data/steinbock/masks_deepcell.zip"
+download.file(url, destfile)
+unzip(destfile, exdir="data/steinbock", overwrite=TRUE)
+unlink(destfile)
 
 # download individual files
 download.file("https://zenodo.org/record/6043600/files/panel.csv", "data/steinbock/panel.csv")
