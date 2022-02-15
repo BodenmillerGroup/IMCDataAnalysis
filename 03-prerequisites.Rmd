@@ -92,16 +92,22 @@ channel metadata. All these files will be downloaded here for easy access. The
 commands which were used to process the data can be found in
 `data/steinbock/steinbock.sh`.
 
+```{r, echo = FALSE, message = FALSE}
+# To trigger download
+sleep(10)
+```
+
 ```{r steinbock-results}
+# download intensities
+download.file("https://zenodo.org/record/6043600/files/intensities.zip", "data/steinbock/intensities.zip")
+unzip("data/steinbock/intensities.zip", exdir="data/steinbock", overwrite=TRUE)
+unlink("data/steinbock/intensities.zip")
+
 # download regionprops
 download.file("https://zenodo.org/record/6043600/files/regionprops.zip", "data/steinbock/regionprops.zip")
 unzip("data/steinbock/regionprops.zip", exdir="data/steinbock", overwrite=TRUE)
 unlink("data/steinbock/regionprops.zip")
 
-# download intensities
-download.file("https://zenodo.org/record/6043600/files/intensities.zip", "data/steinbock/intensities.zip")
-unzip("data/steinbock/intensities.zip", exdir="data/steinbock", overwrite=TRUE)
-unlink("data/steinbock/intensities.zip")
 
 # download neighbors
 download.file("https://zenodo.org/record/6043600/files/neighbors.zip", "data/steinbock/neighbors.zip")
