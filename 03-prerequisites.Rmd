@@ -19,6 +19,7 @@ software dependencies are installed and the needed example data is downloaded.
 ## Software requirements
 
 ```{r load-libraries, echo = FALSE, message = FALSE}
+options(timeout=10000)
 library(CATALYST)
 library(SpatialExperiment)
 library(SingleCellExperiment)
@@ -92,15 +93,15 @@ commands which were used to process the data can be found in
 `data/steinbock/steinbock.sh`.
 
 ```{r steinbock-results}
-# download intensities
-download.file("https://zenodo.org/record/6043600/files/intensities.zip", "data/steinbock/intensities.zip")
-unzip("data/steinbock/intensities.zip", exdir="data/steinbock", overwrite=TRUE)
-unlink("data/steinbock/intensities.zip")
-
 # download regionprops
 download.file("https://zenodo.org/record/6043600/files/regionprops.zip", "data/steinbock/regionprops.zip")
 unzip("data/steinbock/regionprops.zip", exdir="data/steinbock", overwrite=TRUE)
 unlink("data/steinbock/regionprops.zip")
+
+# download intensities
+download.file("https://zenodo.org/record/6043600/files/intensities.zip", "data/steinbock/intensities.zip")
+unzip("data/steinbock/intensities.zip", exdir="data/steinbock", overwrite=TRUE)
+unlink("data/steinbock/intensities.zip")
 
 # download neighbors
 download.file("https://zenodo.org/record/6043600/files/neighbors.zip", "data/steinbock/neighbors.zip")
