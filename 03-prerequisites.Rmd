@@ -19,7 +19,6 @@ software dependencies are installed and the needed example data is downloaded.
 ## Software requirements
 
 ```{r load-libraries, echo = FALSE, message = FALSE}
-options(timeout=10000)
 library(CATALYST)
 library(SpatialExperiment)
 library(SingleCellExperiment)
