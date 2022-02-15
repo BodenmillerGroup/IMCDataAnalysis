@@ -94,7 +94,7 @@ commands which were used to process the data can be found in
 
 ```{r, echo = FALSE, message = FALSE}
 # To trigger download
-sleep(10)
+Sys.sleep(10)
 ```
 
 ```{r steinbock-results}
