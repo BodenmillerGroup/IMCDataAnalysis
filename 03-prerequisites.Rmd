@@ -70,8 +70,7 @@ the IMC segmentation pipeline (see below) and we will only need to access the
 sample/patient information here:
 
 ```{r download-sample-data}
-library(downloader)
-download("https://zenodo.org/record/5949116/files/sample_metadata.xlsx", 
+download.file("https://zenodo.org/record/5949116/files/sample_metadata.xlsx", 
          destfile = "data/sample_metadata.xlsx")
 ```
 
@@ -94,17 +93,19 @@ commands which were used to process the data can be found in
 `data/steinbock/steinbock.sh`.
 
 ```{r steinbock-results}
+print(1+1)
+
 # download intensities
 url <- "https://zenodo.org/record/6043600/files/intensities.zip"
 destfile <- "data/steinbock/intensities.zip"
-download(url, destfile)
+download.file(url, destfile)
 unzip(destfile, exdir="data/steinbock", overwrite=TRUE)
 unlink(destfile)
 
 # download regionprops
 url <- "https://zenodo.org/record/6043600/files/regionprops.zip"
 destfile <- "data/steinbock/regionprops.zip"
-download(url, destfile)
+download.file(url, destfile)
 unzip(destfile, exdir="data/steinbock", overwrite=TRUE)
 unlink(destfile)
 
@@ -112,30 +113,30 @@ unlink(destfile)
 # download neighbors
 url <- "https://zenodo.org/record/6043600/files/neighbors.zip"
 destfile <- "data/steinbock/neighbors.zip"
-download(url, destfile)
+download.file(url, destfile)
 unzip(destfile, exdir="data/steinbock", overwrite=TRUE)
 unlink(destfile)
 
 # download images
 url <- "https://zenodo.org/record/6043600/files/img.zip"
 destfile <- "data/steinbock/img.zip"
-download(url, destfile)
+download.file(url, destfile)
 unzip(destfile, exdir="data/steinbock", overwrite=TRUE)
 unlink(destfile)
 
 # download masks
 url <- "https://zenodo.org/record/6043600/files/masks_deepcell.zip"
 destfile <- "data/steinbock/masks_deepcell.zip"
-download(url, destfile)
+download.file(url, destfile)
 unzip(destfile, exdir="data/steinbock", overwrite=TRUE)
 unlink(destfile)
 
 # download individual files
-download("https://zenodo.org/record/6043600/files/panel.csv", 
+download.file("https://zenodo.org/record/6043600/files/panel.csv", 
               "data/steinbock/panel.csv")
-download("https://zenodo.org/record/6043600/files/images.csv", 
+download.file("https://zenodo.org/record/6043600/files/images.csv", 
               "data/steinbock/images.csv")
-download("https://zenodo.org/record/6043600/files/steinbock.sh", 
+download.file("https://zenodo.org/record/6043600/files/steinbock.sh", 
               "data/steinbock/steinbock.sh")
 ```
 
