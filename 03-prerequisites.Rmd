@@ -96,36 +96,36 @@ commands which were used to process the data can be found in
 # download intensities
 url <- "https://zenodo.org/record/6043600/files/intensities.zip"
 destfile <- "data/steinbock/intensities.zip"
-download.file(url, destfile)
-unzip(destfile, exdir="data/steinbock", overwrite=TRUE, method = "wget")
+download.file(url, destfile, method = "wget")
+unzip(destfile, exdir="data/steinbock", overwrite=TRUE)
 unlink(destfile)
 
 # download regionprops
 url <- "https://zenodo.org/record/6043600/files/regionprops.zip"
 destfile <- "data/steinbock/regionprops.zip"
-download.file(url, destfile)
-unzip(destfile, exdir="data/steinbock", overwrite=TRUE, method = "wget")
+download.file(url, destfile, method = "wget")
+unzip(destfile, exdir="data/steinbock", overwrite=TRUE)
 unlink(destfile)
 
 
 # download neighbors
 url <- "https://zenodo.org/record/6043600/files/neighbors.zip"
 destfile <- "data/steinbock/neighbors.zip"
-download.file(url, destfile)
-unzip(destfile, exdir="data/steinbock", overwrite=TRUE, method = "wget")
+download.file(url, destfile, method = "wget")
+unzip(destfile, exdir="data/steinbock", overwrite=TRUE)
 unlink(destfile)
 
 # download images
 url <- "https://zenodo.org/record/6043600/files/img.zip"
 destfile <- "data/steinbock/img.zip"
-download.file(url, destfile)
-unzip(destfile, exdir="data/steinbock", overwrite=TRUE, method = "wget")
+download.file(url, destfile, method = "wget")
+unzip(destfile, exdir="data/steinbock", overwrite=TRUE)
 unlink(destfile)
 
 # download masks
 destfile <- "data/steinbock/masks_deepcell.zip"
-download.file(url, destfile)
-unzip(destfile, exdir="data/steinbock", overwrite=TRUE, method = "wget")
+download.file(url, destfile, method = "wget")
+unzip(destfile, exdir="data/steinbock", overwrite=TRUE)
 unlink(destfile)
 
 # download individual files
