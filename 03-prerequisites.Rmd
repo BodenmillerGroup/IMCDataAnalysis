@@ -93,7 +93,8 @@ commands which were used to process the data can be found in
 `data/steinbock/steinbock.sh`.
 
 ```{r steinbock-results}
-print(1+1)
+download.file("https://zenodo.org/record/5949116/files/sample_metadata.xlsx", 
+         destfile = "data/sample_metadata.xlsx")
 
 # download intensities
 url <- "https://zenodo.org/record/6043600/files/intensities.zip"
@@ -150,7 +151,7 @@ To highlight the estimation and correction of channel-spillover as described by
 [@Chevrier2017], we can access an example spillover-acquisition from:
 
 ```{r download-spillover-data}
-download("https://zenodo.org/record/5949116/files/compensation.zip",
+download.file("https://zenodo.org/record/5949116/files/compensation.zip",
               "data/compensation.zip")
 unzip("data/compensation.zip", exdir="data", overwrite=TRUE)
 unlink("data/compensation.zip")
