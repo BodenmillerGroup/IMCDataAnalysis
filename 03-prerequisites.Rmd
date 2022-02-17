@@ -93,8 +93,12 @@ commands which were used to process the data can be found in
 `data/steinbock/steinbock.sh`.
 
 ```{r steinbock-results}
-download.file("https://zenodo.org/record/5949116/files/sample_metadata.xlsx", 
-         destfile = "data/sample_metadata.xlsx")
+# download intensities
+url <- "https://zenodo.org/record/6043600/files/intensities.zip"
+destfile <- "data/steinbock/intensities.zip"
+download.file(url, destfile)
+unzip(destfile, exdir="data/steinbock", overwrite=TRUE)
+unlink(destfile)
 
 # download intensities
 url <- "https://zenodo.org/record/6043600/files/intensities.zip"
