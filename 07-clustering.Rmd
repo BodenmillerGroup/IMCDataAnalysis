@@ -5,3 +5,13 @@
 ## Shared nearest neighbour graph
 
 ## FlowSOM
+
+## Session Info
+
+<details>
+   <summary>SessionInfo</summary>
+   
+```{r, echo = FALSE}
+sessionInfo()
+```
+</details>

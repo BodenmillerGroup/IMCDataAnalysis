@@ -1,3 +1,196 @@
 # Image and cell-level quality control
 
-Overview on possible quality indicators
+The following section discusses possible quality indicators for data obtained
+by IMC and other highly multiplexed imaging technologies.
+Due to the complexity of the data, the quality metric range across the image
+and single-cell levels and the chapter is sectioned as such.
+In general, we commonly do not exclude individual cells from images but rather
+whole images to keep the spatial structure of the tissue intact.
+
+## Read in the data
+
+We will first read in the data processed in previous sections:
+
+```{r read-data, message=FALSE}
+images <- readRDS("data/images.rds")
+masks <- readRDS("data/masks.rds")
+spe <- readRDS("data/spe.rds")
+```
+
+## Segmentation quality control
+
+The first step after image segmentation is to observe its accuracy.
+Without having ground-truth data readily available, a common approach to 
+segmentation quality control is to overlay segmentation masks on composite images
+displaying channels that were used for segmentation. 
+The [cytomapper](https://www.bioconductor.org/packages/release/bioc/html/cytomapper.html) 
+Bioconductor package supports exactly this tasks by using the `plotPixels` function.
+
+Here, we select 3 random images and perform image- and channel-wise
+normalization (channels are first min-max normalized and scaled to a range of
+0-1 before clipping the maximum intensity to 0.2). For more information to image
+normalization, refer to Section \@ref(read-data).
+
+```{r overlay-masks, message=FALSE}
+library(cytomapper)
+set.seed(20220118)
+img_ids <- sample(seq_len(length(images)), 3)
+
+# Normalize and clip images
+cur_images <- images[img_ids]
+cur_images <- normalize(cur_images, separateImages = TRUE)
+cur_images <- normalize(cur_images, inputRange = c(0, 0.2))
+
+plotPixels(cur_images,
+           mask = masks[img_ids],
+           img_id = "sample_id",
+           missing_colour = "white",
+           colour_by = c("CD163", "CD20", "CD3", "Ecad", "DNA1"),
+           colour = list(CD163 = c("black", "yellow"),
+                         CD20 = c("black", "red"),
+                         CD3 = c("black", "green"),
+                         Ecad = c("black", "cyan"),
+                         DNA1 = c("black", "blue")),
+           image_title = NULL,
+           legend = list(colour_by.title.cex = 0.7,
+                         colour_by.labels.cex = 0.7))
+```
+
+We can see that nuclei are centered within the segmentation masks and all cell
+types are correctly segmented, A common challenge here is to segment large (e.g.
+epithelial cells - in cyan) _versus_ small (e.g. B cells - in red). However, the
+segmentation approach here appears to correctly segment cells across different
+sizes.
+
+An additional approach to observe cell segmentation quality and potentially also
+antibody specificity issues is to visualize single-cell expression in form of a
+heatmap. Here, we sub-sample the dataset to 2000 cells for visualization
+purposes and overlay the cancer type from which the cells were extracted.
+
+```{r segmentation-heatmap, message=FALSE}
+library(dittoSeq)
+library(viridis)
+cur_cells <- sample(seq_len(ncol(spe)), 2000)
+
+dittoHeatmap(spe[,cur_cells], genes = rownames(spe)[rowData(spe)$use_channel],
+             assay = "exprs", cluster_cols = TRUE, scale = "none",
+             heatmap.colors = viridis(100), annot.by = "indication")
+```
+
+We can differentiate between epithelial cells (Ecad+) and immune cells (CD45RO).
+Some of the markers are specifically detected (e.g., Ki67, CD20, Ecad) and markers
+that are more broadly detected (e.g. HLADR, B2M, CD4). 
+
+## Image-level quality control
+
+Image-level quality control is often performed using tools that offer a
+graphical user interface such as [QuPath](https://qupath.github.io/) and
+[FIJI](https://imagej.net/software/fiji/). Viewers that were specifically
+developed for IMC data can be seen
+[here](https://bodenmillergroup.github.io/IMCWorkflow/viewers.html). In this
+section, we will specificaly focus on quantitative metrics to assess image
+quality.
+
+It is often of interest to calculate the signal-to-noise ratio (SNR) for
+individual channels and markers. Here, we define the SNR as:
+
+$$SNR = I_s/I_n$$
+
+where $I_s$ is the intensity of the signal (mean intensity of pixels with true
+signal) and $I_n$ is the intensity of the noise (mean intensity of pixels
+containing noise). Finding a threshold that separates pixels containing signal
+and pixels containing noise is not trivial and different approaches can be
+chosen. Here, we use the `otsu` thresholding approach to find pixels of the
+"foreground" (i.e., signal) and "background" (i.e., noise). The SNR is then
+defined as the mean intensity of foreground pixels divided by the mean intensity
+of background pixels. We then plot the SNR versus mean signal intensity
+(together with their 95% confidence interval).
+
+```{r image-snr, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(ggrepel)
+library(EBImage)
+cur_snr <- lapply(images, function(img){
+    mat <- apply(img, 3, function(ch){
+        # Otsu threshold
+        thres <- otsu(ch, range = c(min(ch), max(ch)))
+        # Signal-to-noise ratio
+        snr <- mean(ch[ch > thres]) / mean(ch[ch <= thres])
+        # Signal intensity
+        ps <- mean(ch[ch > thres])
+        
+        return(c(snr = snr, ps = ps))
+    })
+    t(mat) %>% as.data.frame() %>% 
+        mutate(marker = colnames(mat)) %>% 
+        pivot_longer(cols = c(snr, ps))
+})
+
+cur_snr <- do.call(rbind, cur_snr)
+
+cur_snr %>% 
+    group_by(marker, name) %>%
+    summarize(mean = mean(value),
+              ci = qnorm(0.975)*sd(value)/sqrt(n())) %>%
+    pivot_wider(names_from = name, values_from = c(mean, ci)) %>%
+    ggplot() +
+    geom_errorbar(aes(y = log2(mean_snr), xmin = log2(mean_ps - ci_ps), 
+                      xmax = log2(mean_ps + ci_ps))) +
+    geom_errorbar(aes(x = log2(mean_ps), ymin = log2(mean_snr - ci_snr), 
+                      ymax = log2(mean_snr + ci_snr))) +
+    geom_point(aes(log2(mean_ps), log2(mean_snr))) +
+    geom_label_repel(aes(log2(mean_ps), log2(mean_snr), label = marker)) +
+    theme_minimal(base_size = 15) + ylab("Signal-to-noise ratio") +
+    xlab("Signal intensity")
+```
+
+We observe PD1, LAG3 and cleaved PARP to have high SNR but low signal intensity
+meaning that in general these markers are not abundantly expressed. The Iridium
+intercalator (here marked as DNA1 and DNA2) has the highest signal intensity 
+but low SNR. This might be due to staining differences between individual nuclei
+where some nuclei are considered as background. We do however observe high
+SNR and sufficient signal intensity for the majority of markers.
+
+Another quality indicator is the image area covered by cells (or biological tissue).
+This metric identifies ROIs where little cells are present, possibly hinting
+at incorrect selection of the ROI. We can compute the percentage of image 
+are covered by cells using the metadata contained in the `SpatialExperiment`
+object:
+
+```{r cell-density, fig.height=7}
+colData(spe) %>%
+    as.data.frame() %>%
+    group_by(sample_id) %>%
+    summarize(cell_area = sum(area),
+           no_pixels = mean(width_px) * mean(height_px)) %>%
+    mutate(covered_area = cell_area / no_pixels) %>%
+    ggplot() +
+        geom_point(aes(sample_id, covered_area)) + 
+        theme_minimal(base_size = 15) +
+        ylim(c(0.5, 1)) + 
+        theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 8)) +
+        ylab("% covered area") + xlab("")
+```
+
+We observe that all images contain a similar percentage of covered area of 
+around 80%. 
+
+## Cell-level quality control
+
+Signal-to-noise
+
+Size
+
+No cells per image
+
+Staining differences
+
+## Session Info
+
+<details>
+   <summary>SessionInfo</summary>
+   
+```{r, echo = FALSE}
+sessionInfo()
+```
+</details>

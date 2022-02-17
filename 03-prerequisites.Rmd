@@ -1,12 +1,27 @@
 # Prerequisites {#prerequisites}
 
+The analysis presented in this book requires a basic understanding of the 
+`R` programing language. An introduction to `R` can be found [here](https://cran.r-project.org/doc/manuals/r-release/R-intro.pdf) and
+in the book [R for Data Science](https://r4ds.had.co.nz/index.html).
+
+Furthermore, it is beneficial to be familiar with single-cell data analysis
+using the [Bioconductor](https://www.bioconductor.org/) framework. The 
+[Orchestrating Single-Cell Analysis with Bioconductor](https://bioconductor.org/books/release/OSCA/) 
+gives an excellent overview on data containers and basic analysis that are being
+used here.
+
+An overview on IMC as technologie and necessary image processing steps can be
+found on the [IMC workflow website](https://bodenmillergroup.github.io/IMCWorkflow/). 
+
 Before we get started on IMC data analysis, we will need to make sure that
 software dependencies are installed and the needed example data is downloaded.
 
 ## Software requirements
 
 ```{r load-libraries, echo = FALSE, message = FALSE}
+options(timeout=10000)
 library(CATALYST)
+library(SpatialExperiment)
 library(SingleCellExperiment)
 library(scuttle)
 library(scater)
@@ -21,51 +36,143 @@ This section lists the most commonly used packages in this workflow.
 
 Data containers:
 
+* [SpatialExperiment](https://bioconductor.org/packages/release/bioc/html/SpatialExperiment.html) version `r packageVersion("SpatialExperiment")`
 * [SingleCellExperiment](https://bioconductor.org/packages/release/bioc/html/SingleCellExperiment.html) version `r packageVersion("SingleCellExperiment")`
 
 Data processing:
 
-* [CATALYST](https://bioconductor.org/packages/release/bioc/html/CATALYST.html) version `r packageVersion("SingleCellExperiment")`
+* [CATALYST](https://bioconductor.org/packages/release/bioc/html/CATALYST.html) version `r packageVersion("CATALYST")`
 * [imcRtools](https://github.com/BodenmillerGroup/imcRtools) version `r packageVersion("imcRtools")` from [Github](https://github.com/BodenmillerGroup/imcRtools)
 * [scuttle](https://bioconductor.org/packages/release/bioc/html/scuttle.html) version `r packageVersion("scuttle")`
 * [scater](https://bioconductor.org/packages/release/bioc/html/scater.html) version `r packageVersion("scater")`
 
 Data visualization:
 
-* [cytomapper](https://bioconductor.org/packages/release/bioc/html/cytomapper.html) version `r packageVersion("cytomapper")` from [Github](https://github.com/BodenmillerGroup/cytomapper)
+* [cytomapper](https://github.com/BodenmillerGroup/cytomapper) version `r packageVersion("cytomapper")` from [Github](https://github.com/BodenmillerGroup/cytomapper)
 * [dittoSeq](https://bioconductor.org/packages/release/bioc/html/dittoSeq.html) version `r packageVersion("dittoSeq")`
 
 Tidy R:
 
-* [tidyverse](https://www.tidyverse.org/)
+* [tidyverse](https://www.tidyverse.org/) version `r packageVersion("tidyverse")`
 
-## Download example data
+## Download example data {#download-data}
 
 Throughout this tutorial, we will access a number of different data types. 
 To declutter the analysis scripts, we will already download all needed data here.
 
-### Files for spillover matrix estimation
+To highlight the basic steps of IMC data analysis, we provide example data that
+were acquired as part of the *I*ntegrated i*MMU*noprofiling of large adaptive
+*CAN*cer patient cohorts projects ([immucan.eu/](https://immucan.eu/)). The
+raw data of 4 patients can be accessed online at 
+[zenodo.org/record/5949116](https://zenodo.org/record/5949116).
+Image processing and segmentation has been performed using `steinbock` and
+the IMC segmentation pipeline (see below) and we will only need to access the
+sample/patient information here:
 
-To highlight the generation of a spillover matrix, we will use files that were 
-provided in the original publication [@Chevrier2017].
-
-```{r dowload-chevrier2017, message=FALSE}
-# Figure_S5
-sm_url <- "https://data.mendeley.com/public-files/datasets/v58yj49pfr/files/b39223d2-2825-4e79-9875-86fa0e1c55d2/file_downloaded?dl=1"
-
-download.file(sm_url, "data/Figure_S5.zip")
-unzip("data/Figure_S5.zip", exdir="data", overwrite=TRUE)
-unlink("data/Figure_S5.zip")
-
-# Figure_4
-sm_url <- "https://data.mendeley.com/public-files/datasets/v58yj49pfr/files/fad34c02-8a26-4291-814a-dc3bd4d980a2/file_downloaded?dl=1"
-
-download.file(sm_url, "data/Figure_4.zip")
-unzip("data/Figure_4.zip", exdir="data", overwrite=TRUE)
-unlink("data/Figure_4.zip")
+```{r download-sample-data}
+download.file("https://zenodo.org/record/5949116/files/sample_metadata.xlsx", 
+         destfile = "data/sample_metadata.xlsx")
 ```
 
-### Software versions {#sessionInfo}
+### Processed multiplexed imaging data
+
+The IMC raw data was either processed using the 
+[steinbock](https://github.com/BodenmillerGroup/steinbock) framework or the
+[IMC Segmentation Pipeline](https://github.com/BodenmillerGroup/ImcSegmentationPipeline).
+Image processing included file type conversion, cell segmentation and feature
+extraction. 
+
+**steinbock output**
+
+The needed output of the `steinbock` framework includes the single-cell mean
+intensity files, the single-cell morphological features and spatial locations,
+spatial object graphs in form of edge lists indication cells in close proximity,
+hot pixel filtered multi-channel images, segmentation masks, image metadata and
+channel metadata. All these files will be downloaded here for easy access. The
+commands which were used to process the data can be found in
+`data/steinbock/steinbock.sh`.
+
+```{r, echo = FALSE, message = FALSE}
+# for some reason GA doesn't download the intensity files
+# That's why we download them twice
+# download intensities
+url <- "https://zenodo.org/record/6043600/files/intensities.zip"
+destfile <- "data/steinbock/intensities.zip"
+download.file(url, destfile)
+unzip(destfile, exdir="data/steinbock", overwrite=TRUE)
+unlink(destfile)
+
+# download intensities
+url <- "https://zenodo.org/record/6043600/files/intensities.zip"
+destfile <- "data/steinbock/intensities.zip"
+download.file(url, destfile)
+unzip(destfile, exdir="data/steinbock", overwrite=TRUE)
+unlink(destfile)
+```
+
+```{r steinbock-results}
+# download intensities
+url <- "https://zenodo.org/record/6043600/files/intensities.zip"
+destfile <- "data/steinbock/intensities.zip"
+download.file(url, destfile)
+unzip(destfile, exdir="data/steinbock", overwrite=TRUE)
+unlink(destfile)
+
+# download regionprops
+url <- "https://zenodo.org/record/6043600/files/regionprops.zip"
+destfile <- "data/steinbock/regionprops.zip"
+download.file(url, destfile)
+unzip(destfile, exdir="data/steinbock", overwrite=TRUE)
+unlink(destfile)
+
+
+# download neighbors
+url <- "https://zenodo.org/record/6043600/files/neighbors.zip"
+destfile <- "data/steinbock/neighbors.zip"
+download.file(url, destfile)
+unzip(destfile, exdir="data/steinbock", overwrite=TRUE)
+unlink(destfile)
+
+# download images
+url <- "https://zenodo.org/record/6043600/files/img.zip"
+destfile <- "data/steinbock/img.zip"
+download.file(url, destfile)
+unzip(destfile, exdir="data/steinbock", overwrite=TRUE)
+unlink(destfile)
+
+# download masks
+url <- "https://zenodo.org/record/6043600/files/masks_deepcell.zip"
+destfile <- "data/steinbock/masks_deepcell.zip"
+download.file(url, destfile)
+unzip(destfile, exdir="data/steinbock", overwrite=TRUE)
+unlink(destfile)
+
+# download individual files
+download.file("https://zenodo.org/record/6043600/files/panel.csv", 
+              "data/steinbock/panel.csv")
+download.file("https://zenodo.org/record/6043600/files/images.csv", 
+              "data/steinbock/images.csv")
+download.file("https://zenodo.org/record/6043600/files/steinbock.sh", 
+              "data/steinbock/steinbock.sh")
+```
+
+**IMC Segmentation Pipeline output**
+
+Under development
+
+### Files for spillover matrix estimation
+
+To highlight the estimation and correction of channel-spillover as described by
+[@Chevrier2017], we can access an example spillover-acquisition from:
+
+```{r download-spillover-data}
+download.file("https://zenodo.org/record/5949116/files/compensation.zip",
+              "data/compensation.zip")
+unzip("data/compensation.zip", exdir="data", overwrite=TRUE)
+unlink("data/compensation.zip")
+```
+
+## Software versions {#sessionInfo}
 
 <details>
    <summary>SessionInfo</summary>
