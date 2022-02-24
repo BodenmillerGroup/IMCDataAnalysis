@@ -74,7 +74,8 @@ cur_cells <- sample(seq_len(ncol(spe)), 2000)
 
 dittoHeatmap(spe[,cur_cells], genes = rownames(spe)[rowData(spe)$use_channel],
              assay = "exprs", cluster_cols = TRUE, scale = "none",
-             heatmap.colors = viridis(100), annot.by = "indication")
+             heatmap.colors = viridis(100), annot.by = "indication",
+             annotation_colors = list(indication = metadata(spe)$color_vectors$indication))
 ```
 
 We can differentiate between epithelial cells (Ecad+) and immune cells (CD45RO).
@@ -219,7 +220,10 @@ assay(image_mean, "exprs") <- asinh(counts(image_mean))
 dittoHeatmap(image_mean, genes = rownames(spe)[rowData(spe)$use_channel],
              assay = "exprs", cluster_cols = TRUE, scale = "none",
              heatmap.colors = viridis(100), 
-             annot.by = c("indication", "patient_id", "ROI"))
+             annot.by = c("indication", "patient_id", "ROI"),
+             annotation_colors = list(indication = metadata(spe)$color_vectors$indication,
+                                      patient_id = metadata(spe)$color_vectors$patient_id,
+                                      ROI = metadata(spe)$color_vectors$ROI))
 ```
 
 We observe extensive biological variation across the 14 images. Some images
@@ -343,10 +347,28 @@ number of tumor/non-tumor cells. As we can see in the following sections, some
 immune cells appear in cell dense regions while other stromal parts are less
 dense.
 
+The data presented here were stained on individual slides. Also, samples were
+processed in different locations. These (and other) technical aspects can
+induces staining differences between samples or batches of samples. Observing
+potential staining differences can be crucial to assess data quality.
+We will use ridgeline visualizations to check differences in staining patterns:
 
-Staining differences
+```{r ridges, message=FALSE, fig.width=7, fig.height=25}
+multi_dittoPlot(spe, vars = rownames(spe)[rowData(spe)$use_channel],
+               group.by = "patient_id", plots = c("ridgeplot"), 
+               assay = "exprs", 
+               color.panel = metadata(spe)$color_vectors$patient_id)
+```
 
-DimRed
+We observe variations in the distributions of marker expression across patients.
+These variations arise partly from differences in region selection for
+measurement (it appears that Patient3 contains a higher number of CD11c+ and
+HLADR+ cells) as well as staining differences between samples. While most of the
+selected markers are specifically expressed in immune cell subtypes, we can see
+that E-Cadherin (a marker for tumor cells) shows similar expression across all
+patients.
+
+Finally, 
 
 ```{r dimred, message=FALSE}
 library(scater)

@@ -182,6 +182,34 @@ biological targets.
 rowData(spe)$use_channel <- !grepl("DNA|Histone", rownames(spe))
 ```
 
+**Define color schemes**
+
+We will already at this point define color schemes for different metadata
+entries which will be helpful for downstream data visualizations. We will use
+colors from the `RColorBrewer` and `dittoSeq` package but any other coloring
+package will suffice.
+
+```{r define-colors, message=FALSE}
+library(RColorBrewer)
+color_vectors <- list()
+
+ROI <- setNames(brewer.pal(length(unique(spe$ROI)), name = "BrBG"), 
+                unique(spe$ROI))
+patient_id <- setNames(brewer.pal(length(unique(spe$patient_id)), name = "Set1"), 
+                unique(spe$patient_id))
+sample_id <- setNames(dittoColors(reps = 1)[seq_along(unique(spe$sample_id))], 
+                unique(spe$sample_id))
+indication <- setNames(brewer.pal(length(unique(spe$indication)), name = "Set2"), 
+                unique(spe$indication))
+
+color_vectors$ROI <- ROI
+color_vectors$patient_id <- patient_id
+color_vectors$sample_id <- sample_id
+color_vectors$indication <- indication
+
+metadata(spe)$color_vectors <- color_vectors
+```
+
 ## Read in images {#read-images}
 
 The `cytomapper` package allows multi-channel image handling and visualization
@@ -233,6 +261,8 @@ mcols(images) <- mcols(masks) <- DataFrame(sample_id = names(images),
                                            patient_id = patient_id,
                                            indication = indication)
 ```
+
+## Generate single-cell data from images
 
 ## Save objects
 
