@@ -55,6 +55,27 @@ Tidy R:
 
 * [tidyverse](https://www.tidyverse.org/) version `r packageVersion("tidyverse")`
 
+## Image processing
+
+The analysis presented here fully relies on packages written in the programming
+language `R` and primarily focuses on analysis approaches downstream of image
+processing. The example data available at
+[https://zenodo.org/record/5949116](https://zenodo.org/record/5949116) were
+processed (file type conversion, image segmentation, feature extraction as
+explained in Section \@ref(processing)) using the
+[steinbock](https://bodenmillergroup.github.io/steinbock/latest/) framework. The
+exact command line interface calls to process the raw data are shown below:
+
+```{r, echo = FALSE, message = FALSE}
+# Pre-download steinbock file
+download.file("https://zenodo.org/record/6043600/files/steinbock.sh", 
+              "data/steinbock/steinbock.sh")
+```
+
+```{bash, file="data/steinbock/steinbock.sh", eval=FALSE}
+
+```
+
 ## Download example data {#download-data}
 
 Throughout this tutorial, we will access a number of different data types. 
@@ -92,7 +113,7 @@ channel metadata. All these files will be downloaded here for easy access. The
 commands which were used to process the data can be found in
 `data/steinbock/steinbock.sh`.
 
-```{r, echo = FALSE, message = FALSE}
+```{r, echo = FALSE, message = FALSE, eval=FALSE}
 # for some reason GA doesn't download the intensity files
 # That's why we download them twice
 # download intensities
@@ -110,7 +131,7 @@ unzip(destfile, exdir="data/steinbock", overwrite=TRUE)
 unlink(destfile)
 ```
 
-```{r steinbock-results}
+```{r steinbock-results, eval=FALSE}
 # download intensities
 url <- "https://zenodo.org/record/6043600/files/intensities.zip"
 destfile <- "data/steinbock/intensities.zip"
@@ -165,7 +186,7 @@ Under development
 To highlight the estimation and correction of channel-spillover as described by
 [@Chevrier2017], we can access an example spillover-acquisition from:
 
-```{r download-spillover-data}
+```{r download-spillover-data, eval=FALSE}
 download.file("https://zenodo.org/record/5949116/files/compensation.zip",
               "data/compensation.zip")
 unzip("data/compensation.zip", exdir="data", overwrite=TRUE)

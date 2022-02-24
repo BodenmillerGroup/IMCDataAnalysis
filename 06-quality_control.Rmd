@@ -67,7 +67,7 @@ antibody specificity issues is to visualize single-cell expression in form of a
 heatmap. Here, we sub-sample the dataset to 2000 cells for visualization
 purposes and overlay the cancer type from which the cells were extracted.
 
-```{r segmentation-heatmap, message=FALSE}
+```{r segmentation-heatmap, message=FALSE, fig.height=7}
 library(dittoSeq)
 library(viridis)
 cur_cells <- sample(seq_len(ncol(spe)), 2000)
@@ -134,10 +134,10 @@ cur_snr %>%
               ci = qnorm(0.975)*sd(value)/sqrt(n())) %>%
     pivot_wider(names_from = name, values_from = c(mean, ci)) %>%
     ggplot() +
-    geom_errorbar(aes(y = log2(mean_snr), xmin = log2(mean_ps - ci_ps), 
-                      xmax = log2(mean_ps + ci_ps))) +
-    geom_errorbar(aes(x = log2(mean_ps), ymin = log2(mean_snr - ci_snr), 
-                      ymax = log2(mean_snr + ci_snr))) +
+#    geom_errorbar(aes(y = log2(mean_snr), xmin = log2(mean_ps - ci_ps), 
+#                      xmax = log2(mean_ps + ci_ps))) +
+#    geom_errorbar(aes(x = log2(mean_ps), ymin = log2(mean_snr - ci_snr), 
+#                      ymax = log2(mean_snr + ci_snr))) +
     geom_point(aes(log2(mean_ps), log2(mean_snr))) +
     geom_label_repel(aes(log2(mean_ps), log2(mean_snr), label = marker)) +
     theme_minimal(base_size = 15) + ylab("Signal-to-noise ratio") +
@@ -157,7 +157,7 @@ at incorrect selection of the ROI. We can compute the percentage of image
 are covered by cells using the metadata contained in the `SpatialExperiment`
 object:
 
-```{r cell-density, fig.height=7}
+```{r cell-density}
 colData(spe) %>%
     as.data.frame() %>%
     group_by(sample_id) %>%
@@ -167,7 +167,7 @@ colData(spe) %>%
     ggplot() +
         geom_point(aes(sample_id, covered_area)) + 
         theme_minimal(base_size = 15) +
-        ylim(c(0.5, 1)) + 
+        ylim(c(0, 1)) + 
         theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 8)) +
         ylab("% covered area") + xlab("")
 ```
