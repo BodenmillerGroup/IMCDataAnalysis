@@ -132,8 +132,8 @@ library(openxlsx)
 library(stringr)
 meta <- read.xlsx("data/sample_metadata.xlsx")
 
-spe$patient_id <- str_extract_all(spe$sample_id, "Patient[1-4]", simplify = TRUE)
-spe$ROI <- str_extract_all(spe$sample_id, "00[1-8]", simplify = TRUE)
+spe$patient_id <- as.vector(str_extract_all(spe$sample_id, "Patient[1-4]", simplify = TRUE))
+spe$ROI <- as.vector(str_extract_all(spe$sample_id, "00[1-8]", simplify = TRUE))
 spe$indication <- meta$Indication[match(spe$patient_id, meta$Sample.ID)]
 
 unique(spe$indication)
@@ -248,7 +248,8 @@ saveRDS(masks, "data/masks.rds")
 ```{r integration-test-read-single-cell, include = FALSE}
 library(testthat)
 expect_equal(names(colData(spe)), c("sample_id", "ObjectNumber", "area", "major_axis_length", "minor_axis_length", 
-"eccentricity", "width_px", "height_px", "patient_id", "indication"))
+"eccentricity", "width_px", "height_px", "patient_id", "ROI", 
+"indication"))
 expect_equal(colData(spe)[1:5, ], new("DFrame", rownames = c("Patient1_001_1", "Patient1_001_2", 
 "Patient1_001_3", "Patient1_001_4", "Patient1_001_5"), nrows = 5L, 
     listData = list(sample_id = c("Patient1_001", "Patient1_001", 
@@ -259,10 +260,10 @@ expect_equal(colData(spe)[1:5, ], new("DFrame", rownames = c("Patient1_001_1", "
     3.13466326780999), eccentricity = c(0.987420882906575, 0.894427190999916, 
     0.943911217824785, 0.932335463337873, 0.956397255130736), 
         width_px = c(600, 600, 600, 600, 600), height_px = c(600, 
-        600, 600, 600, 600), patient_id = structure(c("Patient1", 
-        "Patient1", "Patient1", "Patient1", "Patient1"), .Dim = c(5L, 
-        1L)), indication = c("SCCHN", "SCCHN", "SCCHN", "SCCHN", 
-        "SCCHN")), elementType = "ANY", elementMetadata = NULL, 
+        600, 600, 600, 600), patient_id = c("Patient1", "Patient1", 
+        "Patient1", "Patient1", "Patient1"), ROI = c("001", "001", 
+        "001", "001", "001"), indication = c("SCCHN", "SCCHN", 
+        "SCCHN", "SCCHN", "SCCHN")), elementType = "ANY", elementMetadata = NULL, 
     metadata = list()))
 expect_equal(names(rowData(spe)), c("channel", "name", "keep", "ilastik", "deepcell", "Tube.Number", 
 "Target", "Antibody.Clone", "Stock.Concentration", "Final.Concentration...Dilution", 

@@ -229,13 +229,146 @@ in the following chapters.
 
 ## Cell-level quality control
 
-Signal-to-noise
+In the following paragraphs we will look at different metrics and visualization
+approaches to assess data quality (as well as biological differences) on the 
+single-cell level. 
 
-Size
+Similar to the signal-to-noise ratio (SNR) calculated above on the pixel-level, 
+a similar measure can be derived on the single-cell level. Here, we will use 
+a two component Gaussian mixture model for each marker to find cells
+with positive and negative expression. As above the SNR is defined as:
 
-No cells per image
+$$SNR = I_s/I_n$$
+
+where $I_s$ is the intensity of the signal (mean intensity of cells with positive
+signal) and $I_n$ is the intensity of the noise (mean intensity of cells
+lacking expression).
+
+```{r cell-snr, message=FALSE, warning=FALSE}
+library(mclust)
+
+set.seed(220224)
+cur_snr <- lapply(unique(spe$patient_id), function(patient){
+    
+    cur_spe <- spe[,spe$patient_id == patient]
+    mat <- apply(assay(cur_spe, "exprs"), 1, function(x){
+        cur_model <- Mclust(x, G = 2)
+        mean1 <- mean(x[cur_model$classification == 1])
+        mean2 <- mean(x[cur_model$classification == 2])
+        
+        signal <- ifelse(mean1 > mean2, mean1, mean2)
+        noise <- ifelse(mean1 > mean2, mean2, mean1)
+        
+        return(c(signal/noise, signal))
+    })
+    rownames(mat) <- c("snr", "ps")
+    
+    t(mat) %>% as.data.frame() %>% 
+        mutate(marker = colnames(mat)) %>% 
+        pivot_longer(cols = c(snr, ps))
+})
+
+cur_snr <- do.call(rbind, cur_snr)
+
+cur_snr %>% 
+    group_by(marker, name) %>%
+    summarize(mean = mean(value),
+              ci = qnorm(0.975)*sd(value)/sqrt(n())) %>%
+    pivot_wider(names_from = name, values_from = c(mean, ci)) %>%
+    ggplot() +
+#    geom_errorbar(aes(y = log2(mean_snr), xmin = log2(mean_ps - ci_ps), 
+#                      xmax = log2(mean_ps + ci_ps))) +
+#    geom_errorbar(aes(x = log2(mean_ps), ymin = log2(mean_snr - ci_snr), 
+#                      ymax = log2(mean_snr + ci_snr))) +
+    geom_point(aes(log2(mean_ps), log2(mean_snr))) +
+    geom_label_repel(aes(log2(mean_ps), log2(mean_snr), label = marker)) +
+    theme_minimal(base_size = 15) + ylab("Signal-to-noise ratio") +
+    xlab("Signal intensity")
+```
+
+Next, we will observe the distributions of cell sizes across the individual images.
+Differences in cell sizes can indicate segmentation biases due to differences
+in cell density or can indicate biological differences due to cell type compositions (tumor cells tend to be larger than immune cells).
+We will also observe the minimum cell sizes to exclude very small cells.
+
+```{r cell-size, message=FALSE}
+colData(spe) %>%
+    as.data.frame() %>%
+    group_by(sample_id) %>%
+    ggplot() +
+        geom_boxplot(aes(sample_id, area)) +
+        theme_minimal(base_size = 15) + 
+        theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 8)) +
+        ylab("Cell area") + xlab("")
+
+summary(spe$area)
+```
+
+The median cell size is `r median(spe$area)` pixels with a median major axis
+length of `r median(spe$major_axis_length)`. The largest cell has an area of 
+`r max(spe$area)` pixels which relates to a diameter of `r sqrt(max(spe$area))`
+pixels assuming a circular shape. Overall, the distribution of cell sizes is
+similar across images with image `Patient4_005` and `Patient4_007` showing
+reduces average cell size. These images contain fewer tumor cells which can 
+explain smaller average cell size.
+
+We observe very small cells an will remove them from the dataset. The chosen
+threshold is arbitrary and needs to be adjusted per dataset.
+
+```{r remove-small-cells}
+sum(spe$area < 5)
+spe <- spe[,spe$area >= 5]
+```
+
+Another quality indicator can be the number of cells per image divided by the
+image size. This measure relates to the percentage of image area covered by
+cells as explained above.
+
+```{r no-cells-per-image, message=FALSE}
+colData(spe) %>%
+    as.data.frame() %>%
+    group_by(sample_id) %>%
+    summarize(cell_count = n(),
+           no_pixels = mean(width_px) * mean(height_px)) %>%
+    mutate(cells_per_mm2 = cell_count/(no_pixels/1000000)) %>%
+    ggplot() +
+        geom_point(aes(sample_id, cells_per_mm2)) + 
+        theme_minimal(base_size = 15)  + 
+        theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 8)) +
+        ylab("Cells per mm2") + xlab("")
+```
+
+The number of cells per mm$^2$ varies across images which also depends on the
+number of tumor/non-tumor cells. As we can see in the following sections, some
+immune cells appear in cell dense regions while other stromal parts are less
+dense.
+
 
 Staining differences
+
+DimRed
+
+```{r dimred, message=FALSE}
+library(scater)
+
+spe <- runUMAP(spe, subset_row = rowData(spe)$use_channel, exprs_values = "exprs") 
+spe <- runTSNE(spe, subset_row = rowData(spe)$use_channel, exprs_values = "exprs") 
+
+dittoDimPlot(spe, var = "patient_id", reduction.use = "UMAP")
+dittoDimPlot(spe, var = "patient_id", reduction.use = "TSNE")
+
+plotReducedDim(spe, dimred = "UMAP", colour_by = "Ecad", by_exprs_values = "exprs")
+plotReducedDim(spe, dimred = "UMAP", colour_by = "CD45RO", by_exprs_values = "exprs")
+plotReducedDim(spe, dimred = "TSNE", colour_by = "Ecad", by_exprs_values = "exprs")
+```
+
+## Save objects
+
+The modified `SpatialExperiment` object is saved for further downstream analysis.
+
+```{r save-objects-read-data}
+saveRDS(spe, "data/spe.rds")
+```
 
 ## Session Info
 
