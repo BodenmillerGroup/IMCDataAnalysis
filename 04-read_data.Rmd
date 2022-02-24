@@ -133,6 +133,7 @@ library(stringr)
 meta <- read.xlsx("data/sample_metadata.xlsx")
 
 spe$patient_id <- str_extract_all(spe$sample_id, "Patient[1-4]", simplify = TRUE)
+spe$ROI <- str_extract_all(spe$sample_id, "00[1-8]", simplify = TRUE)
 spe$indication <- meta$Indication[match(spe$patient_id, meta$Sample.ID)]
 
 unique(spe$indication)

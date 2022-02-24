@@ -172,8 +172,60 @@ colData(spe) %>%
         ylab("% covered area") + xlab("")
 ```
 
-We observe that all images contain a similar percentage of covered area of 
-around 80%. 
+We observe that two of the 14 images show unusually low cell coverage. These
+two images can now be visualized using `cytomapper`.
+
+```{r low-density-images, message=FALSE}
+# Normalize and clip images
+cur_images <- images[c("Patient4_005", "Patient4_007")]
+cur_images <- normalize(cur_images, separateImages = TRUE)
+cur_images <- normalize(cur_images, inputRange = c(0, 0.2))
+
+plotPixels(cur_images,
+           mask = masks[c("Patient4_005", "Patient4_007")],
+           img_id = "sample_id",
+           missing_colour = "white",
+           colour_by = c("CD163", "CD20", "CD3", "Ecad", "DNA1"),
+           colour = list(CD163 = c("black", "yellow"),
+                         CD20 = c("black", "red"),
+                         CD3 = c("black", "green"),
+                         Ecad = c("black", "cyan"),
+                         DNA1 = c("black", "blue")),
+           legend = list(colour_by.title.cex = 0.7,
+                         colour_by.labels.cex = 0.7))
+```
+
+These two images display less dense tissue structure and `Patient4_007` shows
+signs of under-segmentation potentially due to irregular nuclear shape or 
+missing markers to detect certain cell types (e.g., fibroblasts).
+
+Finally, it can be beneficial to visualize the mean marker expression per image
+to identify images with outlying cell type compositions. This check does not
+indicate image quality _per se_ but can highlight biological differences. Here,
+we will use the `aggregateAcrossCells` function of the 
+`rBiocStyle::Biocpkg("scuttle")` package to compute the mean expression per 
+image. For visualization purposes, we again `asinh` transform the mean expression
+values.
+
+```{r mean-expression-per-image, message=FALSE, fig.height=7}
+library(scuttle)
+
+image_mean <- aggregateAcrossCells(spe, 
+                                   ids = spe$sample_id, 
+                                   statistics="mean",
+                                   use.assay.type = "counts")
+assay(image_mean, "exprs") <- asinh(counts(image_mean))
+
+dittoHeatmap(image_mean, genes = rownames(spe)[rowData(spe)$use_channel],
+             assay = "exprs", cluster_cols = TRUE, scale = "none",
+             heatmap.colors = viridis(100), 
+             annot.by = c("indication", "patient_id", "ROI"))
+```
+
+We observe extensive biological variation across the 14 images. Some images
+contain a high fraction of macrophages (CD206), B cells (CD20), neutrophils
+(CD15) or proliferating cells (Ki67). These differences will be further studied
+in the following chapters.
 
 ## Cell-level quality control
 

@@ -31,7 +31,7 @@ jobs:
                                             "zoo", "BiocManager", "devtools", "testthat", "tiff",
                                             "distill", "openxlsx", "ggrepel", "patchwork"))'
       - name: Install Bioconductor dependencies
-        run: Rscript -e 'BiocManager::install(c("CATALYST", "scuttle", "scater", "dittoSeq", "tidyverse"))'
+        run: Rscript -e 'BiocManager::install(c("CATALYST", "scuttle", "scater", "dittoSeq", "tidyverse", "BiocStyle"))'
       - name: Install Github dependencies
         run: Rscript -e 'devtools::install_github(c("BodenmillerGroup/imcRtools", "BodenmillerGroup/cytomapper"))'    
       - name: Render Book
