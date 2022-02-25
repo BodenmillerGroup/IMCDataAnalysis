@@ -436,6 +436,14 @@ p4 <- dittoDimPlot(spe, var = "CD45RO", reduction.use = "TSNE", assay = "exprs")
 (p1 + p2) / (p3 + p4)
 ```
 
+We observe a strong separation between tumor cells (Ecad+ cells) between the patients.
+This separation could be of biological origin since tumor cells tend to display
+differences in expression between patients and/or of technical origin: the panel
+only contains a single tumor marker (E-Cadherin) and therefore slight technical
+differences in staining causes visible separation between cells of different patients.
+Nevertheless, the immune compartment (CD45RO+ cells) mix between patients and we
+can rule out systematic staining differences between patients.
+
 ## Save objects
 
 The modified `SpatialExperiment` object is saved for further downstream analysis.

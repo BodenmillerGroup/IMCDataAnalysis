@@ -264,6 +264,20 @@ mcols(images) <- mcols(masks) <- DataFrame(sample_id = names(images),
 
 ## Generate single-cell data from images
 
+An alternative way of generating a `SingleCellExperiment` object directly 
+from the multi-channel images and segmentation masks is the 
+[measureObjects](https://bodenmillergroup.github.io/cytomapper/reference/measureObjects.html)
+function of the `cytomapper` package. For each cell presented in the `masks`
+object, the function computes the mean pixel intensity per channel as well as
+morphological features (area, radius, major axis length, eccentricity) and the 
+location of cells:
+
+```{r measureObjects, message=FALSE}
+cytomapper_sce <- measureObjects(masks, image = images, img_id = "sample_id")
+
+cytomapper_sce
+```
+
 ## Save objects
 
 Finally, the generated data objects can be saved for further downstream 
