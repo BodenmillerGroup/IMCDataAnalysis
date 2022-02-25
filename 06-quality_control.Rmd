@@ -368,27 +368,79 @@ selected markers are specifically expressed in immune cell subtypes, we can see
 that E-Cadherin (a marker for tumor cells) shows similar expression across all
 patients.
 
-Finally, 
+Finally, we will use non-linear dimensionality reduction methods to project
+cells from high-dimensional (40) down to a low-dimensional (2) space. For this
+the `r BiocStyle::Biocpkg("scater")` package provides the `runUMAP` and `runTSNE`
+function (among others). To ensure reproducibility, we will need to set a seed; 
+however different seeds and different parameter settings (e.g. the `perplexity`)
+parameter in the `runTSNE` function need to be tested to avoid interpreting
+visualization artefacts. For dimensionality reduction, we will use all channels
+that show biological variation across the dataset. However, marker selection 
+can be performed with different biological questions in mind.
 
 ```{r dimred, message=FALSE}
 library(scater)
 
+set.seed(220225)
 spe <- runUMAP(spe, subset_row = rowData(spe)$use_channel, exprs_values = "exprs") 
 spe <- runTSNE(spe, subset_row = rowData(spe)$use_channel, exprs_values = "exprs") 
+```
 
-dittoDimPlot(spe, var = "patient_id", reduction.use = "UMAP")
-dittoDimPlot(spe, var = "patient_id", reduction.use = "TSNE")
+After dimensionality reduction, the low-dimensional embeddings are stored in the 
+`reducedDim` slot.
 
-plotReducedDim(spe, dimred = "UMAP", colour_by = "Ecad", by_exprs_values = "exprs")
-plotReducedDim(spe, dimred = "UMAP", colour_by = "CD45RO", by_exprs_values = "exprs")
-plotReducedDim(spe, dimred = "TSNE", colour_by = "Ecad", by_exprs_values = "exprs")
+```{r show-dimred-slot}
+reducedDims(spe)
+head(reducedDim(spe, "UMAP"))
+```
+
+Visualization of the low-dimensional embedding facilitates assessment of 
+potential "batch effects". The `dittoSeq::dittoDimPlot` and `scater::plotReducedDim`
+functions allow flexible visualization. They return `ggplot` objects which
+can be further modified. The `plotReducedDim` is the prefered way of visualizing
+marker expression on the cells due to increased control of the color scheme.
+
+```{r visualizing-dimred, message=FALSE}
+# visualize patient id 
+p1 <- dittoDimPlot(spe, var = "patient_id", reduction.use = "UMAP") + 
+    scale_color_manual(values = metadata(spe)$color_vectors$patient_id) +
+    ggtitle("Patient ID on UMAP")
+p2 <- dittoDimPlot(spe, var = "patient_id", reduction.use = "TSNE") + 
+    scale_color_manual(values = metadata(spe)$color_vectors$patient_id) +
+    ggtitle("Patient ID on TSNE")
+
+# visualize region of interest id
+p3 <- dittoDimPlot(spe, var = "ROI", reduction.use = "UMAP") + 
+    scale_color_manual(values = metadata(spe)$color_vectors$ROI) +
+    ggtitle("ROI ID on UMAP")
+p4 <- dittoDimPlot(spe, var = "ROI", reduction.use = "TSNE") + 
+    scale_color_manual(values = metadata(spe)$color_vectors$ROI) +
+    ggtitle("ROI ID on TSNE")
+
+(p1 + p2) / (p3 + p4)
+
+# visualize marker expression
+p1 <- dittoDimPlot(spe, var = "Ecad", reduction.use = "UMAP", assay = "exprs") +
+    scale_color_viridis(name = "Ecad") +
+    ggtitle("E-Cadherin expression on UMAP")
+p2 <- dittoDimPlot(spe, var = "CD45RO", reduction.use = "UMAP", assay = "exprs") +
+    scale_color_viridis(name = "CD45RO") +
+    ggtitle("CD45RO expression on UMAP")
+p3 <- dittoDimPlot(spe, var = "Ecad", reduction.use = "TSNE", assay = "exprs") +
+    scale_color_viridis(name = "Ecad") +
+    ggtitle("Ecad expression on TSNE")
+p4 <- dittoDimPlot(spe, var = "CD45RO", reduction.use = "TSNE", assay = "exprs") +
+    scale_color_viridis(name = "CD45RO") +
+    ggtitle("CD45RO expression on TSNE")
+
+(p1 + p2) / (p3 + p4)
 ```
 
 ## Save objects
 
 The modified `SpatialExperiment` object is saved for further downstream analysis.
 
-```{r save-objects-read-data}
+```{r save-objects-quality-control}
 saveRDS(spe, "data/spe.rds")
 ```
 
