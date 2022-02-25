@@ -4,8 +4,6 @@ The following section discusses possible quality indicators for data obtained
 by IMC and other highly multiplexed imaging technologies.
 Due to the complexity of the data, the quality metric range across the image
 and single-cell levels and the chapter is sectioned as such.
-In general, we commonly do not exclude individual cells from images but rather
-whole images to keep the spatial structure of the tissue intact.
 
 ## Read in the data
 
@@ -28,8 +26,7 @@ Bioconductor package supports exactly this tasks by using the `plotPixels` funct
 
 Here, we select 3 random images and perform image- and channel-wise
 normalization (channels are first min-max normalized and scaled to a range of
-0-1 before clipping the maximum intensity to 0.2). For more information to image
-normalization, refer to Section \@ref(read-data).
+0-1 before clipping the maximum intensity to 0.2).
 
 ```{r overlay-masks, message=FALSE}
 library(cytomapper)
@@ -56,8 +53,9 @@ plotPixels(cur_images,
                          colour_by.labels.cex = 0.7))
 ```
 
+To zoom into the image you can right click and select `Open Image in New Tab`.
 We can see that nuclei are centered within the segmentation masks and all cell
-types are correctly segmented, A common challenge here is to segment large (e.g.
+types are correctly segmented A common challenge here is to segment large (e.g.
 epithelial cells - in cyan) _versus_ small (e.g. B cells - in red). However, the
 segmentation approach here appears to correctly segment cells across different
 sizes.
@@ -79,8 +77,8 @@ dittoHeatmap(spe[,cur_cells], genes = rownames(spe)[rowData(spe)$use_channel],
 ```
 
 We can differentiate between epithelial cells (Ecad+) and immune cells (CD45RO).
-Some of the markers are specifically detected (e.g., Ki67, CD20, Ecad) and markers
-that are more broadly detected (e.g. HLADR, B2M, CD4). 
+Some of the markers are specifically detected (e.g., Ki67, CD20, Ecad) and
+others are more broadly detected (e.g. HLADR, B2M, CD4).
 
 ## Image-level quality control
 

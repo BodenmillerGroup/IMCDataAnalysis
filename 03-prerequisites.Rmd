@@ -10,7 +10,7 @@ using the [Bioconductor](https://www.bioconductor.org/) framework. The
 gives an excellent overview on data containers and basic analysis that are being
 used here.
 
-An overview on IMC as technologie and necessary image processing steps can be
+An overview on IMC as technology and necessary image processing steps can be
 found on the [IMC workflow website](https://bodenmillergroup.github.io/IMCWorkflow/). 
 
 Before we get started on IMC data analysis, we will need to make sure that
@@ -82,8 +82,8 @@ Throughout this tutorial, we will access a number of different data types.
 To declutter the analysis scripts, we will already download all needed data here.
 
 To highlight the basic steps of IMC data analysis, we provide example data that
-were acquired as part of the *I*ntegrated i*MMU*noprofiling of large adaptive
-*CAN*cer patient cohorts projects ([immucan.eu/](https://immucan.eu/)). The
+were acquired as part of the **I**ntegrated i**MMU**noprofiling of large adaptive
+**CAN**cer patient cohorts projects ([immucan.eu](https://immucan.eu/)). The
 raw data of 4 patients can be accessed online at 
 [zenodo.org/record/5949116](https://zenodo.org/record/5949116).
 Image processing and segmentation has been performed using `steinbock` and
