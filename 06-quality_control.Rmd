@@ -248,7 +248,7 @@ where $I_s$ is the intensity of the signal (mean intensity of cells with positiv
 signal) and $I_n$ is the intensity of the noise (mean intensity of cells
 lacking expression).
 
-```{r cell-snr, message=FALSE, warning=FALSE}
+```{r cell-snr, message=FALSE, warning=FALSE, results="hide", fig.keep="all"}
 library(mclust)
 
 set.seed(220224)
@@ -289,6 +289,10 @@ cur_snr %>%
     theme_minimal(base_size = 15) + ylab("Signal-to-noise ratio") +
     xlab("Signal intensity")
 ```
+
+The SNR quantification on the single-cell level recapitulates the SNR quantification
+on the pixel level. `DNA1` and `DNA2` show low SNR since this marker is 
+detectable in all cells.
 
 Next, we will observe the distributions of cell sizes across the individual images.
 Differences in cell sizes can indicate segmentation biases due to differences
@@ -402,34 +406,38 @@ marker expression on the cells due to increased control of the color scheme.
 
 ```{r visualizing-dimred, message=FALSE}
 # visualize patient id 
-p1 <- dittoDimPlot(spe, var = "patient_id", reduction.use = "UMAP") + 
+p1 <- dittoDimPlot(spe, var = "patient_id", reduction.use = "UMAP", size = 0.2) + 
     scale_color_manual(values = metadata(spe)$color_vectors$patient_id) +
     ggtitle("Patient ID on UMAP")
-p2 <- dittoDimPlot(spe, var = "patient_id", reduction.use = "TSNE") + 
+p2 <- dittoDimPlot(spe, var = "patient_id", reduction.use = "TSNE", size = 0.2) + 
     scale_color_manual(values = metadata(spe)$color_vectors$patient_id) +
     ggtitle("Patient ID on TSNE")
 
 # visualize region of interest id
-p3 <- dittoDimPlot(spe, var = "ROI", reduction.use = "UMAP") + 
+p3 <- dittoDimPlot(spe, var = "ROI", reduction.use = "UMAP", size = 0.2) + 
     scale_color_manual(values = metadata(spe)$color_vectors$ROI) +
     ggtitle("ROI ID on UMAP")
-p4 <- dittoDimPlot(spe, var = "ROI", reduction.use = "TSNE") + 
+p4 <- dittoDimPlot(spe, var = "ROI", reduction.use = "TSNE", size = 0.2) + 
     scale_color_manual(values = metadata(spe)$color_vectors$ROI) +
     ggtitle("ROI ID on TSNE")
 
 (p1 + p2) / (p3 + p4)
 
 # visualize marker expression
-p1 <- dittoDimPlot(spe, var = "Ecad", reduction.use = "UMAP", assay = "exprs") +
+p1 <- dittoDimPlot(spe, var = "Ecad", reduction.use = "UMAP", 
+                   assay = "exprs", size = 0.2) +
     scale_color_viridis(name = "Ecad") +
     ggtitle("E-Cadherin expression on UMAP")
-p2 <- dittoDimPlot(spe, var = "CD45RO", reduction.use = "UMAP", assay = "exprs") +
+p2 <- dittoDimPlot(spe, var = "CD45RO", reduction.use = "UMAP", 
+                   assay = "exprs", size = 0.2) +
     scale_color_viridis(name = "CD45RO") +
     ggtitle("CD45RO expression on UMAP")
-p3 <- dittoDimPlot(spe, var = "Ecad", reduction.use = "TSNE", assay = "exprs") +
+p3 <- dittoDimPlot(spe, var = "Ecad", reduction.use = "TSNE", 
+                   assay = "exprs", size = 0.2) +
     scale_color_viridis(name = "Ecad") +
     ggtitle("Ecad expression on TSNE")
-p4 <- dittoDimPlot(spe, var = "CD45RO", reduction.use = "TSNE", assay = "exprs") +
+p4 <- dittoDimPlot(spe, var = "CD45RO", reduction.use = "TSNE", 
+                   assay = "exprs", size = 0.2) +
     scale_color_viridis(name = "CD45RO") +
     ggtitle("CD45RO expression on TSNE")
 
