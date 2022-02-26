@@ -102,8 +102,9 @@ and pixels containing noise is not trivial and different approaches can be
 chosen. Here, we use the `otsu` thresholding approach to find pixels of the
 "foreground" (i.e., signal) and "background" (i.e., noise). The SNR is then
 defined as the mean intensity of foreground pixels divided by the mean intensity
-of background pixels. We then plot the SNR versus mean signal intensity
-(together with their 95% confidence interval).
+of background pixels. We compute this measure as well as mean signal intensity
+per image as well as the 95% confidence interval. The plot below shows the  
+average SNR _versus_ the average signal intensity across all images.  
 
 ```{r image-snr, message=FALSE, warning=FALSE}
 library(tidyverse)
@@ -150,10 +151,10 @@ but low SNR. This might be due to staining differences between individual nuclei
 where some nuclei are considered as background. We do however observe high
 SNR and sufficient signal intensity for the majority of markers.
 
-Another quality indicator is the image area covered by cells (or biological tissue).
-This metric identifies ROIs where little cells are present, possibly hinting
-at incorrect selection of the ROI. We can compute the percentage of image 
-are covered by cells using the metadata contained in the `SpatialExperiment`
+Another quality indicator is the image area covered by cells (or biological
+tissue). This metric identifies ROIs where little cells are present, possibly
+hinting at incorrect selection of the ROI. We can compute the percentage of
+covered image area using the metadata contained in the `SpatialExperiment`
 object:
 
 ```{r cell-density}
@@ -202,7 +203,7 @@ Finally, it can be beneficial to visualize the mean marker expression per image
 to identify images with outlying cell type compositions. This check does not
 indicate image quality _per se_ but can highlight biological differences. Here,
 we will use the `aggregateAcrossCells` function of the 
-`rBiocStyle::Biocpkg("scuttle")` package to compute the mean expression per 
+`r BiocStyle::Biocpkg("scuttle")` package to compute the mean expression per 
 image. For visualization purposes, we again `asinh` transform the mean expression
 values.
 
@@ -221,7 +222,8 @@ dittoHeatmap(image_mean, genes = rownames(spe)[rowData(spe)$use_channel],
              annot.by = c("indication", "patient_id", "ROI"),
              annotation_colors = list(indication = metadata(spe)$color_vectors$indication,
                                       patient_id = metadata(spe)$color_vectors$patient_id,
-                                      ROI = metadata(spe)$color_vectors$ROI))
+                                      ROI = metadata(spe)$color_vectors$ROI),
+             show_colnames = TRUE)
 ```
 
 We observe extensive biological variation across the 14 images. Some images
@@ -235,67 +237,53 @@ In the following paragraphs we will look at different metrics and visualization
 approaches to assess data quality (as well as biological differences) on the 
 single-cell level. 
 
-Similar to the signal-to-noise ratio (SNR) calculated above on the pixel-level, 
+Related to the signal-to-noise ratio (SNR) calculated above on the pixel-level, 
 a similar measure can be derived on the single-cell level. Here, we will use 
 a two component Gaussian mixture model for each marker to find cells
-with positive and negative expression. As above the SNR is defined as:
+with positive and negative expression. The SNR is defined as:
 
 $$SNR = I_s/I_n$$
 
 where $I_s$ is the intensity of the signal (mean intensity of cells with positive
 signal) and $I_n$ is the intensity of the noise (mean intensity of cells
-lacking expression).
+lacking expression). We calculate the SNR and signal intensity by fitting the
+mixture model across the transformed counts of all cells contained in the
+`SpatialExperiment` object.
 
 ```{r cell-snr, message=FALSE, warning=FALSE, results="hide", fig.keep="all"}
 library(mclust)
 
 set.seed(220224)
-cur_snr <- lapply(unique(spe$patient_id), function(patient){
+mat <- apply(assay(spe, "exprs"), 1, function(x){
+    cur_model <- Mclust(x, G = 2)
+    mean1 <- mean(x[cur_model$classification == 1])
+    mean2 <- mean(x[cur_model$classification == 2])
     
-    cur_spe <- spe[,spe$patient_id == patient]
-    mat <- apply(assay(cur_spe, "exprs"), 1, function(x){
-        cur_model <- Mclust(x, G = 2)
-        mean1 <- mean(x[cur_model$classification == 1])
-        mean2 <- mean(x[cur_model$classification == 2])
-        
-        signal <- ifelse(mean1 > mean2, mean1, mean2)
-        noise <- ifelse(mean1 > mean2, mean2, mean1)
-        
-        return(c(signal/noise, signal))
-    })
-    rownames(mat) <- c("snr", "ps")
+    signal <- ifelse(mean1 > mean2, mean1, mean2)
+    noise <- ifelse(mean1 > mean2, mean2, mean1)
     
-    t(mat) %>% as.data.frame() %>% 
-        mutate(marker = colnames(mat)) %>% 
-        pivot_longer(cols = c(snr, ps))
+    return(c(snr = signal/noise, ps = signal))
 })
+    
+cur_snr <- t(mat) %>% as.data.frame() %>% 
+        mutate(marker = colnames(mat))
 
 cur_snr <- do.call(rbind, cur_snr)
 
-cur_snr %>% 
-    group_by(marker, name) %>%
-    summarize(mean = mean(value),
-              ci = qnorm(0.975)*sd(value)/sqrt(n())) %>%
-    pivot_wider(names_from = name, values_from = c(mean, ci)) %>%
-    ggplot() +
-#    geom_errorbar(aes(y = log2(mean_snr), xmin = log2(mean_ps - ci_ps), 
-#                      xmax = log2(mean_ps + ci_ps))) +
-#    geom_errorbar(aes(x = log2(mean_ps), ymin = log2(mean_snr - ci_snr), 
-#                      ymax = log2(mean_snr + ci_snr))) +
-    geom_point(aes(log2(mean_ps), log2(mean_snr))) +
-    geom_label_repel(aes(log2(mean_ps), log2(mean_snr), label = marker)) +
+cur_snr %>% ggplot() +
+    geom_point(aes(log2(ps), log2(snr))) +
+    geom_label_repel(aes(log2(ps), log2(snr), label = marker)) +
     theme_minimal(base_size = 15) + ylab("Signal-to-noise ratio") +
     xlab("Signal intensity")
 ```
 
 The SNR quantification on the single-cell level recapitulates the SNR quantification
-on the pixel level. `DNA1` and `DNA2` show low SNR since this marker is 
-detectable in all cells.
+on the pixel level.
 
-Next, we will observe the distributions of cell sizes across the individual images.
-Differences in cell sizes can indicate segmentation biases due to differences
-in cell density or can indicate biological differences due to cell type compositions (tumor cells tend to be larger than immune cells).
-We will also observe the minimum cell sizes to exclude very small cells.
+Next, we observe the distributions of cell size across the individual images.
+Differences in cell size distributions can indicate segmentation biases due to
+differences in cell density or can indicate biological differences due to cell
+type compositions (tumor cells tend to be larger than immune cells). 
 
 ```{r cell-size, message=FALSE}
 colData(spe) %>%
@@ -311,15 +299,15 @@ summary(spe$area)
 ```
 
 The median cell size is `r median(spe$area)` pixels with a median major axis
-length of `r median(spe$major_axis_length)`. The largest cell has an area of 
-`r max(spe$area)` pixels which relates to a diameter of `r sqrt(max(spe$area))`
-pixels assuming a circular shape. Overall, the distribution of cell sizes is
-similar across images with image `Patient4_005` and `Patient4_007` showing
-reduces average cell size. These images contain fewer tumor cells which can 
-explain smaller average cell size.
+length of `r round(median(spe$major_axis_length), digits = 1)`. The largest cell
+has an area of `r max(spe$area)` pixels which relates to a diameter of `r
+round(sqrt(max(spe$area)), digits = 1)` pixels assuming a circular shape.
+Overall, the distribution of cell sizes is similar across images with image
+`Patient4_005` and `Patient4_007` showing reduces average cell size. These
+images contain fewer tumor cells which can explain the smaller average cell size.
 
-We observe very small cells an will remove them from the dataset. The chosen
-threshold is arbitrary and needs to be adjusted per dataset.
+We detect very small cells in the dataset and will remove them.
+The chosen threshold is arbitrary and needs to be adjusted per dataset.
 
 ```{r remove-small-cells}
 sum(spe$area < 5)
@@ -350,8 +338,8 @@ immune cells appear in cell dense regions while other stromal parts are less
 dense.
 
 The data presented here were stained on individual slides. Also, samples were
-processed in different locations. These (and other) technical aspects can
-induces staining differences between samples or batches of samples. Observing
+pre-processed in different locations. These (and other) technical aspects can
+induce staining differences between samples or batches of samples. Observing
 potential staining differences can be crucial to assess data quality.
 We will use ridgeline visualizations to check differences in staining patterns:
 
@@ -371,9 +359,9 @@ that E-Cadherin (a marker for tumor cells) shows similar expression across all
 patients.
 
 Finally, we will use non-linear dimensionality reduction methods to project
-cells from high-dimensional (40) down to a low-dimensional (2) space. For this
+cells from a high-dimensional (40) down to a low-dimensional (2) space. For this
 the `r BiocStyle::Biocpkg("scater")` package provides the `runUMAP` and `runTSNE`
-function (among others). To ensure reproducibility, we will need to set a seed; 
+function. To ensure reproducibility, we will need to set a seed; 
 however different seeds and different parameter settings (e.g. the `perplexity`)
 parameter in the `runTSNE` function need to be tested to avoid interpreting
 visualization artefacts. For dimensionality reduction, we will use all channels
@@ -397,10 +385,9 @@ head(reducedDim(spe, "UMAP"))
 ```
 
 Visualization of the low-dimensional embedding facilitates assessment of 
-potential "batch effects". The `dittoSeq::dittoDimPlot` and `scater::plotReducedDim`
-functions allow flexible visualization. They return `ggplot` objects which
-can be further modified. The `plotReducedDim` is the prefered way of visualizing
-marker expression on the cells due to increased control of the color scheme.
+potential "batch effects". The `dittoDimPlot`
+function allows flexible visualization. It returns `ggplot` objects which
+can be further modified.
 
 ```{r visualizing-dimred, message=FALSE}
 # visualize patient id 
@@ -442,7 +429,7 @@ p4 <- dittoDimPlot(spe, var = "CD45RO", reduction.use = "TSNE",
 (p1 + p2) / (p3 + p4)
 ```
 
-We observe a strong separation between tumor cells (Ecad+ cells) between the patients.
+We observe a strong separation of tumor cells (Ecad+ cells) between the patients.
 This separation could be of biological origin since tumor cells tend to display
 differences in expression between patients and/or of technical origin: the panel
 only contains a single tumor marker (E-Cadherin) and therefore slight technical
