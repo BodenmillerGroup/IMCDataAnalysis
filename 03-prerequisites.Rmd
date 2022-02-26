@@ -114,25 +114,7 @@ channel metadata. All these files will be downloaded here for easy access. The
 commands which were used to process the data can be found in
 `data/steinbock/steinbock.sh`.
 
-```{r, echo = FALSE, message = FALSE, eval=FALSE, warning=FALSE}
-# for some reason GA doesn't download the intensity files
-# That's why we download them twice
-# download intensities
-url <- "https://zenodo.org/record/6043600/files/intensities.zip"
-destfile <- "data/steinbock/intensities.zip"
-download.file(url, destfile)
-unzip(destfile, exdir="data/steinbock", overwrite=TRUE)
-unlink(destfile)
-
-# download intensities
-url <- "https://zenodo.org/record/6043600/files/intensities.zip"
-destfile <- "data/steinbock/intensities.zip"
-download.file(url, destfile)
-unzip(destfile, exdir="data/steinbock", overwrite=TRUE)
-unlink(destfile)
-```
-
-```{r steinbock-results, eval=FALSE}
+```{r steinbock-results}
 # download intensities
 url <- "https://zenodo.org/record/6043600/files/intensities.zip"
 destfile <- "data/steinbock/intensities.zip"
@@ -187,7 +169,7 @@ Under development
 To highlight the estimation and correction of channel-spillover as described by
 [@Chevrier2017], we can access an example spillover-acquisition from:
 
-```{r download-spillover-data, eval=FALSE}
+```{r download-spillover-data}
 download.file("https://zenodo.org/record/5949116/files/compensation.zip",
               "data/compensation.zip")
 unzip("data/compensation.zip", exdir="data", overwrite=TRUE)
