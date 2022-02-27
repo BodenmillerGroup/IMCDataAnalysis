@@ -1,0 +1,27 @@
+# Cell phenotyping
+
+## Clustering approaches
+
+### Rphenograph
+
+### Shared nearest neighbour graph
+
+### FlowSOM
+
+## Classification approaches
+
+### Manual labelling of cells
+
+### Training a classifier
+
+### Classification of new data
+
+## Session Info
+
+<details>
+   <summary>SessionInfo</summary>
+   
+```{r, echo = FALSE}
+sessionInfo()
+```
+</details>

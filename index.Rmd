@@ -45,6 +45,18 @@ issues. Have a look at the source code at:
 
 [https://github.com/BodenmillerGroup/IMCDataAnalysis](https://github.com/BodenmillerGroup/IMCDataAnalysis)
 
+## Citation
+
+The workflow is currently under development for final publication.
+In the meantime please refer to the 
+[preprint](https://www.biorxiv.org/content/10.1101/2021.11.12.468357v1) 
+which you can site as follows:
+
+```
+Jonas Windhager, Bernd Bodenmiller, Nils Eling (2020). An end-to-end workflow for multiplexed image processing and analysis. 
+    bioRxiv, doi: 10.1101/2021.11.12.468357
+```
+
 ---
 
 <a name="email"><sup>*</sup></a> nils.eling@uzh.ch  
