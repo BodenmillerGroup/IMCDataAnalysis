@@ -268,8 +268,6 @@ mat <- apply(assay(spe, "exprs"), 1, function(x){
 cur_snr <- t(mat) %>% as.data.frame() %>% 
         mutate(marker = colnames(mat))
 
-cur_snr <- do.call(rbind, cur_snr)
-
 cur_snr %>% ggplot() +
     geom_point(aes(log2(ps), log2(snr))) +
     geom_label_repel(aes(log2(ps), log2(snr), label = marker)) +
