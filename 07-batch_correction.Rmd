@@ -1,0 +1,163 @@
+# Batch effect correction
+
+In Section \@ref(cell-quality) we observed staining/expression differences
+betweem the individual samples. This can arise due to technical (e.g.,
+differences in sample processing) as well as biological (e.g. differential
+expression between patients) reasons. However, the combination of these effects
+hinders cell phenotyping via clustering as highlighted in Section \@ref(clustering).
+
+To correct for differences between the samples, we can use computational strategies
+developed for correcting batch effects in single-cell RNA sequencing data.
+The `r BiocStyle::Biocpkg("batchelor")` package offers a number of approaches
+to correct for such batch effects. We will use the `fastMNN` function while
+supplying the patient information as batch vector.
+
+Of note: the correction approach presented here aims at removing any differences
+between samples. This will also remove biological samples between the patients.
+
+## Read data
+
+First, we will read in the `SpatialExperiment` object containing the single-cell
+data.
+
+```{r read-data-batch-correction, message=FALSE}
+spe <- readRDS("data/spe.rds")
+```
+
+## Perform sample correction
+
+```{r batch-correction, message=FALSE}
+library(batchelor)
+set.seed(220228)
+out <- fastMNN(spe, batch = spe$patient_id, 
+               auto.merge = TRUE, correct.all = TRUE,
+               subset.row = rowData(spe)$use_channel, 
+               assay.type = "exprs")
+```
+
+## Quality control on correction results
+
+```{r}
+merge_info <- metadata(out)$merge.info 
+
+# Here, we will have a look at the percentage of lost variance per merge step
+# As rule of thumb, more than 10% should be investigated further
+# Here we rank the samples based on the lost variance
+cur_colmax <- colMaxs(merge_info$lost.var)
+names(cur_colmax) <- colnames(merge_info$lost.var) 
+cur_colmax[order(cur_colmax, decreasing = TRUE)]
+
+# Next, we will look at the batch.size argument - the raltive magnitute of the batch effect
+DataFrame(left = merge_info$left,
+          right = merge_info$right,
+          batch.size = merge_info$batch.size,
+          max_lost_var = rowMax(merge_info$lost.var))
+
+# Transfer the correction results to the main sce object
+reducedDims(spe)$corrected <- reducedDims(out)$corrected
+```
+
+## Visualization
+
+```{r dimred-batch-correction, message=FALSE}
+library(scater)
+
+set.seed(220228)
+spe <- runUMAP(spe, dimred = "corrected", name = "UMAP_mnnCorrected") 
+spe <- runTSNE(spe, dimred = "corrected", name = "TSNE_mnnCorrected") 
+```
+
+```{r visualizing-batch-correction, message=FALSE}
+library(patchwork)
+library(dittoSeq)
+library(viridis)
+
+# visualize patient id 
+p1 <- dittoDimPlot(spe, var = "patient_id", 
+                   reduction.use = "UMAP", size = 0.2) + 
+    scale_color_manual(values = metadata(spe)$color_vectors$patient_id) +
+    ggtitle("Patient ID on UMAP before correction")
+p2 <- dittoDimPlot(spe, var = "patient_id", 
+                   reduction.use = "UMAP_mnnCorrected", size = 0.2) + 
+    scale_color_manual(values = metadata(spe)$color_vectors$patient_id) +
+    ggtitle("Patient ID on UMAP after correction")
+
+p1 + p2
+```
+
+Visualize markers
+
+```{r, warning=FALSE}
+p1 <- dittoDimPlot(spe, var = "Ecad", reduction.use = "UMAP", 
+                   assay = "exprs", size = 0.2) +
+    scale_color_viridis(name = "Ecad") +
+    ggtitle("E-Cadherin expression before correction")
+p2 <- dittoDimPlot(spe, var = "Ecad", reduction.use = "UMAP_mnnCorrected", 
+                   assay = "exprs", size = 0.2) +
+    scale_color_viridis(name = "Ecad") +
+    ggtitle("E-Cadherin expression after correction")
+
+p1 + p2
+
+p1 <- dittoDimPlot(spe, var = "CD45RO", reduction.use = "UMAP", 
+                   assay = "exprs", size = 0.2) +
+    scale_color_viridis(name = "CD45RO") +
+    ggtitle("CD45RO expression before correction")
+p2 <- dittoDimPlot(spe, var = "CD45RO", reduction.use = "UMAP_mnnCorrected", 
+                   assay = "exprs", size = 0.2) +
+    scale_color_viridis(name = "CD45RO") +
+    ggtitle("CD45RO expression after correction")
+
+p1 + p2
+
+p1 <- dittoDimPlot(spe, var = "CD20", reduction.use = "UMAP", 
+                   assay = "exprs", size = 0.2) +
+    scale_color_viridis(name = "Ecad") +
+    ggtitle("CD20 expression before correction")
+p2 <- dittoDimPlot(spe, var = "CD20", reduction.use = "UMAP_mnnCorrected", 
+                   assay = "exprs", size = 0.2) +
+    scale_color_viridis(name = "CD45RO") +
+    ggtitle("CD20 expression after correction")
+
+p1 + p2
+
+p1 <- dittoDimPlot(spe, var = "CD3", reduction.use = "UMAP", 
+                   assay = "exprs", size = 0.2) +
+    scale_color_viridis(name = "Ecad") +
+    ggtitle("CD3 expression before correction")
+p2 <- dittoDimPlot(spe, var = "CD3", reduction.use = "UMAP_mnnCorrected", 
+                   assay = "exprs", size = 0.2) +
+    scale_color_viridis(name = "CD45RO") +
+    ggtitle("CD3 expression after correction")
+
+p1 + p2
+
+p1 <- dittoDimPlot(spe, var = "FOXP3", reduction.use = "UMAP", 
+                   assay = "exprs", size = 0.2) +
+    scale_color_viridis(name = "FOXP3") +
+    ggtitle("FOXP3 expression before correction")
+p2 <- dittoDimPlot(spe, var = "FOXP3", reduction.use = "UMAP_mnnCorrected", 
+                   assay = "exprs", size = 0.2) +
+    scale_color_viridis(name = "FOXP3") +
+    ggtitle("FOXP3 expression after correction")
+
+p1 + p2
+```
+
+## Save objects
+
+The modified `SpatialExperiment` object is saved for further downstream analysis.
+
+```{r save-objects-quality-control}
+saveRDS(spe, "data/spe.rds")
+```
+
+## Session Info
+
+<details>
+   <summary>SessionInfo</summary>
+   
+```{r, echo = FALSE}
+sessionInfo()
+```
+</details>
