@@ -30,7 +30,7 @@ jobs:
         run: Rscript -e 'install.packages(c("rmarkdown", "bookdown", "pheatmap", "viridis", 
                                             "zoo", "BiocManager", "devtools", "testthat", "tiff",
                                             "distill", "openxlsx", "ggrepel", "patchwork", "mclust",
-                                            "RColorBrewer"))'
+                                            "RColorBrewer", "uwot", "Rtsne"))'
       - name: Install Bioconductor dependencies
         run: Rscript -e 'BiocManager::install(c("CATALYST", "scuttle", "scater", "dittoSeq", "tidyverse", "BiocStyle"))'
       - name: Install Github dependencies
