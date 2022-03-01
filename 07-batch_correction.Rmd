@@ -24,28 +24,23 @@ data.
 spe <- readRDS("data/spe.rds")
 ```
 
-## Perform sample correction
+## fastMNN correction
 
-```{r batch-correction, message=FALSE}
+### Perform sample correction
+
+```{r batch-correction-fastMNN, message=FALSE}
 library(batchelor)
 set.seed(220228)
 out <- fastMNN(spe, batch = spe$patient_id, 
                auto.merge = TRUE, correct.all = TRUE,
-               subset.row = rowData(spe)$use_channel, 
+               subset.row = rowData(spe)$use_channel,
                assay.type = "exprs")
 ```
 
-## Quality control on correction results
+### Quality control on correction results
 
 ```{r}
 merge_info <- metadata(out)$merge.info 
-
-# Here, we will have a look at the percentage of lost variance per merge step
-# As rule of thumb, more than 10% should be investigated further
-# Here we rank the samples based on the lost variance
-cur_colmax <- colMaxs(merge_info$lost.var)
-names(cur_colmax) <- colnames(merge_info$lost.var) 
-cur_colmax[order(cur_colmax, decreasing = TRUE)]
 
 # Next, we will look at the batch.size argument - the raltive magnitute of the batch effect
 DataFrame(left = merge_info$left,
@@ -54,20 +49,20 @@ DataFrame(left = merge_info$left,
           max_lost_var = rowMax(merge_info$lost.var))
 
 # Transfer the correction results to the main sce object
-reducedDims(spe)$corrected <- reducedDims(out)$corrected
+assay(spe, "corrected") <- assay(out, "corrected")
 ```
 
-## Visualization
+### Visualization
 
-```{r dimred-batch-correction, message=FALSE}
+```{r dimred-batch-correction-fastMNN, message=FALSE}
 library(scater)
 
 set.seed(220228)
-spe <- runUMAP(spe, dimred = "corrected", name = "UMAP_mnnCorrected") 
-spe <- runTSNE(spe, dimred = "corrected", name = "TSNE_mnnCorrected") 
+spe <- runUMAP(spe, exprs_values = "corrected", name = "UMAP_mnnCorrected") 
+spe <- runTSNE(spe, exprs_values = "corrected", name = "TSNE_mnnCorrected") 
 ```
 
-```{r visualizing-batch-correction, message=FALSE}
+```{r visualizing-batch-correction-fastMNN, message=FALSE}
 library(patchwork)
 library(dittoSeq)
 library(viridis)
@@ -78,7 +73,7 @@ p1 <- dittoDimPlot(spe, var = "patient_id",
     scale_color_manual(values = metadata(spe)$color_vectors$patient_id) +
     ggtitle("Patient ID on UMAP before correction")
 p2 <- dittoDimPlot(spe, var = "patient_id", 
-                   reduction.use = "UMAP_mnnCorrected", size = 0.2) + 
+                   reduction.use = "UMAP_harmony", size = 0.2) + 
     scale_color_manual(values = metadata(spe)$color_vectors$patient_id) +
     ggtitle("Patient ID on UMAP after correction")
 
@@ -92,7 +87,7 @@ p1 <- dittoDimPlot(spe, var = "Ecad", reduction.use = "UMAP",
                    assay = "exprs", size = 0.2) +
     scale_color_viridis(name = "Ecad") +
     ggtitle("E-Cadherin expression before correction")
-p2 <- dittoDimPlot(spe, var = "Ecad", reduction.use = "UMAP_mnnCorrected", 
+p2 <- dittoDimPlot(spe, var = "Ecad", reduction.use = "UMAP_harmony", 
                    assay = "exprs", size = 0.2) +
     scale_color_viridis(name = "Ecad") +
     ggtitle("E-Cadherin expression after correction")
@@ -103,7 +98,7 @@ p1 <- dittoDimPlot(spe, var = "CD45RO", reduction.use = "UMAP",
                    assay = "exprs", size = 0.2) +
     scale_color_viridis(name = "CD45RO") +
     ggtitle("CD45RO expression before correction")
-p2 <- dittoDimPlot(spe, var = "CD45RO", reduction.use = "UMAP_mnnCorrected", 
+p2 <- dittoDimPlot(spe, var = "CD45RO", reduction.use = "UMAP_harmony", 
                    assay = "exprs", size = 0.2) +
     scale_color_viridis(name = "CD45RO") +
     ggtitle("CD45RO expression after correction")
@@ -114,7 +109,7 @@ p1 <- dittoDimPlot(spe, var = "CD20", reduction.use = "UMAP",
                    assay = "exprs", size = 0.2) +
     scale_color_viridis(name = "Ecad") +
     ggtitle("CD20 expression before correction")
-p2 <- dittoDimPlot(spe, var = "CD20", reduction.use = "UMAP_mnnCorrected", 
+p2 <- dittoDimPlot(spe, var = "CD20", reduction.use = "UMAP_harmony", 
                    assay = "exprs", size = 0.2) +
     scale_color_viridis(name = "CD45RO") +
     ggtitle("CD20 expression after correction")
@@ -125,7 +120,7 @@ p1 <- dittoDimPlot(spe, var = "CD3", reduction.use = "UMAP",
                    assay = "exprs", size = 0.2) +
     scale_color_viridis(name = "Ecad") +
     ggtitle("CD3 expression before correction")
-p2 <- dittoDimPlot(spe, var = "CD3", reduction.use = "UMAP_mnnCorrected", 
+p2 <- dittoDimPlot(spe, var = "CD3", reduction.use = "UMAP_harmony", 
                    assay = "exprs", size = 0.2) +
     scale_color_viridis(name = "CD45RO") +
     ggtitle("CD3 expression after correction")
@@ -136,7 +131,218 @@ p1 <- dittoDimPlot(spe, var = "FOXP3", reduction.use = "UMAP",
                    assay = "exprs", size = 0.2) +
     scale_color_viridis(name = "FOXP3") +
     ggtitle("FOXP3 expression before correction")
-p2 <- dittoDimPlot(spe, var = "FOXP3", reduction.use = "UMAP_mnnCorrected", 
+p2 <- dittoDimPlot(spe, var = "FOXP3", reduction.use = "UMAP_harmony", 
+                   assay = "exprs", size = 0.2) +
+    scale_color_viridis(name = "FOXP3") +
+    ggtitle("FOXP3 expression after correction")
+
+p1 + p2
+```
+
+## harmony correction
+
+```{r batch-correction-harmony, message=FALSE}
+library(harmony)
+
+mat <- t(assay(spe, "exprs")[rowData(spe)$use_channel,])
+set.seed(220228)
+harmony_embeddings <- HarmonyMatrix(
+    mat, spe$patient_id, do_pca = TRUE, verbose=TRUE
+)
+
+reducedDim(spe, "harmony") <- harmony_embeddings
+```
+
+### Visualization
+
+```{r dimred-batch-correction-harmony, message=FALSE}
+library(scater)
+
+set.seed(220228)
+spe <- runUMAP(spe, exprs_values = "corrected", name = "UMAP_mnnCorrected") 
+spe <- runTSNE(spe, exprs_values = "corrected", name = "TSNE_mnnCorrected") 
+```
+
+```{r visualizing-batch-correction-harmony, message=FALSE}
+library(patchwork)
+library(dittoSeq)
+library(viridis)
+
+# visualize patient id 
+p1 <- dittoDimPlot(spe, var = "patient_id", 
+                   reduction.use = "UMAP", size = 0.2) + 
+    scale_color_manual(values = metadata(spe)$color_vectors$patient_id) +
+    ggtitle("Patient ID on UMAP before correction")
+p2 <- dittoDimPlot(spe, var = "patient_id", 
+                   reduction.use = "UMAP_harmony", size = 0.2) + 
+    scale_color_manual(values = metadata(spe)$color_vectors$patient_id) +
+    ggtitle("Patient ID on UMAP after correction")
+
+p1 + p2
+```
+
+Visualize markers
+
+```{r, warning=FALSE}
+p1 <- dittoDimPlot(spe, var = "Ecad", reduction.use = "UMAP", 
+                   assay = "exprs", size = 0.2) +
+    scale_color_viridis(name = "Ecad") +
+    ggtitle("E-Cadherin expression before correction")
+p2 <- dittoDimPlot(spe, var = "Ecad", reduction.use = "UMAP_harmony", 
+                   assay = "exprs", size = 0.2) +
+    scale_color_viridis(name = "Ecad") +
+    ggtitle("E-Cadherin expression after correction")
+
+p1 + p2
+
+p1 <- dittoDimPlot(spe, var = "CD45RO", reduction.use = "UMAP", 
+                   assay = "exprs", size = 0.2) +
+    scale_color_viridis(name = "CD45RO") +
+    ggtitle("CD45RO expression before correction")
+p2 <- dittoDimPlot(spe, var = "CD45RO", reduction.use = "UMAP_harmony", 
+                   assay = "exprs", size = 0.2) +
+    scale_color_viridis(name = "CD45RO") +
+    ggtitle("CD45RO expression after correction")
+
+p1 + p2
+
+p1 <- dittoDimPlot(spe, var = "CD20", reduction.use = "UMAP", 
+                   assay = "exprs", size = 0.2) +
+    scale_color_viridis(name = "Ecad") +
+    ggtitle("CD20 expression before correction")
+p2 <- dittoDimPlot(spe, var = "CD20", reduction.use = "UMAP_harmony", 
+                   assay = "exprs", size = 0.2) +
+    scale_color_viridis(name = "CD45RO") +
+    ggtitle("CD20 expression after correction")
+
+p1 + p2
+
+p1 <- dittoDimPlot(spe, var = "CD3", reduction.use = "UMAP", 
+                   assay = "exprs", size = 0.2) +
+    scale_color_viridis(name = "Ecad") +
+    ggtitle("CD3 expression before correction")
+p2 <- dittoDimPlot(spe, var = "CD3", reduction.use = "UMAP_harmony", 
+                   assay = "exprs", size = 0.2) +
+    scale_color_viridis(name = "CD45RO") +
+    ggtitle("CD3 expression after correction")
+
+p1 + p2
+
+p1 <- dittoDimPlot(spe, var = "FOXP3", reduction.use = "UMAP", 
+                   assay = "exprs", size = 0.2) +
+    scale_color_viridis(name = "FOXP3") +
+    ggtitle("FOXP3 expression before correction")
+p2 <- dittoDimPlot(spe, var = "FOXP3", reduction.use = "UMAP_harmony", 
+                   assay = "exprs", size = 0.2) +
+    scale_color_viridis(name = "FOXP3") +
+    ggtitle("FOXP3 expression after correction")
+
+p1 + p2
+```
+
+## Seurat correction
+
+```{r, message=FALSE}
+library(Seurat)
+library(SeuratObject)
+seurat_obj <- as.Seurat(spe, counts = "counts", data = "exprs")
+seurat_obj <- AddMetaData(seurat_obj, as.data.frame(colData(spe)))
+
+seurat.list <- SplitObject(seurat_obj, split.by = "patient_id")
+
+anchors <- FindIntegrationAnchors(object.list = seurat.list, anchor.features = rownames(spe)[rowData(spe)$use_channel])
+
+combined <- IntegrateData(anchorset = anchors)
+
+DefaultAssay(combined) <- "integrated"
+
+# Run the standard workflow for visualization and clustering
+combined <- ScaleData(combined, verbose = FALSE)
+combined <- RunPCA(combined, npcs = 30, verbose = FALSE)
+```
+
+### Visualization
+
+```{r dimred-batch-correction-harmony, message=FALSE}
+library(scater)
+
+reducedDim(spe, "seurat_integrated") <- combined@reductions$pca@cell.embeddings
+
+set.seed(220228)
+spe <- runUMAP(spe, dimred = "seurat_integrated", name = "UMAP_seurat") 
+spe <- runTSNE(spe, dimred = "seurat_integrated", name = "TSNE_seurat") 
+```
+
+```{r visualizing-batch-correction-harmony, message=FALSE}
+library(patchwork)
+library(dittoSeq)
+library(viridis)
+
+# visualize patient id 
+p1 <- dittoDimPlot(spe, var = "patient_id", 
+                   reduction.use = "UMAP", size = 0.2) + 
+    scale_color_manual(values = metadata(spe)$color_vectors$patient_id) +
+    ggtitle("Patient ID on UMAP before correction")
+p2 <- dittoDimPlot(spe, var = "patient_id", 
+                   reduction.use = "UMAP_seurat", size = 0.2) + 
+    scale_color_manual(values = metadata(spe)$color_vectors$patient_id) +
+    ggtitle("Patient ID on UMAP after correction")
+
+p1 + p2
+```
+
+Visualize markers
+
+```{r, warning=FALSE}
+p1 <- dittoDimPlot(spe, var = "Ecad", reduction.use = "UMAP", 
+                   assay = "exprs", size = 0.2) +
+    scale_color_viridis(name = "Ecad") +
+    ggtitle("E-Cadherin expression before correction")
+p2 <- dittoDimPlot(spe, var = "Ecad", reduction.use = "UMAP_seurat", 
+                   assay = "exprs", size = 0.2) +
+    scale_color_viridis(name = "Ecad") +
+    ggtitle("E-Cadherin expression after correction")
+
+p1 + p2
+
+p1 <- dittoDimPlot(spe, var = "CD45RO", reduction.use = "UMAP", 
+                   assay = "exprs", size = 0.2) +
+    scale_color_viridis(name = "CD45RO") +
+    ggtitle("CD45RO expression before correction")
+p2 <- dittoDimPlot(spe, var = "CD45RO", reduction.use = "UMAP_seurat", 
+                   assay = "exprs", size = 0.2) +
+    scale_color_viridis(name = "CD45RO") +
+    ggtitle("CD45RO expression after correction")
+
+p1 + p2
+
+p1 <- dittoDimPlot(spe, var = "CD20", reduction.use = "UMAP", 
+                   assay = "exprs", size = 0.2) +
+    scale_color_viridis(name = "Ecad") +
+    ggtitle("CD20 expression before correction")
+p2 <- dittoDimPlot(spe, var = "CD20", reduction.use = "UMAP_seurat", 
+                   assay = "exprs", size = 0.2) +
+    scale_color_viridis(name = "CD45RO") +
+    ggtitle("CD20 expression after correction")
+
+p1 + p2
+
+p1 <- dittoDimPlot(spe, var = "CD3", reduction.use = "UMAP", 
+                   assay = "exprs", size = 0.2) +
+    scale_color_viridis(name = "Ecad") +
+    ggtitle("CD3 expression before correction")
+p2 <- dittoDimPlot(spe, var = "CD3", reduction.use = "UMAP_seurat", 
+                   assay = "exprs", size = 0.2) +
+    scale_color_viridis(name = "CD45RO") +
+    ggtitle("CD3 expression after correction")
+
+p1 + p2
+
+p1 <- dittoDimPlot(spe, var = "FOXP3", reduction.use = "UMAP", 
+                   assay = "exprs", size = 0.2) +
+    scale_color_viridis(name = "FOXP3") +
+    ggtitle("FOXP3 expression before correction")
+p2 <- dittoDimPlot(spe, var = "FOXP3", reduction.use = "UMAP_seurat", 
                    assay = "exprs", size = 0.2) +
     scale_color_viridis(name = "FOXP3") +
     ggtitle("FOXP3 expression after correction")

@@ -45,6 +45,9 @@ Data processing:
 * [imcRtools](https://github.com/BodenmillerGroup/imcRtools) version `r packageVersion("imcRtools")` from [Github](https://github.com/BodenmillerGroup/imcRtools)
 * [scuttle](https://bioconductor.org/packages/release/bioc/html/scuttle.html) version `r packageVersion("scuttle")`
 * [scater](https://bioconductor.org/packages/release/bioc/html/scater.html) version `r packageVersion("scater")`
+* [batchelor](https://www.bioconductor.org/packages/release/bioc/html/batchelor.html) version `r packageVersion("batchelor")`
+* [harmony](https://github.com/immunogenomics/harmony) version `r packageVersion("harmony")`
+* [Seurat](https://github.com/immunogenomics/harmony) version `r packageVersion("Seurat")`
 
 Data visualization:
 
