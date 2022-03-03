@@ -51,6 +51,10 @@ slot. This low-dimensional embedding can be further used for clustering and
 non-linear dimensionality reduction. We transfer the corrected cooridnates
 to the main `SpatialExperiment` object.
 
+```{r, echo=FALSE}
+start_time <- Sys.time()
+```
+
 ```{r batch-correction-fastMNN, message=FALSE, warning=FALSE}
 library(batchelor)
 set.seed(220228)
@@ -62,6 +66,13 @@ out <- fastMNN(spe, batch = spe$patient_id,
 # Transfer the correction results to the main spe object
 reducedDim(spe, "fastMNN") <- reducedDim(out, "corrected")
 ```
+
+```{r, echo=FALSE}
+end_time <- Sys.time()
+```
+
+The computational time of the `fastMNN` function call is 
+`r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
 
 ### Quality control of correction results
 
@@ -98,7 +109,7 @@ spe <- runUMAP(spe, dimred= "fastMNN", name = "UMAP_mnnCorrected")
 
 Next, we visualize the corrected UMAP while overlaying patient IDs.
 
-```{r visualizing-batch-correction-fastMNN-1, message=FALSE, warning=FALSE, fig.height=4}
+```{r visualizing-batch-correction-fastMNN-1, message=FALSE, warning=FALSE, fig.height=3}
 library(cowplot)
 library(dittoSeq)
 library(viridis)
@@ -119,7 +130,7 @@ plot_grid(p1, p2)
 We now also visualize the expression of selected markers across all cells 
 before and after batch correction.
 
-```{r visualizing-batch-correction-fastMNN-2, warning=FALSE, message=FALSE}
+```{r visualizing-batch-correction-fastMNN-2, warning=FALSE, message=FALSE, fig.height=8}
 markers <- c("Ecad", "CD45RO", "CD20", "CD3", "FOXP3", "CD206", "MPO", "SMA", "Ki67")
 
 # Before correction
@@ -151,7 +162,11 @@ Similar to the `fastMNN` function, `harmony` returns the corrected
 low-dimensional coordinates for each cell. These can be saved in the
 `reducedDim` slot.
 
-```{r batch-correction-harmony, message=FALSE}
+```{r, echo=FALSE}
+start_time <- Sys.time()
+```
+
+```{r batch-correction-harmony, message=FALSE, warning=FALSE}
 library(harmony)
 
 mat <- t(assay(spe, "exprs")[rowData(spe)$use_channel,])
@@ -162,6 +177,13 @@ harmony_emb <- HarmonyMatrix(mat, spe$patient_id,
 reducedDim(spe, "harmony") <- harmony_emb
 ```
 
+```{r, echo=FALSE}
+end_time <- Sys.time()
+```
+
+The computational time of the `HarmonyMatrix` function call is 
+`r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
+
 ### Visualization
 
 We will now again visualize the cells in low dimensions after UMAP embedding.
@@ -171,7 +193,7 @@ set.seed(220228)
 spe <- runUMAP(spe, dimred = "harmony", name = "UMAP_harmony") 
 ```
 
-```{r visualizing-batch-correction-harmony-1, message=FALSE, warning=FALSE, fig.height=4}
+```{r visualizing-batch-correction-harmony-1, message=FALSE, warning=FALSE, fig.height=3}
 # visualize patient id 
 p1 <- dittoDimPlot(spe, var = "patient_id", 
                    reduction.use = "UMAP", size = 0.2) + 
@@ -187,7 +209,7 @@ plot_grid(p1, p2)
 
 And we visualize selected marker expression as defined above.
 
-```{r visualizing-batch-correction-harmony-2, warning=FALSE, message=FALSE}
+```{r visualizing-batch-correction-harmony-2, warning=FALSE, message=FALSE, fig.height=8}
 # Before correction
 plot_list <- multi_dittoDimPlot(spe, var = markers, reduction.use = "UMAP", 
                    assay = "exprs", size = 0.2, list.out = TRUE) 
@@ -207,42 +229,91 @@ markers are expressed in proximal cells as visualized on the UMAP.
 
 ## Seurat correction
 
-```{r, message=FALSE, eval=FALSE}
+The `Seurat` package provides a number of functionalities to analyse single-cell
+data. As such it also allows the integration of cells across different samples.
+Conceptually, `Seurat` performs batch correction similarly to `fastMNN` by
+finding mutual nearest neighbors (MNN) in low dimensional space before
+correcting the expression values of cells.
+
+To use `Seurat`, we will first create a `Seurat` object from `SpatialExperiment`
+object and add relevant metadata. The object also needs to be split by patient
+prior to integration.
+
+```{r prepare-seurat, message=FALSE, warning=FALSE}
 library(Seurat)
 library(SeuratObject)
 seurat_obj <- as.Seurat(spe, counts = "counts", data = "exprs")
 seurat_obj <- AddMetaData(seurat_obj, as.data.frame(colData(spe)))
 
 seurat.list <- SplitObject(seurat_obj, split.by = "patient_id")
+```
 
-anchors <- FindIntegrationAnchors(object.list = seurat.list, anchor.features = rownames(spe)[rowData(spe)$use_channel])
+To avoid long run times, we will use an approach that relies on reciprocal PCA
+instead of canonical correlation analysis for dimensionality reduction and
+initial alignment. For an extended tutorial on how to use `Seurat` for data
+integration, please refer to their
+[vignette](https://satijalab.org/seurat/articles/integration_rpca.html).
+
+We will first define the features used for integration and perform PCA on cells
+of each patient individually. The `FindIntegrationAnchors` detects MNNs between
+cells of different patients and the `IntegrateData` function corrects the
+expression values of cells. We slightly increase the number of neighbors to be
+considered for MNN detection. This increases the integration
+strength.
+
+```{r, echo=FALSE}
+start_time <- Sys.time()
+```
+
+```{r seurat-correction, message=FALSE, warning=FALSE}
+features <- rownames(spe)[rowData(spe)$use_channel]
+seurat.list <- lapply(X = seurat.list, FUN = function(x) {
+    x <- ScaleData(x, features = features, verbose = FALSE)
+    x <- RunPCA(x, features = features, verbose = FALSE)
+    return(x)
+})
+
+anchors <- FindIntegrationAnchors(object.list = seurat.list, 
+                                  anchor.features = features,
+                                  reduction = "rpca", 
+                                  k.anchor = 20)
 
 combined <- IntegrateData(anchorset = anchors)
+```
 
+```{r, echo=FALSE}
+end_time <- Sys.time()
+```
+
+We now select the `integrated` assay and perform PCA dimensionality reduction.
+The cell coordinates in PCA reduced space can then be transferred to the 
+original `SpatialExperiment` object.
+
+```{r message=FALSE, warning=FALSE}
 DefaultAssay(combined) <- "integrated"
 
-# Run the standard workflow for visualization and clustering
 combined <- ScaleData(combined, verbose = FALSE)
 combined <- RunPCA(combined, npcs = 30, verbose = FALSE)
+
+reducedDim(spe, "seurat") <- combined@reductions$pca@cell.embeddings
 ```
+
+The computational time of the `Seurat` function calls is 
+`r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
 
 ### Visualization
 
-```{r, message=FALSE, eval=FALSE}
-library(scater)
+As above, we recompute the UMAP embeddings based on `Seurat` integrated results
+and visualize the embedding.
 
-reducedDim(spe, "seurat_integrated") <- combined@reductions$pca@cell.embeddings
-
+```{r umap-seurat, message=FALSE, warning=FALSE}
 set.seed(220228)
-spe <- runUMAP(spe, dimred = "seurat_integrated", name = "UMAP_seurat") 
-spe <- runTSNE(spe, dimred = "seurat_integrated", name = "TSNE_seurat") 
+spe <- runUMAP(spe, dimred = "seurat", name = "UMAP_seurat") 
 ```
 
-```{r visualizing-batch-correction-seurat, message=FALSE, eval=FALSE}
-library(patchwork)
-library(dittoSeq)
-library(viridis)
+Visualize patient IDs.
 
+```{r visualizing-batch-correction-seurat-1, message=FALSE, warning=FALSE, fig.height=3}
 # visualize patient id 
 p1 <- dittoDimPlot(spe, var = "patient_id", 
                    reduction.use = "UMAP", size = 0.2) + 
@@ -253,67 +324,35 @@ p2 <- dittoDimPlot(spe, var = "patient_id",
     scale_color_manual(values = metadata(spe)$color_vectors$patient_id) +
     ggtitle("Patient ID on UMAP after correction")
 
-p1 + p2
+plot_grid(p1, p2)
 ```
 
-Visualize markers
+Visualization of marker expression.
 
-```{r, warning=FALSE, eval=FALSE}
-p1 <- dittoDimPlot(spe, var = "Ecad", reduction.use = "UMAP", 
-                   assay = "exprs", size = 0.2) +
-    scale_color_viridis(name = "Ecad") +
-    ggtitle("E-Cadherin expression before correction")
-p2 <- dittoDimPlot(spe, var = "Ecad", reduction.use = "UMAP_seurat", 
-                   assay = "exprs", size = 0.2) +
-    scale_color_viridis(name = "Ecad") +
-    ggtitle("E-Cadherin expression after correction")
+```{r visualizing-batch-correction-seurat-2, warning=FALSE, message=FALSE, fig.height=8}
+# Before correction
+plot_list <- multi_dittoDimPlot(spe, var = markers, reduction.use = "UMAP", 
+                   assay = "exprs", size = 0.2, list.out = TRUE) 
+plot_list <- lapply(plot_list, function(x) x + scale_color_viridis())
+plot_grid(plotlist = plot_list) 
 
-p1 + p2
-
-p1 <- dittoDimPlot(spe, var = "CD45RO", reduction.use = "UMAP", 
-                   assay = "exprs", size = 0.2) +
-    scale_color_viridis(name = "CD45RO") +
-    ggtitle("CD45RO expression before correction")
-p2 <- dittoDimPlot(spe, var = "CD45RO", reduction.use = "UMAP_seurat", 
-                   assay = "exprs", size = 0.2) +
-    scale_color_viridis(name = "CD45RO") +
-    ggtitle("CD45RO expression after correction")
-
-p1 + p2
-
-p1 <- dittoDimPlot(spe, var = "CD20", reduction.use = "UMAP", 
-                   assay = "exprs", size = 0.2) +
-    scale_color_viridis(name = "Ecad") +
-    ggtitle("CD20 expression before correction")
-p2 <- dittoDimPlot(spe, var = "CD20", reduction.use = "UMAP_seurat", 
-                   assay = "exprs", size = 0.2) +
-    scale_color_viridis(name = "CD45RO") +
-    ggtitle("CD20 expression after correction")
-
-p1 + p2
-
-p1 <- dittoDimPlot(spe, var = "CD3", reduction.use = "UMAP", 
-                   assay = "exprs", size = 0.2) +
-    scale_color_viridis(name = "Ecad") +
-    ggtitle("CD3 expression before correction")
-p2 <- dittoDimPlot(spe, var = "CD3", reduction.use = "UMAP_seurat", 
-                   assay = "exprs", size = 0.2) +
-    scale_color_viridis(name = "CD45RO") +
-    ggtitle("CD3 expression after correction")
-
-p1 + p2
-
-p1 <- dittoDimPlot(spe, var = "FOXP3", reduction.use = "UMAP", 
-                   assay = "exprs", size = 0.2) +
-    scale_color_viridis(name = "FOXP3") +
-    ggtitle("FOXP3 expression before correction")
-p2 <- dittoDimPlot(spe, var = "FOXP3", reduction.use = "UMAP_seurat", 
-                   assay = "exprs", size = 0.2) +
-    scale_color_viridis(name = "FOXP3") +
-    ggtitle("FOXP3 expression after correction")
-
-p1 + p2
+# After correction
+plot_list <- multi_dittoDimPlot(spe, var = markers, reduction.use = "UMAP_seurat", 
+                   assay = "exprs", size = 0.2, list.out = TRUE) 
+plot_list <- lapply(plot_list, function(x) x + scale_color_viridis())
+plot_grid(plotlist = plot_list) 
 ```
+
+Similar to the methods presented above, `Seurat` integrates immune cells correctly.
+When visualizing the patient IDs, slight patient-to-patient differences within tumor
+cells can be detected. 
+
+Chosing the correct integration approach is challenging withou having ground truth
+cell labels available. It is recommended to compare different techniques and different
+parameter settings. Please refer to the documentation of the individual tools
+to become familiar with the possible parameter choices. Furthermore, in the following
+section, we will discuss clustering and classification approaches in light of
+expression differences between samples.
 
 ## Save objects
 
