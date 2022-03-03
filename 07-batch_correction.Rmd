@@ -60,7 +60,7 @@ out <- fastMNN(spe, batch = spe$patient_id,
                assay.type = "exprs")
 
 # Transfer the correction results to the main spe object
-reducedDim(spe, "corrected") <- reducedDim(out, "corrected")
+reducedDim(spe, "fastMNN") <- reducedDim(out, "corrected")
 ```
 
 ### Quality control of correction results
@@ -93,7 +93,7 @@ low-dimensional coordinates for each cell.
 library(scater)
 
 set.seed(220228)
-spe <- runUMAP(spe, dimred= "corrected", name = "UMAP_mnnCorrected") 
+spe <- runUMAP(spe, dimred= "fastMNN", name = "UMAP_mnnCorrected") 
 ```
 
 Next, we visualize the corrected UMAP while overlaying patient IDs.
@@ -120,7 +120,7 @@ We now also visualize the expression of selected markers across all cells
 before and after batch correction.
 
 ```{r visualizing-batch-correction-fastMNN-2, warning=FALSE, message=FALSE}
-markers <- c("Ecad", "CD45RO", "CD20", "CD3", "FOXP3", "CD206")
+markers <- c("Ecad", "CD45RO", "CD20", "CD3", "FOXP3", "CD206", "MPO", "SMA", "Ki67")
 
 # Before correction
 plot_list <- multi_dittoDimPlot(spe, var = markers, reduction.use = "UMAP", 
@@ -141,103 +141,69 @@ separately.
 
 ## harmony correction
 
-```{r batch-correction-harmony, message=FALSE, eval=FALSE}
+The `harmony` algorithm performs batch correction by iteratively clustering
+and correcting the positions of cells in PCA space [TODO: cite harmony]. It
+requires a matrix of transformed expression counts and internally performs
+PCA before kmeans clustering. We will first create the expression matrix and
+call the `HarmonyMatrix` function to perform the correction. 
+
+Similar to the `fastMNN` function, `harmony` returns the corrected
+low-dimensional coordinates for each cell. These can be saved in the
+`reducedDim` slot.
+
+```{r batch-correction-harmony, message=FALSE}
 library(harmony)
 
 mat <- t(assay(spe, "exprs")[rowData(spe)$use_channel,])
-set.seed(220228)
-harmony_embeddings <- HarmonyMatrix(
-    mat, spe$patient_id, do_pca = TRUE, verbose=TRUE
-)
 
-reducedDim(spe, "harmony") <- harmony_embeddings
+harmony_emb <- HarmonyMatrix(mat, spe$patient_id, 
+                             do_pca = TRUE)
+
+reducedDim(spe, "harmony") <- harmony_emb
 ```
 
 ### Visualization
 
-```{r dimred-batch-correction-harmony, message=FALSE, eval=FALSE}
-library(scater)
+We will now again visualize the cells in low dimensions after UMAP embedding.
 
+```{r dimred-batch-correction-harmony, message=FALSE}
 set.seed(220228)
-spe <- runUMAP(spe, exprs_values = "harmony", name = "UMAP_harmony") 
+spe <- runUMAP(spe, dimred = "harmony", name = "UMAP_harmony") 
 ```
 
-```{r visualizing-batch-correction-harmony-1, message=FALSE}
-library(cowplot)
-library(dittoSeq)
-library(viridis)
-
+```{r visualizing-batch-correction-harmony-1, message=FALSE, warning=FALSE, fig.height=4}
 # visualize patient id 
 p1 <- dittoDimPlot(spe, var = "patient_id", 
                    reduction.use = "UMAP", size = 0.2) + 
     scale_color_manual(values = metadata(spe)$color_vectors$patient_id) +
     ggtitle("Patient ID on UMAP before correction")
 p2 <- dittoDimPlot(spe, var = "patient_id", 
-                   reduction.use = "UMAP_mnnCorrected", size = 0.2) + 
+                   reduction.use = "UMAP_harmony", size = 0.2) + 
     scale_color_manual(values = metadata(spe)$color_vectors$patient_id) +
     ggtitle("Patient ID on UMAP after correction")
 
 plot_grid(p1, p2)
 ```
 
-Visualize markers
+And we visualize selected marker expression as defined above.
 
-```{r, warning=FALSE, eval=FALSE}
-p1 <- dittoDimPlot(spe, var = "Ecad", reduction.use = "UMAP", 
-                   assay = "exprs", size = 0.2) +
-    scale_color_viridis(name = "Ecad") +
-    ggtitle("E-Cadherin expression before correction")
-p2 <- dittoDimPlot(spe, var = "Ecad", reduction.use = "UMAP_harmony", 
-                   assay = "exprs", size = 0.2) +
-    scale_color_viridis(name = "Ecad") +
-    ggtitle("E-Cadherin expression after correction")
+```{r visualizing-batch-correction-harmony-2, warning=FALSE, message=FALSE}
+# Before correction
+plot_list <- multi_dittoDimPlot(spe, var = markers, reduction.use = "UMAP", 
+                   assay = "exprs", size = 0.2, list.out = TRUE) 
+plot_list <- lapply(plot_list, function(x) x + scale_color_viridis())
+plot_grid(plotlist = plot_list) 
 
-p1 + p2
-
-p1 <- dittoDimPlot(spe, var = "CD45RO", reduction.use = "UMAP", 
-                   assay = "exprs", size = 0.2) +
-    scale_color_viridis(name = "CD45RO") +
-    ggtitle("CD45RO expression before correction")
-p2 <- dittoDimPlot(spe, var = "CD45RO", reduction.use = "UMAP_harmony", 
-                   assay = "exprs", size = 0.2) +
-    scale_color_viridis(name = "CD45RO") +
-    ggtitle("CD45RO expression after correction")
-
-p1 + p2
-
-p1 <- dittoDimPlot(spe, var = "CD20", reduction.use = "UMAP", 
-                   assay = "exprs", size = 0.2) +
-    scale_color_viridis(name = "Ecad") +
-    ggtitle("CD20 expression before correction")
-p2 <- dittoDimPlot(spe, var = "CD20", reduction.use = "UMAP_harmony", 
-                   assay = "exprs", size = 0.2) +
-    scale_color_viridis(name = "CD45RO") +
-    ggtitle("CD20 expression after correction")
-
-p1 + p2
-
-p1 <- dittoDimPlot(spe, var = "CD3", reduction.use = "UMAP", 
-                   assay = "exprs", size = 0.2) +
-    scale_color_viridis(name = "Ecad") +
-    ggtitle("CD3 expression before correction")
-p2 <- dittoDimPlot(spe, var = "CD3", reduction.use = "UMAP_harmony", 
-                   assay = "exprs", size = 0.2) +
-    scale_color_viridis(name = "CD45RO") +
-    ggtitle("CD3 expression after correction")
-
-p1 + p2
-
-p1 <- dittoDimPlot(spe, var = "FOXP3", reduction.use = "UMAP", 
-                   assay = "exprs", size = 0.2) +
-    scale_color_viridis(name = "FOXP3") +
-    ggtitle("FOXP3 expression before correction")
-p2 <- dittoDimPlot(spe, var = "FOXP3", reduction.use = "UMAP_harmony", 
-                   assay = "exprs", size = 0.2) +
-    scale_color_viridis(name = "FOXP3") +
-    ggtitle("FOXP3 expression after correction")
-
-p1 + p2
+# After correction
+plot_list <- multi_dittoDimPlot(spe, var = markers, reduction.use = "UMAP_harmony", 
+                   assay = "exprs", size = 0.2, list.out = TRUE) 
+plot_list <- lapply(plot_list, function(x) x + scale_color_viridis())
+plot_grid(plotlist = plot_list) 
 ```
+
+We observe a more aggressive merging of cells from different patients compared
+to the results after `fastMNN` correction. Important immune cell and epithelial
+markers are expressed in proximal cells as visualized on the UMAP.
 
 ## Seurat correction
 
