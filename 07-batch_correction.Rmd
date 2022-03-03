@@ -6,14 +6,16 @@ differences in sample processing) as well as biological (e.g. differential
 expression between patients) reasons. However, the combination of these effects
 hinders cell phenotyping via clustering as highlighted in Section \@ref(clustering).
 
-To correct for differences between the samples, we can use computational strategies
-developed for correcting batch effects in single-cell RNA sequencing data.
-The `r BiocStyle::Biocpkg("batchelor")` package offers a number of approaches
-to correct for such batch effects. We will use the `fastMNN` function while
-supplying the patient information as batch vector.
+To correct for differences between the samples, we can use computational
+strategies developed for correcting batch effects in single-cell RNA sequencing
+data. In the following sections, we will use functions of the
+[batchelor](https://www.bioconductor.org/packages/release/bioc/html/batchelor.html),
+[harmony](https://github.com/immunogenomics/harmony) and
+[Seurat](https://satijalab.org/seurat/articles/integration_introduction.html)
+packages to correct for such batch effects.
 
-Of note: the correction approach presented here aims at removing any differences
-between samples. This will also remove biological samples between the patients.
+Of note: the correction approaches presented here aim at removing any differences
+between samples. This will also remove biological differences between the patients.
 
 ## Read data
 
@@ -26,44 +28,78 @@ spe <- readRDS("data/spe.rds")
 
 ## fastMNN correction
 
+The `batchelor` package provides the `mnnCorrect` and `fastMNN` functions to
+correct for differences between samples/batches. Both functions build up on
+finding mutual nearest neighbors (MNN) among the cells of different samples and
+correct expression differences between the cells. The `mnnCorrect` function 
+returns corrected expression counts while the `fastMNN` functions performs the 
+correction on a reduced dimension space. As such, `fastMNN` returns integrated
+cells in form of a low dimensional embedding.
+
 ### Perform sample correction
 
-```{r batch-correction-fastMNN, message=FALSE}
+Here, we apply the `fastMNN` function to correct for differences between the 
+patients. By setting `auto.merge = TRUE` the function estimates the best 
+batch merging order by maximizing the number of MNN pairs at each merging step. 
+This is more time consuming than merging sequentially as batches appear in the 
+dataset (default). We again select the markers defined in Section \@ref(cell-processing)
+for sample correction.
+
+The function returns a `SingleCellExperiment` object which contains corrected
+low-dimensional coordinates for each cell in the `reducedDim(out, "corrected")`
+slot. This low-dimensional embedding can be further used for clustering and
+non-linear dimensionality reduction. We transfer the corrected cooridnates
+to the main `SpatialExperiment` object.
+
+```{r batch-correction-fastMNN, message=FALSE, warning=FALSE}
 library(batchelor)
 set.seed(220228)
-out <- fastMNN(spe, batch = spe$patient_id, 
-               auto.merge = TRUE, correct.all = TRUE,
+out <- fastMNN(spe, batch = spe$patient_id,
+               auto.merge = TRUE,
                subset.row = rowData(spe)$use_channel,
                assay.type = "exprs")
+
+# Transfer the correction results to the main spe object
+reducedDim(spe, "corrected") <- reducedDim(out, "corrected")
 ```
 
-### Quality control on correction results
+### Quality control of correction results
 
-```{r}
+The `fastMNN` function further returns outputs that can be used to assess the
+quality of the batch correction. The `metadata(out)$merge.info` entry collects
+diagnostics for each individual merging step. Here, the `batch.size` and
+`lost.var` entries are important. The `batch.size` entry reports the relative
+magnitute of the batch effect and the `lost.var` entry represents the percentage
+of lost variance per mergin step. A large `batch.size` and low `lost.var`
+indicate sufficient batch correction.
+
+```{r batch-correction-fastMNN-QC, message=FALSE}
 merge_info <- metadata(out)$merge.info 
 
-# Next, we will look at the batch.size argument - the raltive magnitute of the batch effect
 DataFrame(left = merge_info$left,
           right = merge_info$right,
           batch.size = merge_info$batch.size,
           max_lost_var = rowMax(merge_info$lost.var))
-
-# Transfer the correction results to the main sce object
-assay(spe, "corrected") <- assay(out, "corrected")
 ```
 
 ### Visualization
 
-```{r dimred-batch-correction-fastMNN, message=FALSE}
+The simplest option to check if the sample effects were corrected is by using
+non-linear dimensionality reduction techniques and observe mixing of cells across
+samples. We will recompute the UMAP embedding using the corrected
+low-dimensional coordinates for each cell.
+
+```{r dimred-batch-correction-fastMNN, message=FALSE, warning=FALSE}
 library(scater)
 
 set.seed(220228)
-spe <- runUMAP(spe, exprs_values = "corrected", name = "UMAP_mnnCorrected") 
-spe <- runTSNE(spe, exprs_values = "corrected", name = "TSNE_mnnCorrected") 
+spe <- runUMAP(spe, dimred= "corrected", name = "UMAP_mnnCorrected") 
 ```
 
-```{r visualizing-batch-correction-fastMNN, message=FALSE}
-library(patchwork)
+Next, we visualize the corrected UMAP while overlaying patient IDs.
+
+```{r visualizing-batch-correction-fastMNN-1, message=FALSE, warning=FALSE, fig.height=4}
+library(cowplot)
 library(dittoSeq)
 library(viridis)
 
@@ -73,75 +109,39 @@ p1 <- dittoDimPlot(spe, var = "patient_id",
     scale_color_manual(values = metadata(spe)$color_vectors$patient_id) +
     ggtitle("Patient ID on UMAP before correction")
 p2 <- dittoDimPlot(spe, var = "patient_id", 
-                   reduction.use = "UMAP_harmony", size = 0.2) + 
+                   reduction.use = "UMAP_mnnCorrected", size = 0.2) + 
     scale_color_manual(values = metadata(spe)$color_vectors$patient_id) +
     ggtitle("Patient ID on UMAP after correction")
 
-p1 + p2
+plot_grid(p1, p2)
 ```
 
-Visualize markers
+We now also visualize the expression of selected markers across all cells 
+before and after batch correction.
 
-```{r, warning=FALSE}
-p1 <- dittoDimPlot(spe, var = "Ecad", reduction.use = "UMAP", 
-                   assay = "exprs", size = 0.2) +
-    scale_color_viridis(name = "Ecad") +
-    ggtitle("E-Cadherin expression before correction")
-p2 <- dittoDimPlot(spe, var = "Ecad", reduction.use = "UMAP_harmony", 
-                   assay = "exprs", size = 0.2) +
-    scale_color_viridis(name = "Ecad") +
-    ggtitle("E-Cadherin expression after correction")
+```{r visualizing-batch-correction-fastMNN-2, warning=FALSE, message=FALSE}
+markers <- c("Ecad", "CD45RO", "CD20", "CD3", "FOXP3", "CD206")
 
-p1 + p2
+# Before correction
+plot_list <- multi_dittoDimPlot(spe, var = markers, reduction.use = "UMAP", 
+                   assay = "exprs", size = 0.2, list.out = TRUE) 
+plot_list <- lapply(plot_list, function(x) x + scale_color_viridis())
+plot_grid(plotlist = plot_list) 
 
-p1 <- dittoDimPlot(spe, var = "CD45RO", reduction.use = "UMAP", 
-                   assay = "exprs", size = 0.2) +
-    scale_color_viridis(name = "CD45RO") +
-    ggtitle("CD45RO expression before correction")
-p2 <- dittoDimPlot(spe, var = "CD45RO", reduction.use = "UMAP_harmony", 
-                   assay = "exprs", size = 0.2) +
-    scale_color_viridis(name = "CD45RO") +
-    ggtitle("CD45RO expression after correction")
-
-p1 + p2
-
-p1 <- dittoDimPlot(spe, var = "CD20", reduction.use = "UMAP", 
-                   assay = "exprs", size = 0.2) +
-    scale_color_viridis(name = "Ecad") +
-    ggtitle("CD20 expression before correction")
-p2 <- dittoDimPlot(spe, var = "CD20", reduction.use = "UMAP_harmony", 
-                   assay = "exprs", size = 0.2) +
-    scale_color_viridis(name = "CD45RO") +
-    ggtitle("CD20 expression after correction")
-
-p1 + p2
-
-p1 <- dittoDimPlot(spe, var = "CD3", reduction.use = "UMAP", 
-                   assay = "exprs", size = 0.2) +
-    scale_color_viridis(name = "Ecad") +
-    ggtitle("CD3 expression before correction")
-p2 <- dittoDimPlot(spe, var = "CD3", reduction.use = "UMAP_harmony", 
-                   assay = "exprs", size = 0.2) +
-    scale_color_viridis(name = "CD45RO") +
-    ggtitle("CD3 expression after correction")
-
-p1 + p2
-
-p1 <- dittoDimPlot(spe, var = "FOXP3", reduction.use = "UMAP", 
-                   assay = "exprs", size = 0.2) +
-    scale_color_viridis(name = "FOXP3") +
-    ggtitle("FOXP3 expression before correction")
-p2 <- dittoDimPlot(spe, var = "FOXP3", reduction.use = "UMAP_harmony", 
-                   assay = "exprs", size = 0.2) +
-    scale_color_viridis(name = "FOXP3") +
-    ggtitle("FOXP3 expression after correction")
-
-p1 + p2
+# After correction
+plot_list <- multi_dittoDimPlot(spe, var = markers, reduction.use = "UMAP_mnnCorrected", 
+                   assay = "exprs", size = 0.2, list.out = TRUE) 
+plot_list <- lapply(plot_list, function(x) x + scale_color_viridis())
+plot_grid(plotlist = plot_list) 
 ```
+
+We observe that immune cells across patients are merged after batch correction 
+using `fastMNN`. However, the tumor cells of different patients still cluster
+separately.
 
 ## harmony correction
 
-```{r batch-correction-harmony, message=FALSE}
+```{r batch-correction-harmony, message=FALSE, eval=FALSE}
 library(harmony)
 
 mat <- t(assay(spe, "exprs")[rowData(spe)$use_channel,])
@@ -155,16 +155,15 @@ reducedDim(spe, "harmony") <- harmony_embeddings
 
 ### Visualization
 
-```{r dimred-batch-correction-harmony, message=FALSE}
+```{r dimred-batch-correction-harmony, message=FALSE, eval=FALSE}
 library(scater)
 
 set.seed(220228)
-spe <- runUMAP(spe, exprs_values = "corrected", name = "UMAP_mnnCorrected") 
-spe <- runTSNE(spe, exprs_values = "corrected", name = "TSNE_mnnCorrected") 
+spe <- runUMAP(spe, exprs_values = "harmony", name = "UMAP_harmony") 
 ```
 
-```{r visualizing-batch-correction-harmony, message=FALSE}
-library(patchwork)
+```{r visualizing-batch-correction-harmony-1, message=FALSE}
+library(cowplot)
 library(dittoSeq)
 library(viridis)
 
@@ -174,16 +173,16 @@ p1 <- dittoDimPlot(spe, var = "patient_id",
     scale_color_manual(values = metadata(spe)$color_vectors$patient_id) +
     ggtitle("Patient ID on UMAP before correction")
 p2 <- dittoDimPlot(spe, var = "patient_id", 
-                   reduction.use = "UMAP_harmony", size = 0.2) + 
+                   reduction.use = "UMAP_mnnCorrected", size = 0.2) + 
     scale_color_manual(values = metadata(spe)$color_vectors$patient_id) +
     ggtitle("Patient ID on UMAP after correction")
 
-p1 + p2
+plot_grid(p1, p2)
 ```
 
 Visualize markers
 
-```{r, warning=FALSE}
+```{r, warning=FALSE, eval=FALSE}
 p1 <- dittoDimPlot(spe, var = "Ecad", reduction.use = "UMAP", 
                    assay = "exprs", size = 0.2) +
     scale_color_viridis(name = "Ecad") +
@@ -242,7 +241,7 @@ p1 + p2
 
 ## Seurat correction
 
-```{r, message=FALSE}
+```{r, message=FALSE, eval=FALSE}
 library(Seurat)
 library(SeuratObject)
 seurat_obj <- as.Seurat(spe, counts = "counts", data = "exprs")
@@ -263,7 +262,7 @@ combined <- RunPCA(combined, npcs = 30, verbose = FALSE)
 
 ### Visualization
 
-```{r dimred-batch-correction-harmony, message=FALSE}
+```{r, message=FALSE, eval=FALSE}
 library(scater)
 
 reducedDim(spe, "seurat_integrated") <- combined@reductions$pca@cell.embeddings
@@ -273,7 +272,7 @@ spe <- runUMAP(spe, dimred = "seurat_integrated", name = "UMAP_seurat")
 spe <- runTSNE(spe, dimred = "seurat_integrated", name = "TSNE_seurat") 
 ```
 
-```{r visualizing-batch-correction-harmony, message=FALSE}
+```{r visualizing-batch-correction-seurat, message=FALSE, eval=FALSE}
 library(patchwork)
 library(dittoSeq)
 library(viridis)
@@ -293,7 +292,7 @@ p1 + p2
 
 Visualize markers
 
-```{r, warning=FALSE}
+```{r, warning=FALSE, eval=FALSE}
 p1 <- dittoDimPlot(spe, var = "Ecad", reduction.use = "UMAP", 
                    assay = "exprs", size = 0.2) +
     scale_color_viridis(name = "Ecad") +
@@ -354,7 +353,7 @@ p1 + p2
 
 The modified `SpatialExperiment` object is saved for further downstream analysis.
 
-```{r save-objects-quality-control}
+```{r save-objects-batch-correction, eval=FALSE}
 saveRDS(spe, "data/spe.rds")
 ```
 

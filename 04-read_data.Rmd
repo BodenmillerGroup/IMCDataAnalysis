@@ -113,7 +113,7 @@ head(rowData(spe))
 
 **This section is under development**
 
-## Single-cell processing
+## Single-cell processing {#cell-processing}
 
 After reading in the single-cell data, few further processing steps need to be
 taken.
