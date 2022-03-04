@@ -1,6 +1,6 @@
-# Cell phenotyping
+# Cell phenotyping 
 
-## Clustering approaches
+## Clustering approaches {#clustering}
 
 ### Rphenograph
 

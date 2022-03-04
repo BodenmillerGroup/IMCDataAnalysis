@@ -231,7 +231,7 @@ contain a high fraction of macrophages (CD206), B cells (CD20), neutrophils
 (CD15) or proliferating cells (Ki67). These differences will be further studied
 in the following chapters.
 
-## Cell-level quality control
+## Cell-level quality control {#cell-quality}
 
 In the following paragraphs we will look at different metrics and visualization
 approaches to assess data quality (as well as biological differences) on the 
