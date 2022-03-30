@@ -1,5 +1,28 @@
 # Cell phenotyping 
 
+A common step during single-cell data analysis is the labeling of cells based
+on their phenotype. Defining cell phenotypes is often subjective and relies
+on previous biological knowledge. The [Orchestrating Single Cell Analysis with Bioconductor](https://bioconductor.org/books/3.14/OSCA.basic/cell-type-annotation.html) book
+presents a number of approaches to phenotype cells detected by single-cell RNA
+sequencing based on reference datasets of prior knowledge of gene sets.
+
+In highly-multiplexed imaging, target proteins are manually selected based on
+the biological question at hand. It narrows down the feature space and
+facilitates the manual annotation of clusters to derive cell phenotypes. We
+will therefore discuss and compare a number of clustering approaches to group cells
+based on their similarity in marker expression in Section \@ref(clustering). 
+
+Unlike single-cell RNA sequencing and CyTOF data, single-cell data derived from
+highly-multiplexed imaging data often suffers from "lateral spillover" between
+neighboring cells. This spillover caused by imperfect segmentation often hinders
+accurate clustering to define specific cell phenotypes in multiplexed imaging
+data. Tools have been developed to correct lateral spillover between cells
+[@Bai2021] but the approach requires careful selection of which markers to
+correct. In Section \@ref(classification) we will train and apply a random
+forest classifier to classify cell phenotypes in the datasete. This approach has
+been previously used to identify major cell phenotypes in metastatic melanoma
+and avoids clustering of cells [@Hoch2021].
+
 ## Clustering approaches {#clustering}
 
 ### Rphenograph
@@ -8,11 +31,13 @@
 
 ### FlowSOM
 
-## Classification approaches
+## Classification approaches {#classification}
 
 ### Manual labelling of cells
 
 ### Training a classifier
+
+### Classifier performance
 
 ### Classification of new data
 
