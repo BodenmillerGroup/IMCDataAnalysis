@@ -71,6 +71,7 @@ exact command line interface calls to process the raw data are shown below:
 
 ```{r, echo = FALSE, message = FALSE}
 dir.create("data/steinbock")
+dir.create("data/ImcSegmentationPipeline")
 # Pre-download steinbock file
 download.file("https://zenodo.org/record/6043600/files/steinbock.sh", 
               "data/steinbock/steinbock.sh")
@@ -165,7 +166,30 @@ download.file("https://zenodo.org/record/6043600/files/steinbock.sh",
 
 **IMC Segmentation Pipeline output**
 
-Under development
+The example data was also processed using the 
+[IMC Segmetation Pipeline](https://github.com/BodenmillerGroup/ImcSegmentationPipeline) (version 3). 
+To highlight the use of the reader function for this type of output, we will need
+to download the `cpout` folder which is part of the `analysis` folder. The `cpout`
+folder stores all relevant output files of the pipeline. For a full description
+of the pipeline, please refer to the [docs](https://bodenmillergroup.github.io/ImcSegmentationPipeline/).
+
+```{r imcsegpipe-results}
+# download analysis folder
+url <- "https://zenodo.org/record/6404960/files/analysis.zip"
+destfile <- "data/ImcSegmentationPipeline/analysis.zip"
+download.file(url, destfile)
+unzip(destfile, exdir="data/ImcSegmentationPipeline", overwrite=TRUE)
+unlink(destfile)
+
+unlink("data/ImcSegmentationPipeline/analysis/cpinp/", recursive=TRUE)
+unlink("data/ImcSegmentationPipeline/analysis/crops/", recursive=TRUE)
+unlink("data/ImcSegmentationPipeline/analysis/histocat/", recursive=TRUE)
+unlink("data/ImcSegmentationPipeline/analysis/ilastik/", recursive=TRUE)
+unlink("data/ImcSegmentationPipeline/analysis/ometiff/", recursive=TRUE)
+unlink("data/ImcSegmentationPipeline/analysis/cpout/images/", recursive=TRUE)
+unlink("data/ImcSegmentationPipeline/analysis/cpout/probabilities/", recursive=TRUE)
+unlink("data/ImcSegmentationPipeline/analysis/cpout/masks/", recursive=TRUE)
+```
 
 ### Files for spillover matrix estimation
 
