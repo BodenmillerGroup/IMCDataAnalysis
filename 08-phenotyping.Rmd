@@ -23,9 +23,32 @@ forest classifier to classify cell phenotypes in the datasete. This approach has
 been previously used to identify major cell phenotypes in metastatic melanoma
 and avoids clustering of cells [@Hoch2021].
 
+## Load data
+
+Read in the previously generated `SpatialExperiment` object.
+
+```{r read-data-pheno, message=FALSE}
+spe <- readRDS("data/spe.rds")
+```
+
 ## Clustering approaches {#clustering}
 
 ### Rphenograph
+
+```{r rphenograph-1, message=FALSE}
+library(igraph)
+library(dittoSeq)
+mat <- t(assay(spe, "exprs")[rowData(spe)$use_channel,])
+
+out <- Rphenograph(mat, k = 30)
+
+clusters <- factor(membership(out[[2]]))
+
+spe$rp_clusters <- clusters
+
+dittoDimPlot(spe, var = "rp_clusters", reduction.use = "UMAP", size = 0.2) +
+    ggtitle("Phenograph clusters expression on UMAP")
+```
 
 ### Shared nearest neighbour graph
 

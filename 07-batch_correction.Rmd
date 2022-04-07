@@ -379,7 +379,7 @@ cells in a way that regresses out biological signals.
 
 The modified `SpatialExperiment` object is saved for further downstream analysis.
 
-```{r save-objects-batch-correction, eval=FALSE}
+```{r save-objects-batch-correction}
 saveRDS(spe, "data/spe.rds")
 ```
 
