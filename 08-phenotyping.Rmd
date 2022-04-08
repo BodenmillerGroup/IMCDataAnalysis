@@ -36,21 +36,78 @@ spe <- readRDS("data/spe.rds")
 ### Rphenograph
 
 ```{r rphenograph-1, message=FALSE}
+library(Rphenograph)
 library(igraph)
 library(dittoSeq)
 mat <- t(assay(spe, "exprs")[rowData(spe)$use_channel,])
 
-out <- Rphenograph(mat, k = 30)
+out <- Rphenograph(mat, k = 45)
 
 clusters <- factor(membership(out[[2]]))
 
-spe$rp_clusters <- clusters
+spe$pg_clusters <- clusters
 
-dittoDimPlot(spe, var = "rp_clusters", reduction.use = "UMAP", size = 0.2) +
+dittoDimPlot(spe, var = "pg_clusters", reduction.use = "UMAP", size = 0.2) +
     ggtitle("Phenograph clusters expression on UMAP")
 ```
 
+Integrated cells
+
+```{r rphenograph-1, message=FALSE}
+mat <- reducedDim(spe, "fastMNN")
+
+out <- Rphenograph(mat, k = 45)
+
+clusters <- factor(membership(out[[2]]))
+
+spe$pg_clusters_corrected <- clusters
+
+dittoDimPlot(spe, var = "pg_clusters_corrected", reduction.use = "UMAP_mnnCorrected", size = 0.2) +
+    ggtitle("Phenograph clusters expression on UMAP")
+```
+
+```{r}
+dittoHeatmap(spe[,cur_cells], genes = rownames(spe)[rowData(spe)$use_channel],
+             assay = "exprs", scale = "none",
+             heatmap.colors = viridis(100), annot.by = c("pg_clusters_corrected", "pg_clusters"))
+```
+
 ### Shared nearest neighbour graph
+
+```{r rphenograph-1, message=FALSE}
+library(scran)
+library(bluster)
+
+clusters <- clusterCells(spe[rowData(spe)$use_channel,], assay.type = "exprs", BLUSPARAM = NNGraphParam(k=10))
+
+spe$nn_clusters <- clusters
+
+dittoDimPlot(spe, var = "nn_clusters", reduction.use = "UMAP", size = 0.2) +
+    ggtitle("Phenograph clusters expression on UMAP")
+
+tab <- table(spe$nn_clusters, spe$rp_clusters)
+```
+
+Integrated cells
+
+```{r rphenograph-1, message=FALSE}
+mat <- reducedDim(spe, "fastMNN")
+
+out <- Rphenograph(mat, k = 45)
+
+clusters <- factor(membership(out[[2]]))
+
+spe$rp_clusters_corrected <- clusters
+
+dittoDimPlot(spe, var = "rp_clusters_corrected", reduction.use = "UMAP_mnnCorrected", size = 0.2) +
+    ggtitle("Phenograph clusters expression on UMAP")
+```
+
+```{r}
+dittoHeatmap(spe[,cur_cells], genes = rownames(spe)[rowData(spe)$use_channel],
+             assay = "exprs", scale = "none",
+             heatmap.colors = viridis(100), annot.by = c("rp_clusters_corrected", "rp_clusters"))
+```
 
 ### FlowSOM
 
