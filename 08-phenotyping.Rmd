@@ -43,6 +43,10 @@ Mention https://github.com/stuchly/Rphenoannoy
 
 jaccard-based weights +  louvain clustering
 
+```{r, echo=FALSE}
+start_time <- Sys.time()
+```
+
 ```{r rphenograph-1, message=FALSE}
 library(Rphenograph)
 library(igraph)
@@ -65,6 +69,13 @@ dittoHeatmap(spe[,cur_cells],
              heatmap.colors = viridis(100), 
              annot.by = "pg_clusters")
 ```
+
+```{r, echo=FALSE}
+end_time <- Sys.time()
+```
+
+The `Rphenograph` function call took 
+`r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
 
 Integrated cells
 
@@ -90,7 +101,42 @@ dittoHeatmap(spe[,cur_cells],
 
 ### Shared nearest neighbour graph
 
+```{r, echo=FALSE}
+start_time <- Sys.time()
+```
+
+```{r parameter-sweep}
+library(bluster)
+library(BiocParallel)
+library(ggplot2)
+mat <- t(assay(spe, "exprs")[rowData(spe)$use_channel,])
+combinations <- clusterSweep(mat, BLUSPARAM=SNNGraphParam(),
+    k=c(10L, 20L), cluster.fun=c("walktrap", "louvain"),
+    BPPARAM = bpparam())
+
+sil <- vapply(as.list(combinations$clusters), 
+              function(x) mean(approxSilhouette(mat, x)$width), 
+              0)
+
+ggplot(data.frame(method = names(sil),
+                  sil = sil)) +
+    geom_point(aes(method, sil))
+
+plot(names(sil), sil, xlab="Number of clusters", ylab="Average silhouette width")
+```
+
+```{r, echo=FALSE}
+end_time <- Sys.time()
+```
+
+The cluster parameter sweep took 
+`r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
+
 rank-based weights + walktrap clustering
+
+```{r, echo=FALSE}
+start_time <- Sys.time()
+```
 
 ```{r snn-1, message=FALSE}
 library(scran)
@@ -99,7 +145,9 @@ library(BiocParallel)
 
 clusters <- clusterCells(spe[rowData(spe)$use_channel,], 
                          assay.type = "exprs", 
-                         BLUSPARAM = NNGraphParam(k=10, BPPARAM = bpparam()))
+                         BLUSPARAM = NNGraphParam(k=20, 
+                                                  cluster.fun = "louvain",
+                                                  BPPARAM = bpparam()))
 
 spe$nn_clusters <- clusters
 
@@ -114,12 +162,21 @@ dittoHeatmap(spe[,cur_cells],
              annot.by = "nn_clusters")
 ```
 
+```{r, echo=FALSE}
+end_time <- Sys.time()
+```
+
+The shared nearest beighbor graph clustering approach took 
+`r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
+
 Integrated cells
 
 ```{r snn-2, message=FALSE}
 clusters <- clusterCells(spe[rowData(spe)$use_channel,], 
                          use.dimred = "fastMNN", 
-                         BLUSPARAM = NNGraphParam(k=10, BPPARAM = bpparam()))
+                         BLUSPARAM = NNGraphParam(k=20, 
+                                                  cluster.fun = "louvain",
+                                                  BPPARAM = bpparam()))
 
 spe$nn_clusters_corrected <- clusters
 
@@ -135,6 +192,10 @@ dittoHeatmap(spe[,cur_cells],
 ```
 
 ### FlowSOM
+
+```{r, echo=FALSE}
+start_time <- Sys.time()
+```
 
 ```{r flowSOM-1, message=FALSE}
 library(CATALYST)
@@ -158,6 +219,13 @@ dittoHeatmap(spe[,cur_cells],
              heatmap.colors = viridis(100), 
              annot.by = "som_clusters")
 ```
+
+```{r, echo=FALSE}
+end_time <- Sys.time()
+```
+
+Running FlowSOM clustering took  
+`r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
 
 ```{r flowSOM-2, message=FALSE}
 library(kohonen)
