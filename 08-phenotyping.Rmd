@@ -29,11 +29,19 @@ Read in the previously generated `SpatialExperiment` object.
 
 ```{r read-data-pheno, message=FALSE}
 spe <- readRDS("data/spe.rds")
+
+# Sample cells
+set.seed(220410)
+cur_cells <- sample(seq_len(ncol(spe)), 2000)
 ```
 
 ## Clustering approaches {#clustering}
 
 ### Rphenograph
+
+Mention https://github.com/stuchly/Rphenoannoy
+
+jaccard-based weights +  louvain clustering
 
 ```{r rphenograph-1, message=FALSE}
 library(Rphenograph)
@@ -47,13 +55,20 @@ clusters <- factor(membership(out[[2]]))
 
 spe$pg_clusters <- clusters
 
-dittoDimPlot(spe, var = "pg_clusters", reduction.use = "UMAP", size = 0.2) +
+dittoDimPlot(spe, var = "pg_clusters", 
+             reduction.use = "UMAP", size = 0.2) +
     ggtitle("Phenograph clusters expression on UMAP")
+
+dittoHeatmap(spe[,cur_cells], 
+             genes = rownames(spe)[rowData(spe)$use_channel],
+             assay = "exprs", scale = "none",
+             heatmap.colors = viridis(100), 
+             annot.by = "pg_clusters")
 ```
 
 Integrated cells
 
-```{r rphenograph-1, message=FALSE}
+```{r rphenograph-2, message=FALSE}
 mat <- reducedDim(spe, "fastMNN")
 
 out <- Rphenograph(mat, k = 45)
@@ -62,54 +77,140 @@ clusters <- factor(membership(out[[2]]))
 
 spe$pg_clusters_corrected <- clusters
 
-dittoDimPlot(spe, var = "pg_clusters_corrected", reduction.use = "UMAP_mnnCorrected", size = 0.2) +
+dittoDimPlot(spe, var = "pg_clusters_corrected", 
+             reduction.use = "UMAP_mnnCorrected", size = 0.2) +
     ggtitle("Phenograph clusters expression on UMAP")
-```
 
-```{r}
-dittoHeatmap(spe[,cur_cells], genes = rownames(spe)[rowData(spe)$use_channel],
+dittoHeatmap(spe[,cur_cells], 
+             genes = rownames(spe)[rowData(spe)$use_channel],
              assay = "exprs", scale = "none",
-             heatmap.colors = viridis(100), annot.by = c("pg_clusters_corrected", "pg_clusters"))
+             heatmap.colors = viridis(100), 
+             annot.by = "pg_clusters_corrected")
 ```
 
 ### Shared nearest neighbour graph
 
-```{r rphenograph-1, message=FALSE}
+rank-based weights + walktrap clustering
+
+```{r snn-1, message=FALSE}
 library(scran)
 library(bluster)
+library(BiocParallel)
 
-clusters <- clusterCells(spe[rowData(spe)$use_channel,], assay.type = "exprs", BLUSPARAM = NNGraphParam(k=10))
+clusters <- clusterCells(spe[rowData(spe)$use_channel,], 
+                         assay.type = "exprs", 
+                         BLUSPARAM = NNGraphParam(k=10, BPPARAM = bpparam()))
 
 spe$nn_clusters <- clusters
 
-dittoDimPlot(spe, var = "nn_clusters", reduction.use = "UMAP", size = 0.2) +
+dittoDimPlot(spe, var = "nn_clusters", 
+             reduction.use = "UMAP", size = 0.2) +
     ggtitle("Phenograph clusters expression on UMAP")
 
-tab <- table(spe$nn_clusters, spe$rp_clusters)
+dittoHeatmap(spe[,cur_cells], 
+             genes = rownames(spe)[rowData(spe)$use_channel],
+             assay = "exprs", scale = "none",
+             heatmap.colors = viridis(100), 
+             annot.by = "nn_clusters")
 ```
 
 Integrated cells
 
-```{r rphenograph-1, message=FALSE}
-mat <- reducedDim(spe, "fastMNN")
+```{r snn-2, message=FALSE}
+clusters <- clusterCells(spe[rowData(spe)$use_channel,], 
+                         use.dimred = "fastMNN", 
+                         BLUSPARAM = NNGraphParam(k=10, BPPARAM = bpparam()))
 
-out <- Rphenograph(mat, k = 45)
+spe$nn_clusters_corrected <- clusters
 
-clusters <- factor(membership(out[[2]]))
-
-spe$rp_clusters_corrected <- clusters
-
-dittoDimPlot(spe, var = "rp_clusters_corrected", reduction.use = "UMAP_mnnCorrected", size = 0.2) +
+dittoDimPlot(spe, var = "nn_clusters_corrected", 
+             reduction.use = "UMAP", size = 0.2) +
     ggtitle("Phenograph clusters expression on UMAP")
-```
 
-```{r}
-dittoHeatmap(spe[,cur_cells], genes = rownames(spe)[rowData(spe)$use_channel],
+dittoHeatmap(spe[,cur_cells], 
+             genes = rownames(spe)[rowData(spe)$use_channel],
              assay = "exprs", scale = "none",
-             heatmap.colors = viridis(100), annot.by = c("rp_clusters_corrected", "rp_clusters"))
+             heatmap.colors = viridis(100), 
+             annot.by = "nn_clusters_corrected")
 ```
 
 ### FlowSOM
+
+```{r flowSOM-1, message=FALSE}
+library(CATALYST)
+
+spe <- cluster(spe, 
+               features = rownames(spe)[rowData(spe)$use_channel],
+               maxK = 30,
+               seed = 220410)
+
+delta_area(spe)
+
+spe$som_clusters <- cluster_ids(spe, "meta13")
+
+dittoDimPlot(spe, var = "som_clusters", 
+             reduction.use = "UMAP", size = 0.2) +
+    ggtitle("Phenograph clusters expression on UMAP")
+
+dittoHeatmap(spe[,cur_cells], 
+             genes = rownames(spe)[rowData(spe)$use_channel],
+             assay = "exprs", scale = "none",
+             heatmap.colors = viridis(100), 
+             annot.by = "som_clusters")
+```
+
+```{r flowSOM-2, message=FALSE}
+library(kohonen)
+mat <- reducedDim(spe, "fastMNN")
+
+set.seed(1000)
+som.out <- clusterRows(mat, SomParam(13))
+
+spe$som_clusters_corrected <- som.out
+
+dittoDimPlot(spe, var = "som_clusters_corrected", 
+             reduction.use = "UMAP_mnnCorrected", size = 0.2) +
+    ggtitle("Phenograph clusters expression on UMAP")
+
+dittoHeatmap(spe[,cur_cells], 
+             genes = rownames(spe)[rowData(spe)$use_channel],
+             assay = "exprs", scale = "none",
+             heatmap.colors = viridis(100), 
+             annot.by = "som_clusters_corrected")
+```
+
+
+
+### Compare between clustering approaches
+
+```{r raw-counts}
+library(patchwork)
+tab1 <- table(paste("Rphenograph", spe$pg_clusters), 
+              paste("SNN", spe$nn_clusters))
+tab2 <- table(paste("Rphenograph", spe$pg_clusters), 
+              paste("SOM", spe$som_clusters))
+tab3 <- table(paste("SNN", spe$nn_clusters), 
+              paste("SOM", spe$som_clusters))
+
+pheatmap(log10(tab1 + 10), color = viridis(100)) 
+pheatmap(log10(tab2 + 10), color = viridis(100)) 
+pheatmap(log10(tab3 + 10), color = viridis(100)) 
+```
+
+```{r corrected}
+tab1 <- table(paste("Rphenograph", spe$pg_clusters_corrected), 
+              paste("SNN", spe$nn_clusters_corrected))
+tab2 <- table(paste("Rphenograph", spe$pg_clusters_corrected), 
+              paste("SOM", spe$som_clusters_corrected))
+tab3 <- table(paste("SNN", spe$nn_clusters_corrected), 
+              paste("SOM", spe$som_clusters_corrected))
+
+pheatmap(log10(tab1 + 10), color = viridis(100)) 
+pheatmap(log10(tab2 + 10), color = viridis(100)) 
+pheatmap(log10(tab3 + 10), color = viridis(100)) 
+```
+
+Mention cluster stability metrics https://www.bioconductor.org/packages/release/bioc/vignettes/bluster/inst/doc/diagnostics.html
 
 ## Classification approaches {#classification}
 
