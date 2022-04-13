@@ -4,13 +4,14 @@ A common step during single-cell data analysis is the labeling of cells based
 on their phenotype. Defining cell phenotypes is often subjective and relies
 on previous biological knowledge. The [Orchestrating Single Cell Analysis with Bioconductor](https://bioconductor.org/books/3.14/OSCA.basic/cell-type-annotation.html) book
 presents a number of approaches to phenotype cells detected by single-cell RNA
-sequencing based on reference datasets of prior knowledge of gene sets.
+sequencing based on reference datasets or prior knowledge of gene sets.
 
-In highly-multiplexed imaging, target proteins are manually selected based on
-the biological question at hand. It narrows down the feature space and
-facilitates the manual annotation of clusters to derive cell phenotypes. We
-will therefore discuss and compare a number of clustering approaches to group cells
-based on their similarity in marker expression in Section \@ref(clustering). 
+In highly-multiplexed imaging, target proteins or moelcules are manually
+selected based on the biological question at hand. It narrows down the feature
+space and facilitates the manual annotation of clusters to derive cell
+phenotypes. We will therefore discuss and compare a number of clustering
+approaches to group cells based on their similarity in marker expression in
+Section \@ref(clustering).
 
 Unlike single-cell RNA sequencing and CyTOF data, single-cell data derived from
 highly-multiplexed imaging data often suffers from "lateral spillover" between
@@ -19,13 +20,15 @@ accurate clustering to define specific cell phenotypes in multiplexed imaging
 data. Tools have been developed to correct lateral spillover between cells
 [@Bai2021] but the approach requires careful selection of which markers to
 correct. In Section \@ref(classification) we will train and apply a random
-forest classifier to classify cell phenotypes in the datasete. This approach has
-been previously used to identify major cell phenotypes in metastatic melanoma
-and avoids clustering of cells [@Hoch2021].
+forest classifier to classify cell phenotypes in the dataset as alternative
+approach for cell phenotyping. This approach has been previously used to
+identify major cell phenotypes in metastatic melanoma and avoids clustering of
+cells [@Hoch2022].
 
 ## Load data
 
-Read in the previously generated `SpatialExperiment` object.
+We will first read in the previously generated `SpatialExperiment` object and
+sample 2000 cells of the dataset to visualize cluster annotations.
 
 ```{r read-data-pheno, message=FALSE}
 spe <- readRDS("data/spe.rds")
@@ -37,11 +40,44 @@ cur_cells <- sample(seq_len(ncol(spe)), 2000)
 
 ## Clustering approaches {#clustering}
 
+In the first section to identify cellular phenotypes in the dataset, we will
+present clustering approaches that group cells based on their similarity in
+marker expression. A number approaches have been developed to cluster data
+derived from single-cell RNA sequencing technologies [TODO ref] or CyTOF
+[@Weber2016]. For demonstration purposes, we will highlight common clustering
+approaches that are available in R and have been used for clustering cells
+obtained from IMC. Two approaches rely on graph-based clustering and one
+approach uses self organizing maps (SOM).
+
 ### Rphenograph
 
-Mention https://github.com/stuchly/Rphenoannoy
+The PhenoGraph clustering approach was first described to group cells of a CyTOF
+dataset in [@Levine2015]. The algorithm first constructs a graph by detecting
+the `k` nearest neighbours based on euclidean distance in expression space. In
+the next step, edges between nodes (cells) are weighted by their overlap in
+nearest neighbor sets. To quantify the overlap in shared nearest neighbors, the
+jaccard index is used. The Louvain modularity optimization approach is used
+to detect connected communities and partition the graph into cluster of cells.
+This clustering strategy was used by [@Jackson2020] to cluster IMC data.
 
-jaccard-based weights +  louvain clustering
+There are several different PhenoGraph implementations available in R. Here, we
+use the one available at
+[https://github.com/i-cyto/Rphenograph](https://github.com/i-cyto/Rphenograph).
+For large datasets,
+[https://github.com/stuchly/Rphenoannoy](https://github.com/stuchly/Rphenoannoy)
+offers a more performant implementation of the algorithm.
+
+In the following code chunk, we select the asinh-transformed mean pixel
+intensities per cell and channel and subset the channels to the ones containing
+biological variation. This matrix is transposed to store cells in rows. Within
+the `Rphenograph` function, we select the 45 nearest neighbors for graph
+building and louvain community detection (default). The function returns a list
+of length 2, the first entry being the graph and the second entry containing the
+community object. Calling `membership` on the community object will return
+cluster IDs for each cell. These cluster IDs are then stored within the
+`colData` of the `SpatialExperiment` object. Cluster IDs are mapped on top of
+the UMAP embedding and single-cell marker expression within each cluster are
+visualized in form of a heatmap.
 
 ```{r, echo=FALSE}
 start_time <- Sys.time()
@@ -51,6 +87,7 @@ start_time <- Sys.time()
 library(Rphenograph)
 library(igraph)
 library(dittoSeq)
+library(viridis)
 mat <- t(assay(spe, "exprs")[rowData(spe)$use_channel,])
 
 out <- Rphenograph(mat, k = 45)
@@ -67,7 +104,7 @@ dittoHeatmap(spe[,cur_cells],
              genes = rownames(spe)[rowData(spe)$use_channel],
              assay = "exprs", scale = "none",
              heatmap.colors = viridis(100), 
-             annot.by = "pg_clusters")
+             annot.by = c("pg_clusters", "patient_id"))
 ```
 
 ```{r, echo=FALSE}
@@ -100,6 +137,8 @@ dittoHeatmap(spe[,cur_cells],
 ```
 
 ### Shared nearest neighbour graph
+
+Sunnys paper?
 
 ```{r, echo=FALSE}
 start_time <- Sys.time()
@@ -192,6 +231,8 @@ dittoHeatmap(spe[,cur_cells],
 ```
 
 ### FlowSOM
+
+Tobis paper?
 
 ```{r, echo=FALSE}
 start_time <- Sys.time()
