@@ -1,4 +1,4 @@
-# Batch effect correction
+# Batch effect correction {#batch-effects}
 
 In Section \@ref(cell-quality) we observed staining/expression differences
 between the individual samples. This can arise due to technical (e.g.,

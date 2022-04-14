@@ -114,7 +114,11 @@ end_time <- Sys.time()
 The `Rphenograph` function call took 
 `r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
 
-Integrated cells
+We can observe that some of the clusters only contain cells of a single patient.
+This  can often be observed in the tumor compartment. In the next step, we
+use the integrated cells (see Section \@ref(batch-effects)) in low dimensional
+embedding for clustering. Here, the low dimensional embedding can
+be directly accessed from the `reducedDim` slot.
 
 ```{r rphenograph-2, message=FALSE}
 mat <- reducedDim(spe, "fastMNN")
@@ -133,8 +137,12 @@ dittoHeatmap(spe[,cur_cells],
              genes = rownames(spe)[rowData(spe)$use_channel],
              assay = "exprs", scale = "none",
              heatmap.colors = viridis(100), 
-             annot.by = "pg_clusters_corrected")
+             annot.by = c("pg_clusters_corrected", "patient_id"))
 ```
+
+Clustering using the integrated embedding leads to clusters that contain cells
+of different patients. Cluster annotation can now be performed by manually labeling
+cells based on their marker expression. 
 
 ### Shared nearest neighbour graph
 
@@ -148,7 +156,9 @@ start_time <- Sys.time()
 library(bluster)
 library(BiocParallel)
 library(ggplot2)
+
 mat <- t(assay(spe, "exprs")[rowData(spe)$use_channel,])
+
 combinations <- clusterSweep(mat, BLUSPARAM=SNNGraphParam(),
     k=c(10L, 20L), cluster.fun=c("walktrap", "louvain"),
     BPPARAM = bpparam())
@@ -159,9 +169,8 @@ sil <- vapply(as.list(combinations$clusters),
 
 ggplot(data.frame(method = names(sil),
                   sil = sil)) +
-    geom_point(aes(method, sil))
-
-plot(names(sil), sil, xlab="Number of clusters", ylab="Average silhouette width")
+    geom_point(aes(method, sil)) +
+    theme_classic()
 ```
 
 ```{r, echo=FALSE}
