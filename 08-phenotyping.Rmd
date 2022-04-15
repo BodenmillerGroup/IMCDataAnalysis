@@ -148,6 +148,8 @@ cells based on their marker expression.
 
 Sunnys paper?
 
+Test more k's
+
 ```{r, echo=FALSE}
 start_time <- Sys.time()
 ```
