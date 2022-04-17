@@ -88,6 +88,7 @@ library(Rphenograph)
 library(igraph)
 library(dittoSeq)
 library(viridis)
+
 mat <- t(assay(spe, "exprs")[rowData(spe)$use_channel,])
 
 out <- Rphenograph(mat, k = 45)
@@ -146,15 +147,36 @@ cells based on their marker expression.
 
 ### Shared nearest neighbour graph
 
-Sunnys paper?
+The [bluster](https://www.bioconductor.org/packages/release/bioc/html/bluster.html) 
+package provides a simple interface to cluster cells using a number of different
+[clustering approaches](https://www.bioconductor.org/packages/release/bioc/vignettes/bluster/inst/doc/clusterRows.html) and different metrics to [access cluster stability](https://www.bioconductor.org/packages/release/bioc/vignettes/bluster/inst/doc/diagnostics.html).  
 
-Test more k's
+For simplicity, we will focus on graph based clustering as this is the most
+popular and a fast method for single-cell clustering. The `bluster` package
+provides functionalities to build k-nearest neighbour (KNN) and it's weighted
+version (shared nearest neighbor; SNN) graphs where nodes represent cells.
+The user can chose the number of neighbors to consider (parameter `k`), the 
+the edge weighting method (parameter `type`) and the community detection
+function to use (parameter `cluster.fun`). As all parameters affect the clustering
+results, the `bluster` package provides the `clusterSweep` function to test
+a number of parameter settings in parallel. In the following code chunk,
+we select the asinh-transformed mean pixel intensities and subset the markers
+of interest. The resulting matrix is transposed to fit to the requirements of 
+the bluster package (cells in rows).
+
+We test two different settings for `k`, two for `type` and two for `cluster.fun`.
+This function call is parallelized by setting the `BPPARAM` parameter. We use
+the `approxSilhouette` function to compute the silhouette width for each cell
+and compute the average across all cells per parameter setting. 
+Please see `?silhouette` for more information on how the silhouette 
+width id computed for each cell. A large average silhouette width indicates 
+cells that are well clustered.
 
 ```{r, echo=FALSE}
 start_time <- Sys.time()
 ```
 
-```{r parameter-sweep}
+```{r parameter-sweep, message=FALSE}
 library(bluster)
 library(BiocParallel)
 library(ggplot2)
@@ -162,8 +184,10 @@ library(ggplot2)
 mat <- t(assay(spe, "exprs")[rowData(spe)$use_channel,])
 
 combinations <- clusterSweep(mat, BLUSPARAM=SNNGraphParam(),
-    k=c(10L, 20L), cluster.fun=c("walktrap", "louvain"),
-    BPPARAM = bpparam())
+                             k=c(10L, 20L), 
+                             type = c("rank", "jaccard"), 
+                             cluster.fun=c("walktrap", "louvain"),
+                             BPPARAM = bpparam())
 
 sil <- vapply(as.list(combinations$clusters), 
               function(x) mean(approxSilhouette(mat, x)$width), 
@@ -172,7 +196,10 @@ sil <- vapply(as.list(combinations$clusters),
 ggplot(data.frame(method = names(sil),
                   sil = sil)) +
     geom_point(aes(method, sil)) +
-    theme_classic()
+    theme_classic(base_size = 15) +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+    xlab("Cluster parameter combination") +
+    ylab("Average silhouette width")
 ```
 
 ```{r, echo=FALSE}
@@ -182,7 +209,23 @@ end_time <- Sys.time()
 The cluster parameter sweep took 
 `r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
 
-rank-based weights + walktrap clustering
+Performing a cluster sweep takes some time as multiple clustering are run in parallel.
+We do however recommend testing a number of different parameter settings to
+access clustering performance.
+
+Once parameter settings are know, we can either use the `clusterRows` function
+of the `bluster` package to cluster cells or its convenient wrapper function
+exported by the
+[scran](https://bioconductor.org/packages/release/bioc/html/scran.html) package.
+The `scran::clusterCells` function accepts a `SpatialExperiment` (or
+`SingleCellExperiment`) object which stores cells in columns. By default, the
+function detects the 10 nearest neighbours for each cell, performs rank-based
+weighting of edges (see `?makeSNNGraph` for more information) and uses the
+`cluster_walktrap` function to detect communities in the graph.
+
+As we can see above, the `louvain` community detection approach outperforms the 
+default `walktrap` approach in this dataset. We also increase the number of nearest
+neighbors to decrease granularity of the resulting clusters.
 
 ```{r, echo=FALSE}
 start_time <- Sys.time()
@@ -190,8 +233,6 @@ start_time <- Sys.time()
 
 ```{r snn-1, message=FALSE}
 library(scran)
-library(bluster)
-library(BiocParallel)
 
 clusters <- clusterCells(spe[rowData(spe)$use_channel,], 
                          assay.type = "exprs", 
@@ -209,17 +250,22 @@ dittoHeatmap(spe[,cur_cells],
              genes = rownames(spe)[rowData(spe)$use_channel],
              assay = "exprs", scale = "none",
              heatmap.colors = viridis(100), 
-             annot.by = "nn_clusters")
+             annot.by = c("nn_clusters", "patient_id"))
 ```
 
 ```{r, echo=FALSE}
 end_time <- Sys.time()
 ```
 
-The shared nearest beighbor graph clustering approach took 
+The shared nearest neighbor graph clustering approach took 
 `r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
 
-Integrated cells
+This function was used by [@Tietscher2022] to cluster cells obtained by IMC. Setting
+`type = "jaccard"` performs clustering similar to `Rphenograph` above and [Seurat](https://satijalab.org/seurat/articles/pbmc3k_tutorial.html#cluster-the-cells-1).
+
+Similar to the results obtained by `Rphenograph`, some of the clusters are 
+patient-specific. We can now perform clustering of the integrated cells
+by directly specifying which low-dimensional embedding to use:
 
 ```{r snn-2, message=FALSE}
 clusters <- clusterCells(spe[rowData(spe)$use_channel,], 
@@ -231,14 +277,14 @@ clusters <- clusterCells(spe[rowData(spe)$use_channel,],
 spe$nn_clusters_corrected <- clusters
 
 dittoDimPlot(spe, var = "nn_clusters_corrected", 
-             reduction.use = "UMAP", size = 0.2) +
+             reduction.use = "UMAP_mnnCorrected", size = 0.2) +
     ggtitle("Phenograph clusters expression on UMAP")
 
 dittoHeatmap(spe[,cur_cells], 
              genes = rownames(spe)[rowData(spe)$use_channel],
              assay = "exprs", scale = "none",
              heatmap.colors = viridis(100), 
-             annot.by = "nn_clusters_corrected")
+             annot.by = c("nn_clusters_corrected", "patient_id"))
 ```
 
 ### FlowSOM
