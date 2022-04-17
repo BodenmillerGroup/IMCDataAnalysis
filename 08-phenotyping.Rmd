@@ -98,14 +98,17 @@ clusters <- factor(membership(out[[2]]))
 spe$pg_clusters <- clusters
 
 dittoDimPlot(spe, var = "pg_clusters", 
-             reduction.use = "UMAP", size = 0.2) +
+             reduction.use = "UMAP", size = 0.2,
+             do.label = TRUE) +
     ggtitle("Phenograph clusters expression on UMAP")
 
 dittoHeatmap(spe[,cur_cells], 
              genes = rownames(spe)[rowData(spe)$use_channel],
              assay = "exprs", scale = "none",
              heatmap.colors = viridis(100), 
-             annot.by = c("pg_clusters", "patient_id"))
+             annot.by = c("pg_clusters", "patient_id"),
+             annot.colors = c(dittoColors(1)[1:length(unique(spe$pg_clusters))],
+                              metadata(spe)$color_vectors$patient_id))
 ```
 
 ```{r, echo=FALSE}
@@ -131,14 +134,17 @@ clusters <- factor(membership(out[[2]]))
 spe$pg_clusters_corrected <- clusters
 
 dittoDimPlot(spe, var = "pg_clusters_corrected", 
-             reduction.use = "UMAP_mnnCorrected", size = 0.2) +
+             reduction.use = "UMAP_mnnCorrected", size = 0.2,
+             do.label = TRUE) +
     ggtitle("Phenograph clusters expression on UMAP")
 
 dittoHeatmap(spe[,cur_cells], 
              genes = rownames(spe)[rowData(spe)$use_channel],
              assay = "exprs", scale = "none",
              heatmap.colors = viridis(100), 
-             annot.by = c("pg_clusters_corrected", "patient_id"))
+             annot.by = c("pg_clusters_corrected", "patient_id"),
+             annot.colors = c(dittoColors(1)[1:length(unique(spe$pg_clusters_corrected))],
+                              metadata(spe)$color_vectors$patient_id))
 ```
 
 Clustering using the integrated embedding leads to clusters that contain cells
@@ -243,14 +249,17 @@ clusters <- clusterCells(spe[rowData(spe)$use_channel,],
 spe$nn_clusters <- clusters
 
 dittoDimPlot(spe, var = "nn_clusters", 
-             reduction.use = "UMAP", size = 0.2) +
+             reduction.use = "UMAP", size = 0.2,
+             do.label = TRUE) +
     ggtitle("Phenograph clusters expression on UMAP")
 
 dittoHeatmap(spe[,cur_cells], 
              genes = rownames(spe)[rowData(spe)$use_channel],
              assay = "exprs", scale = "none",
              heatmap.colors = viridis(100), 
-             annot.by = c("nn_clusters", "patient_id"))
+             annot.by = c("nn_clusters", "patient_id"),
+             annot.colors = c(dittoColors(1)[1:length(unique(spe$nn_clusters))],
+                              metadata(spe)$color_vectors$patient_id))
 ```
 
 ```{r, echo=FALSE}
@@ -277,14 +286,17 @@ clusters <- clusterCells(spe[rowData(spe)$use_channel,],
 spe$nn_clusters_corrected <- clusters
 
 dittoDimPlot(spe, var = "nn_clusters_corrected", 
-             reduction.use = "UMAP_mnnCorrected", size = 0.2) +
+             reduction.use = "UMAP_mnnCorrected", size = 0.2,
+             do.label = TRUE) +
     ggtitle("Phenograph clusters expression on UMAP")
 
 dittoHeatmap(spe[,cur_cells], 
              genes = rownames(spe)[rowData(spe)$use_channel],
              assay = "exprs", scale = "none",
              heatmap.colors = viridis(100), 
-             annot.by = c("nn_clusters_corrected", "patient_id"))
+             annot.by = c("nn_clusters_corrected", "patient_id"),
+             annot.colors = c(dittoColors(1)[1:length(unique(spe$nn_clusters_corrected))],
+                              metadata(spe)$color_vectors$patient_id))
 ```
 
 ### FlowSOM
@@ -308,14 +320,17 @@ delta_area(spe)
 spe$som_clusters <- cluster_ids(spe, "meta13")
 
 dittoDimPlot(spe, var = "som_clusters", 
-             reduction.use = "UMAP", size = 0.2) +
+             reduction.use = "UMAP", size = 0.2,
+             do.label = TRUE) +
     ggtitle("Phenograph clusters expression on UMAP")
 
 dittoHeatmap(spe[,cur_cells], 
              genes = rownames(spe)[rowData(spe)$use_channel],
              assay = "exprs", scale = "none",
              heatmap.colors = viridis(100), 
-             annot.by = "som_clusters")
+             annot.by = "som_clusters",
+             annot.colors = c(dittoColors(1)[1:length(unique(spe$som_clusters))],
+                              metadata(spe)$color_vectors$patient_id))
 ```
 
 ```{r, echo=FALSE}
@@ -335,14 +350,17 @@ som.out <- clusterRows(mat, SomParam(13))
 spe$som_clusters_corrected <- som.out
 
 dittoDimPlot(spe, var = "som_clusters_corrected", 
-             reduction.use = "UMAP_mnnCorrected", size = 0.2) +
+             reduction.use = "UMAP_mnnCorrected", size = 0.2,
+             do.label = TRUE) +
     ggtitle("Phenograph clusters expression on UMAP")
 
 dittoHeatmap(spe[,cur_cells], 
              genes = rownames(spe)[rowData(spe)$use_channel],
              assay = "exprs", scale = "none",
              heatmap.colors = viridis(100), 
-             annot.by = "som_clusters_corrected")
+             annot.by = "som_clusters_corrected",
+             annot.colors = c(dittoColors(1)[1:length(unique(spe$som_clusters_corrected))],
+                              metadata(spe)$color_vectors$patient_id))
 ```
 
 
