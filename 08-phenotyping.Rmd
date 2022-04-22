@@ -252,7 +252,7 @@ spe$nn_clusters <- clusters
 dittoDimPlot(spe, var = "nn_clusters", 
              reduction.use = "UMAP", size = 0.2,
              do.label = TRUE) +
-    ggtitle("Phenograph clusters expression on UMAP")
+    ggtitle("SNN clusters expression on UMAP")
 
 dittoHeatmap(spe[,cur_cells], 
              genes = rownames(spe)[rowData(spe)$use_channel],
@@ -290,7 +290,7 @@ spe$nn_clusters_corrected <- clusters
 dittoDimPlot(spe, var = "nn_clusters_corrected", 
              reduction.use = "UMAP_mnnCorrected", size = 0.2,
              do.label = TRUE) +
-    ggtitle("Phenograph clusters expression on UMAP")
+    ggtitle("SNN clusters expression on UMAP")
 
 dittoHeatmap(spe[,cur_cells], 
              genes = rownames(spe)[rowData(spe)$use_channel],
@@ -301,7 +301,7 @@ dittoHeatmap(spe[,cur_cells],
                               metadata(spe)$color_vectors$patient_id))
 ```
 
-### FlowSOM
+### Self organizing maps
 
 An alternative to graph-based clustering is offered by the
 [CATALYST](https://bioconductor.org/packages/release/bioc/html/CATALYST.html)
@@ -337,7 +337,7 @@ spe$som_clusters <- cluster_ids(spe, "meta13")
 dittoDimPlot(spe, var = "som_clusters", 
              reduction.use = "UMAP", size = 0.2,
              do.label = TRUE) +
-    ggtitle("Phenograph clusters expression on UMAP")
+    ggtitle("SOM clusters expression on UMAP")
 
 dittoHeatmap(spe[,cur_cells], 
              genes = rownames(spe)[rowData(spe)$use_channel],
@@ -379,12 +379,14 @@ set.seed(1000)
 som.out <- clusterRows(mat, SomParam(100), full = TRUE)
 
 # Cluster the 100 SOM codes into larger clusters
+pdf(NULL)
 ccp <- ConsensusClusterPlus(t(som.out$objects$som$codes[[1]]),
                             maxK = 30,
                             reps = 100, 
                             distance = "euclidean", 
                             seed = 220410, 
                             plot = NULL)
+dev.off()
 
 # Visualize delta area plot
 CATALYST:::.plot_delta_area(ccp)
@@ -412,8 +414,20 @@ cells as measured by IMC.
 
 ### Compare between clustering approaches
 
-```{r raw-counts}
+Finally, we can compare the results of different clustering approaches. For
+this, we visualize the number of cells that are shared between different
+clustering results in a pairwise fashion. In the following heatmaps a high match
+between clustering results can be seen for those clusters that are uniquely
+detected in both approaches.
+
+First, we will visualize the match between the three different approaches 
+applied to the asinh-transformed counts.
+
+```{r raw-counts, message=FALSE, fig.width=25, fig.height=7}
 library(patchwork)
+library(pheatmap)
+library(gridExtra)
+
 tab1 <- table(paste("Rphenograph", spe$pg_clusters), 
               paste("SNN", spe$nn_clusters))
 tab2 <- table(paste("Rphenograph", spe$pg_clusters), 
@@ -421,12 +435,25 @@ tab2 <- table(paste("Rphenograph", spe$pg_clusters),
 tab3 <- table(paste("SNN", spe$nn_clusters), 
               paste("SOM", spe$som_clusters))
 
-pheatmap(log10(tab1 + 10), color = viridis(100)) 
-pheatmap(log10(tab2 + 10), color = viridis(100)) 
-pheatmap(log10(tab3 + 10), color = viridis(100)) 
+pdf(NULL)
+ph1 <- pheatmap(log10(tab1 + 10), color = viridis(100))[[4]]
+ph2 <- pheatmap(log10(tab2 + 10), color = viridis(100))[[4]]
+ph3 <- pheatmap(log10(tab3 + 10), color = viridis(100))[[4]]
+dev.off()
+
+grid.arrange(ph1, ph2, ph3, nrow = 1, ncol = 3)
 ```
 
-```{r corrected}
+We observe that `Rphenograph` and the shared nearest neighbor (SNN) approach by `scran`
+show similar results (left heatmap above). For example, Rphenograph cluster 20 (a tumor cluster)
+is perfectly captured by SNN cluster 15. On the other hand, the B cell cluster (Rphenograph cluster 19)
+is split into SNN cluster 13 and SNN cluster 11. A common approach is to now merge clusters that contain
+similar cell types and annotate them by hand.
+
+Below, a comparison between the clustering results of the integrated cells 
+is shown.
+
+```{r corrected, message=FALSE, fig.width=25, fig.height=7}
 tab1 <- table(paste("Rphenograph", spe$pg_clusters_corrected), 
               paste("SNN", spe$nn_clusters_corrected))
 tab2 <- table(paste("Rphenograph", spe$pg_clusters_corrected), 
@@ -434,12 +461,30 @@ tab2 <- table(paste("Rphenograph", spe$pg_clusters_corrected),
 tab3 <- table(paste("SNN", spe$nn_clusters_corrected), 
               paste("SOM", spe$som_clusters_corrected))
 
-pheatmap(log10(tab1 + 10), color = viridis(100)) 
-pheatmap(log10(tab2 + 10), color = viridis(100)) 
-pheatmap(log10(tab3 + 10), color = viridis(100)) 
+pdf(NULL)
+ph1 <- pheatmap(log10(tab1 + 10), color = viridis(100))[[4]]
+ph2 <- pheatmap(log10(tab2 + 10), color = viridis(100))[[4]]
+ph3 <- pheatmap(log10(tab3 + 10), color = viridis(100))[[4]]
+dev.off()
+
+grid.arrange(ph1, ph2, ph3, nrow = 1, ncol = 3)
 ```
 
-Mention cluster stability metrics https://www.bioconductor.org/packages/release/bioc/vignettes/bluster/inst/doc/diagnostics.html
+In comparison to clustering on the non-integrated cells, the clustering results
+of the integrated cells show higher overlap. The SNN approach resulted in fewer
+clusters and therefore matches better with the SOM clustering approach.
+
+### Further clustering notes
+
+The `bluster` package provides a number of metrics to assess cluster stability
+[here](https://www.bioconductor.org/packages/release/bioc/vignettes/bluster/inst/doc/diagnostics.html).
+for brevity we only highlighted the use of the silouhette width but different
+metrics should be tested to assess cluster stability.
+
+To assign cell types to clusters, we manually annotate clusters based on their
+marker expression. For example, SNN cluster 11 (clustering of the integrated
+cells) shows high, homogeneous expression of CD20 and we might therefore label
+this cluster as B cells.
 
 ## Classification approaches {#classification}
 
