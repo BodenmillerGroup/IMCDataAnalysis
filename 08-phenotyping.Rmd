@@ -203,7 +203,7 @@ ggplot(data.frame(method = names(sil),
                   sil = sil)) +
     geom_point(aes(method, sil)) +
     theme_classic(base_size = 15) +
-    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+    theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
     xlab("Cluster parameter combination") +
     ylab("Average silhouette width")
 ```
@@ -244,6 +244,7 @@ clusters <- clusterCells(spe[rowData(spe)$use_channel,],
                          assay.type = "exprs", 
                          BLUSPARAM = NNGraphParam(k=20, 
                                                   cluster.fun = "louvain",
+                                                  type = "rank",
                                                   BPPARAM = bpparam()))
 
 spe$nn_clusters <- clusters
@@ -281,6 +282,7 @@ clusters <- clusterCells(spe[rowData(spe)$use_channel,],
                          use.dimred = "fastMNN", 
                          BLUSPARAM = NNGraphParam(k=20, 
                                                   cluster.fun = "louvain",
+                                                  type = "rank",
                                                   BPPARAM = bpparam()))
 
 spe$nn_clusters_corrected <- clusters
@@ -301,7 +303,18 @@ dittoHeatmap(spe[,cur_cells],
 
 ### FlowSOM
 
-Tobis paper?
+An alternative to graph-based clustering is offered by the
+[CATALYST](https://bioconductor.org/packages/release/bioc/html/CATALYST.html)
+package. The `cluster` function internally uses the
+[FlowSOM](https://bioconductor.org/packages/release/bioc/html/FlowSOM.html)
+package to group cells into 100 (default) clusters based on self organizing maps
+(SOM). In the next step, the
+[ConsensusClusterPlus](https://bioconductor.org/packages/release/bioc/html/ConsensusClusterPlus.html)
+package is used to perform hierarchical consensus clustering of the previously
+detected 100 SOM nodes into 1 to `maxK` clusters. Cluster stability for each `k`
+can be assessed by plotting the `delta_area(spe)`. The optimal number
+of clusters can be found by selecting the `k` at which a plateau is reached.
+In the example below, the optimal `k` lies somewhere around 13.
 
 ```{r, echo=FALSE}
 start_time <- Sys.time()
@@ -310,11 +323,13 @@ start_time <- Sys.time()
 ```{r flowSOM-1, message=FALSE}
 library(CATALYST)
 
+# Run FlowSOM and ConsensusClusterPlus clustering
 spe <- cluster(spe, 
                features = rownames(spe)[rowData(spe)$use_channel],
                maxK = 30,
                seed = 220410)
 
+# Assess cluster stability
 delta_area(spe)
 
 spe$som_clusters <- cluster_ids(spe, "meta13")
@@ -340,14 +355,43 @@ end_time <- Sys.time()
 Running FlowSOM clustering took  
 `r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
 
+The `CATALYST` package does not provide functionality to perform `FlowSOM` and
+`ConsensusClusterPlus` clustering directly on the integrated cells. As an
+alternative to the `CATALYST` package, `bluster` provides SOM clustering when
+specifying the `SomParam()` parameter. Similar to the `CATALYST` approach,
+we will first cluster the dataset into 100 clusters (also called "codes").
+These codes are then further clustered into a maximum of 30 clusters using 
+`ConsensusClusterPlus` (using hierarchical clustering and euclidean distance).
+The delta area plot can be accessed using the (not exported) `.plot_delta_area`
+function from `CATALYST`. Here, it seems that the plateau is reached at a
+`k` of 16 and we will store the final cluster IDs within the `SpatialExperiment`
+object.
+
 ```{r flowSOM-2, message=FALSE}
 library(kohonen)
+library(ConsensusClusterPlus)
+
+# Select integrated cells
 mat <- reducedDim(spe, "fastMNN")
 
+# Perform SOM clustering
 set.seed(1000)
-som.out <- clusterRows(mat, SomParam(13))
+som.out <- clusterRows(mat, SomParam(100), full = TRUE)
 
-spe$som_clusters_corrected <- som.out
+# Cluster the 100 SOM codes into larger clusters
+ccp <- ConsensusClusterPlus(t(som.out$objects$som$codes[[1]]),
+                            maxK = 30,
+                            reps = 100, 
+                            distance = "euclidean", 
+                            seed = 220410, 
+                            plot = NULL)
+
+# Visualize delta area plot
+CATALYST:::.plot_delta_area(ccp)
+
+# Link ConsensusClusterPlus clusters with SOM codes and save in object
+som.cluster <- ccp[[16]][["consensusClass"]][som.out$clusters]
+spe$som_clusters_corrected <- as.factor(som.cluster)
 
 dittoDimPlot(spe, var = "som_clusters_corrected", 
              reduction.use = "UMAP_mnnCorrected", size = 0.2,
@@ -363,7 +407,8 @@ dittoHeatmap(spe[,cur_cells],
                               metadata(spe)$color_vectors$patient_id))
 ```
 
-
+The `FlowSOM` clustering approach has been used by [@Hoch2022] to sub-cluster tumor
+cells as measured by IMC.
 
 ### Compare between clustering approaches
 
