@@ -17,8 +17,8 @@ publication](https://www.cell.com/cell-systems/fulltext/S2405-4712(18)30063-2) [
 * Allow the slide to dry completely (at least 30 minutes).  
 * Retrieve all the antibody conjugates used in the panel for which the spillover matrix is to be generated and place them on ice. 
 * Arrange them in a known order (e.g. mass of the conjugated metal).  
-* Pipette 0.3 ul spots of 0.4% trypan blue dye into an array on the slide. Prepare one spot per antibody, and make sure the spots are well separated. 
-* Pipette 0.3ul of each antibody conjugate (usually at 0.5mg/ml) onto a unique blue spot, taking care to avoid different antibodies bleeding into each other. Note the exact location of each conjugate on the slide. 
+* Pipette 0.3 µl spots of 0.4% trypan blue dye into an array on the slide. Prepare one spot per antibody, and make sure the spots are well separated. 
+* Pipette 0.3 µl of each antibody conjugate (usually at 0.5 mg/ml) onto a unique blue spot, taking care to avoid different antibodies bleeding into each other. Note the exact location of each conjugate on the slide. 
 * Let the spots dry completely, at least 1 hour. 
 
 **Spillover slide acquisition:**  
