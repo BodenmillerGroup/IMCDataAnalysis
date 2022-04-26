@@ -33,7 +33,8 @@ jobs:
                                             "RColorBrewer", "uwot", "Rtsne", "harmony", "Seurat", "SeuratObject", "cowplot",
                                             "kohonen"))'
       - name: Install Bioconductor dependencies
-        run: Rscript -e 'BiocManager::install(c("CATALYST", "scuttle", "scater", "dittoSeq", "tidyverse", "BiocStyle", "batchelor"))'
+        run: Rscript -e 'BiocManager::install(c("CATALYST", "scuttle", "scater", "dittoSeq", "tidyverse", "BiocStyle", "batchelor", "bluster",
+                                                "scran"))'
       - name: Install Github dependencies
         run: Rscript -e 'devtools::install_github(c("BodenmillerGroup/imcRtools", "BodenmillerGroup/cytomapper", "i-cyto/Rphenograph"))'    
       - name: Render Book
