@@ -1,34 +1,34 @@
 # Cell phenotyping 
 
-A common step during single-cell data analysis is the labeling of cells based
+A common step during single-cell data analysis is the annotation of cells based
 on their phenotype. Defining cell phenotypes is often subjective and relies
 on previous biological knowledge. The [Orchestrating Single Cell Analysis with Bioconductor](https://bioconductor.org/books/3.14/OSCA.basic/cell-type-annotation.html) book
 presents a number of approaches to phenotype cells detected by single-cell RNA
-sequencing based on reference datasets or prior knowledge of gene sets.
+sequencing based on reference datasets or prior knowledge of geneset importance.
 
-In highly-multiplexed imaging, target proteins or moelcules are manually
+In highly-multiplexed imaging, target proteins or molecules are manually
 selected based on the biological question at hand. It narrows down the feature
 space and facilitates the manual annotation of clusters to derive cell
 phenotypes. We will therefore discuss and compare a number of clustering
 approaches to group cells based on their similarity in marker expression in
 Section \@ref(clustering).
 
-Unlike single-cell RNA sequencing and CyTOF data, single-cell data derived from
+Unlike single-cell RNA sequencing or CyTOF data, single-cell data derived from
 highly-multiplexed imaging data often suffers from "lateral spillover" between
 neighboring cells. This spillover caused by imperfect segmentation often hinders
 accurate clustering to define specific cell phenotypes in multiplexed imaging
 data. Tools have been developed to correct lateral spillover between cells
-[@Bai2021] but the approach requires careful selection of which markers to
+[@Bai2021] but the approach requires careful selection of the markers to
 correct. In Section \@ref(classification) we will train and apply a random
 forest classifier to classify cell phenotypes in the dataset as alternative
-approach for cell phenotyping. This approach has been previously used to
+approach for clustering-based cell phenotyping. This approach has been previously used to
 identify major cell phenotypes in metastatic melanoma and avoids clustering of
 cells [@Hoch2022].
 
 ## Load data
 
 We will first read in the previously generated `SpatialExperiment` object and
-sample 2000 cells of the dataset to visualize cluster annotations.
+sample 2000 cells to visualize cluster membership.
 
 ```{r read-data-pheno, message=FALSE}
 spe <- readRDS("data/spe.rds")
@@ -42,8 +42,8 @@ cur_cells <- sample(seq_len(ncol(spe)), 2000)
 
 In the first section to identify cellular phenotypes in the dataset, we will
 present clustering approaches that group cells based on their similarity in
-marker expression. A number approaches have been developed to cluster data
-derived from single-cell RNA sequencing technologies [TODO ref] or CyTOF
+marker expression. A number of approaches have been developed to cluster data
+derived from single-cell RNA sequencing technologies [@Yu2022] or CyTOF
 [@Weber2016]. For demonstration purposes, we will highlight common clustering
 approaches that are available in R and have been used for clustering cells
 obtained from IMC. Two approaches rely on graph-based clustering and one
@@ -52,13 +52,14 @@ approach uses self organizing maps (SOM).
 ### Rphenograph
 
 The PhenoGraph clustering approach was first described to group cells of a CyTOF
-dataset in [@Levine2015]. The algorithm first constructs a graph by detecting
-the `k` nearest neighbours based on euclidean distance in expression space. In
-the next step, edges between nodes (cells) are weighted by their overlap in
-nearest neighbor sets. To quantify the overlap in shared nearest neighbors, the
-jaccard index is used. The Louvain modularity optimization approach is used
-to detect connected communities and partition the graph into cluster of cells.
-This clustering strategy was used by [@Jackson2020] to cluster IMC data.
+dataset [@Levine2015]. The algorithm first constructs a graph by detecting the
+`k` nearest neighbours based on euclidean distance in expression space. In the
+next step, edges between nodes (cells) are weighted by their overlap in nearest
+neighbor sets. To quantify the overlap in shared nearest neighbor sets, the
+jaccard index is used. The Louvain modularity optimization approach is used to
+detect connected communities and partition the graph into cluster of cells. This
+clustering strategy was used by Jackson, Fischer _et al._ to
+cluster IMC data [@Jackson2020].
 
 There are several different PhenoGraph implementations available in R. Here, we
 use the one available at
@@ -101,7 +102,9 @@ dittoDimPlot(spe, var = "pg_clusters",
              reduction.use = "UMAP", size = 0.2,
              do.label = TRUE) +
     ggtitle("Phenograph clusters expression on UMAP")
+```
 
+```{r, fig.height=8}
 dittoHeatmap(spe[,cur_cells], 
              genes = rownames(spe)[rowData(spe)$use_channel],
              assay = "exprs", scale = "none",
@@ -136,8 +139,10 @@ spe$pg_clusters_corrected <- clusters
 dittoDimPlot(spe, var = "pg_clusters_corrected", 
              reduction.use = "UMAP_mnnCorrected", size = 0.2,
              do.label = TRUE) +
-    ggtitle("Phenograph clusters expression on UMAP")
+    ggtitle("Phenograph clusters expression on UMAP, integrated cells")
+```
 
+```{r, fig.height=8}
 dittoHeatmap(spe[,cur_cells], 
              genes = rownames(spe)[rowData(spe)$use_channel],
              assay = "exprs", scale = "none",
@@ -148,8 +153,9 @@ dittoHeatmap(spe[,cur_cells],
 ```
 
 Clustering using the integrated embedding leads to clusters that contain cells
-of different patients. Cluster annotation can now be performed by manually labeling
-cells based on their marker expression. 
+of different patients. Cluster annotation can now be performed by manually
+labeling cells based on their marker expression (see Notes in Section
+\@ref(clustering-notes)).
 
 ### Shared nearest neighbour graph
 
@@ -161,7 +167,7 @@ For simplicity, we will focus on graph based clustering as this is the most
 popular and a fast method for single-cell clustering. The `bluster` package
 provides functionalities to build k-nearest neighbour (KNN) and it's weighted
 version (shared nearest neighbor; SNN) graphs where nodes represent cells.
-The user can chose the number of neighbors to consider (parameter `k`), the 
+The user can chose the number of neighbors to consider (parameter `k`), 
 the edge weighting method (parameter `type`) and the community detection
 function to use (parameter `cluster.fun`). As all parameters affect the clustering
 results, the `bluster` package provides the `clusterSweep` function to test
@@ -182,7 +188,7 @@ cells that are well clustered.
 start_time <- Sys.time()
 ```
 
-```{r parameter-sweep, message=FALSE}
+```{r parameter-sweep, message=FALSE, fig.height=7}
 library(bluster)
 library(BiocParallel)
 library(ggplot2)
@@ -203,7 +209,7 @@ ggplot(data.frame(method = names(sil),
                   sil = sil)) +
     geom_point(aes(method, sil)) +
     theme_classic(base_size = 15) +
-    theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
     xlab("Cluster parameter combination") +
     ylab("Average silhouette width")
 ```
@@ -215,7 +221,7 @@ end_time <- Sys.time()
 The cluster parameter sweep took 
 `r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
 
-Performing a cluster sweep takes some time as multiple clustering are run in parallel.
+Performing a cluster sweep takes some time as multiple function calls are run in parallel.
 We do however recommend testing a number of different parameter settings to
 access clustering performance.
 
@@ -229,9 +235,9 @@ function detects the 10 nearest neighbours for each cell, performs rank-based
 weighting of edges (see `?makeSNNGraph` for more information) and uses the
 `cluster_walktrap` function to detect communities in the graph.
 
-As we can see above, the `louvain` community detection approach outperforms the 
-default `walktrap` approach in this dataset. We also increase the number of nearest
-neighbors to decrease granularity of the resulting clusters.
+As we can see above, the `louvain` community detection approach outperforms the
+default `walktrap` approach in this dataset with `k` being 20 and rank-based
+edge weighting.
 
 ```{r, echo=FALSE}
 start_time <- Sys.time()
@@ -253,7 +259,9 @@ dittoDimPlot(spe, var = "nn_clusters",
              reduction.use = "UMAP", size = 0.2,
              do.label = TRUE) +
     ggtitle("SNN clusters expression on UMAP")
+```
 
+```{r, fig.height=8}
 dittoHeatmap(spe[,cur_cells], 
              genes = rownames(spe)[rowData(spe)$use_channel],
              assay = "exprs", scale = "none",
@@ -290,8 +298,10 @@ spe$nn_clusters_corrected <- clusters
 dittoDimPlot(spe, var = "nn_clusters_corrected", 
              reduction.use = "UMAP_mnnCorrected", size = 0.2,
              do.label = TRUE) +
-    ggtitle("SNN clusters expression on UMAP")
+    ggtitle("SNN clusters expression on UMAP, integrated cells")
+```
 
+```{r, fig.height=8}
 dittoHeatmap(spe[,cur_cells], 
              genes = rownames(spe)[rowData(spe)$use_channel],
              assay = "exprs", scale = "none",
@@ -338,12 +348,14 @@ dittoDimPlot(spe, var = "som_clusters",
              reduction.use = "UMAP", size = 0.2,
              do.label = TRUE) +
     ggtitle("SOM clusters expression on UMAP")
+```
 
+```{r, fig.height=8}
 dittoHeatmap(spe[,cur_cells], 
              genes = rownames(spe)[rowData(spe)$use_channel],
              assay = "exprs", scale = "none",
              heatmap.colors = viridis(100), 
-             annot.by = "som_clusters",
+             annot.by = c("som_clusters", "patient_id"),
              annot.colors = c(dittoColors(1)[1:length(unique(spe$som_clusters))],
                               metadata(spe)$color_vectors$patient_id))
 ```
@@ -352,22 +364,21 @@ dittoHeatmap(spe[,cur_cells],
 end_time <- Sys.time()
 ```
 
-Running FlowSOM clustering took  
-`r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
+Running FlowSOM clustering took `r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
 
 The `CATALYST` package does not provide functionality to perform `FlowSOM` and
 `ConsensusClusterPlus` clustering directly on the integrated cells. As an
-alternative to the `CATALYST` package, `bluster` provides SOM clustering when
-specifying the `SomParam()` parameter. Similar to the `CATALYST` approach,
-we will first cluster the dataset into 100 clusters (also called "codes").
-These codes are then further clustered into a maximum of 30 clusters using 
-`ConsensusClusterPlus` (using hierarchical clustering and euclidean distance).
-The delta area plot can be accessed using the (not exported) `.plot_delta_area`
-function from `CATALYST`. Here, it seems that the plateau is reached at a
-`k` of 16 and we will store the final cluster IDs within the `SpatialExperiment`
-object.
+alternative to the `CATALYST` package, the `bluster` package provides SOM
+clustering when specifying the `SomParam()` parameter. Similar to the `CATALYST`
+approach, we will first cluster the dataset into 100 clusters (also called
+"codes"). These codes are then further clustered into a maximum of 30 clusters
+using `ConsensusClusterPlus` (using hierarchical clustering and euclidean
+distance). The delta area plot can be accessed using the (not exported)
+`.plot_delta_area` function from `CATALYST`. Here, it seems that the plateau is
+reached at a `k` of 16 and we will store the final cluster IDs within the
+`SpatialExperiment` object.
 
-```{r flowSOM-2, message=FALSE}
+```{r flowSOM-2, message=FALSE, results='hide', fig.show='hide'}
 library(kohonen)
 library(ConsensusClusterPlus)
 
@@ -379,15 +390,15 @@ set.seed(1000)
 som.out <- clusterRows(mat, SomParam(100), full = TRUE)
 
 # Cluster the 100 SOM codes into larger clusters
-pdf(NULL)
 ccp <- ConsensusClusterPlus(t(som.out$objects$som$codes[[1]]),
                             maxK = 30,
                             reps = 100, 
                             distance = "euclidean", 
                             seed = 220410, 
                             plot = NULL)
-dev.off()
+```
 
+```{r}
 # Visualize delta area plot
 CATALYST:::.plot_delta_area(ccp)
 
@@ -398,13 +409,15 @@ spe$som_clusters_corrected <- as.factor(som.cluster)
 dittoDimPlot(spe, var = "som_clusters_corrected", 
              reduction.use = "UMAP_mnnCorrected", size = 0.2,
              do.label = TRUE) +
-    ggtitle("Phenograph clusters expression on UMAP")
+    ggtitle("Phenograph clusters expression on UMAP, integrated cells")
+```
 
+```{r, fig.height=8}
 dittoHeatmap(spe[,cur_cells], 
              genes = rownames(spe)[rowData(spe)$use_channel],
              assay = "exprs", scale = "none",
              heatmap.colors = viridis(100), 
-             annot.by = "som_clusters_corrected",
+             annot.by = c("som_clusters_corrected", "patient_id"),
              annot.colors = c(dittoColors(1)[1:length(unique(spe$som_clusters_corrected))],
                               metadata(spe)$color_vectors$patient_id))
 ```
@@ -423,7 +436,7 @@ detected in both approaches.
 First, we will visualize the match between the three different approaches 
 applied to the asinh-transformed counts.
 
-```{r raw-counts, message=FALSE, fig.width=25, fig.height=7}
+```{r raw-counts, message=FALSE, results='hide', fig.show='hide'}
 library(patchwork)
 library(pheatmap)
 library(gridExtra)
@@ -435,12 +448,12 @@ tab2 <- table(paste("Rphenograph", spe$pg_clusters),
 tab3 <- table(paste("SNN", spe$nn_clusters), 
               paste("SOM", spe$som_clusters))
 
-pdf(NULL)
 ph1 <- pheatmap(log10(tab1 + 10), color = viridis(100))[[4]]
 ph2 <- pheatmap(log10(tab2 + 10), color = viridis(100))[[4]]
 ph3 <- pheatmap(log10(tab3 + 10), color = viridis(100))[[4]]
-dev.off()
+```
 
+```{r, fig.width=25, fig.height=7}
 grid.arrange(ph1, ph2, ph3, nrow = 1, ncol = 3)
 ```
 
@@ -453,7 +466,7 @@ similar cell types and annotate them by hand.
 Below, a comparison between the clustering results of the integrated cells 
 is shown.
 
-```{r corrected, message=FALSE, fig.width=25, fig.height=7}
+```{r corrected, message=FALSE, results='hide', fig.show='hide'}
 tab1 <- table(paste("Rphenograph", spe$pg_clusters_corrected), 
               paste("SNN", spe$nn_clusters_corrected))
 tab2 <- table(paste("Rphenograph", spe$pg_clusters_corrected), 
@@ -461,12 +474,12 @@ tab2 <- table(paste("Rphenograph", spe$pg_clusters_corrected),
 tab3 <- table(paste("SNN", spe$nn_clusters_corrected), 
               paste("SOM", spe$som_clusters_corrected))
 
-pdf(NULL)
 ph1 <- pheatmap(log10(tab1 + 10), color = viridis(100))[[4]]
 ph2 <- pheatmap(log10(tab2 + 10), color = viridis(100))[[4]]
 ph3 <- pheatmap(log10(tab3 + 10), color = viridis(100))[[4]]
-dev.off()
+```
 
+```{r, fig.width=25, fig.height=7}
 grid.arrange(ph1, ph2, ph3, nrow = 1, ncol = 3)
 ```
 
@@ -474,17 +487,17 @@ In comparison to clustering on the non-integrated cells, the clustering results
 of the integrated cells show higher overlap. The SNN approach resulted in fewer
 clusters and therefore matches better with the SOM clustering approach.
 
-### Further clustering notes
+### Further clustering notes {#clustering-notes}
 
 The `bluster` package provides a number of metrics to assess cluster stability
 [here](https://www.bioconductor.org/packages/release/bioc/vignettes/bluster/inst/doc/diagnostics.html).
-for brevity we only highlighted the use of the silouhette width but different
+For brevity we only highlighted the use of the silouhette width but different
 metrics should be tested to assess cluster stability.
 
 To assign cell types to clusters, we manually annotate clusters based on their
 marker expression. For example, SNN cluster 11 (clustering of the integrated
 cells) shows high, homogeneous expression of CD20 and we might therefore label
-this cluster as B cells.
+this cluster as B cells. Full cell labeling can be seen in the following section.
 
 ## Classification approaches {#classification}
 
