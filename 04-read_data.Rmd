@@ -127,7 +127,7 @@ storing single-cell data is contained in the `cpout` folder.
 For reading in the single-cell measurement, the `imcRtools` package offers the
 `read_cpout` function:
 
-````{r read-cpout}
+```{r read-cpout}
 spe2 <- read_cpout("data/ImcSegmentationPipeline/analysis/cpout/")
 rownames(spe2) <- rowData(spe2)$Clean_Target
 spe2
