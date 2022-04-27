@@ -204,7 +204,7 @@ combinations <- clusterSweep(mat[sam_cells,], BLUSPARAM=SNNGraphParam(),
                              k=c(10L, 20L), 
                              type = c("rank", "jaccard"), 
                              cluster.fun=c("walktrap", "louvain"),
-                             BPPARAM = bpparam())
+                             BPPARAM = MulticoreParam(RNGseed = 220427))
 
 sil <- vapply(as.list(combinations$clusters), 
               function(x) mean(approxSilhouette(mat[sam_cells,], x)$width), 
@@ -462,11 +462,12 @@ ph3 <- pheatmap(log10(tab3 + 10), color = viridis(100))[[4]]
 grid.arrange(ph1, ph2, ph3, nrow = 1, ncol = 3)
 ```
 
-We observe that `Rphenograph` and the shared nearest neighbor (SNN) approach by `scran`
-show similar results (left heatmap above). For example, Rphenograph cluster 20 (a tumor cluster)
-is perfectly captured by SNN cluster 15. On the other hand, the B cell cluster (Rphenograph cluster 19)
-is split into SNN cluster 13 and SNN cluster 11. A common approach is to now merge clusters that contain
-similar cell types and annotate them by hand.
+We observe that `Rphenograph` and the shared nearest neighbor (SNN) approach by
+`scran` show similar results (left heatmap above). For example, Rphenograph
+cluster 15 (a tumor cluster) is perfectly captured by SNN cluster 12. On the
+other hand, another tumor cluster (SNN cluster 1) is split into Rphenograph
+cluster 1 and Rphenograph cluster 11. A common approach is to now merge clusters
+that contain similar cell types and annotate them by hand.
 
 Below, a comparison between the clustering results of the integrated cells 
 is shown.
