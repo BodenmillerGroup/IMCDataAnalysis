@@ -184,6 +184,9 @@ Please see `?silhouette` for more information on how the silhouette
 width id computed for each cell. A large average silhouette width indicates 
 cells that are well clustered.
 
+For time reasons, we sample 10000 cells but it is recommended to increase
+this number to include rare cells into parameter testing.
+
 ```{r, echo=FALSE}
 start_time <- Sys.time()
 ```
@@ -193,16 +196,18 @@ library(bluster)
 library(BiocParallel)
 library(ggplot2)
 
+sam_cells <- sample(seq_len(ncol(spe)), 10000)
+
 mat <- t(assay(spe, "exprs")[rowData(spe)$use_channel,])
 
-combinations <- clusterSweep(mat, BLUSPARAM=SNNGraphParam(),
+combinations <- clusterSweep(mat[sam_cells,], BLUSPARAM=SNNGraphParam(),
                              k=c(10L, 20L), 
                              type = c("rank", "jaccard"), 
                              cluster.fun=c("walktrap", "louvain"),
                              BPPARAM = bpparam())
 
 sil <- vapply(as.list(combinations$clusters), 
-              function(x) mean(approxSilhouette(mat, x)$width), 
+              function(x) mean(approxSilhouette(mat[sam_cells,], x)$width), 
               0)
 
 ggplot(data.frame(method = names(sil),
