@@ -31,6 +31,7 @@ We will first read in the previously generated `SpatialExperiment` object and
 sample 2000 cells to visualize cluster membership.
 
 ```{r read-data-pheno, message=FALSE}
+library(SpatialExperiment)
 spe <- readRDS("data/spe.rds")
 
 # Sample cells
@@ -391,7 +392,6 @@ library(ConsensusClusterPlus)
 mat <- reducedDim(spe, "fastMNN")
 
 # Perform SOM clustering
-set.seed(1000)
 som.out <- clusterRows(mat, SomParam(100), full = TRUE)
 
 # Cluster the 100 SOM codes into larger clusters
