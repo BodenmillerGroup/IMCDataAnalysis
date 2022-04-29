@@ -35,7 +35,7 @@ library(SpatialExperiment)
 spe <- readRDS("data/spe.rds")
 
 # Sample cells
-set.seed(220410)
+set.seed(220429)
 cur_cells <- sample(seq_len(ncol(spe)), 2000)
 ```
 
@@ -464,10 +464,11 @@ grid.arrange(ph1, ph2, ph3, nrow = 1, ncol = 3)
 
 We observe that `Rphenograph` and the shared nearest neighbor (SNN) approach by
 `scran` show similar results (left heatmap above). For example, Rphenograph
-cluster 15 (a tumor cluster) is perfectly captured by SNN cluster 12. On the
-other hand, another tumor cluster (SNN cluster 1) is split into Rphenograph
-cluster 1 and Rphenograph cluster 11. A common approach is to now merge clusters
-that contain similar cell types and annotate them by hand.
+cluster 19 (a tumor cluster) is perfectly captured by SNN cluster 16. On the
+other hand, the CD4 T cells cluster (SNN cluster 12) is split into Rphenograph
+cluster 9, Rphenograph cluster 15 and Rphenograph cluster 17. A common approach
+is to now merge clusters that contain similar cell types and annotate them by
+hand.
 
 Below, a comparison between the clustering results of the integrated cells 
 is shown.
