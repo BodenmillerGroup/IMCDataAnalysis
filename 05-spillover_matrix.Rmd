@@ -9,8 +9,34 @@ intensities per spot need to be available. For complete details on the spillover
 correction approach, please refer to [the original
 publication](https://www.cell.com/cell-systems/fulltext/S2405-4712(18)30063-2) [@Chevrier2017].
 
-The original code is available on Github
-[here](https://github.com/BodenmillerGroup/cyTOFcompensation), however, due to
+**Spillover slide preparation:**  
+
+* Prepare 2% agarose in double distilled H$_2$O in a beaker and melt it in a microwave until well dissolved. 
+* Dip a blank superfrost plus glass microscope slide into the agarose and submerge it until the label. 
+* Remove the slide and prop it up against a support to allow the excess agarose to run off onto paper towels.  
+* Allow the slide to dry completely (at least 30 minutes).  
+* Retrieve all the antibody conjugates used in the panel for which the spillover matrix is to be generated and place them on ice. 
+* Arrange them in a known order (e.g. mass of the conjugated metal).  
+* Pipette 0.3 µl spots of 0.4% trypan blue dye into an array on the slide. Prepare one spot per antibody, and make sure the spots are well separated. 
+* Pipette 0.3 µl of each antibody conjugate (usually at 0.5 mg/ml) onto a unique blue spot, taking care to avoid different antibodies bleeding into each other. Note the exact location of each conjugate on the slide. 
+* Let the spots dry completely, at least 1 hour. 
+
+**Spillover slide acquisition:**  
+
+* Create a .jpeg or .png image of the slide using a mobile phone camera or flat-bed scanner.  
+* In the CyTOF software, create a new file and import the slide image into it. 
+* Create a panorama across all the spots to visualize their locations.  
+* Within each spot, create a region of interest (ROI) with a width of 200 pixels and a height of 10 pixels.  
+* Name each ROI with the mass and name of the metal conjugate contained in the spot, e.g "Ir193" or "Ho165". This will be how each .txt file is named. 
+* Set the profiling type of each ROI to "Local".  
+* Apply the antibody panel to all the ROIs. This panel should contain all (or more) of the isotopes in the panel, with the correct metal specified. For example: if the metal used is Barium 138, make sure this, rather than Lanthanum 138, is selected. 
+* Save the file, make sure "Generate Text File" is selected, and start the acquisition. 
+
+This procedure will generate an MCD file similar to the one available on zenodo:
+[https://zenodo.org/record/5949116/files/compensation.zip](https://zenodo.org/record/5949116/files/compensation.zip)
+
+The original code of the spillover correction manuscript is available on Github
+[here](https://github.com/BodenmillerGroup/cyTOFcompensation); however, due to
 changes in the
 [CATALYST](https://bioconductor.org/packages/release/bioc/html/CATALYST.html)
 package, users were not able to reproduce the analysis using the newest software

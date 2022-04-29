@@ -7,3 +7,5 @@ data/*
 docs/
 IMCDataAnalysis.Rmd
 IMCDataAnalysis_files/
+IMCDataAnalysis.rds
+_bookdown_files/

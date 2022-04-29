@@ -1,6 +1,6 @@
 --- 
 title: "Analysis workflow for IMC data"
-author: "**Authors:** Nils Eling [<sup>1</sup>](#DQBM)<sup>,</sup>[<sup>2</sup>](#IMHS)<sup>,</sup>[<sup>*</sup>](#email), Vito Zanotelli [<sup>1</sup>](#DQBM)<sup>,</sup>[<sup>2</sup>](#IMHS), Daniel Schulz [<sup>1</sup>](#DQBM)<sup>,</sup>[<sup>2</sup>](#IMHS), Jonas Windhager [<sup>1</sup>](#DQBM)<sup>,</sup>[<sup>2</sup>](#IMHS)"
+author: "**Authors:** Nils Eling [<sup>1</sup>](#DQBM)<sup>,</sup>[<sup>2</sup>](#IMHS)<sup>,</sup>[<sup>*</sup>](#email), Vito Zanotelli [<sup>1</sup>](#DQBM)<sup>,</sup>[<sup>2</sup>](#IMHS), Michelle Daniel [<sup>1</sup>](#DQBM)<sup>,</sup>[<sup>2</sup>](#IMHS), Daniel Schulz [<sup>1</sup>](#DQBM)<sup>,</sup>[<sup>2</sup>](#IMHS), Jonas Windhager [<sup>1</sup>](#DQBM)<sup>,</sup>[<sup>2</sup>](#IMHS)"
 date: "**Compiled:** `r Sys.Date()`"
 site: bookdown::bookdown_site
 github-repo: "BodenmillerGroup/IMCDataAnalysis"
