@@ -498,7 +498,7 @@ clusters and therefore matches better with the SOM clustering approach.
 
 The `bluster` package provides a number of metrics to assess cluster stability
 [here](https://www.bioconductor.org/packages/release/bioc/vignettes/bluster/inst/doc/diagnostics.html).
-For brevity we only highlighted the use of the silouhette width but different
+For brevity we only highlighted the use of the silhouette width but different
 metrics should be tested to assess cluster stability.
 
 To assign cell types to clusters, we manually annotate clusters based on their
@@ -506,15 +506,284 @@ marker expression. For example, SNN cluster 11 (clustering of the integrated
 cells) shows high, homogeneous expression of CD20 and we might therefore label
 this cluster as B cells. Full cell labeling can be seen in the following section.
 
-## Classification approaches {#classification}
+## Cell type classification {#classification}
+
+In this section, we will highlight a cell type classification approach based
+on ground truth labeling and random forest classification. 
 
 ### Manual labelling of cells
 
+The [cytomapper](https://www.bioconductor.org/packages/release/bioc/html/cytomapper.html)
+package provides the `cytomapperShiny` function that allows gating of cells
+based on their marker expression and visualization of selected cells directly
+on the images. 
+
+```{r cytomapperShiny}
+if (interactive()) {
+    library(cytomapper)
+    
+    images <- readRDS("data/images.rds")
+    masks <- readRDS("data/masks.rds")
+    
+    cytomapperShiny(object = spe, mask = masks, image = images, 
+                    cell_id = "ObjectNumber", img_id = "sample_id")
+}
+```
+
 ### Training a classifier
+
+Read in and consolidate data.
+
+```{r, message=FALSE}
+library(SingleCellExperiment)
+label.files <- list.files("/Volumes/projects/IMCWorkflow/Robjects/gated_cells/", 
+                          full.names = TRUE, pattern = ".rds$")
+
+# Read in SCE objects
+cur_sces <- lapply(label.files, readRDS)
+
+# Merge SCE objects
+cur_sce <- do.call("cbind", cur_sces)
+
+# Visualize number of cells labelled per patient
+table(cur_sce$cytomapper_CellLabel, cur_sce$patient_id)
+
+cur_vec <- cur_sce$cytomapper_CellLabel
+
+cur_tab <- unclass(table(colnames(cur_sce), cur_sce$cytomapper_CellLabel))
+cur_labels <- rep("doublets", nrow(cur_tab))
+
+# Single assignments
+cur_labels[rowSums(cur_tab) == 1] <- colnames(cur_tab)[apply(cur_tab[rowSums(cur_tab) == 1,], 1,  which.max)]
+
+table(cur_labels)
+
+# Remove doublets
+names(cur_labels) <- rownames(cur_tab)
+cur_labels <- cur_labels[cur_labels != "doublets"]
+table(cur_labels)
+
+spe_labels <- rep("unlabelled", ncol(spe))
+names(spe_labels) <- colnames(spe)
+spe_labels[names(cur_labels)] <- cur_labels
+spe$cell_labels <- spe_labels
+
+table(spe$cell_labels, spe$patient_id)
+```
+
+Train classifier
+
+```{r, echo=FALSE}
+start_time <- Sys.time()
+```
+
+```{r train-classifier, message=FALSE}
+library(caret)
+lab_spe <- spe[,spe$cell_labels != "unlabelled"]
+unlab_spe <- spe[,spe$cell_labels == "unlabelled"]
+
+set.seed(220510)
+trainIndex <- createDataPartition(factor(lab_spe$cell_labels), p = 0.75)
+train_spe <- lab_spe[,trainIndex$Resample1]
+test_spe <- lab_spe[,-trainIndex$Resample1]
+
+fitControl <- trainControl(method = "cv",
+                           number = 5)
+
+# Add dummy variables
+cur_mat <- t(assay(train_spe, "exprs")[rowData(train_spe)$use_channel,])
+
+set.seed(220510)
+rffit <- train(x = cur_mat, 
+               y = factor(train_spe$cell_labels),
+               method = "rf", ntree = 1000,
+               tuneLength = 5,
+               trControl = fitControl)
+```
+
+```{r, echo=FALSE}
+end_time <- Sys.time()
+```
+
+Training the classifier took 
+`r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
 
 ### Classifier performance
 
+```{r accuracy}
+ggplot(rffit) + 
+  geom_errorbar(data = rffit$results,
+                aes(ymin = Accuracy - AccuracySD,
+                    ymax = Accuracy + AccuracySD),
+                width = 0.4)
+```
+
+We can also compute the confusion matrix:
+
+```{r confusion-matrix}
+confusionMatrix(rffit)
+```
+
+We will also look at the variable importance.
+
+```{r variable-importance, fig.height = 15}
+plot(varImp(rffit))
+```
+
+Finally, we will validate the model using the test data.
+
+```{r model-testing, message=FALSE}
+library(tidyverse)
+
+# Add dummy variables
+cur_mat <- t(assay(test_spe, "exprs")[rowData(test_spe)$use_channel,])
+
+cur_pred <- predict(rffit, 
+                    newdata = cur_mat)
+
+cm <- confusionMatrix(data = cur_pred, 
+                reference = factor(test_spe$cell_labels), 
+                mode = "everything")
+
+cm
+
+data.frame(cm$byClass) %>%
+  mutate(class = sub("Class: ", "", rownames(cm$byClass))) %>%
+  ggplot() + 
+  geom_point(aes(1 - Specificity, Sensitivity, 
+                 size = Detection.Rate,
+                 fill = class),
+             shape = 21) + 
+  scale_fill_brewer(10, palette = "Set3") +
+  theme_bw() + 
+  ylab("Sensitivity (TPR)") +
+  xlab("1 - Specificity (FPR)")
+```
+
+We will also observe the distribution of classification probabilities per image and class:
+
+```{r prediciton-probability, fig.width = 15}
+cur_pred <- predict(rffit, 
+                    newdata = cur_mat, 
+                    type = "prob")
+cur_pred$truth <- factor(test_spe$cell_labels)
+
+cur_pred %>%
+  pivot_longer(cols = Bcell:Tumor) %>%
+  ggplot() +
+  geom_boxplot(aes(x = name, y = value, fill = name), outlier.size = 0.5) +
+  facet_wrap(. ~ truth) + 
+  scale_fill_brewer(10, palette = "Set3")  +
+  theme(panel.background = element_blank(), 
+        axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
 ### Classification of new data
+
+```{r}
+cur_mat <- t(assay(unlab_spe, "exprs")[rowData(unlab_spe)$use_channel,])
+
+cell_labels.class <- as.character(predict.train(rffit, 
+              newdata = cur_mat, 
+              type = "raw"))
+names(cell_labels.class) <- rownames(cur_mat)
+cell_labels.prob <- predict.train(rffit, 
+              newdata = cur_mat, 
+              type = "prob")
+
+cell_labels <- spe$cell_labels
+cell_labels[colnames(unlab_spe)] <- cell_labels.class
+
+spe$celltypes <- cell_labels 
+
+cur_probs <- matrix(NA, ncol = ncol(cell_labels.prob), nrow = ncol(spe))
+rownames(cur_probs) <- colnames(spe)
+colnames(cur_probs) <- colnames(cell_labels.prob)
+cur_probs[rownames(cell_labels.prob),] <- as.matrix(cell_labels.prob)
+
+spe$probabilities <- DataFrame(cur_probs)
+```
+
+Visualization in next sections
+
+
+```{r, echo=FALSE}
+library(testthat)
+test_that("images are written out", {
+    skip_on_ci()
+    cell_types <- unique(spe$celltypes)
+
+    markers <- vector(mode = "list", length = length(cell_types))
+    names(markers) <- cell_types
+
+    markers[["Bcell"]] <- c("CD20", "CD3")
+    markers[["Plasma_cell"]] <- c("CD38")
+    markers[["CD4"]] <- c("CD4", "CD8a", "FOXP3")
+    markers[["BnTcell"]] <- c("CD20","CD3")
+    markers[["CD8"]] <- c("CD4", "CD8a", "FOXP3")
+    markers[["Treg"]] <- c("CD4", "CD8a", "FOXP3")
+    markers[["Myeloid"]] <- c("CD11c", "CD68", "HLADR", "CD163")
+    markers[["Neutrophil"]] <- c("CD15", "MPO")
+    markers[["Stroma"]] <- c("SMA", "PDGFRb")
+    markers[["Tumor"]] <- c("Ecad")
+    
+    images <- readRDS("data/images.rds")
+    masks <- readRDS("data/masks.rds")
+    
+    images <- normalize(images, separateImages = TRUE)
+    images <- normalize(images, separateImages = TRUE, 
+                        inputRange = c(0, 0.2))
+    
+    dir.create("data/CellTypeValidation")
+    
+    for(j in unique(spe$celltypes)){
+        cur_sce <- spe[,spe$celltypes == j]
+        cur_markers <- markers[[j]]
+  
+        if(dim(cur_sce)[2] == 0) {
+            next(j)
+        }
+    
+        if (length(cur_markers) == 1) {
+            cur_col <- "red"
+            names(cur_col) <- j
+            cur_col <- list(cur_col)
+            names(cur_col) <- "celltypes"
+            plotPixels(image = images, 
+                object = cur_sce, 
+                mask = masks, 
+                cell_id = "ObjectNumber",
+                img_id = "sample_id", 
+                colour_by = cur_markers, 
+                outline_by = "celltypes",
+                image_title = list(text = names(images),
+                                cex = 1), 
+                colour = cur_col,
+                save_plot = list(filename = paste0("data/CellTypeValidation/",
+                            j, ".png")))
+        } else {
+            plotPixels(image = images,
+                   object = cur_sce, 
+                   mask = masks, 
+                   cell_id = "ObjectNumber",
+                   img_id = "sample_id", 
+                   colour_by = cur_markers, 
+                   outline_by = "celltypes",
+                   image_title = list(text = names(images),
+                                  cex = 1),
+                   save_plot = list(filename = paste0("data/CellTypeValidation/",
+                            j, ".png")))
+    }
+}
+    
+})
+```
+
+Finally, we save the updated `SpatialExperiment` object.
+
+```{r phenotyping-save-object}
+saveRDS(spe, "data/spe.rds")
+```
 
 ## Session Info
 
