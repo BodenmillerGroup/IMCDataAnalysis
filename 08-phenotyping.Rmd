@@ -509,7 +509,34 @@ this cluster as B cells. Full cell labeling can be seen in the following section
 ## Cell type classification {#classification}
 
 In this section, we will highlight a cell type classification approach based
-on ground truth labeling and random forest classification. 
+on ground truth labeling and random forest classification. The rational for
+this supervised cell phenotyping approach is to use the information contained
+in the pre-defined markers to detect cells of interest. This approach was
+used by Hoch _et al._ to classify cell types in a metastatic melanoma IMC
+dataset [@Hoch2022].
+
+The antibody panel used in the example data set mainly focuses on immune cell
+types and little on tumor cell phenotypes. Therefore we will label the following
+cell types:
+
+* Tumor (E-cadherin positive)
+* Stroma (SMA, PDGFRb positive)
+* Plasma cells (CD38 positive)
+* Neutrophil (MPO, CD15 positive)
+* Myeloid cells (HLADR positive)
+* B cells (CD20 positive)
+* B next to T cells (CD20, CD3 positive)
+* Regulatory T cells (FOXP3 positive)
+* CD8+ T cells (CD3, CD8 positive)
+* CD4+ T cells (CD3, CD4 positive)
+
+The "B next to T cell" phenotype (`BnTcell`) is commonly observed in immune 
+infiltrated regions measured by IMC. We include this phenotype to account
+for B cell/T cell interactions where precise classification into B cells or
+T cells is not possible. The exact gating scheme can be seen at [TODO]().
+
+As a related approach, [Astir](TODO) and [Garnet](TODO) use pre-defined panel information
+to classify cell phenotypes based on their marker expression.
 
 ### Manual labelling of cells
 
@@ -530,48 +557,99 @@ if (interactive()) {
 }
 ```
 
-### Training a classifier
+The labelled cells for this data set can be accessed at [TODO](TODO) and were
+downloaded in Section \@ref(prerequisites). Per image, the `cytomapperShiny`
+function allows the export of gated cells in form of `SingleCellExperiment` or
+`SpatialExperiment` objects. The cell label is stored in
+`colData(object)$cytomapper_CellLabel` and the gates are stored in
+`metadata(object)`. In the next section, we will read in and consolidate the
+labelled data.
 
-Read in and consolidate data.
+### Read in and consolidate labelled data
 
-```{r, message=FALSE}
+Here, we will read in the individual `SpatialExperiment` objects containing the
+labelled cells and concatenate them. In the process of concatenating the 
+`SpatialExperiment` objects along their columns, the `sample_id` entry is 
+appended by `.1, .2, .3, ...` due to replicated entries. The last row in this
+code chunk sets the `sample_id` entry back to its original entry.
+
+```{r, read-in-labelled-data, message=FALSE}
 library(SingleCellExperiment)
-label.files <- list.files("/Volumes/projects/IMCWorkflow/Robjects/gated_cells/", 
+label_files <- list.files("/Volumes/projects/IMCWorkflow/Robjects/gated_cells/", 
                           full.names = TRUE, pattern = ".rds$")
 
-# Read in SCE objects
-cur_sces <- lapply(label.files, readRDS)
+# Read in SPE objects
+spes <- lapply(label_files, readRDS)
 
-# Merge SCE objects
-cur_sce <- do.call("cbind", cur_sces)
+# Merge SPE objects
+concat_spe <- do.call("cbind", spes)
+```
 
-# Visualize number of cells labelled per patient
-table(cur_sce$cytomapper_CellLabel, cur_sce$patient_id)
+In the next section we will identify cells that were labeled multiple times.
+This occurs when different cell phenotypes are gated per image and in this 
+dataset affects immune cells that are located inside the tumor compartment.
 
-cur_vec <- cur_sce$cytomapper_CellLabel
+We will first identify those cells that were uniquely labelled and assign their
+label. In the next step, we will identify those cells that were labelled twice
+AND were labelled as Tumor cells. These cells will be assigned their immune cell
+label. Finally, we will save the unique labels within the original
+`SpatialExperiment` object.
 
-cur_tab <- unclass(table(colnames(cur_sce), cur_sce$cytomapper_CellLabel))
+```{r, consolidate-labels}
+cur_tab <- unclass(table(colnames(concat_spe), 
+                         concat_spe$cytomapper_CellLabel))
 cur_labels <- rep("doublets", nrow(cur_tab))
+names(cur_labels) <- rownames(cur_tab)
 
 # Single assignments
-cur_labels[rowSums(cur_tab) == 1] <- colnames(cur_tab)[apply(cur_tab[rowSums(cur_tab) == 1,], 1,  which.max)]
+single_index <- rowSums(cur_tab) == 1
+cur_labels[single_index] <- colnames(cur_tab)[apply(cur_tab[single_index,], 1, 
+                                                    which.max)]
 
-table(cur_labels)
+# Double assignment within the tumor
+double_index <- rowSums(cur_tab) == 2 & cur_tab[,"Tumor"] == 1
+no_tumor <- cur_tab[,colnames(cur_tab) != "Tumor"]
+cur_labels[double_index] <- colnames(no_tumor)[apply(no_tumor[double_index,], 1, 
+                                                    which.max)]
 
 # Remove doublets
-names(cur_labels) <- rownames(cur_tab)
 cur_labels <- cur_labels[cur_labels != "doublets"]
 table(cur_labels)
 
+# Transfer labels to SPE object
 spe_labels <- rep("unlabelled", ncol(spe))
 names(spe_labels) <- colnames(spe)
 spe_labels[names(cur_labels)] <- cur_labels
 spe$cell_labels <- spe_labels
 
+# Number of cells labelled per patient
 table(spe$cell_labels, spe$patient_id)
 ```
 
-Train classifier
+Based on these labels, we can now train a random forest classifier to classify
+all remaining, unlabelled cells.
+
+## Train classifier
+
+In this section, we will use the [caret](TODO) framework for machine learning
+in R. This package provides an interface to train a number of regression and
+classification models in a coherent fashion. We use a random forest classifier
+due to low number of parameters, speed and an observed high performance for
+cell type classification [@Hoch2022].
+
+In the following section, we will first split the `SpatialExperiment` object
+into labelled and unlabelled cells. Based on the labelled cells, we split
+the data into a train (75% of the data) and test (25% of the data) dataset. 
+We currently do not provide an independently labelled validation dataset.
+
+The `caret` package provides the `trainControl` function, which specifies model
+training parameters and the `train` function, which performs the actual model
+training. While training the model, we also want to estimate the best model
+parameters. In the case of the chosen random forest model (`method = "rf"`), we
+only need to estimate a single parameters (`mtry`) which corresponds to the
+number of variables randomly sampled as candidates at each split. To estimate
+the best parameter, we will perform a 5-fold cross validation (se within
+`trainControl`) over a tune length of 5 entries to `mtry`.
 
 ```{r, echo=FALSE}
 start_time <- Sys.time()
@@ -579,26 +657,34 @@ start_time <- Sys.time()
 
 ```{r train-classifier, message=FALSE}
 library(caret)
+
+# Split between labelled and unlabelled cells
 lab_spe <- spe[,spe$cell_labels != "unlabelled"]
 unlab_spe <- spe[,spe$cell_labels == "unlabelled"]
 
+# Randomly split into train and test data
 set.seed(220510)
 trainIndex <- createDataPartition(factor(lab_spe$cell_labels), p = 0.75)
 train_spe <- lab_spe[,trainIndex$Resample1]
 test_spe <- lab_spe[,-trainIndex$Resample1]
 
+# Specify train parameters for 5-fold cross validation
 fitControl <- trainControl(method = "cv",
                            number = 5)
 
-# Add dummy variables
+# Select the data for training
 cur_mat <- t(assay(train_spe, "exprs")[rowData(train_spe)$use_channel,])
 
+# Train a random forest model for predicting cell labels
+# This call also performs parameter tuning
 set.seed(220510)
 rffit <- train(x = cur_mat, 
                y = factor(train_spe$cell_labels),
                method = "rf", ntree = 1000,
                tuneLength = 5,
                trControl = fitControl)
+
+rffit
 ```
 
 ```{r, echo=FALSE}
@@ -610,12 +696,18 @@ Training the classifier took
 
 ### Classifier performance
 
+We next observe the accuracy of the classifer when predicting cell 
+phenotypes across the cross-validation as well as the test dataset.
+
+
+
 ```{r accuracy}
 ggplot(rffit) + 
   geom_errorbar(data = rffit$results,
                 aes(ymin = Accuracy - AccuracySD,
                     ymax = Accuracy + AccuracySD),
-                width = 0.4)
+                width = 0.4) +
+    theme_classic(base_size = 15)
 ```
 
 We can also compute the confusion matrix:
