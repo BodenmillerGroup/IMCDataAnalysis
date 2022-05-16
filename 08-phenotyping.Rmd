@@ -575,7 +575,7 @@ code chunk sets the `sample_id` entry back to its original entry.
 
 ```{r, read-in-labelled-data, message=FALSE}
 library(SingleCellExperiment)
-label_files <- list.files("/Volumes/projects/IMCWorkflow/Robjects/gated_cells/", 
+label_files <- list.files("data/gated_cells/", 
                           full.names = TRUE, pattern = ".rds$")
 
 # Read in SPE objects
@@ -810,7 +810,7 @@ cur_mat <- t(assay(unlab_spe, "exprs")[rowData(unlab_spe)$use_channel,])
 cell_class <- as.character(predict.train(rffit, 
                                          newdata = cur_mat, 
                                          type = "raw"))
-names(cell_labels.class) <- rownames(cur_mat)
+names(cell_class) <- rownames(cur_mat)
 
 # Extract classification probabilities
 cell_prob <- predict.train(rffit, 
@@ -838,11 +838,11 @@ tibble(max_prob = rowMax(as.matrix(cell_prob)),
         xlim(c(0,1.2))
 
 # Label undefined cells
-cell_labels.class[rowMax(as.matrix(cell_labels.prob)) < 0.4] <- "undefined"
+cell_class[rowMax(as.matrix(cell_prob)) < 0.4] <- "undefined"
 
 # Store labels in SpatialExperiment onject
 cell_labels <- spe$cell_labels
-cell_labels[colnames(unlab_spe)] <- cell_labels.class
+cell_labels[colnames(unlab_spe)] <- cell_class
 spe$celltype <- cell_labels 
 
 table(spe$celltype, spe$patient_id)
@@ -892,10 +892,11 @@ ph3 <- pheatmap(log10(tab3 + 10), color = viridis(100))[[4]]
 grid.arrange(ph1, ph2, ph3, nrow = 1, ncol = 3)
 ```
 
-We observe a high agreement between the shared nearest neighbor clustering approach using the 
-integrated cells and the cell phenotypes derived by classification.
+We observe a high agreement between the shared nearest neighbor clustering
+approach using the integrated cells and the cell phenotypes derived by
+classification.
 
-In the next sections, we will highlight visualization strategies to verify the 
+In the next sections, we will highlight visualization strategies to verify the
 correctness of the phenotyping approach.
 
 ```{r, echo=FALSE}
