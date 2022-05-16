@@ -699,9 +699,10 @@ Training the classifier took
 We next observe the accuracy of the classifer when predicting cell 
 phenotypes across the cross-validation as well as the test dataset.
 
+First, we can visualize the classification accuracy during parameter
+tuning:
 
-
-```{r accuracy}
+```{r accuracy-tuning}
 ggplot(rffit) + 
   geom_errorbar(data = rffit$results,
                 aes(ymin = Accuracy - AccuracySD,
@@ -710,35 +711,52 @@ ggplot(rffit) +
     theme_classic(base_size = 15)
 ```
 
-We can also compute the confusion matrix:
+The best value for `mtry` is 19 and is used when predicting new data.
 
-```{r confusion-matrix}
-confusionMatrix(rffit)
-```
-
-We will also look at the variable importance.
+It is often recommended to visualize the variable importance of the
+classifier. The following plot specifies which variables (markers) are 
+most important for classifying the data.
 
 ```{r variable-importance, fig.height = 15}
 plot(varImp(rffit))
 ```
 
-Finally, we will validate the model using the test data.
+As expected, the markers that were used for gating (Ecad, CD3, CD20, HLADR,
+CD8a, CD38, FOXP3) were important for classification.
+
+To assess the accuracy, sensitivty, specificity, among other quality measures of
+the classifier, we will now predict cell phenotypes in the test data.
 
 ```{r model-testing, message=FALSE}
-library(tidyverse)
-
-# Add dummy variables
+# Select test data
 cur_mat <- t(assay(test_spe, "exprs")[rowData(test_spe)$use_channel,])
 
+# Predict cell phenotypes in test data
 cur_pred <- predict(rffit, 
                     newdata = cur_mat)
+```
 
+While the overall classification accuracy can appear high, we also want
+to check if each cell phenotype class is correctly predicted.
+For this, we will calculate the confusion matrix between predicted and actual 
+cell labels. This measure highlights individual cell phenotype classes that 
+were not correctly predicted by the classifier. When setting `mode = "everything"`,
+the `confusionMatrix` function returns all available prediction measures including
+sensitivity, specificity, precision, recall and the F1 score per cell 
+phenotype class.
+
+```{r confusion-matrix}
 cm <- confusionMatrix(data = cur_pred, 
                 reference = factor(test_spe$cell_labels), 
                 mode = "everything")
 
 cm
+```
 
+To easily visualize these results, we can now plot the true positive rate (sensitivity)
+versus the true negative rate (1 - specificity):
+
+```{r specificity-sensitivity}
 data.frame(cm$byClass) %>%
   mutate(class = sub("Class: ", "", rownames(cm$byClass))) %>%
   ggplot() + 
@@ -747,12 +765,15 @@ data.frame(cm$byClass) %>%
                  fill = class),
              shape = 21) + 
   scale_fill_brewer(10, palette = "Set3") +
-  theme_bw() + 
+  theme_classic(base_size = 15) + 
   ylab("Sensitivity (TPR)") +
   xlab("1 - Specificity (FPR)")
 ```
 
-We will also observe the distribution of classification probabilities per image and class:
+We observe TODO... The sice of the circle specifies the number of cells per class.
+
+Finally, to observe which cell phenotypes were wrongly classified, we can visualize
+the distribution of classification probabilities per cell phenotype class:
 
 ```{r prediciton-probability, fig.width = 15}
 cur_pred <- predict(rffit, 
@@ -760,6 +781,7 @@ cur_pred <- predict(rffit,
                     type = "prob")
 cur_pred$truth <- factor(test_spe$cell_labels)
 
+library(tidyverse)
 cur_pred %>%
   pivot_longer(cols = Bcell:Tumor) %>%
   ggplot() +
@@ -770,36 +792,114 @@ cur_pred %>%
         axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
+TODO: explanation
+
 ### Classification of new data
 
-```{r}
+In the final section, we will now use the tuned and tested random forest 
+classifier to predict the cell phenotypes of the unlabelled data.
+
+First, we predict the cell phenotypes and extract their classification
+probabilities.
+
+```{r, unlabelled-prediction}
+# Select unlabelled data
 cur_mat <- t(assay(unlab_spe, "exprs")[rowData(unlab_spe)$use_channel,])
 
-cell_labels.class <- as.character(predict.train(rffit, 
-              newdata = cur_mat, 
-              type = "raw"))
+# Predict cell phenotypes
+cell_class <- as.character(predict.train(rffit, 
+                                         newdata = cur_mat, 
+                                         type = "raw"))
 names(cell_labels.class) <- rownames(cur_mat)
-cell_labels.prob <- predict.train(rffit, 
-              newdata = cur_mat, 
-              type = "prob")
 
-cell_labels <- spe$cell_labels
-cell_labels[colnames(unlab_spe)] <- cell_labels.class
-
-spe$celltypes <- cell_labels 
-
-cur_probs <- matrix(NA, ncol = ncol(cell_labels.prob), nrow = ncol(spe))
-rownames(cur_probs) <- colnames(spe)
-colnames(cur_probs) <- colnames(cell_labels.prob)
-cur_probs[rownames(cell_labels.prob),] <- as.matrix(cell_labels.prob)
-
-spe$probabilities <- DataFrame(cur_probs)
+# Extract classification probabilities
+cell_prob <- predict.train(rffit, 
+                           newdata = cur_mat, 
+                           type = "prob")
 ```
 
-Visualization in next sections
+Each cell is assigned to the class with highest probability. There are however
+cases, where the highest probability is low meaning the cell can not be uniquely
+assigned to a class. We next want to identify these cells and label them as 
+"undefined". Here, we select a maximum classification probability threshold 
+of 40% but this threshold needs to be adjusted for other datasets. The adjusted
+cell labels are then stored in the `SpatialExperiment` object.
 
+```{r, undefined-cells}
+# Distribution of maximum probabilities
+tibble(max_prob = rowMax(as.matrix(cell_prob)),
+       type = cell_class) %>%
+    ggplot() +
+        geom_density_ridges(aes(x = max_prob, y = cell_class, fill = cell_class)) +
+        scale_fill_brewer(palette = "Set3") +
+        theme_classic(base_size = 15) +
+        xlab("Maximum probability") +
+        ylab("Cell type") + 
+        xlim(c(0,1.2))
+
+# Label undefined cells
+cell_labels.class[rowMax(as.matrix(cell_labels.prob)) < 0.4] <- "undefined"
+
+# Store labels in SpatialExperiment onject
+cell_labels <- spe$cell_labels
+cell_labels[colnames(unlab_spe)] <- cell_labels.class
+spe$celltype <- cell_labels 
+
+table(spe$celltype, spe$patient_id)
+```
+
+We can now compare the cell labels derived by classification to the different
+clustering strategies. The first comparison is against the clustering results
+using the asinh-transformed counts.
+
+```{r compare-raw, message=FALSE, results='hide', fig.show='hide'}
+tab1 <- table(spe$celltypes, 
+              paste("Rphenograph", spe$pg_clusters))
+tab2 <- table(spe$celltypes, 
+              paste("SNN", spe$nn_clusters))
+tab3 <- table(spe$celltypes, 
+              paste("SOM", spe$som_clusters))
+
+ph1 <- pheatmap(log10(tab1 + 10), color = viridis(100))[[4]]
+ph2 <- pheatmap(log10(tab2 + 10), color = viridis(100))[[4]]
+ph3 <- pheatmap(log10(tab3 + 10), color = viridis(100))[[4]]
+```
+
+```{r, fig.width=25, fig.height=7}
+grid.arrange(ph1, ph2, ph3, nrow = 1, ncol = 3)
+```
+
+We can see that Tumor and Myeloid cells span multiple clusters while
+Neutrophiles are detected as an individual cluster by all clustering approaches.
+
+We next compare cell classification against clustering results using the 
+integrated cells.
+
+```{r compare-corrected, message=FALSE, results='hide', fig.show='hide'}
+tab1 <- table(spe$celltypes, 
+              paste("Rphenograph", spe$pg_clusters_corrected))
+tab2 <- table(spe$celltypes, 
+              paste("SNN", spe$nn_clusters_corrected))
+tab3 <- table(spe$celltypes, 
+              paste("SOM", spe$som_clusters_corrected))
+
+ph1 <- pheatmap(log10(tab1 + 10), color = viridis(100))[[4]]
+ph2 <- pheatmap(log10(tab2 + 10), color = viridis(100))[[4]]
+ph3 <- pheatmap(log10(tab3 + 10), color = viridis(100))[[4]]
+```
+
+```{r, fig.width=25, fig.height=7}
+grid.arrange(ph1, ph2, ph3, nrow = 1, ncol = 3)
+```
+
+We observe a high agreement between the shared nearest neighbor clustering approach using the 
+integrated cells and the cell phenotypes derived by classification.
+
+In the next sections, we will highlight visualization strategies to verify the 
+correctness of the phenotyping approach.
 
 ```{r, echo=FALSE}
+# This section serves quality control purposes.
 library(testthat)
 test_that("images are written out", {
     skip_on_ci()
@@ -818,6 +918,7 @@ test_that("images are written out", {
     markers[["Neutrophil"]] <- c("CD15", "MPO")
     markers[["Stroma"]] <- c("SMA", "PDGFRb")
     markers[["Tumor"]] <- c("Ecad")
+    markers[["undefined"]] <- c("Ecad", "CD3", "CD20", "MPO", "CD38")
     
     images <- readRDS("data/images.rds")
     masks <- readRDS("data/masks.rds")
