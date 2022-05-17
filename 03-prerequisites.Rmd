@@ -205,13 +205,13 @@ unlink("data/compensation.zip")
 
 ### Gated cells
 
-In Section \@ref(classification), we present a cell type classification
-approach that relies on previously gated cells. This ground truth data
-is available online at 
-[TODO](TODO) and will be downloaded here for later use:
+In Section \@ref(classification), we present a cell type classification approach
+that relies on previously gated cells. This ground truth data is available
+online at [zenodo.org/record/6554611](https://zenodo.org/record/6554611) and
+will be downloaded here for later use:
 
 ```{r download-gated-cells}
-download.file("https://zenodo.org/record/5949116/files/gated_cells.zip",
+download.file("https://zenodo.org/record/6554611/files/gated_cells.zip",
               "data/gated_cells.zip")
 unzip("data/gated_cells.zip", exdir="data", overwrite=TRUE)
 unlink("data/gated_cells.zip")

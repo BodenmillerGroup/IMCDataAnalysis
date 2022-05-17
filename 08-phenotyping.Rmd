@@ -533,9 +533,9 @@ cell types:
 The "B next to T cell" phenotype (`BnTcell`) is commonly observed in immune 
 infiltrated regions measured by IMC. We include this phenotype to account
 for B cell/T cell interactions where precise classification into B cells or
-T cells is not possible. The exact gating scheme can be seen at [TODO]().
+T cells is not possible. The exact gating scheme can be seen at [img/Gating_scheme.pdf](img/Gating_scheme.pdf).
 
-As a related approach, [Astir](TODO) and [Garnet](TODO) use pre-defined panel information
+As a related approach, [Astir](https://github.com/camlab-bioml/astir) and [Garnett](https://cole-trapnell-lab.github.io/garnett/) use pre-defined panel information
 to classify cell phenotypes based on their marker expression.
 
 ### Manual labelling of cells
@@ -557,7 +557,7 @@ if (interactive()) {
 }
 ```
 
-The labelled cells for this data set can be accessed at [TODO](TODO) and were
+The labelled cells for this data set can be accessed at [zenodo.org/record/6554611](https://zenodo.org/record/6554611) and were
 downloaded in Section \@ref(prerequisites). Per image, the `cytomapperShiny`
 function allows the export of gated cells in form of `SingleCellExperiment` or
 `SpatialExperiment` objects. The cell label is stored in
@@ -575,7 +575,7 @@ code chunk sets the `sample_id` entry back to its original entry.
 
 ```{r, read-in-labelled-data, message=FALSE}
 library(SingleCellExperiment)
-label_files <- list.files("data/gated_cells/", 
+label_files <- list.files("data/gated_cells", 
                           full.names = TRUE, pattern = ".rds$")
 
 # Read in SPE objects
@@ -631,11 +631,12 @@ all remaining, unlabelled cells.
 
 ## Train classifier
 
-In this section, we will use the [caret](TODO) framework for machine learning
-in R. This package provides an interface to train a number of regression and
-classification models in a coherent fashion. We use a random forest classifier
-due to low number of parameters, speed and an observed high performance for
-cell type classification [@Hoch2022].
+In this section, we will use the
+[caret](https://topepo.github.io/caret/index.html) framework for machine
+learning in R. This package provides an interface to train a number of
+regression and classification models in a coherent fashion. We use a random
+forest classifier due to low number of parameters, speed and an observed high
+performance for cell type classification [@Hoch2022].
 
 In the following section, we will first split the `SpatialExperiment` object
 into labelled and unlabelled cells. Based on the labelled cells, we split
@@ -756,7 +757,9 @@ cm
 To easily visualize these results, we can now plot the true positive rate (sensitivity)
 versus the true negative rate (1 - specificity):
 
-```{r specificity-sensitivity}
+```{r specificity-sensitivity, message=FALSE}
+library(tidyverse)
+
 data.frame(cm$byClass) %>%
   mutate(class = sub("Class: ", "", rownames(cm$byClass))) %>%
   ggplot() + 
@@ -770,7 +773,9 @@ data.frame(cm$byClass) %>%
   xlab("1 - Specificity (FPR)")
 ```
 
-We observe TODO... The sice of the circle specifies the number of cells per class.
+We observe high sensitivity and specificity for most cell types. Plasma cells
+show the lowest true positive rate with 88% being sufficiently high. The size of
+the circle specifies the number of cells per class.
 
 Finally, to observe which cell phenotypes were wrongly classified, we can visualize
 the distribution of classification probabilities per cell phenotype class:
@@ -781,7 +786,6 @@ cur_pred <- predict(rffit,
                     type = "prob")
 cur_pred$truth <- factor(test_spe$cell_labels)
 
-library(tidyverse)
 cur_pred %>%
   pivot_longer(cols = Bcell:Tumor) %>%
   ggplot() +
@@ -792,7 +796,9 @@ cur_pred %>%
         axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
-TODO: explanation
+The boxplots indicate the classification probabilities per class. The classifier
+is well trained if classification probabilities are only high for the one 
+specific class.
 
 ### Classification of new data
 
@@ -826,6 +832,8 @@ of 40% but this threshold needs to be adjusted for other datasets. The adjusted
 cell labels are then stored in the `SpatialExperiment` object.
 
 ```{r, undefined-cells}
+library(ggridges)
+
 # Distribution of maximum probabilities
 tibble(max_prob = rowMax(as.matrix(cell_prob)),
        type = cell_class) %>%
@@ -853,11 +861,11 @@ clustering strategies. The first comparison is against the clustering results
 using the asinh-transformed counts.
 
 ```{r compare-raw, message=FALSE, results='hide', fig.show='hide'}
-tab1 <- table(spe$celltypes, 
+tab1 <- table(spe$celltype, 
               paste("Rphenograph", spe$pg_clusters))
-tab2 <- table(spe$celltypes, 
+tab2 <- table(spe$celltype, 
               paste("SNN", spe$nn_clusters))
-tab3 <- table(spe$celltypes, 
+tab3 <- table(spe$celltype, 
               paste("SOM", spe$som_clusters))
 
 ph1 <- pheatmap(log10(tab1 + 10), color = viridis(100))[[4]]
@@ -876,11 +884,11 @@ We next compare cell classification against clustering results using the
 integrated cells.
 
 ```{r compare-corrected, message=FALSE, results='hide', fig.show='hide'}
-tab1 <- table(spe$celltypes, 
+tab1 <- table(spe$celltype, 
               paste("Rphenograph", spe$pg_clusters_corrected))
-tab2 <- table(spe$celltypes, 
+tab2 <- table(spe$celltype, 
               paste("SNN", spe$nn_clusters_corrected))
-tab3 <- table(spe$celltypes, 
+tab3 <- table(spe$celltype, 
               paste("SOM", spe$som_clusters_corrected))
 
 ph1 <- pheatmap(log10(tab1 + 10), color = viridis(100))[[4]]
@@ -904,6 +912,7 @@ correctness of the phenotyping approach.
 library(testthat)
 test_that("images are written out", {
     skip_on_ci()
+    expect_true(TRUE)
     cell_types <- unique(spe$celltypes)
 
     markers <- vector(mode = "list", length = length(cell_types))
@@ -924,11 +933,13 @@ test_that("images are written out", {
     images <- readRDS("data/images.rds")
     masks <- readRDS("data/masks.rds")
     
-    images <- normalize(images, separateImages = TRUE)
-    images <- normalize(images, separateImages = TRUE, 
+    images <- cytomapper::normalize(images, separateImages = TRUE)
+    images <- cytomapper::normalize(images, separateImages = TRUE, 
                         inputRange = c(0, 0.2))
     
-    dir.create("data/CellTypeValidation")
+    if (!dir.exists("data/CellTypeValidation")) {
+        dir.create("data/CellTypeValidation")
+    }
     
     for(j in unique(spe$celltypes)){
         cur_sce <- spe[,spe$celltypes == j]
@@ -967,8 +978,9 @@ test_that("images are written out", {
                                   cex = 1),
                    save_plot = list(filename = paste0("data/CellTypeValidation/",
                             j, ".png")))
+        }
     }
-}
+    expect_true(TRUE)
     
 })
 ```
