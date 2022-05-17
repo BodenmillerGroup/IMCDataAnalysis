@@ -441,7 +441,7 @@ detected in both approaches.
 First, we will visualize the match between the three different approaches 
 applied to the asinh-transformed counts.
 
-```{r raw-counts, message=FALSE, results='hide', fig.show='hide'}
+```{r raw-counts, message=FALSE}
 library(patchwork)
 library(pheatmap)
 library(gridExtra)
@@ -453,13 +453,9 @@ tab2 <- table(paste("Rphenograph", spe$pg_clusters),
 tab3 <- table(paste("SNN", spe$nn_clusters), 
               paste("SOM", spe$som_clusters))
 
-ph1 <- pheatmap(log10(tab1 + 10), color = viridis(100))[[4]]
-ph2 <- pheatmap(log10(tab2 + 10), color = viridis(100))[[4]]
-ph3 <- pheatmap(log10(tab3 + 10), color = viridis(100))[[4]]
-```
-
-```{r, fig.width=25, fig.height=7}
-grid.arrange(ph1, ph2, ph3, nrow = 1, ncol = 3)
+pheatmap(log10(tab1 + 10), color = viridis(100))
+pheatmap(log10(tab2 + 10), color = viridis(100))
+pheatmap(log10(tab3 + 10), color = viridis(100))
 ```
 
 We observe that `Rphenograph` and the shared nearest neighbor (SNN) approach by
@@ -473,7 +469,7 @@ hand.
 Below, a comparison between the clustering results of the integrated cells 
 is shown.
 
-```{r corrected, message=FALSE, results='hide', fig.show='hide'}
+```{r corrected, message=FALSE}
 tab1 <- table(paste("Rphenograph", spe$pg_clusters_corrected), 
               paste("SNN", spe$nn_clusters_corrected))
 tab2 <- table(paste("Rphenograph", spe$pg_clusters_corrected), 
@@ -481,13 +477,9 @@ tab2 <- table(paste("Rphenograph", spe$pg_clusters_corrected),
 tab3 <- table(paste("SNN", spe$nn_clusters_corrected), 
               paste("SOM", spe$som_clusters_corrected))
 
-ph1 <- pheatmap(log10(tab1 + 10), color = viridis(100))[[4]]
-ph2 <- pheatmap(log10(tab2 + 10), color = viridis(100))[[4]]
-ph3 <- pheatmap(log10(tab3 + 10), color = viridis(100))[[4]]
-```
-
-```{r, fig.width=25, fig.height=7}
-grid.arrange(ph1, ph2, ph3, nrow = 1, ncol = 3)
+pheatmap(log10(tab1 + 10), color = viridis(100))
+pheatmap(log10(tab2 + 10), color = viridis(100))
+pheatmap(log10(tab3 + 10), color = viridis(100))
 ```
 
 In comparison to clustering on the non-integrated cells, the clustering results
@@ -530,15 +522,17 @@ cell types:
 * CD8+ T cells (CD3, CD8 positive)
 * CD4+ T cells (CD3, CD4 positive)
 
-The "B next to T cell" phenotype (`BnTcell`) is commonly observed in immune 
-infiltrated regions measured by IMC. We include this phenotype to account
-for B cell/T cell interactions where precise classification into B cells or
-T cells is not possible. The exact gating scheme can be seen at [img/Gating_scheme.pdf](img/Gating_scheme.pdf).
+The "B next to T cell" phenotype (`BnTcell`) is commonly observed in immune
+infiltrated regions measured by IMC. We include this phenotype to account for B
+cell/T cell interactions where precise classification into B cells or T cells is
+not possible. The exact gating scheme can be seen at
+[img/Gating_scheme.pdf](img/Gating_scheme.pdf).
 
-As a related approach, [Astir](https://github.com/camlab-bioml/astir) and [Garnett](https://cole-trapnell-lab.github.io/garnett/) use pre-defined panel information
-to classify cell phenotypes based on their marker expression.
+As related approaches, [Astir](https://github.com/camlab-bioml/astir) and
+[Garnett](https://cole-trapnell-lab.github.io/garnett/) use pre-defined panel
+information to classify cell phenotypes based on their marker expression.
 
-### Manual labelling of cells
+### Manual labeling of cells
 
 The [cytomapper](https://www.bioconductor.org/packages/release/bioc/html/cytomapper.html)
 package provides the `cytomapperShiny` function that allows gating of cells
@@ -557,23 +551,36 @@ if (interactive()) {
 }
 ```
 
-The labelled cells for this data set can be accessed at [zenodo.org/record/6554611](https://zenodo.org/record/6554611) and were
+The labeled cells for this data set can be accessed at
+[zenodo.org/record/6554611](https://zenodo.org/record/6554611) and were
 downloaded in Section \@ref(prerequisites). Per image, the `cytomapperShiny`
-function allows the export of gated cells in form of `SingleCellExperiment` or
-`SpatialExperiment` objects. The cell label is stored in
+function allows the export of gated cells in form of a `SingleCellExperiment` or
+`SpatialExperiment` object. The cell label is stored in
 `colData(object)$cytomapper_CellLabel` and the gates are stored in
 `metadata(object)`. In the next section, we will read in and consolidate the
-labelled data.
+labeled data.
 
-### Read in and consolidate labelled data
+### Define color vectors
+
+For consistent visualization of cell types, we will no pre-define their colors:
+
+```{r cell-type-colors}
+celltype <- setNames(c("#3F1B03", "#F4AD31", "#894F36", "#1C750C", "#EF8ECC", 
+                       "#6471E2", "#4DB23B", "grey", "#F4800C", "#BF0A3D", "#066970"),
+                     c("Tumor", "Stroma", "Myeloid", "CD8", "Plasma_cell", 
+                       "Treg", "CD4", "undefined", "BnTcell", "Bcell", "Neutrophil"))
+
+metadata(spe)$color_vectors$celltype <- celltype
+```
+
+### Read in and consolidate labeled data
 
 Here, we will read in the individual `SpatialExperiment` objects containing the
-labelled cells and concatenate them. In the process of concatenating the 
+labeled cells and concatenate them. In the process of concatenating the 
 `SpatialExperiment` objects along their columns, the `sample_id` entry is 
-appended by `.1, .2, .3, ...` due to replicated entries. The last row in this
-code chunk sets the `sample_id` entry back to its original entry.
+appended by `.1, .2, .3, ...` due to replicated entries. 
 
-```{r, read-in-labelled-data, message=FALSE}
+```{r, read-in-labeled-data, message=FALSE}
 library(SingleCellExperiment)
 label_files <- list.files("data/gated_cells", 
                           full.names = TRUE, pattern = ".rds$")
@@ -585,15 +592,14 @@ spes <- lapply(label_files, readRDS)
 concat_spe <- do.call("cbind", spes)
 ```
 
-In the next section we will identify cells that were labeled multiple times.
-This occurs when different cell phenotypes are gated per image and in this 
-dataset affects immune cells that are located inside the tumor compartment.
+In the following code chunk we will identify cells that were labeled multiple
+times. This occurs when different cell phenotypes are gated per image and can
+affect immune cells that are located inside the tumor compartment.
 
-We will first identify those cells that were uniquely labelled and assign their
-label. In the next step, we will identify those cells that were labelled twice
-AND were labelled as Tumor cells. These cells will be assigned their immune cell
-label. Finally, we will save the unique labels within the original
-`SpatialExperiment` object.
+We will first identify those cells that were uniquely labeled. In the next step,
+we will identify those cells that were labeled twice AND were labeled as Tumor
+cells. These cells will be assigned their immune cell label. Finally, we will
+save the unique labels within the original `SpatialExperiment` object.
 
 ```{r, consolidate-labels}
 cur_tab <- unclass(table(colnames(concat_spe), 
@@ -617,31 +623,31 @@ cur_labels <- cur_labels[cur_labels != "doublets"]
 table(cur_labels)
 
 # Transfer labels to SPE object
-spe_labels <- rep("unlabelled", ncol(spe))
+spe_labels <- rep("unlabeled", ncol(spe))
 names(spe_labels) <- colnames(spe)
 spe_labels[names(cur_labels)] <- cur_labels
 spe$cell_labels <- spe_labels
 
-# Number of cells labelled per patient
+# Number of cells labeled per patient
 table(spe$cell_labels, spe$patient_id)
 ```
 
 Based on these labels, we can now train a random forest classifier to classify
-all remaining, unlabelled cells.
+all remaining, unlabeled cells.
 
-## Train classifier
+### Train classifier
 
 In this section, we will use the
 [caret](https://topepo.github.io/caret/index.html) framework for machine
 learning in R. This package provides an interface to train a number of
 regression and classification models in a coherent fashion. We use a random
-forest classifier due to low number of parameters, speed and an observed high
-performance for cell type classification [@Hoch2022].
+forest classifier due to low number of parameters, high speed and an observed
+high performance for cell type classification [@Hoch2022].
 
 In the following section, we will first split the `SpatialExperiment` object
-into labelled and unlabelled cells. Based on the labelled cells, we split
+into labeled and unlabeled cells. Based on the labeled cells, we split
 the data into a train (75% of the data) and test (25% of the data) dataset. 
-We currently do not provide an independently labelled validation dataset.
+We currently do not provide an independently labeled validation dataset.
 
 The `caret` package provides the `trainControl` function, which specifies model
 training parameters and the `train` function, which performs the actual model
@@ -649,7 +655,7 @@ training. While training the model, we also want to estimate the best model
 parameters. In the case of the chosen random forest model (`method = "rf"`), we
 only need to estimate a single parameters (`mtry`) which corresponds to the
 number of variables randomly sampled as candidates at each split. To estimate
-the best parameter, we will perform a 5-fold cross validation (se within
+the best parameter, we will perform a 5-fold cross validation (set within
 `trainControl`) over a tune length of 5 entries to `mtry`.
 
 ```{r, echo=FALSE}
@@ -659,9 +665,9 @@ start_time <- Sys.time()
 ```{r train-classifier, message=FALSE}
 library(caret)
 
-# Split between labelled and unlabelled cells
-lab_spe <- spe[,spe$cell_labels != "unlabelled"]
-unlab_spe <- spe[,spe$cell_labels == "unlabelled"]
+# Split between labeled and unlabeled cells
+lab_spe <- spe[,spe$cell_labels != "unlabeled"]
+unlab_spe <- spe[,spe$cell_labels == "unlabeled"]
 
 # Randomly split into train and test data
 set.seed(220510)
@@ -712,20 +718,20 @@ ggplot(rffit) +
     theme_classic(base_size = 15)
 ```
 
-The best value for `mtry` is 19 and is used when predicting new data.
+The best value for `mtry` is 28 and is used when predicting new data.
 
 It is often recommended to visualize the variable importance of the
 classifier. The following plot specifies which variables (markers) are 
 most important for classifying the data.
 
-```{r variable-importance, fig.height = 15}
+```{r variable-importance, fig.height = 10}
 plot(varImp(rffit))
 ```
 
 As expected, the markers that were used for gating (Ecad, CD3, CD20, HLADR,
 CD8a, CD38, FOXP3) were important for classification.
 
-To assess the accuracy, sensitivty, specificity, among other quality measures of
+To assess the accuracy, sensitivity, specificity, among other quality measures of
 the classifier, we will now predict cell phenotypes in the test data.
 
 ```{r model-testing, message=FALSE}
@@ -748,14 +754,14 @@ phenotype class.
 
 ```{r confusion-matrix}
 cm <- confusionMatrix(data = cur_pred, 
-                reference = factor(test_spe$cell_labels), 
-                mode = "everything")
+                      reference = factor(test_spe$cell_labels), 
+                      mode = "everything")
 
 cm
 ```
 
 To easily visualize these results, we can now plot the true positive rate (sensitivity)
-versus the true negative rate (1 - specificity):
+versus the false positive rate (1 - specificity):
 
 ```{r specificity-sensitivity, message=FALSE}
 library(tidyverse)
@@ -767,7 +773,7 @@ data.frame(cm$byClass) %>%
                  size = Detection.Rate,
                  fill = class),
              shape = 21) + 
-  scale_fill_brewer(10, palette = "Set3") +
+  scale_fill_manual(values = metadata(spe)$color_vectors$celltype) +
   theme_classic(base_size = 15) + 
   ylab("Sensitivity (TPR)") +
   xlab("1 - Specificity (FPR)")
@@ -780,7 +786,7 @@ the circle specifies the number of cells per class.
 Finally, to observe which cell phenotypes were wrongly classified, we can visualize
 the distribution of classification probabilities per cell phenotype class:
 
-```{r prediciton-probability, fig.width = 15}
+```{r prediciton-probability, fig.height=15}
 cur_pred <- predict(rffit, 
                     newdata = cur_mat, 
                     type = "prob")
@@ -790,8 +796,8 @@ cur_pred %>%
   pivot_longer(cols = Bcell:Tumor) %>%
   ggplot() +
   geom_boxplot(aes(x = name, y = value, fill = name), outlier.size = 0.5) +
-  facet_wrap(. ~ truth) + 
-  scale_fill_brewer(10, palette = "Set3")  +
+  facet_wrap(. ~ truth, ncol = 1) + 
+  scale_fill_manual(values = metadata(spe)$color_vectors$celltype)  +
   theme(panel.background = element_blank(), 
         axis.text.x = element_text(angle = 45, hjust = 1))
 ```
@@ -803,13 +809,13 @@ specific class.
 ### Classification of new data
 
 In the final section, we will now use the tuned and tested random forest 
-classifier to predict the cell phenotypes of the unlabelled data.
+classifier to predict the cell phenotypes of the unlabeled data.
 
 First, we predict the cell phenotypes and extract their classification
 probabilities.
 
-```{r, unlabelled-prediction}
-# Select unlabelled data
+```{r, unlabeled-prediction}
+# Select unlabeled data
 cur_mat <- t(assay(unlab_spe, "exprs")[rowData(unlab_spe)$use_channel,])
 
 # Predict cell phenotypes
@@ -839,7 +845,7 @@ tibble(max_prob = rowMax(as.matrix(cell_prob)),
        type = cell_class) %>%
     ggplot() +
         geom_density_ridges(aes(x = max_prob, y = cell_class, fill = cell_class)) +
-        scale_fill_brewer(palette = "Set3") +
+        scale_fill_manual(values = metadata(spe)$color_vectors$celltype) +
         theme_classic(base_size = 15) +
         xlab("Maximum probability") +
         ylab("Cell type") + 
@@ -860,7 +866,7 @@ We can now compare the cell labels derived by classification to the different
 clustering strategies. The first comparison is against the clustering results
 using the asinh-transformed counts.
 
-```{r compare-raw, message=FALSE, results='hide', fig.show='hide'}
+```{r compare-raw, message=FALSE}
 tab1 <- table(spe$celltype, 
               paste("Rphenograph", spe$pg_clusters))
 tab2 <- table(spe$celltype, 
@@ -868,22 +874,18 @@ tab2 <- table(spe$celltype,
 tab3 <- table(spe$celltype, 
               paste("SOM", spe$som_clusters))
 
-ph1 <- pheatmap(log10(tab1 + 10), color = viridis(100))[[4]]
-ph2 <- pheatmap(log10(tab2 + 10), color = viridis(100))[[4]]
-ph3 <- pheatmap(log10(tab3 + 10), color = viridis(100))[[4]]
-```
-
-```{r, fig.width=25, fig.height=7}
-grid.arrange(ph1, ph2, ph3, nrow = 1, ncol = 3)
+pheatmap(log10(tab1 + 10), color = viridis(100))
+pheatmap(log10(tab2 + 10), color = viridis(100))
+pheatmap(log10(tab3 + 10), color = viridis(100))
 ```
 
 We can see that Tumor and Myeloid cells span multiple clusters while
 Neutrophiles are detected as an individual cluster by all clustering approaches.
 
-We next compare cell classification against clustering results using the 
+We next compare the cell classification against clustering results using the 
 integrated cells.
 
-```{r compare-corrected, message=FALSE, results='hide', fig.show='hide'}
+```{r compare-corrected, message=FALSE}
 tab1 <- table(spe$celltype, 
               paste("Rphenograph", spe$pg_clusters_corrected))
 tab2 <- table(spe$celltype, 
@@ -891,13 +893,9 @@ tab2 <- table(spe$celltype,
 tab3 <- table(spe$celltype, 
               paste("SOM", spe$som_clusters_corrected))
 
-ph1 <- pheatmap(log10(tab1 + 10), color = viridis(100))[[4]]
-ph2 <- pheatmap(log10(tab2 + 10), color = viridis(100))[[4]]
-ph3 <- pheatmap(log10(tab3 + 10), color = viridis(100))[[4]]
-```
-
-```{r, fig.width=25, fig.height=7}
-grid.arrange(ph1, ph2, ph3, nrow = 1, ncol = 3)
+pheatmap(log10(tab1 + 10), color = viridis(100))
+pheatmap(log10(tab2 + 10), color = viridis(100))
+pheatmap(log10(tab3 + 10), color = viridis(100))
 ```
 
 We observe a high agreement between the shared nearest neighbor clustering
@@ -907,7 +905,7 @@ classification.
 In the next sections, we will highlight visualization strategies to verify the
 correctness of the phenotyping approach.
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, message = FALSE, results='hide'}
 # This section serves quality control purposes.
 library(testthat)
 test_that("images are written out", {
