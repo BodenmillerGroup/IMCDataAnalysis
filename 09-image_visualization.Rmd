@@ -2,13 +2,256 @@
 
 Using the `cytomapper` package.
 
-## Normalization
+```{r read-data-img-viz, message=FALSE}
+library(SpatialExperiment)
+library(cytomapper)
+spe <- readRDS("data/spe.rds")
+images <- readRDS("data/images.rds")
+masks <- readRDS("data/masks.rds")
+
+# Sample images
+set.seed(220517)
+cur_id <- sample(unique(spe$sample_id), 3)
+cur_images <- images[names(images) %in% cur_id]
+cur_masks <- masks[names(masks) %in% cur_id]
+```
+
+Explain CytoImageList container
+
+## Pixel visualization {#pixel-visualization}
+
+Up to 6 markers
+
+```{r}
+plotPixels(cur_images, 
+           colour_by = c("Ecad", "CD3", "CD20", "CD8a", "CD38", "Ki67"),
+           bcg = list(Ecad = c(0, 5, 1),
+                      CD3 = c(0, 5, 1),
+                      CD20 = c(0, 5, 1),
+                      CD8a = c(0, 5, 1),
+                      CD38 = c(0, 8, 1),
+                      Ki67 = c(0, 5, 1)))
+```
+
+### Adjusting colors
+
+The default colors are the best. But you can change them.
+
+```{r}
+plotPixels(cur_images, 
+           colour_by = c("Ecad", "CD3", "CD20"),
+           bcg = list(Ecad = c(0, 5, 1),
+                      CD3 = c(0, 5, 1),
+                      CD20 = c(0, 5, 1)),
+           colour = list(Ecad = c("black", "burlywood1"),
+                         CD3 = c("black", "cyan2"),
+                         CD20 = c("black", "firebrick1")))
+```
+
+### Adjusting plot annotations
+
+`?plotting-param`
+
+```{r}
+plotPixels(cur_images, 
+           colour_by = c("Ecad", "CD3", "CD20", "CD8a", "CD38", "Ki67"),
+           bcg = list(Ecad = c(0, 5, 1),
+                      CD3 = c(0, 5, 1),
+                      CD20 = c(0, 5, 1),
+                      CD8a = c(0, 5, 1),
+                      CD38 = c(0, 8, 1),
+                      Ki67 = c(0, 5, 1)),
+           scale_bar = list(length = 100,
+                            label = expression("100 " ~ mu * "m"),
+                            cex = 0.7, 
+                            lwidth = 10,
+                            colour = "grey",
+                            position = "bottomleft",
+                            margin = c(5,5),
+                            frame = 3),
+           image_title = list(text = mcols(cur_images)$indication,
+                              position = "topright",
+                              colour = "grey",
+                              margin = c(5,5),
+                              font = 2,
+                              cex = 2),
+           legend = list(colour_by.title.cex = 0.7,
+                         margin = 10))
+```
+
+### Normalization
 
 Explain normalization and clipping
 
-## Pixel visualization
+```{r}
+# 0 - 1 channel scaling across all images
+norm_images <- normalize(cur_images)
 
-## Cell visualization
+# Clip channel at 0.2
+norm_images <- normalize(norm_images, inputRange = c(0, 0.2))
+
+plotPixels(norm_images, 
+           colour_by = c("Ecad", "CD3", "CD20", "CD8a", "CD38", "Ki67"))
+```
+
+```{r}
+# 0 - 1 channel scaling per image
+norm_images <- normalize(cur_images, separateImages = TRUE)
+
+# Clip channel at 0.2
+norm_images <- normalize(norm_images, inputRange = c(0, 0.2))
+
+plotPixels(norm_images, 
+           colour_by = c("Ecad", "CD3", "CD20", "CD8a", "CD38", "Ki67"))
+```
+
+```{r}
+# 0 - 1 channel scaling per image
+norm_images <- normalize(cur_images, 
+                         separateImages = TRUE,
+                         inputRange = list(Ecad = c(0, 50), 
+                                           CD3 = c(0, 30),
+                                           CD20 = c(0, 40),
+                                           CD8a = c(0, 50),
+                                           CD38 = c(0, 10),
+                                           Ki67 = c(0, 70)))
+
+plotPixels(norm_images, 
+           colour_by = c("Ecad", "CD3", "CD20", "CD8a", "CD38", "Ki67"))
+```
+
+## Cell visualization {#mask-visualization}
+
+### Visualzing metadata
+
+```{r}
+plotCells(cur_masks,
+          object = spe, 
+          cell_id = "ObjectNumber", img_id = "sample_id",
+          colour_by = "celltype")
+```
+
+```{r}
+plotCells(cur_masks,
+          object = spe, 
+          cell_id = "ObjectNumber", img_id = "sample_id",
+          colour_by = "celltype",
+          colour = list(celltype = metadata(spe)$color_vectors$celltype))
+```
+
+```{r}
+plotCells(cur_masks,
+          object = spe, 
+          cell_id = "ObjectNumber", img_id = "sample_id",
+          colour_by = "area")
+```
+
+### Visualizating expression
+
+```{r}
+plotCells(cur_masks,
+          object = spe, 
+          cell_id = "ObjectNumber", img_id = "sample_id",
+          colour_by = "Ecad",
+          exprs_values = "exprs")
+```
+
+```{r}
+plotCells(cur_masks,
+          object = spe, 
+          cell_id = "ObjectNumber", img_id = "sample_id",
+          colour_by = c("Ecad", "CD3", "CD20", "CD8a", "CD38", "Ki67"),
+          exprs_values = "exprs")
+```
+
+```{r}
+plotCells(cur_masks,
+          object = spe, 
+          cell_id = "ObjectNumber", img_id = "sample_id",
+          colour_by = c("Ecad", "CD3", "CD20"),
+          exprs_values = "exprs",
+          colour = list(Ecad = c("black", "burlywood1"),
+                          CD3 = c("black", "cyan2"),
+                          CD20 = c("black", "firebrick1")))
+```
+
+### Outlining cells on images {#outline-cells}
+
+```{r}
+plotPixels(image = cur_images,
+           mask = cur_masks,
+           object = spe, 
+           cell_id = "ObjectNumber", img_id = "sample_id",
+           colour_by = c("Ecad", "CD3", "CD20"),
+           outline_by = "celltype",
+                      bcg = list(Ecad = c(0, 5, 1),
+                      CD3 = c(0, 5, 1),
+                      CD20 = c(0, 5, 1)),
+           colour = list(celltype = metadata(spe)$color_vectors$celltype),
+           thick = TRUE)
+```
+
+```{r}
+CD8 <- spe[,spe$celltype == "CD8"]
+
+plotPixels(image = cur_images,
+           mask = cur_masks,
+           object = CD8, 
+           cell_id = "ObjectNumber", img_id = "sample_id",
+           colour_by = c("CD3", "CD8a"),
+           outline_by = "celltype",
+                      bcg = list(CD3 = c(0, 5, 1),
+                      CD8a = c(0, 5, 1)),
+           colour = list(celltype = c("CD8" = "white")),
+           thick = TRUE)
+```
+
+## Displaying individual images
+
+```{r}
+plotCells(cur_masks,
+          object = spe, 
+          cell_id = "ObjectNumber", img_id = "sample_id",
+          colour_by = "celltype",
+          colour = list(celltype = metadata(spe)$color_vectors$celltype),
+          display = "single",
+          legend = NULL)
+```
+
+## Saving and returning images
+
+```{r}
+plotCells(cur_masks,
+          object = spe, 
+          cell_id = "ObjectNumber", img_id = "sample_id",
+          colour_by = "celltype",
+          colour = list(celltype = metadata(spe)$color_vectors$celltype),
+          save_plot = list(filename = "data/celltype_image.png"))
+```
+
+```{r, results="hide"}
+out1 <- plotCells(cur_masks,
+          object = spe, 
+          cell_id = "ObjectNumber", img_id = "sample_id",
+          colour_by = "celltype",
+          colour = list(celltype = metadata(spe)$color_vectors$celltype),
+          return_plot = TRUE)
+
+out2 <- plotCells(cur_masks,
+          object = spe, 
+          cell_id = "ObjectNumber", img_id = "sample_id",
+          colour_by = "Ecad",
+          exprs_values = "exprs",
+          return_plot = TRUE)
+```
+
+```{r}
+library(cowplot)
+p1 <- ggdraw(out1$plot, clip = "on")
+p2 <- ggdraw(out2$plot, clip = "on")
+
+plot_grid(p1, p2)
+```
 
 ## Session Info
 
