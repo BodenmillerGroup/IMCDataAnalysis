@@ -1,6 +1,25 @@
-# Visualizing the images {#image-visualization}
+# Image visualization {#image-visualization}
 
-Using the `cytomapper` package.
+The following section describes how to visualize the abundance of biomolecules
+(e.g. protein or RNA) as well as cell-specific metadata on images. Section
+\@ref(pixel-visualization) focuses on visualizing pixel-level information
+including the generation of pseudo-color composite images. Section
+\@ref(mask-visualization) highlights the visualization of cell metadata (e.g.
+cell phenotype) as well as summarized pixel intensities on cell segmentation
+masks.
+
+The
+[cytomapper](https://www.bioconductor.org/packages/release/bioc/html/cytomapper.html)
+R/Bioconductor package was developed to support the handling and visualization
+of multiple multi-channel images and segmentation masks [@Eling2020].
+
+The main data object for image handling is the
+[CytoImageList](https://www.bioconductor.org/packages/release/bioc/vignettes/cytomapper/inst/doc/cytomapper.html#5_The_CytoImageList_object)
+container which we used in Section \@ref(read-data) to store multi-channel
+images and segmentation masks.
+
+We will first read in the previously processed data and randomly select 3 images
+for visualization purposes.
 
 ```{r read-data-img-viz, message=FALSE}
 library(SpatialExperiment)
@@ -16,11 +35,32 @@ cur_images <- images[names(images) %in% cur_id]
 cur_masks <- masks[names(masks) %in% cur_id]
 ```
 
-Explain CytoImageList container
-
 ## Pixel visualization {#pixel-visualization}
 
-Up to 6 markers
+The following section gives examples for visualizing individual channels or 
+multiple channels as pseudo-color composite images. For this the `cytomapper`
+package exports the `plotPixels` function which expects a `CytoImageList` object
+storing one or multiple multi-channel images. In the simplest use case, a 
+single channel can be visualized as follows:
+
+```{r}
+plotPixels(cur_images, 
+           colour_by = "Ecad",
+           bcg = list(Ecad = c(0, 5, 1)))
+```
+
+The plot above shows the tissue expression of the epithelial tumor marker
+E-cadherin on the 3 selected images. The `bcg` parameter (default `c(0, 1, 1)`)
+stands for "background", "contrast", "gamma" and controls these attributes of
+the image. This parameter takes a named list where each entry specifies these
+attributes per channel. The first value of the numeric vector will be added to
+the pixel intensities (background); pixel intensities will be multiplied by the
+second entry of the vector (contrast); pixel intensities will be exponentiated
+by the third entry of the vector (gamma). In most cases, it is sufficient to
+adjust the second (contrast) entry of the vector.
+
+The following example highlights the visualization of 6 markers (maximum allowed
+number of markers) at once per image.
 
 ```{r}
 plotPixels(cur_images, 
@@ -35,7 +75,11 @@ plotPixels(cur_images,
 
 ### Adjusting colors
 
-The default colors are the best. But you can change them.
+The default colors for visualization are chosen by the additive RGB (red, green,
+blue) color model. For six markers the default colors are: red, green, blue,
+cyan (green + blue), magenta (red + blue), yellow (green + red). These colors
+are the easiest to distinguish by eye. However, you can select other colors for
+each channel by setting the `colour` parameter:
 
 ```{r}
 plotPixels(cur_images, 
@@ -48,40 +92,25 @@ plotPixels(cur_images,
                          CD20 = c("black", "firebrick1")))
 ```
 
-### Adjusting plot annotations
+The `colour` parameter takes a named list in which each entry specifies the
+colors from which a color gradient is constructed via `colorRampPalette`. These
+are usually vectors of length 2 in which the first entry is `"black"` and the
+second entry specifies the color of choice. Although not recommended, you can
+also specify more than two colors to generate a more complex color gradient.
 
-`?plotting-param`
+### Image normalization
 
-```{r}
-plotPixels(cur_images, 
-           colour_by = c("Ecad", "CD3", "CD20", "CD8a", "CD38", "Ki67"),
-           bcg = list(Ecad = c(0, 5, 1),
-                      CD3 = c(0, 5, 1),
-                      CD20 = c(0, 5, 1),
-                      CD8a = c(0, 5, 1),
-                      CD38 = c(0, 8, 1),
-                      Ki67 = c(0, 5, 1)),
-           scale_bar = list(length = 100,
-                            label = expression("100 " ~ mu * "m"),
-                            cex = 0.7, 
-                            lwidth = 10,
-                            colour = "grey",
-                            position = "bottomleft",
-                            margin = c(5,5),
-                            frame = 3),
-           image_title = list(text = mcols(cur_images)$indication,
-                              position = "topright",
-                              colour = "grey",
-                              margin = c(5,5),
-                              font = 2,
-                              cex = 2),
-           legend = list(colour_by.title.cex = 0.7,
-                         margin = 10))
-```
+As an alternative to setting the `bcg` parameter, images can first be
+normalized. Normalization here means to scale the pixel intensities per channel
+between 0 and 1 (or a range specified by the `ft` parameter in the `normalize`
+function). By default, the `normalize` function scales pixel intensities across
+**all** images contained in the `CytoImageList` object (`separateImages = FALSE`).
+Each individual channel is scaled independently (`separateChannels = TRUE`).
 
-### Normalization
-
-Explain normalization and clipping
+After 0-1 normalization, maximum pixel intensities can be clipped to enhance the
+contrast of the image (setting the `inputRange` parameter). In the following
+example, the clipping to 0 and 0.2 is the same as multiplying the pixel
+intensities by a factor of 5.
 
 ```{r}
 # 0 - 1 channel scaling across all images
@@ -94,6 +123,11 @@ plotPixels(norm_images,
            colour_by = c("Ecad", "CD3", "CD20", "CD8a", "CD38", "Ki67"))
 ```
 
+The default setting of scaling pixel intensities across all images ensures 
+comparable intensity levels across images. Pixel intensities can also be 
+scaled **per image** therefore correcting for staining/expression differences
+between images:
+
 ```{r}
 # 0 - 1 channel scaling per image
 norm_images <- normalize(cur_images, separateImages = TRUE)
@@ -104,6 +138,9 @@ norm_images <- normalize(norm_images, inputRange = c(0, 0.2))
 plotPixels(norm_images, 
            colour_by = c("Ecad", "CD3", "CD20", "CD8a", "CD38", "Ki67"))
 ```
+Finally, the `normalize` function also accepts a named list input for the
+`inputRange` argument. In this list, the clipping range per channel can be set
+individually:
 
 ```{r}
 # 0 - 1 channel scaling per image
@@ -206,6 +243,40 @@ plotPixels(image = cur_images,
            thick = TRUE)
 ```
 
+## Adjusting plot annotations
+
+The `cytomapper` package provides a number of additional parameters which are shared
+between the `plotPixels` and `plotCells` function.
+
+`?plotting-param`
+
+```{r}
+plotPixels(cur_images, 
+           colour_by = c("Ecad", "CD3", "CD20", "CD8a", "CD38", "Ki67"),
+           bcg = list(Ecad = c(0, 5, 1),
+                      CD3 = c(0, 5, 1),
+                      CD20 = c(0, 5, 1),
+                      CD8a = c(0, 5, 1),
+                      CD38 = c(0, 8, 1),
+                      Ki67 = c(0, 5, 1)),
+           scale_bar = list(length = 100,
+                            label = expression("100 " ~ mu * "m"),
+                            cex = 0.7, 
+                            lwidth = 10,
+                            colour = "grey",
+                            position = "bottomleft",
+                            margin = c(5,5),
+                            frame = 3),
+           image_title = list(text = mcols(cur_images)$indication,
+                              position = "topright",
+                              colour = "grey",
+                              margin = c(5,5),
+                              font = 2,
+                              cex = 2),
+           legend = list(colour_by.title.cex = 0.7,
+                         margin = 10))
+```
+
 ## Displaying individual images
 
 ```{r}
@@ -240,13 +311,14 @@ out1 <- plotCells(cur_masks,
 out2 <- plotCells(cur_masks,
           object = spe, 
           cell_id = "ObjectNumber", img_id = "sample_id",
-          colour_by = "Ecad",
+          colour_by = c("Ecad", "CD3", "CD20"),
           exprs_values = "exprs",
           return_plot = TRUE)
 ```
 
 ```{r}
 library(cowplot)
+library(gridGraphics)
 p1 <- ggdraw(out1$plot, clip = "on")
 p2 <- ggdraw(out2$plot, clip = "on")
 
