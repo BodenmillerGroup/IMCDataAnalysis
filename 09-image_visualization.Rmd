@@ -159,7 +159,33 @@ plotPixels(norm_images,
 
 ## Cell visualization {#mask-visualization}
 
+In the following section, we will show examples on how to visualize single
+cells either as segmentation masks or outlined on composite images. This type
+of visualization allows to observe the spatial distribution of cell phenotypes,
+the visual assessment of morphological features and quality control in terms
+of cell segmentation and phenotyping.
+
 ### Visualzing metadata
+
+The `cytomapper` package provides the `plotCells` function that accepts a
+`CytoImageList` object containing segmentation masks. These are defined as
+single channel images where sets of pixels with the same integer ID identify
+individual cells. This integer ID can be found as an entry in the `colData(spe)`
+slot and as pixel information in the segmentation masks. The entry in
+`colData(spe)` needs to be specified via the `cell_id` argument to the
+`plotCells` function. In that way, data contained in the `SpatialExperiment`
+object can be mapped to segmentation masks. For the current dataset, the cell
+IDs are stored in `colData(spe)$ObjectNumber`.
+
+As cell IDs are only unique within a single image, the `plotCells` also requires
+the `img_id` argument. This argument specifies the `colData(spe)` as well as the
+`mcols(masks)` entry that stores the unique image name from which each cell was
+extracted. In the current dataset the unique image names are stored in
+`colData(spe)$sample_id` and `mcols(masks)$sample_id`.
+
+Providing these two entries that allow mapping between the `SpatialExperiment`
+object and segmentation masks, we can now color individual cells based on their
+cell type:
 
 ```{r celltype}
 plotCells(cur_masks,
@@ -168,6 +194,9 @@ plotCells(cur_masks,
           colour_by = "celltype")
 ```
 
+For consistent visualization, the `plotCells` function takes a named list as
+`color` argument. The entry name must match the `colour_by` argument. 
+
 ```{r setting-celltype-colors}
 plotCells(cur_masks,
           object = spe, 
@@ -175,6 +204,11 @@ plotCells(cur_masks,
           colour_by = "celltype",
           colour = list(celltype = metadata(spe)$color_vectors$celltype))
 ```
+
+In terms of visualizing metadata, any entry in the `colData(spe)` slot can be 
+visualized the `plotCells` function automatically detects if the entry 
+is continuous or discrete. In this fashion, we can now visualize the area of each 
+cell:
 
 ```{r area}
 plotCells(cur_masks,
