@@ -342,10 +342,14 @@ plotPixels(image = cur_images,
 
 ## Adjusting plot annotations
 
-The `cytomapper` package provides a number of additional parameters which are shared
-between the `plotPixels` and `plotCells` function.
+The `cytomapper` package provides a number of function arguments to adjust the
+visual appearance of figures that are shared between the `plotPixels` and
+`plotCells` function.
 
-`?plotting-param`
+For a full overview of the arguments please refer to `?plotting-param`.
+
+We use the following example to highlight how to adjust the scale bar, the image
+title, the legend appearance and the margin between images.
 
 ```{r adjusting-parameters}
 plotPixels(cur_images, 
@@ -371,10 +375,19 @@ plotPixels(cur_images,
                               font = 2,
                               cex = 2),
            legend = list(colour_by.title.cex = 0.7,
-                         margin = 10))
+                         margin = 10),
+           margin = 40)
 ```
 
 ## Displaying individual images
+
+By default, all images are displayed on the same graphics device. This can be
+useful when saving all images at once (see next section) to zoom into the
+individual images instead of opening each image individually. However, when
+displaying images in a markdown document these are more accessible when
+visualized individually. For this, the `plotPixels` and `plotCells` function
+accepts the `display` parameter that when set to `"single"` displays each
+resulting image in its own graphics device:
 
 ```{r individual-images}
 plotCells(cur_masks,
@@ -388,6 +401,14 @@ plotCells(cur_masks,
 
 ## Saving and returning images
 
+The final section addresses how to save composite images and how to get them
+returned for integration with other plots.
+
+The `plotPixels` and `plotCells` function accepts the `save_plot` argument which
+takes a named list of the following entries: `filename` indicates the location
+and file type of the image saved to disk; `scale` adjusts the resolution of the
+image saved to disk - this only needs to be adjusted for small images.
+
 ```{r saving-images}
 plotCells(cur_masks,
           object = spe, 
@@ -397,21 +418,33 @@ plotCells(cur_masks,
           save_plot = list(filename = "data/celltype_image.png"))
 ```
 
+The composite images (together with their annotation) can also be returned
+and saved as variable. In the following code chunk we save two example plots
+to variables.
+
 ```{r returning-images, results="hide", fig.show='hide'}
 out1 <- plotCells(cur_masks,
-          object = spe, 
-          cell_id = "ObjectNumber", img_id = "sample_id",
-          colour_by = "celltype",
-          colour = list(celltype = metadata(spe)$color_vectors$celltype),
-          return_plot = TRUE)
+                  object = spe, 
+                  cell_id = "ObjectNumber", img_id = "sample_id",
+                  colour_by = "celltype",
+                  colour = list(celltype = metadata(spe)$color_vectors$celltype),
+                  return_plot = TRUE)
 
 out2 <- plotCells(cur_masks,
-          object = spe, 
-          cell_id = "ObjectNumber", img_id = "sample_id",
-          colour_by = c("Ecad", "CD3", "CD20"),
-          exprs_values = "exprs",
-          return_plot = TRUE)
+                  object = spe, 
+                  cell_id = "ObjectNumber", img_id = "sample_id",
+                  colour_by = c("Ecad", "CD3", "CD20"),
+                  exprs_values = "exprs",
+                  return_plot = TRUE)
 ```
+
+The composite images are stored in `out1$plot` and `out2$plot` and can be
+converted into a graph object recognized by the
+[cowplot](https://cran.r-project.org/web/packages/cowplot/vignettes/introduction.html)
+package.
+
+The final function call of the following chunk plots both object next to each
+other.
 
 ```{r side-by-side-plot, message=FALSE}
 library(cowplot)
