@@ -60,7 +60,9 @@ by the third entry of the vector (gamma). In most cases, it is sufficient to
 adjust the second (contrast) entry of the vector.
 
 The following example highlights the visualization of 6 markers (maximum allowed
-number of markers) at once per image.
+number of markers) at once per image. The markers indicate the spatial
+distribution of tumor cells (E-caherin), T cells (CD3), B cells (CD20), CD8+ T
+cells (CD8a), plasma cells (CD38) and proliferating cells (Ki67).
 
 ```{r 6-channel}
 plotPixels(cur_images, 
@@ -205,6 +207,23 @@ plotCells(cur_masks,
           colour = list(celltype = metadata(spe)$color_vectors$celltype))
 ```
 
+If only individual cell types should be visualized, the `SpatialExperiment`
+object can be subsetted (e.g., to only contain CD8+ T cells). In the following
+example CD8+ T cells are colored in red and all other cells that are not
+contained in the dataset are colored in white (as set by the `missing_color`
+argument).
+
+```{r selective-visualization}
+CD8 <- spe[,spe$celltype == "CD8"]
+
+plotCells(cur_masks,
+          object = CD8, 
+          cell_id = "ObjectNumber", img_id = "sample_id",
+          colour_by = "celltype",
+          colour = list(celltype = c(CD8 = "red")),
+          missing_colour = "white")
+```
+
 In terms of visualizing metadata, any entry in the `colData(spe)` slot can be 
 visualized the `plotCells` function automatically detects if the entry 
 is continuous or discrete. In this fashion, we can now visualize the area of each 
@@ -219,6 +238,16 @@ plotCells(cur_masks,
 
 ### Visualizating expression
 
+Similar to visualizing single-cell metadata on segmentation masks, we can 
+use the `plotCells` function to visualize the aggregated pixel intensities
+per cell. In the current dataset pixel intensities were aggregated by computing
+the mean pixel intensity per cell and per channel. The `plotCells` function
+accepts the `exprs_values` argument (default `counts`) that allows selecting
+the assay which stores the expression values that should be visualized.
+
+In the following example, we visualize the asinh-transformed mean pixel
+intensities of the epithelial marker E-cadherin on segmentation masks.
+
 ```{r Ecad-expression}
 plotCells(cur_masks,
           object = spe, 
@@ -227,6 +256,16 @@ plotCells(cur_masks,
           exprs_values = "exprs")
 ```
 
+While visualizing 6 markers on the pixel-level still allows the distinction of
+different cell phenotypes it is not recommended to visualize the mean pixel
+intensities of many (often overlapping) markers on segmentation masks.
+
+Nevertheless and as an example, we will now visualize the maximum number of
+allowed markers as composites on the segmentation masks. As above the markers
+indicate the spatial distribution of tumor cells (E-caherin), T cells (CD3), B
+cells (CD20), CD8+ T cells (CD8a), plasma cells (CD38) and proliferating cells
+(Ki67).
+
 ```{r 6-channel-expression}
 plotCells(cur_masks,
           object = spe, 
@@ -234,6 +273,9 @@ plotCells(cur_masks,
           colour_by = c("Ecad", "CD3", "CD20", "CD8a", "CD38", "Ki67"),
           exprs_values = "exprs")
 ```
+
+Similarly to adjusting marker colors when visualizing pixel intensities, we
+can change the color gradients per marker by setting the `color` argument:
 
 ```{r setting-expression-colors}
 plotCells(cur_masks,
@@ -248,6 +290,17 @@ plotCells(cur_masks,
 
 ### Outlining cells on images {#outline-cells}
 
+The following section highlights the combined visualization of pixel- and
+cell-level information at once. For this, the `plotPixels` function accepts,
+next to the multi-channel image `CytoImageList` object, a segmentation mask
+`CytoImageList` object and the `SpatialExperiment` object. By specifying the
+`outline_by` parameter, the outlines of cells can now be colored based on their
+metadata.
+
+The following example first generates a 3-channel composite images displaying
+the expression of E-cadherin, CD3 and CD20 before coloring the cells' outlines
+by their cell phenotype.
+
 ```{r outlining-all-cells}
 plotPixels(image = cur_images,
            mask = cur_masks,
@@ -261,6 +314,16 @@ plotPixels(image = cur_images,
            colour = list(celltype = metadata(spe)$color_vectors$celltype),
            thick = TRUE)
 ```
+
+Distinguishing individual cell phenotypes is nearly impossible in the images
+above.
+
+However, the `SpatialExperiment` object can be subsetted to only contain cells
+of a single or few phenotypes. This allows the selective visualization of cell
+outlines on composite images.
+
+Here, we select all CD8+ T cells from the dataset and outline them on a 2-channel
+composite image displaying the expression of CD3 and CD8a. 
 
 ```{r outlining-CD8}
 CD8 <- spe[,spe$celltype == "CD8"]
