@@ -43,7 +43,7 @@ package exports the `plotPixels` function which expects a `CytoImageList` object
 storing one or multiple multi-channel images. In the simplest use case, a 
 single channel can be visualized as follows:
 
-```{r}
+```{r single-channel}
 plotPixels(cur_images, 
            colour_by = "Ecad",
            bcg = list(Ecad = c(0, 5, 1)))
@@ -62,7 +62,7 @@ adjust the second (contrast) entry of the vector.
 The following example highlights the visualization of 6 markers (maximum allowed
 number of markers) at once per image.
 
-```{r}
+```{r 6-channel}
 plotPixels(cur_images, 
            colour_by = c("Ecad", "CD3", "CD20", "CD8a", "CD38", "Ki67"),
            bcg = list(Ecad = c(0, 5, 1),
@@ -81,7 +81,7 @@ cyan (green + blue), magenta (red + blue), yellow (green + red). These colors
 are the easiest to distinguish by eye. However, you can select other colors for
 each channel by setting the `colour` parameter:
 
-```{r}
+```{r setting-colors}
 plotPixels(cur_images, 
            colour_by = c("Ecad", "CD3", "CD20"),
            bcg = list(Ecad = c(0, 5, 1),
@@ -112,7 +112,7 @@ contrast of the image (setting the `inputRange` parameter). In the following
 example, the clipping to 0 and 0.2 is the same as multiplying the pixel
 intensities by a factor of 5.
 
-```{r}
+```{r default-normalization}
 # 0 - 1 channel scaling across all images
 norm_images <- normalize(cur_images)
 
@@ -128,7 +128,7 @@ comparable intensity levels across images. Pixel intensities can also be
 scaled **per image** therefore correcting for staining/expression differences
 between images:
 
-```{r}
+```{r individual-normalization}
 # 0 - 1 channel scaling per image
 norm_images <- normalize(cur_images, separateImages = TRUE)
 
@@ -142,7 +142,7 @@ Finally, the `normalize` function also accepts a named list input for the
 `inputRange` argument. In this list, the clipping range per channel can be set
 individually:
 
-```{r}
+```{r setting-inputRange}
 # 0 - 1 channel scaling per image
 norm_images <- normalize(cur_images, 
                          separateImages = TRUE,
@@ -161,14 +161,14 @@ plotPixels(norm_images,
 
 ### Visualzing metadata
 
-```{r}
+```{r celltype}
 plotCells(cur_masks,
           object = spe, 
           cell_id = "ObjectNumber", img_id = "sample_id",
           colour_by = "celltype")
 ```
 
-```{r}
+```{r setting-celltype-colors}
 plotCells(cur_masks,
           object = spe, 
           cell_id = "ObjectNumber", img_id = "sample_id",
@@ -176,7 +176,7 @@ plotCells(cur_masks,
           colour = list(celltype = metadata(spe)$color_vectors$celltype))
 ```
 
-```{r}
+```{r area}
 plotCells(cur_masks,
           object = spe, 
           cell_id = "ObjectNumber", img_id = "sample_id",
@@ -185,7 +185,7 @@ plotCells(cur_masks,
 
 ### Visualizating expression
 
-```{r}
+```{r Ecad-expression}
 plotCells(cur_masks,
           object = spe, 
           cell_id = "ObjectNumber", img_id = "sample_id",
@@ -193,7 +193,7 @@ plotCells(cur_masks,
           exprs_values = "exprs")
 ```
 
-```{r}
+```{r 6-channel-expression}
 plotCells(cur_masks,
           object = spe, 
           cell_id = "ObjectNumber", img_id = "sample_id",
@@ -201,7 +201,7 @@ plotCells(cur_masks,
           exprs_values = "exprs")
 ```
 
-```{r}
+```{r setting-expression-colors}
 plotCells(cur_masks,
           object = spe, 
           cell_id = "ObjectNumber", img_id = "sample_id",
@@ -214,7 +214,7 @@ plotCells(cur_masks,
 
 ### Outlining cells on images {#outline-cells}
 
-```{r}
+```{r outlining-all-cells}
 plotPixels(image = cur_images,
            mask = cur_masks,
            object = spe, 
@@ -228,7 +228,7 @@ plotPixels(image = cur_images,
            thick = TRUE)
 ```
 
-```{r}
+```{r outlining-CD8}
 CD8 <- spe[,spe$celltype == "CD8"]
 
 plotPixels(image = cur_images,
@@ -250,7 +250,7 @@ between the `plotPixels` and `plotCells` function.
 
 `?plotting-param`
 
-```{r}
+```{r adjusting-parameters}
 plotPixels(cur_images, 
            colour_by = c("Ecad", "CD3", "CD20", "CD8a", "CD38", "Ki67"),
            bcg = list(Ecad = c(0, 5, 1),
@@ -279,7 +279,7 @@ plotPixels(cur_images,
 
 ## Displaying individual images
 
-```{r}
+```{r individual-images}
 plotCells(cur_masks,
           object = spe, 
           cell_id = "ObjectNumber", img_id = "sample_id",
@@ -291,7 +291,7 @@ plotCells(cur_masks,
 
 ## Saving and returning images
 
-```{r}
+```{r saving-images}
 plotCells(cur_masks,
           object = spe, 
           cell_id = "ObjectNumber", img_id = "sample_id",
@@ -300,7 +300,7 @@ plotCells(cur_masks,
           save_plot = list(filename = "data/celltype_image.png"))
 ```
 
-```{r, results="hide"}
+```{r returning-images, results="hide", fig.show='hide'}
 out1 <- plotCells(cur_masks,
           object = spe, 
           cell_id = "ObjectNumber", img_id = "sample_id",
@@ -316,7 +316,7 @@ out2 <- plotCells(cur_masks,
           return_plot = TRUE)
 ```
 
-```{r}
+```{r side-by-side-plot, message=FALSE}
 library(cowplot)
 library(gridGraphics)
 p1 <- ggdraw(out1$plot, clip = "on")
