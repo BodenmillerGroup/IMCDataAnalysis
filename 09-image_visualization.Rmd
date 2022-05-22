@@ -11,9 +11,8 @@ masks.
 The
 [cytomapper](https://www.bioconductor.org/packages/release/bioc/html/cytomapper.html)
 R/Bioconductor package was developed to support the handling and visualization
-of multiple multi-channel images and segmentation masks [@Eling2020].
-
-The main data object for image handling is the
+of multiple multi-channel images and segmentation masks [@Eling2020]. The main
+data object for image handling is the
 [CytoImageList](https://www.bioconductor.org/packages/release/bioc/vignettes/cytomapper/inst/doc/cytomapper.html#5_The_CytoImageList_object)
 container which we used in Section \@ref(read-data) to store multi-channel
 images and segmentation masks.
@@ -140,6 +139,10 @@ norm_images <- normalize(norm_images, inputRange = c(0, 0.2))
 plotPixels(norm_images, 
            colour_by = c("Ecad", "CD3", "CD20", "CD8a", "CD38", "Ki67"))
 ```
+
+As we can see, the marker Ki67 appears brighter on image 2 and 3 in comparison
+to scaling the channel across all images.
+
 Finally, the `normalize` function also accepts a named list input for the
 `inputRange` argument. In this list, the clipping range per channel can be set
 individually:
@@ -340,6 +343,10 @@ plotPixels(image = cur_images,
            thick = TRUE)
 ```
 
+This type of visualization allows the quality control of two things: 1.
+segmentation quality of individual cell types can be checked and 2. cell
+phenotype quality can be visually assessed against expected marker expression.
+
 ## Adjusting plot annotations
 
 The `cytomapper` package provides a number of function arguments to adjust the
@@ -401,13 +408,13 @@ plotCells(cur_masks,
 
 ## Saving and returning images
 
-The final section addresses how to save composite images and how to get them
-returned for integration with other plots.
+The final section addresses how to save composite images and how to return them
+for integration with other plots.
 
-The `plotPixels` and `plotCells` function accepts the `save_plot` argument which
+The `plotPixels` and `plotCells` functions accept the `save_plot` argument which
 takes a named list of the following entries: `filename` indicates the location
 and file type of the image saved to disk; `scale` adjusts the resolution of the
-image saved to disk - this only needs to be adjusted for small images.
+saved image (this only needs to be adjusted for small images).
 
 ```{r saving-images}
 plotCells(cur_masks,
@@ -418,9 +425,9 @@ plotCells(cur_masks,
           save_plot = list(filename = "data/celltype_image.png"))
 ```
 
-The composite images (together with their annotation) can also be returned
-and saved as variable. In the following code chunk we save two example plots
-to variables.
+The composite images (together with their annotation) can also be returned. In
+the following code chunk we save two example plots to variables (`out1` and
+`out2`).
 
 ```{r returning-images, results="hide", fig.show='hide'}
 out1 <- plotCells(cur_masks,
