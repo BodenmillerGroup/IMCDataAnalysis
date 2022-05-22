@@ -903,7 +903,9 @@ approach using the integrated cells and the cell phenotypes derived by
 classification.
 
 In the next sections, we will highlight visualization strategies to verify the
-correctness of the phenotyping approach.
+correctness of the phenotyping approach. Specifically, Section
+\@ref(outline-cells) shows how to outline identified cell phenotypes on
+composite images.
 
 ```{r, echo=FALSE, message = FALSE, results='hide'}
 # This section serves quality control purposes.
