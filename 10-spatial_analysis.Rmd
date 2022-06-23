@@ -83,6 +83,51 @@ plotSpatial(spe,
 
 ## Spatial community analysis
 
+```{r, message=FALSE}
+library(igraph)
+library(tidyverse)
+library(pheatmap)
+tumor_spe <- spe[,spe$celltype == "Tumor"]
+gr <- graph_from_edgelist(as.matrix(colPair(tumor_spe, "neighborhood")), directed = FALSE)
+cl_comm <- cluster_louvain(gr)
+comm_tumor <- paste0("Tumor_", membership(cl_comm))
+comm_tumor[membership(cl_comm) %in% which(sizes(cl_comm) < 5)] <- NA
+names(comm_tumor) <- colnames(tumor_spe)
+
+stroma_spe <- spe[,spe$celltype != "Tumor"]
+gr <- graph_from_edgelist(as.matrix(colPair(stroma_spe, "neighborhood")), directed = FALSE)
+cl_comm <- cluster_louvain(gr)
+comm_stroma <- paste0("Stroma_", membership(cl_comm))
+comm_stroma[membership(cl_comm) %in% which(sizes(cl_comm) < 5)] <- NA
+names(comm_stroma) <- colnames(stroma_spe)
+
+comm <- c(comm_tumor, comm_stroma)
+
+spe$spatial_community <- comm[colnames(spe)]
+
+plotSpatial(spe[,spe$celltype == "Tumor"], 
+            node_color_by = "spatial_community", 
+            img_id = "sample_id", 
+            node_size_fix = 0.5) +
+    theme(legend.position = "none")
+
+plotSpatial(spe[,spe$celltype != "Tumor"], 
+            node_color_by = "spatial_community", 
+            img_id = "sample_id", 
+            node_size_fix = 0.5) +
+    theme(legend.position = "none")
+
+for_plot <- colData(spe) %>% as_tibble() %>%
+    filter(celltype != "Tumor") %>%
+    group_by(spatial_community, celltype) %>%
+    summarize(count = n()) %>%
+    mutate(freq = count / sum(count)) %>%
+    pivot_wider(id_cols = spatial_community, names_from = celltype, 
+                values_from = freq, values_fill = 0)
+
+pheatmap(for_plot[,-1], color = viridis(100), show_colnames = FALSE)
+```
+
 ## Cellular neighborhood analysis
 
 ## Patch detection
