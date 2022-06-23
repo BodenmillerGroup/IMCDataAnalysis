@@ -1,0 +1,102 @@
+# Performing spatial analysis
+
+```{r spatial-load-data, message=FALSE}
+library(SpatialExperiment)
+spe <- readRDS("data/spe.rds")
+```
+
+## Build interaction graphs
+
+```{r build-spatial-graphs, message=FALSE}
+library(imcRtools)
+spe <- buildSpatialGraph(spe, img_id = "sample_id", type = "knn", k = 10)
+spe <- buildSpatialGraph(spe, img_id = "sample_id", type = "expansion", threshold = 20)
+spe <- buildSpatialGraph(spe, img_id = "sample_id", type = "delaunay", max_dist = 50)
+
+colPairNames(spe)
+```
+
+## Spatial visualization
+
+```{r spatial-viz-1, message=FALSE, fig.width=7, fig.height=7}
+library(ggplot2)
+library(viridis)
+plotSpatial(spe[,spe$sample_id == "Patient3_001"], 
+            node_color_by = "celltype", 
+            img_id = "sample_id", 
+            draw_edges = TRUE, 
+            colPairName = "neighborhood", 
+            nodes_first = FALSE, 
+            edge_color_fix = "grey") + 
+    scale_color_manual(values = metadata(spe)$color_vectors$celltype)
+
+plotSpatial(spe[,spe$sample_id == "Patient3_001"], 
+            node_color_by = "celltype", 
+            img_id = "sample_id", 
+            draw_edges = TRUE, 
+            colPairName = "knn_interaction_graph", 
+            nodes_first = FALSE,
+            edge_color_fix = "grey") + 
+    scale_color_manual(values = metadata(spe)$color_vectors$celltype)
+
+plotSpatial(spe[,spe$sample_id == "Patient3_001"], 
+            node_color_by = "celltype", 
+            img_id = "sample_id", 
+            draw_edges = TRUE, 
+            colPairName = "expansion_interaction_graph", 
+            nodes_first = FALSE, 
+            directed = FALSE,
+            edge_color_fix = "grey") + 
+    scale_color_manual(values = metadata(spe)$color_vectors$celltype)
+
+plotSpatial(spe[,spe$sample_id == "Patient3_001"], 
+            node_color_by = "celltype", 
+            img_id = "sample_id", 
+            draw_edges = TRUE, 
+            colPairName = "delaunay_interaction_graph", 
+            nodes_first = FALSE,
+            edge_color_fix = "grey") + 
+    scale_color_manual(values = metadata(spe)$color_vectors$celltype)
+```
+
+```{r spatial-viz-2, fig.width=7, fig.height=7}
+plotSpatial(spe[,spe$sample_id == "Patient3_001"], 
+            node_color_by = "Ecad", 
+            assay_type = "exprs",
+            img_id = "sample_id", 
+            draw_edges = TRUE, 
+            colPairName = "expansion_interaction_graph", 
+            nodes_first = FALSE, 
+            node_size_by = "area", 
+            directed = FALSE,
+            edge_color_fix = "grey") + 
+    scale_size_continuous(range = c(0.1, 2))
+```
+
+```{r spatial-viz-3, fig.height=12, fig.width=12}
+plotSpatial(spe, 
+            node_color_by = "celltype", 
+            img_id = "sample_id", 
+            node_size_fix = 0.5) + 
+    scale_color_manual(values = metadata(spe)$color_vectors$celltype)
+```
+
+## Spatial community analysis
+
+## Cellular neighborhood analysis
+
+## Patch detection
+
+## Interaction analysis
+
+## Session Info
+
+<details>
+   <summary>SessionInfo</summary>
+   
+```{r, echo = FALSE}
+sessionInfo()
+```
+</details>
+
+
