@@ -35,7 +35,7 @@ library(SpatialExperiment)
 spe <- readRDS("data/spe.rds")
 
 # Sample cells
-set.seed(220429)
+set.seed(220619)
 cur_cells <- sample(seq_len(ncol(spe)), 2000)
 ```
 
@@ -459,10 +459,10 @@ pheatmap(log10(tab3 + 10), color = viridis(100))
 ```
 
 We observe that `Rphenograph` and the shared nearest neighbor (SNN) approach by
-`scran` show similar results (left heatmap above). For example, Rphenograph
-cluster 19 (a tumor cluster) is perfectly captured by SNN cluster 16. On the
-other hand, the CD4 T cells cluster (SNN cluster 12) is split into Rphenograph
-cluster 9, Rphenograph cluster 15 and Rphenograph cluster 17. A common approach
+`scran` show similar results (first heatmap above). For example, Rphenograph
+cluster 17 (a tumor cluster) is perfectly captured by SNN cluster 12. On the
+other hand, the Neutrophil cluster (SNN cluster 8) is split into Rphenograph
+cluster 8 and Rphenograph cluster 10. A common approach
 is to now merge clusters that contain similar cell types and annotate them by
 hand.
 
@@ -539,9 +539,9 @@ package provides the `cytomapperShiny` function that allows gating of cells
 based on their marker expression and visualization of selected cells directly
 on the images. 
 
-```{r cytomapperShiny}
+```{r cytomapperShiny, message=FALSE}
+library(cytomapper)
 if (interactive()) {
-    library(cytomapper)
     
     images <- readRDS("data/images.rds")
     masks <- readRDS("data/masks.rds")
@@ -907,13 +907,13 @@ correctness of the phenotyping approach. Specifically, Section
 \@ref(outline-cells) shows how to outline identified cell phenotypes on
 composite images.
 
-```{r, echo=FALSE, message = FALSE, results='hide'}
+```{r display-images, echo=FALSE, message = FALSE, results='hide'}
 # This section serves quality control purposes.
 library(testthat)
 test_that("images are written out", {
     skip_on_ci()
     expect_true(TRUE)
-    cell_types <- unique(spe$celltypes)
+    cell_types <- unique(spe$celltype)
 
     markers <- vector(mode = "list", length = length(cell_types))
     names(markers) <- cell_types
@@ -941,8 +941,8 @@ test_that("images are written out", {
         dir.create("data/CellTypeValidation")
     }
     
-    for(j in unique(spe$celltypes)){
-        cur_sce <- spe[,spe$celltypes == j]
+    for(j in unique(spe$celltype)){
+        cur_sce <- spe[,spe$celltype == j]
         cur_markers <- markers[[j]]
   
         if(dim(cur_sce)[2] == 0) {
@@ -953,14 +953,14 @@ test_that("images are written out", {
             cur_col <- "red"
             names(cur_col) <- j
             cur_col <- list(cur_col)
-            names(cur_col) <- "celltypes"
+            names(cur_col) <- "celltype"
             plotPixels(image = images, 
                 object = cur_sce, 
                 mask = masks, 
                 cell_id = "ObjectNumber",
                 img_id = "sample_id", 
                 colour_by = cur_markers, 
-                outline_by = "celltypes",
+                outline_by = "celltype",
                 image_title = list(text = names(images),
                                 cex = 1), 
                 colour = cur_col,
@@ -973,7 +973,7 @@ test_that("images are written out", {
                    cell_id = "ObjectNumber",
                    img_id = "sample_id", 
                    colour_by = cur_markers, 
-                   outline_by = "celltypes",
+                   outline_by = "celltype",
                    image_title = list(text = names(images),
                                   cex = 1),
                    save_plot = list(filename = paste0("data/CellTypeValidation/",
