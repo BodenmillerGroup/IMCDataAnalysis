@@ -9,7 +9,7 @@ spe <- readRDS("data/spe.rds")
 
 ```{r build-spatial-graphs, message=FALSE}
 library(imcRtools)
-spe <- buildSpatialGraph(spe, img_id = "sample_id", type = "knn", k = 10)
+spe <- buildSpatialGraph(spe, img_id = "sample_id", type = "knn", k = 20)
 spe <- buildSpatialGraph(spe, img_id = "sample_id", type = "expansion", threshold = 20)
 spe <- buildSpatialGraph(spe, img_id = "sample_id", type = "delaunay", max_dist = 50)
 
@@ -83,7 +83,7 @@ plotSpatial(spe,
 
 ## Spatial community analysis
 
-```{r, message=FALSE}
+```{r, spatial-community, message=FALSE}
 library(igraph)
 library(tidyverse)
 library(pheatmap)
@@ -132,6 +132,59 @@ pheatmap(for_plot, color = viridis(100), show_rownames = FALSE)
 ```
 
 ## Cellular neighborhood analysis
+
+```{r cn-analysis}
+# By celltypes
+spe <- aggregateNeighbors(spe, colPairName = "knn_interaction_graph", 
+                          aggregate_by = "metadata", count_by = "celltype")
+cn_1 <- kmeans(spe$aggregatedNeighbors, centers = 10)
+spe$cn_celltypes <- as.factor(cn_1$cluster)
+
+plotSpatial(spe, 
+            node_color_by = "cn_celltypes", 
+            img_id = "sample_id", 
+            node_size_fix = 0.5) +
+    scale_color_brewer(palette = "Set3")
+
+for_plot <- colData(spe) %>% as_tibble() %>%
+    group_by(cn_celltypes, celltype) %>%
+    summarize(count = n()) %>%
+    mutate(freq = count / sum(count)) %>%
+    pivot_wider(id_cols = cn_celltypes, names_from = celltype, 
+                values_from = freq, values_fill = 0) %>%
+    ungroup() %>%
+    select(-cn_celltypes)
+
+pheatmap(for_plot, color = colorRampPalette(c("dark blue", "white", "dark red"))(100), 
+         show_rownames = FALSE, scale = "column")
+
+# By expression
+spe <- aggregateNeighbors(spe, colPairName = "knn_interaction_graph", 
+                          aggregate_by = "expression", assay_type = "exprs",
+                          subset_row = rowData(spe)$use_channel)
+cn_2 <- kmeans(spe$mean_aggregatedExpression, centers = 10)
+spe$cn_expression <- as.factor(cn_2$cluster)
+
+plotSpatial(spe, 
+            node_color_by = "cn_expression", 
+            img_id = "sample_id", 
+            node_size_fix = 0.5) +
+    scale_color_brewer(palette = "Set3")
+
+for_plot <- colData(spe) %>% as_tibble() %>%
+    group_by(cn_expression, celltype) %>%
+    summarize(count = n()) %>%
+    mutate(freq = count / sum(count)) %>%
+    pivot_wider(id_cols = cn_expression, names_from = celltype, 
+                values_from = freq, values_fill = 0) %>%
+    ungroup() %>%
+    select(-cn_expression)
+
+pheatmap(for_plot, color = colorRampPalette(c("dark blue", "white", "dark red"))(100), 
+         show_rownames = FALSE, scale = "column")
+```
+
+Via lisaClust
 
 ## Patch detection
 
