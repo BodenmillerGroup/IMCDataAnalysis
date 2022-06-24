@@ -186,6 +186,45 @@ pheatmap(for_plot, color = colorRampPalette(c("dark blue", "white", "dark red"))
 
 Via lisaClust
 
+```{r lisaClust}
+library(lisaClust)
+library(spicyR)
+
+cells <- data.frame(row.names = colnames(spe))
+cells$ObjectNumber <- spe$ObjectNumber
+cells$ImageNumber <- spe$sample_id
+cells$AreaShape_Center_X <- spatialCoords(spe)[,"Pos_X"]
+cells$AreaShape_Center_Y <- spatialCoords(spe)[,"Pos_Y"]
+cells$cellType <- spe$celltype
+
+lisa_sc <- SegmentedCells(cells, cellProfiler = TRUE)
+
+lisaCurves <- lisa(lisa_sc, Rs = c(10,20,50))
+lisaCurves[is.na(lisaCurves)] <- 0
+
+lisa_clusters <- kmeans(lisaCurves, centers = 10)$cluster
+
+spe$lisa_clusters <- as.factor(lisa_clusters)
+
+plotSpatial(spe, 
+            node_color_by = "lisa_clusters", 
+            img_id = "sample_id", 
+            node_size_fix = 0.5) +
+    scale_color_brewer(palette = "Set3")
+
+for_plot <- colData(spe) %>% as_tibble() %>%
+    group_by(lisa_clusters, celltype) %>%
+    summarize(count = n()) %>%
+    mutate(freq = count / sum(count)) %>%
+    pivot_wider(id_cols = lisa_clusters, names_from = celltype, 
+                values_from = freq, values_fill = 0) %>%
+    ungroup() %>%
+    select(-lisa_clusters)
+
+pheatmap(for_plot, color = colorRampPalette(c("dark blue", "white", "dark red"))(100), 
+         show_rownames = FALSE, scale = "column")
+```
+
 ## Patch detection
 
 ## Interaction analysis
