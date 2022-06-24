@@ -87,6 +87,7 @@ plotSpatial(spe,
 library(igraph)
 library(tidyverse)
 library(pheatmap)
+library(Rphenograph)
 tumor_spe <- spe[,spe$celltype == "Tumor"]
 gr <- graph_from_edgelist(as.matrix(colPair(tumor_spe, "neighborhood")), directed = FALSE)
 cl_comm <- cluster_louvain(gr)
@@ -123,9 +124,11 @@ for_plot <- colData(spe) %>% as_tibble() %>%
     summarize(count = n()) %>%
     mutate(freq = count / sum(count)) %>%
     pivot_wider(id_cols = spatial_community, names_from = celltype, 
-                values_from = freq, values_fill = 0)
+                values_from = freq, values_fill = 0) %>%
+    ungroup() %>%
+    select(-spatial_community)
 
-pheatmap(for_plot[,-1], color = viridis(100), show_colnames = FALSE)
+pheatmap(for_plot, color = viridis(100), show_rownames = FALSE)
 ```
 
 ## Cellular neighborhood analysis
