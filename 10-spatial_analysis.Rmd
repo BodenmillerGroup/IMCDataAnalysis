@@ -227,7 +227,68 @@ pheatmap(for_plot, color = colorRampPalette(c("dark blue", "white", "dark red"))
 
 ## Patch detection
 
+```{r, fig.height=12, fig.width=12}
+spe <- patchDetection(spe, 
+                      patch_cells = spe$celltype == "Tumor",
+                      img_id = "sample_id",
+                      expand_by = 1,
+                      min_patch_size = 10,
+                      colPairName = "neighborhood")
+
+plotSpatial(spe, 
+            node_color_by = "patch_id", 
+            img_id = "sample_id", 
+            node_size_fix = 0.5) +
+    theme(legend.position = "none")
+```
+
+T cell frequency per tumor patch
+
+```{r}
+colData(spe) %>% as_tibble() %>%
+    group_by(patch_id, sample_id) %>%
+    summarize(Tcell_count = sum(celltype == "CD8" | celltype == "CD4"),
+              patch_size = n(),
+              Tcell_freq = Tcell_count / patch_size) %>%
+    ggplot() +
+        geom_point(aes(log10(patch_size), Tcell_freq, color = sample_id)) +
+    theme_classic()
+```
+
 ## Interaction analysis
+
+```{r}
+library(scales)
+out <- testInteractions(spe, 
+                        group_by = "sample_id",
+                        label = "celltype", 
+                        colPairName = "neighborhood")
+
+head(out)
+
+out %>% as_tibble() %>%
+    group_by(from_label, to_label) %>%
+    summarize(sum_sigval = sum(sigval, na.rm = TRUE)) %>%
+    ggplot() +
+        geom_tile(aes(from_label, to_label, fill = sum_sigval)) +
+        scale_fill_gradient2(low = muted("blue"), mid = "white", high = muted("red"))
+```
+
+```{r}
+out <- testInteractions(spe, 
+                        group_by = "sample_id",
+                        label = "celltype", 
+                        colPairName = "neighborhood",
+                        method = "patch", 
+                        patch_size = 3)
+
+out %>% as_tibble() %>%
+    group_by(from_label, to_label) %>%
+    summarize(sum_sigval = sum(sigval, na.rm = TRUE)) %>%
+    ggplot() +
+        geom_tile(aes(from_label, to_label, fill = sum_sigval)) +
+        scale_fill_gradient2(low = muted("blue"), mid = "white", high = muted("red"))
+```
 
 ## Session Info
 
