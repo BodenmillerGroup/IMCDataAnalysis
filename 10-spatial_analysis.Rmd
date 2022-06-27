@@ -28,7 +28,8 @@ plotSpatial(spe[,spe$sample_id == "Patient3_001"],
             colPairName = "neighborhood", 
             nodes_first = FALSE, 
             edge_color_fix = "grey") + 
-    scale_color_manual(values = metadata(spe)$color_vectors$celltype)
+    scale_color_manual(values = metadata(spe)$color_vectors$celltype) +
+    ggtitle("steinbock interaction graph")
 
 plotSpatial(spe[,spe$sample_id == "Patient3_001"], 
             node_color_by = "celltype", 
@@ -37,7 +38,8 @@ plotSpatial(spe[,spe$sample_id == "Patient3_001"],
             colPairName = "knn_interaction_graph", 
             nodes_first = FALSE,
             edge_color_fix = "grey") + 
-    scale_color_manual(values = metadata(spe)$color_vectors$celltype)
+    scale_color_manual(values = metadata(spe)$color_vectors$celltype) +
+    ggtitle("knn interaction graph")
 
 plotSpatial(spe[,spe$sample_id == "Patient3_001"], 
             node_color_by = "celltype", 
@@ -47,7 +49,8 @@ plotSpatial(spe[,spe$sample_id == "Patient3_001"],
             nodes_first = FALSE, 
             directed = FALSE,
             edge_color_fix = "grey") + 
-    scale_color_manual(values = metadata(spe)$color_vectors$celltype)
+    scale_color_manual(values = metadata(spe)$color_vectors$celltype) +
+    ggtitle("expansion interaction graph")
 
 plotSpatial(spe[,spe$sample_id == "Patient3_001"], 
             node_color_by = "celltype", 
@@ -56,7 +59,8 @@ plotSpatial(spe[,spe$sample_id == "Patient3_001"],
             colPairName = "delaunay_interaction_graph", 
             nodes_first = FALSE,
             edge_color_fix = "grey") + 
-    scale_color_manual(values = metadata(spe)$color_vectors$celltype)
+    scale_color_manual(values = metadata(spe)$color_vectors$celltype) +
+    ggtitle("delaunay interaction graph")
 ```
 
 ```{r spatial-viz-2, fig.width=7, fig.height=7}
@@ -70,7 +74,8 @@ plotSpatial(spe[,spe$sample_id == "Patient3_001"],
             node_size_by = "area", 
             directed = FALSE,
             edge_color_fix = "grey") + 
-    scale_size_continuous(range = c(0.1, 2))
+    scale_size_continuous(range = c(0.1, 2)) +
+    ggtitle("E-cadherin expression")
 ```
 
 ```{r spatial-viz-3, fig.height=12, fig.width=12}
@@ -83,11 +88,11 @@ plotSpatial(spe,
 
 ## Spatial community analysis
 
-```{r, spatial-community, message=FALSE}
+```{r, spatial-community, message=FALSE, fig.height=12, fig.width=12}
 library(igraph)
 library(tidyverse)
 library(pheatmap)
-library(Rphenograph)
+
 tumor_spe <- spe[,spe$celltype == "Tumor"]
 gr <- graph_from_edgelist(as.matrix(colPair(tumor_spe, "neighborhood")), directed = FALSE)
 cl_comm <- cluster_louvain(gr)
@@ -117,7 +122,9 @@ plotSpatial(spe[,spe$celltype != "Tumor"],
             img_id = "sample_id", 
             node_size_fix = 0.5) +
     theme(legend.position = "none")
+```
 
+```{r, message=FALSE}
 for_plot <- colData(spe) %>% as_tibble() %>%
     filter(celltype != "Tumor") %>%
     group_by(spatial_community, celltype) %>%
@@ -133,7 +140,7 @@ pheatmap(for_plot, color = viridis(100), show_rownames = FALSE)
 
 ## Cellular neighborhood analysis
 
-```{r cn-analysis}
+```{r cn-analysis, fig.height=12, fig.width=12}
 # By celltypes
 spe <- aggregateNeighbors(spe, colPairName = "knn_interaction_graph", 
                           aggregate_by = "metadata", count_by = "celltype")
@@ -145,7 +152,9 @@ plotSpatial(spe,
             img_id = "sample_id", 
             node_size_fix = 0.5) +
     scale_color_brewer(palette = "Set3")
+```
 
+```{r, message=FALSE}
 for_plot <- colData(spe) %>% as_tibble() %>%
     group_by(cn_celltypes, celltype) %>%
     summarize(count = n()) %>%
@@ -157,7 +166,9 @@ for_plot <- colData(spe) %>% as_tibble() %>%
 
 pheatmap(for_plot, color = colorRampPalette(c("dark blue", "white", "dark red"))(100), 
          show_rownames = FALSE, scale = "column")
+```
 
+```{r, fig.height=12, fig.width=12}
 # By expression
 spe <- aggregateNeighbors(spe, colPairName = "knn_interaction_graph", 
                           aggregate_by = "expression", assay_type = "exprs",
@@ -170,7 +181,9 @@ plotSpatial(spe,
             img_id = "sample_id", 
             node_size_fix = 0.5) +
     scale_color_brewer(palette = "Set3")
+```
 
+```{r, message=FALSE}
 for_plot <- colData(spe) %>% as_tibble() %>%
     group_by(cn_expression, celltype) %>%
     summarize(count = n()) %>%
@@ -186,7 +199,7 @@ pheatmap(for_plot, color = colorRampPalette(c("dark blue", "white", "dark red"))
 
 Via lisaClust
 
-```{r lisaClust}
+```{r lisaClust, message=FALSE, fig.height=12, fig.width=12}
 library(lisaClust)
 library(spicyR)
 
@@ -211,7 +224,9 @@ plotSpatial(spe,
             img_id = "sample_id", 
             node_size_fix = 0.5) +
     scale_color_brewer(palette = "Set3")
+```
 
+```{r, message=FALSE}
 for_plot <- colData(spe) %>% as_tibble() %>%
     group_by(lisa_clusters, celltype) %>%
     summarize(count = n()) %>%
@@ -244,7 +259,7 @@ plotSpatial(spe,
 
 T cell frequency per tumor patch
 
-```{r}
+```{r, message=FALSE}
 colData(spe) %>% as_tibble() %>%
     group_by(patch_id, sample_id) %>%
     summarize(Tcell_count = sum(celltype == "CD8" | celltype == "CD4"),
@@ -257,7 +272,7 @@ colData(spe) %>% as_tibble() %>%
 
 ## Interaction analysis
 
-```{r}
+```{r, message=FALSE}
 library(scales)
 out <- testInteractions(spe, 
                         group_by = "sample_id",
@@ -271,7 +286,8 @@ out %>% as_tibble() %>%
     summarize(sum_sigval = sum(sigval, na.rm = TRUE)) %>%
     ggplot() +
         geom_tile(aes(from_label, to_label, fill = sum_sigval)) +
-        scale_fill_gradient2(low = muted("blue"), mid = "white", high = muted("red"))
+        scale_fill_gradient2(low = muted("blue"), mid = "white", high = muted("red")) +
+        theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
 ```{r}
@@ -287,7 +303,8 @@ out %>% as_tibble() %>%
     summarize(sum_sigval = sum(sigval, na.rm = TRUE)) %>%
     ggplot() +
         geom_tile(aes(from_label, to_label, fill = sum_sigval)) +
-        scale_fill_gradient2(low = muted("blue"), mid = "white", high = muted("red"))
+        scale_fill_gradient2(low = muted("blue"), mid = "white", high = muted("red")) +
+        theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
 ## Session Info
