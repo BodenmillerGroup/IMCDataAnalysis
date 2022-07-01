@@ -90,6 +90,8 @@ colored in grey.
 ```{r spatial-viz-1, message=FALSE, fig.width=7, fig.height=7}
 library(ggplot2)
 library(viridis)
+
+# steinbock interaction graph 
 plotSpatial(spe[,spe$sample_id == "Patient3_001"], 
             node_color_by = "celltype", 
             img_id = "sample_id", 
@@ -100,6 +102,7 @@ plotSpatial(spe[,spe$sample_id == "Patient3_001"],
     scale_color_manual(values = metadata(spe)$color_vectors$celltype) +
     ggtitle("steinbock interaction graph")
 
+# knn interaction graph 
 plotSpatial(spe[,spe$sample_id == "Patient3_001"], 
             node_color_by = "celltype", 
             img_id = "sample_id", 
@@ -110,6 +113,7 @@ plotSpatial(spe[,spe$sample_id == "Patient3_001"],
     scale_color_manual(values = metadata(spe)$color_vectors$celltype) +
     ggtitle("knn interaction graph")
 
+# expansion interaction graph 
 plotSpatial(spe[,spe$sample_id == "Patient3_001"], 
             node_color_by = "celltype", 
             img_id = "sample_id", 
@@ -121,6 +125,7 @@ plotSpatial(spe[,spe$sample_id == "Patient3_001"],
     scale_color_manual(values = metadata(spe)$color_vectors$celltype) +
     ggtitle("expansion interaction graph")
 
+# delaunay interaction graph 
 plotSpatial(spe[,spe$sample_id == "Patient3_001"], 
             node_color_by = "celltype", 
             img_id = "sample_id", 
@@ -167,43 +172,75 @@ For a full documentation on the `plotSpatial` function, please refer to
 
 ## Spatial community analysis
 
-```{r, spatial-community, message=FALSE, fig.height=12, fig.width=12}
-library(igraph)
-library(tidyverse)
-library(pheatmap)
+The detection of spatial communities was proposed by [@Jackson2020]. Here,
+cells are clustered solely based on their interactions as defined by the
+spatial object graph. In the following example, we perform spatial community 
+detection separately for tumor and stromal cells.
 
+The general procedure is as follows: 
+* subset the object to contain either tumor or stromal cells  
+* create an `igraph` object from the edge list stored in `colPair(tumor_spe, "neighborhood")`  
+* perform community detection using the Louvain algorithm  
+* store the community IDs in a vector and replace all communities with a size
+smaller than 10 by `NA`  
+
+Both tumor and stromal spatial communities are stored in the `colData` of
+the `SpatialExperiment` object.
+
+```{r spatial-community, message=FALSE}
+library(igraph)
+
+# Spatial community detection - tumor
 tumor_spe <- spe[,spe$celltype == "Tumor"]
 gr <- graph_from_edgelist(as.matrix(colPair(tumor_spe, "neighborhood")), directed = FALSE)
 cl_comm <- cluster_louvain(gr)
 comm_tumor <- paste0("Tumor_", membership(cl_comm))
-comm_tumor[membership(cl_comm) %in% which(sizes(cl_comm) < 5)] <- NA
+comm_tumor[membership(cl_comm) %in% which(sizes(cl_comm) < 10)] <- NA
 names(comm_tumor) <- colnames(tumor_spe)
 
+# Spatial community detection - non-tumor
 stroma_spe <- spe[,spe$celltype != "Tumor"]
 gr <- graph_from_edgelist(as.matrix(colPair(stroma_spe, "neighborhood")), directed = FALSE)
 cl_comm <- cluster_louvain(gr)
 comm_stroma <- paste0("Stroma_", membership(cl_comm))
-comm_stroma[membership(cl_comm) %in% which(sizes(cl_comm) < 5)] <- NA
+comm_stroma[membership(cl_comm) %in% which(sizes(cl_comm) < 10)] <- NA
 names(comm_stroma) <- colnames(stroma_spe)
 
 comm <- c(comm_tumor, comm_stroma)
 
 spe$spatial_community <- comm[colnames(spe)]
+```
 
+We can now separately visualize the tumor and stromal communities.
+
+```{r spatial-community-viz, fig.height=12, fig.width=12}
 plotSpatial(spe[,spe$celltype == "Tumor"], 
             node_color_by = "spatial_community", 
             img_id = "sample_id", 
             node_size_fix = 0.5) +
-    theme(legend.position = "none")
+    theme(legend.position = "none") +
+    ggtitle("Spatial tumor communities")
 
 plotSpatial(spe[,spe$celltype != "Tumor"], 
             node_color_by = "spatial_community", 
             img_id = "sample_id", 
             node_size_fix = 0.5) +
-    theme(legend.position = "none")
+    theme(legend.position = "none") +
+    ggtitle("Spatial non-tumor communities")
 ```
 
-```{r, message=FALSE}
+The example data was acquired using a panel that mainly focuses on immune cells.
+We are therefore unable to detect many tumor sub-phenotypes and will therefore
+focus on the stromal communities.
+
+In the next step, we calculate the fraction of cell types within each spatial stromal
+community. 
+
+```{r spatial-community-heatmap, message=FALSE}
+library(tidyverse)
+library(pheatmap)
+library(viridis)
+
 for_plot <- colData(spe) %>% as_tibble() %>%
     filter(celltype != "Tumor") %>%
     group_by(spatial_community, celltype) %>%
@@ -216,6 +253,11 @@ for_plot <- colData(spe) %>% as_tibble() %>%
 
 pheatmap(for_plot, color = viridis(100), show_rownames = FALSE)
 ```
+We observe that many spatial stromal communities are made up of myeloid cells or
+"stromal" (non-immune) cells. Other communities are mainly made up of B cells
+and BnT cells indicating tertiray lymphoid structures. While plasma cells tend
+to aggregate, only in few spatial stromal communities one can observe mainly
+CD4+ or CD8+ T cells.
 
 ## Cellular neighborhood analysis
 
