@@ -1,5 +1,22 @@
 # Performing spatial analysis
 
+Highly multiplexed imaging technologies acquire the spatial distributions 
+of molecule abundances across a tissue section. As such, analyzing single cells
+in their spatial tissue context is a key strength of these technologies.
+
+A number of software packages such as
+[squidpy](https://squidpy.readthedocs.io/en/stable/),
+[giotto](https://rubd.github.io/Giotto_site/) and
+[Seurat](https://satijalab.org/seurat/articles/spatial_vignette_2.html) have
+been developed to analyse and visualize cells in their spatial context. The
+following chapter will highlight the use of
+[imcRtools](https://bioconductor.org/packages/release/bioc/html/imcRtools.html)
+and other Bioconductor tools tools to visualize and analyse single-cell data
+obtained from highly multiplexed imaging technologies.
+
+We will first read in the spatially-annotated single-cell data processed in the 
+previous sections.
+
 ```{r spatial-load-data, message=FALSE}
 library(SpatialExperiment)
 spe <- readRDS("data/spe.rds")
@@ -7,16 +24,68 @@ spe <- readRDS("data/spe.rds")
 
 ## Build interaction graphs
 
+Many spatial analysis approaches either compare the observed versus expected
+number of cells around a given cell type (point process) or utilize interaction
+graphs (spatial object graphs) to estimate clustering or interaction frequencies
+between cell types.
+
+The [steinbock](https://bodenmillergroup.github.io/steinbock/latest/cli/measurement/) 
+framework allows the construction of these spatial graphs. During image 
+processing (see Section \@ref(image-processing)), we have constructed
+a spatial graph by expanding the individual cell masks by 4 pixels. 
+
+The `imcRtools` package further allows the *ad hoc* consctruction of spatial
+graphs directly using a `SpatialExperiment` or `SingleCellExperiment` object
+while considering the spatial location (centroids) of individual cells. The
+[buildSpatialGraph](https://bodenmillergroup.github.io/imcRtools/reference/buildSpatialGraph.html)
+function allows constructing spatial graphs by detecting the k-nearest neighbors
+in 2D (`knn`), by detecting all cells within a given distance to the centre cell
+(`expansion`) and by Delaunay triangulation (`delaunay`).
+
+When constructing a knn graph, the number of neighbors (`k`) needs to be set and
+the maximum distance to consider (`max_dist`) can be set. When constructing a
+graph via expansion, the distance to expand (`threshold`) needs to be specified.
+For graphs to be constructed via Delaunay triangulation, the `max_dist`
+parameter can be set to avoid unusually large connections at the edge of the
+image.
+
 ```{r build-spatial-graphs, message=FALSE}
 library(imcRtools)
 spe <- buildSpatialGraph(spe, img_id = "sample_id", type = "knn", k = 20)
 spe <- buildSpatialGraph(spe, img_id = "sample_id", type = "expansion", threshold = 20)
 spe <- buildSpatialGraph(spe, img_id = "sample_id", type = "delaunay", max_dist = 50)
+```
 
+The spatial graphs are stored in `colPair(spe, name)`. These are `SelfHits`
+objects representing edge lists in which the first column indicates the index of
+the "from" cell and the second column the index of the "to" cell. Each
+edge list is newly constructed when subsetting the object.
+
+```{r show-colPairNames}
 colPairNames(spe)
 ```
 
+Here, `colPair(spe, "neighborhood")` stores the spatial graph constructed by
+`steinbock`, `colPair(spe, "knn_interaction_graph")` stores the knn spatial
+graph, `colPair(spe, "expansion_interaction_graph")` stores the expansion graph
+and `colPair(spe, "delaunay_interaction_graph")` stores the graph constructed by
+Delaunay triangulation.
+
 ## Spatial visualization
+
+Section \@ref(image-visualization) highlights the use of the
+[cytomapper](https://www.bioconductor.org/packages/release/bioc/html/cytomapper.html)
+package to visualize multichannel images and segmentation masks. Here, we
+introduce the
+[plotSpatial](https://bodenmillergroup.github.io/imcRtools/reference/plotSpatial.html)
+function of the `imcRtools` package to visualize the cells' centroids and
+cell-cell interactions as spatial graphs.
+
+In the following example, we select one image for visualization purposes. 
+Here, each dot (node) represents a cell and edges are drawn between cells
+in close physical proximity as detected by `steinbock` or the `buildSpatialGraph`
+function. Nodes are variably colored based on the cell type and edges are
+colored in grey.
 
 ```{r spatial-viz-1, message=FALSE, fig.width=7, fig.height=7}
 library(ggplot2)
@@ -63,6 +132,10 @@ plotSpatial(spe[,spe$sample_id == "Patient3_001"],
     ggtitle("delaunay interaction graph")
 ```
 
+Nodes can also be colored based on the cells' expression levels (e.g.,
+E-cadherin expression) and their size can be adjusted (e.g., based on measured
+cell area).
+
 ```{r spatial-viz-2, fig.width=7, fig.height=7}
 plotSpatial(spe[,spe$sample_id == "Patient3_001"], 
             node_color_by = "Ecad", 
@@ -78,6 +151,9 @@ plotSpatial(spe[,spe$sample_id == "Patient3_001"],
     ggtitle("E-cadherin expression")
 ```
 
+Finally, the `plotSpatial` function allows displaying all images at once. This
+visualization can be useful to quickly detect larger structures of interest.
+
 ```{r spatial-viz-3, fig.height=12, fig.width=12}
 plotSpatial(spe, 
             node_color_by = "celltype", 
@@ -85,6 +161,9 @@ plotSpatial(spe,
             node_size_fix = 0.5) + 
     scale_color_manual(values = metadata(spe)$color_vectors$celltype)
 ```
+
+For a full documentation on the `plotSpatial` function, please refer to
+`?plotSpatial`.
 
 ## Spatial community analysis
 

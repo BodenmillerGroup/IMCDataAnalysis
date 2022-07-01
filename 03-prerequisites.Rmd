@@ -58,7 +58,7 @@ Tidy R:
 
 * [tidyverse](https://www.tidyverse.org/) version `r packageVersion("tidyverse")`
 
-## Image processing
+## Image processing {#image-processing}
 
 The analysis presented here fully relies on packages written in the programming
 language `R` and primarily focuses on analysis approaches downstream of image
