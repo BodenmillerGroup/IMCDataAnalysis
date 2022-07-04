@@ -261,6 +261,30 @@ CD4+ or CD8+ T cells.
 
 ## Cellular neighborhood analysis
 
+In the following section, we will highlight the use of `imcRtools` to detect
+cellular neighborhoods. This approach has been proposed by [@Goltsev2018] and
+[@Schurch2020] to group cells based on information of their direct neighborhood.
+
+[@Goltsev2018] perfomed Delaunay triangulation-based graph construction, 
+neighborhood aggregation and then clustered cells. [@Schurch2020] on the 
+other hand constructed a 10-nearest neighbor graph before aggregating
+information across neighboring cells. 
+
+In the following code chunk we will use the 20-nearest neighbor graph
+as constructed above to define the direct cellular neighborhood. The
+[aggregateNeighbors](https://bodenmillergroup.github.io/imcRtools/reference/aggregateNeighbors.html)
+function now performs neighborhood aggregation in 2 ways:
+
+1. For each cell it computes the fraction of cells of a certain type (e.g., cell
+type) among its neighbors.
+2. For each cell it aggregates (e.g., mean) the expression counts across all
+neighboring cells.
+
+Based on these measures, cells can now be clustered into cellular neighborhoods.
+We will first compute the fraction of the different cell types among the
+20-nearest neighbors and use kmeans clustering to group cells into 10 cellular
+neighborhoods.
+
 ```{r cn-analysis, fig.height=12, fig.width=12}
 # By celltypes
 spe <- aggregateNeighbors(spe, colPairName = "knn_interaction_graph", 
@@ -275,6 +299,9 @@ plotSpatial(spe,
     scale_color_brewer(palette = "Set3")
 ```
 
+We will now visualize the cell type compositions of the detected cellular
+neighborhoods (CN).
+
 ```{r, message=FALSE}
 for_plot <- colData(spe) %>% as_tibble() %>%
     group_by(cn_celltypes, celltype) %>%
@@ -286,8 +313,15 @@ for_plot <- colData(spe) %>% as_tibble() %>%
     select(-cn_celltypes)
 
 pheatmap(for_plot, color = colorRampPalette(c("dark blue", "white", "dark red"))(100), 
-         show_rownames = FALSE, scale = "column")
+         scale = "column")
 ```
+
+CN 9 and CN 4 are mainly composed of tumor cells with CN4 forming the tumor/stroma border.
+CN 2 and CN 10 are mainly composed of B and BnT cells indicating TLS. CN 3 is composed 
+of aggregated plasma cells and CN 7 contains most T cells.
+
+We will now detect cellular neighborhoods by computing the mean expression 
+across the 20-nearest neighbor prior to clustering.
 
 ```{r, fig.height=12, fig.width=12}
 # By expression
@@ -317,6 +351,12 @@ for_plot <- colData(spe) %>% as_tibble() %>%
 pheatmap(for_plot, color = colorRampPalette(c("dark blue", "white", "dark red"))(100), 
          show_rownames = FALSE, scale = "column")
 ```
+
+**Of note:** constructing a 20-nearest neighbor graphs and clustering using
+kmeans with `k=10` is only an example. Similar to the analysis done in 
+Section \@ref(snn-graph), it is recommended to perform a parameter sweep
+across different graph construction algorithms and different parmaters `k`
+for kmeans clustering.
 
 Via lisaClust
 
