@@ -389,7 +389,7 @@ using the
 [spicyR](https://www.bioconductor.org/packages/release/bioc/html/spicyR.html)
 package.
 
-```{r lisaClust, message=FALSE, fig.height=12, fig.width=12}
+```{r lisaClust-1, message=FALSE}
 library(lisaClust)
 library(spicyR)
 
@@ -412,7 +412,7 @@ Increasing these radii will lead to broader and smoother spatial clusters.
 However, a number of parameters should be tested to estimate the robustness
 of the results.
 
-```{r}
+```{r lisaClust-2, fig.height=12, fig.width=12}
 m <- lisa(lisa_sc, Rs = c(10, 20, 50))
 
 # Set NA to 0
@@ -432,7 +432,7 @@ plotSpatial(spe,
 Similar to the example above, we can now observe the cell type composition
 per spatial cluster.
 
-```{r, message=FALSE}
+```{r lisaClust-3, message=FALSE}
 for_plot <- colData(spe) %>% as_tibble() %>%
     group_by(lisa_clusters, celltype) %>%
     summarize(count = n()) %>%
@@ -453,7 +453,20 @@ and CN 1 represents clustered myeloid cells and neutrophiles.
 
 ## Patch detection
 
-```{r, fig.height=12, fig.width=12}
+The previous section focused on detecting cellular neighborhoods in a rather
+unsupervised fashion. However, the `imcRtools` package also provides methods for
+detecting spatial compartments in a supervised fashion. The
+[patchDetection](https://bodenmillergroup.github.io/imcRtools/reference/patchDetection.html)
+function allows the detection of connected sets of similar cells as proposed by
+[@Hoch2022]. In the following example, we will use the `patchDetection` detect
+function to detect tumor patches in three steps:
+
+1. Find connected sets of tumor cells (using the `steinbock` graph).  
+2. Components which contain less than 10 cells are excluded.  
+3. Expand the components by 1µm to construct a concave hull around the patch and
+include cells within the patch.
+
+```{r patchDetection-1, fig.height=12, fig.width=12}
 spe <- patchDetection(spe, 
                       patch_cells = spe$celltype == "Tumor",
                       img_id = "sample_id",
@@ -469,9 +482,10 @@ plotSpatial(spe,
     scale_color_manual(values = rev(colors()))
 ```
 
-T cell frequency per tumor patch
+We can now calculate the fraction of T cells within each tumor patch to roughly
+estimate T cell infiltration.
 
-```{r, message=FALSE}
+```{r patchDetection-2, message=FALSE}
 colData(spe) %>% as_tibble() %>%
     group_by(patch_id, sample_id) %>%
     summarize(Tcell_count = sum(celltype == "CD8" | celltype == "CD4"),
@@ -481,6 +495,10 @@ colData(spe) %>% as_tibble() %>%
         geom_point(aes(log10(patch_size), Tcell_freq, color = sample_id)) +
     theme_classic()
 ```
+
+We observe an increase of T cell infiltration with tumor patch size. This effect
+is most likely cause by sparse but fully connected tumor cell regions which
+contain many stromal cells.
 
 ## Interaction analysis
 
