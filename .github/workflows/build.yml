@@ -32,7 +32,7 @@ jobs:
                                             "distill", "openxlsx", "ggrepel", "patchwork", "mclust",
                                             "RColorBrewer", "uwot", "Rtsne", "harmony", "Seurat", "SeuratObject", "cowplot",
                                             "kohonen", "caret", "randomForest", "ggridges", "cowplot", "gridGraphics", 
-                                            "scales", ))'
+                                            "scales"))'
       - name: Install Bioconductor dependencies
         run: Rscript -e 'BiocManager::install(c("CATALYST", "scuttle", "scater", "dittoSeq", "tidyverse", "BiocStyle", "batchelor", "bluster",
                                                 "scran", "lisaClust", "spicyR"))'
