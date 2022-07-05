@@ -1,7 +1,7 @@
 # Performing spatial analysis
 
 Highly multiplexed imaging technologies acquire the spatial distributions 
-of molecule abundances across a tissue section. As such, analyzing single cells
+of molecule abundances across tissue sections. As such, analyzing single cells
 in their spatial tissue context is a key strength of these technologies.
 
 A number of software packages such as
@@ -22,7 +22,7 @@ library(SpatialExperiment)
 spe <- readRDS("data/spe.rds")
 ```
 
-## Build interaction graphs
+## Spatial interaction graphs
 
 Many spatial analysis approaches either compare the observed versus expected
 number of cells around a given cell type (point process) or utilize interaction
@@ -39,15 +39,15 @@ graphs directly using a `SpatialExperiment` or `SingleCellExperiment` object
 while considering the spatial location (centroids) of individual cells. The
 [buildSpatialGraph](https://bodenmillergroup.github.io/imcRtools/reference/buildSpatialGraph.html)
 function allows constructing spatial graphs by detecting the k-nearest neighbors
-in 2D (`knn`), by detecting all cells within a given distance to the centre cell
+in 2D (`knn`), by detecting all cells within a given distance to the center cell
 (`expansion`) and by Delaunay triangulation (`delaunay`).
 
 When constructing a knn graph, the number of neighbors (`k`) needs to be set and
-the maximum distance to consider (`max_dist`) can be set. When constructing a
-graph via expansion, the distance to expand (`threshold`) needs to be specified.
-For graphs to be constructed via Delaunay triangulation, the `max_dist`
-parameter can be set to avoid unusually large connections at the edge of the
-image.
+(optionally) the maximum distance to consider (`max_dist`) can be specified.
+When constructing a graph via expansion, the distance to expand (`threshold`)
+needs to be provided. For graphs constructed via Delaunay triangulation,
+the `max_dist` parameter can be set to avoid unusually large connections at the
+edge of the image.
 
 ```{r build-spatial-graphs, message=FALSE}
 library(imcRtools)
@@ -56,10 +56,10 @@ spe <- buildSpatialGraph(spe, img_id = "sample_id", type = "expansion", threshol
 spe <- buildSpatialGraph(spe, img_id = "sample_id", type = "delaunay", max_dist = 50)
 ```
 
-The spatial graphs are stored in `colPair(spe, name)`. These are `SelfHits`
-objects representing edge lists in which the first column indicates the index of
-the "from" cell and the second column the index of the "to" cell. Each
-edge list is newly constructed when subsetting the object.
+The spatial graphs are stored in `colPair(spe, name)` slots. These slots store
+`SelfHits` objects representing edge lists in which the first column indicates
+the index of the "from" cell and the second column the index of the "to" cell.
+Each edge list is newly constructed when subsetting the object.
 
 ```{r show-colPairNames}
 colPairNames(spe)
@@ -177,12 +177,13 @@ cells are clustered solely based on their interactions as defined by the
 spatial object graph. In the following example, we perform spatial community 
 detection separately for tumor and stromal cells.
 
-The general procedure is as follows: 
-* subset the object to contain either tumor or stromal cells  
-* create an `igraph` object from the edge list stored in `colPair(tumor_spe, "neighborhood")`  
-* perform community detection using the Louvain algorithm  
-* store the community IDs in a vector and replace all communities with a size
-smaller than 10 by `NA`  
+The general procedure is as follows:    
+1. subset the object to contain either tumor or stromal cells      
+2. create an `igraph` object from the edge list stored in 
+`colPair(tumor_spe, "neighborhood")`
+3. perform community detection using the Louvain algorithm      
+4. store the community IDs in a vector and replace all communities with a size 
+smaller than 10 by `NA`    
 
 Both tumor and stromal spatial communities are stored in the `colData` of
 the `SpatialExperiment` object.
@@ -232,11 +233,11 @@ plotSpatial(spe[,spe$celltype != "Tumor"],
 ```
 
 The example data was acquired using a panel that mainly focuses on immune cells.
-We are therefore unable to detect many tumor sub-phenotypes and will therefore
+We are therefore unable to detect many tumor sub-phenotypes and will 
 focus on the stromal communities.
 
-In the next step, we calculate the fraction of cell types within each spatial stromal
-community. 
+In the next step, the fraction of cell types within each
+spatial stromal community is displayed.
 
 ```{r spatial-community-heatmap, message=FALSE}
 library(tidyverse)
@@ -255,17 +256,19 @@ for_plot <- colData(spe) %>% as_tibble() %>%
 
 pheatmap(for_plot, color = viridis(100), show_rownames = FALSE)
 ```
+
 We observe that many spatial stromal communities are made up of myeloid cells or
 "stromal" (non-immune) cells. Other communities are mainly made up of B cells
-and BnT cells indicating tertiray lymphoid structures. While plasma cells tend
-to aggregate, only in few spatial stromal communities one can observe mainly
-CD4+ or CD8+ T cells.
+and BnT cells indicating tertiary lymphoid structures (TLS). While plasma cells,
+CD4$^+$ or CD8$^+$ T cells tend to aggregate, only in few spatial stromal
+communities consists of mainly neutrophils.
 
 ## Cellular neighborhood analysis
 
-In the following section, we will highlight the use of `imcRtools` to detect
+The following section highlights the use of the `imcRtools` package to detect
 cellular neighborhoods. This approach has been proposed by [@Goltsev2018] and
-[@Schurch2020] to group cells based on information of their direct neighborhood.
+[@Schurch2020] to group cells based on information contained in their direct
+neighborhood.
 
 [@Goltsev2018] perfomed Delaunay triangulation-based graph construction, 
 neighborhood aggregation and then clustered cells. [@Schurch2020] on the 
@@ -275,10 +278,10 @@ information across neighboring cells.
 In the following code chunk we will use the 20-nearest neighbor graph
 as constructed above to define the direct cellular neighborhood. The
 [aggregateNeighbors](https://bodenmillergroup.github.io/imcRtools/reference/aggregateNeighbors.html)
-function now performs neighborhood aggregation in 2 ways:
+function allows neighborhood aggregation in 2 different ways:
 
-1. For each cell it computes the fraction of cells of a certain type (e.g., cell
-type) among its neighbors.
+1. For each cell the function computes the fraction of cells of a certain type
+(e.g., cell type) among its neighbors.
 2. For each cell it aggregates (e.g., mean) the expression counts across all
 neighboring cells.
 
@@ -304,8 +307,8 @@ plotSpatial(spe,
     scale_color_brewer(palette = "Set3")
 ```
 
-We will now visualize the cell type compositions of the detected cellular
-neighborhoods (CN).
+The next code chunk visualizes the cell type compositions of the detected
+cellular neighborhoods (CN).
 
 ```{r, message=FALSE}
 for_plot <- colData(spe) %>% as_tibble() %>%
@@ -407,13 +410,13 @@ lisa_sc
 
 After creating the `SegmentedCells` object, the `lisa` function computes LISA
 curves across a given set of distances. In the following example, we calculate
-the LISA curves within a 10µm, 20µm and 50µm neighborhood of each cell. 
+the LISA curves within a 10µm, 20µm and 50µm neighborhood around each cell.
 Increasing these radii will lead to broader and smoother spatial clusters.
-However, a number of parameters should be tested to estimate the robustness
-of the results.
+However, a number of parameter settings should be tested to estimate the
+robustness of the results.
 
-```{r lisaClust-2, fig.height=12, fig.width=12}
-m <- lisa(lisa_sc, Rs = c(10, 20, 50))
+```{r lisaClust-2, message=FALSE, fig.height=12, fig.width=12}
+lisaCurves <- lisa(lisa_sc, Rs = c(10, 20, 50))
 
 # Set NA to 0
 lisaCurves[is.na(lisaCurves)] <- 0
@@ -446,10 +449,10 @@ pheatmap(for_plot, color = colorRampPalette(c("dark blue", "white", "dark red"))
          scale = "column")
 ```
 
-Int this case, CN 9, CN 8 and CN 4 contain tumor cells with CN 4 forming the 
+In this case, CN 9, CN 8 and CN 4 contain tumor cells with CN 4 forming the 
 tumor/stroma interface. CN 3 and CN 7 represent TLS with CN 7 being the 
 TLS core and CN 3 being the margin. CN 6 indicates clustered plasma cells 
-and CN 1 represents clustered myeloid cells and neutrophiles.
+and CN 1 represents clustered myeloid cells and neutrophils.
 
 ## Patch detection
 
@@ -458,8 +461,8 @@ unsupervised fashion. However, the `imcRtools` package also provides methods for
 detecting spatial compartments in a supervised fashion. The
 [patchDetection](https://bodenmillergroup.github.io/imcRtools/reference/patchDetection.html)
 function allows the detection of connected sets of similar cells as proposed by
-[@Hoch2022]. In the following example, we will use the `patchDetection` detect
-function to detect tumor patches in three steps:
+[@Hoch2022]. In the following example, we will use the `patchDetection` function
+to detect function to detect tumor patches in three steps:
 
 1. Find connected sets of tumor cells (using the `steinbock` graph).  
 2. Components which contain less than 10 cells are excluded.  
@@ -479,7 +482,7 @@ plotSpatial(spe,
             img_id = "sample_id", 
             node_size_fix = 0.5) +
     theme(legend.position = "none") +
-    scale_color_manual(values = rev(colors()))
+    scale_color_manual(values = colors())
 ```
 
 We can now calculate the fraction of T cells within each tumor patch to roughly
@@ -496,15 +499,16 @@ colData(spe) %>% as_tibble() %>%
     theme_classic()
 ```
 
-We observe an increase of T cell infiltration with tumor patch size. This effect
-is most likely cause by sparse but fully connected tumor cell regions which
-contain many stromal cells.
+An increase of T cell infiltration with tumor patch size can be observed. This
+effect is most likely cause by sparse but fully connected tumor cell regions
+which contain many stromal cells.
 
 ## Interaction analysis
 
-The next section focuses on statistically testing the pariwise interaction
+The next section focuses on statistically testing the pairwise interaction
 between all cell types of the dataset. For this, the `imcRtools` package
-provides the [testInteractions](https://bodenmillergroup.github.io/imcRtools/) 
+provides the 
+[testInteractions](https://bodenmillergroup.github.io/imcRtools/reference/testInteractions.html) 
 function which implements the interaction testing strategy proposed by
 [@Shapiro2017]. 
 
@@ -526,7 +530,7 @@ out <- testInteractions(spe,
 head(out)
 ```
 
-The returned `DataFrame` lists the test results per grouping level (in this case
+The returned `DataFrame` contains the test results per grouping level (in this case
 the image ID, `group_by`), "from" cell type (`from_label`) and "to" cell type
 (`to_label`). The `sigval` entry indicates if a pair of cell types is
 significantly interacting (`sigval = 1`), if a pair of cell types is
@@ -545,7 +549,8 @@ out %>% as_tibble() %>%
         scale_fill_gradient2(low = muted("blue"), mid = "white", high = muted("red")) +
         theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
-In the plot above red tiles indicate cell type pairs that were detected to 
+
+In the plot above the red tiles indicate cell type pairs that were detected to 
 significantly interact on a large number of images. On the other hand, blue
 tiles show cell type pairs which tend to avoid each other on a large number 
 of images. 
@@ -555,11 +560,11 @@ avoidance with other cell types. As expected, B cells interact with BnT cells;
 regulatory T cells interact with CD4+ T cells and CD8+ T cells. Most cell types
 show self interactions indicating spatial clustering. 
 
-The `imcRtools` package further implements an interaction testing strategy 
-proposed by [@Schulz2018] where the hypothesis is tested if at least n cells
-of a certain type are located around a target cell type. This type of testing
-can be performed by selecting `method = "patch"` and specifying the number
-of patch cells via the `patch_size` parameter.
+The `imcRtools` package further implements an interaction testing strategy
+proposed by [@Schulz2018] where the hypothesis is tested if at least n cells of
+a certain type are located around a target cell type (`from_cell`). This type of
+testing can be performed by selecting `method = "patch"` and specifying the
+number of patch cells via the `patch_size` parameter.
 
 ```{r testInteractions-3, message=FALSE}
 out <- testInteractions(spe, 
@@ -580,8 +585,8 @@ out %>% as_tibble() %>%
 
 These results are comparable to the interaction testing presented above. The
 main difference comes from the lack of symmetry. We can now for example see that
-3 or more myeloid cells sit around CD4+ T cells while this interaction is not
-as strong when considering CD4+ T cells sitting around myeloid cells.
+3 or more myeloid cells sit around CD4$^+$ T cells while this interaction is not
+as strong when considering CD4$^+$ T cells sitting around myeloid cells.
 
 ## Session Info
 
