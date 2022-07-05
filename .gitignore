@@ -11,3 +11,4 @@ IMCDataAnalysis.rds
 _bookdown_files/
 *~*
 *.md
+*.rds
