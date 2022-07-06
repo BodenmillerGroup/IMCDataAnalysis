@@ -158,7 +158,7 @@ of different patients. Cluster annotation can now be performed by manually
 labeling cells based on their marker expression (see Notes in Section
 \@ref(clustering-notes)).
 
-### Shared nearest neighbour graph
+### Shared nearest neighbour graph {#snn-graph}
 
 The [bluster](https://www.bioconductor.org/packages/release/bioc/html/bluster.html) 
 package provides a simple interface to cluster cells using a number of different
