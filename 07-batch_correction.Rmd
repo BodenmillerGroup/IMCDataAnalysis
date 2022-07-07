@@ -96,9 +96,8 @@ DataFrame(left = merge_info$left,
           max_lost_var = rowMax(merge_info$lost.var))
 ```
 
-We observe that Patient4 and Patient2 are most similar with lowest batch effect.
-The percentage of lost variance is also minimal when merging cells of these
-patients. Merging cells of Patient3 into the combined batch of Patient1,
+We observe that Patient4 and Patient2 are most similar with a low batch effect. 
+Merging cells of Patient3 into the combined batch of Patient1,
 Patient2 and Patient4 resulted in the highest percentage of lost variance and
 the detection of the largest batch effect. In the next paragraph we can
 visualize the correction results.
@@ -362,7 +361,7 @@ plot_grid(plotlist = plot_list)
 
 Similar to the methods presented above, `Seurat` integrates immune cells correctly.
 When visualizing the patient IDs, slight patient-to-patient differences within tumor
-cells can be detected, similar to `fastMNN`. 
+cells can be detected. 
 
 Choosing the correct integration approach is challenging without having ground truth
 cell labels available. It is recommended to compare different techniques and different

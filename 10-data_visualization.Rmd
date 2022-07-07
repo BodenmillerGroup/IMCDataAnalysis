@@ -1,5 +1,0 @@
-# Visualizing single-cell data 
-
-Using the `dittoSeq` package.
-
-# Spatial visualzation {#spatial-viz}

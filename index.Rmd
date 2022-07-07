@@ -13,9 +13,7 @@ description: "This bookdown project highlights possible down-stream analyses per
 
 # IMC Data Analysis Workflow {#preamble}
 
-**This project is under development and will change on a regular basis**
-
-Upon release, this workflow highlights the use of common R/Bioconductor packages
+This workflow highlights the use of common R/Bioconductor packages
 to analyze single-cell data obtained from segmented imaging mass cytometry (IMC)
 images. We will not perform multi-channel image processing and segmentation in R
 but rather link to available approaches in Section \@ref(processing). While we
@@ -30,11 +28,12 @@ strategies to extract single-cell data from IMC images in Section
 Reproducible code written in R is available from Section \@ref(prerequisites)
 onwards and the workflow can be largely divided into the following parts:
 
-1. Pre-processing (reading in the data, spillover correction)
-2. Metrics for quality control
-3. Low-dimensional visualization, clustering and/or cell-type classification
-4. Visualization of cell- and pixel-level information
-5. Spatial analyses
+1. Preprocessing (reading in the data, spillover correction)
+2. Image- and cell-level quality control, low-dimensional visualization
+3. Sample/batch effect correction
+4. Cell phenotyping via clustering or classification
+5. Image visualization
+6. Spatial analyses
 
 ## Feedback and contributing
 

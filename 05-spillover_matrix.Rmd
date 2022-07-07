@@ -369,6 +369,21 @@ For convenience, we will re-set the `channelNames` to their biological targtes:
 channelNames(images_comp) <- rownames(spe)
 ```
 
+## Write out compensated images
+
+In the final step, the compensated images are written out as 16-bit TIFF
+files:
+
+```{r write-images, message=FALSE, results='hide'}
+library(tiff)
+dir.create("data/comp_img")
+lapply(names(images_comp), function(x){
+  writeImage(as.array(images_comp[[x]])/(2^16 - 1), 
+             paste0("data/comp_img/", x, ".tiff"),
+             bits.per.sample = 16)
+})
+```
+
 ## Save objects
 
 For further downstream analysis, the compensated `SpatialExperiment` and

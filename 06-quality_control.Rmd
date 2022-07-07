@@ -275,9 +275,6 @@ cur_snr %>% ggplot() +
     xlab("Signal intensity")
 ```
 
-The SNR quantification on the single-cell level recapitulates the SNR quantification
-on the pixel level.
-
 Next, we observe the distributions of cell size across the individual images.
 Differences in cell size distributions can indicate segmentation biases due to
 differences in cell density or can indicate biological differences due to cell

@@ -47,7 +47,7 @@ Data processing:
 * [scater](https://bioconductor.org/packages/release/bioc/html/scater.html) version `r packageVersion("scater")`
 * [batchelor](https://www.bioconductor.org/packages/release/bioc/html/batchelor.html) version `r packageVersion("batchelor")`
 * [harmony](https://github.com/immunogenomics/harmony) version `r packageVersion("harmony")`
-* [Seurat](https://github.com/immunogenomics/harmony) version `r packageVersion("Seurat")`
+* [Seurat](https://satijalab.org/seurat/index.html) version `r packageVersion("Seurat")`
 
 Data visualization:
 
@@ -58,7 +58,7 @@ Tidy R:
 
 * [tidyverse](https://www.tidyverse.org/) version `r packageVersion("tidyverse")`
 
-## Image processing
+## Image processing {#image-processing}
 
 The analysis presented here fully relies on packages written in the programming
 language `R` and primarily focuses on analysis approaches downstream of image
@@ -73,7 +73,7 @@ exact command line interface calls to process the raw data are shown below:
 dir.create("data/steinbock")
 dir.create("data/ImcSegmentationPipeline")
 # Pre-download steinbock file
-download.file("https://zenodo.org/record/6460961/files/steinbock.sh", 
+download.file("https://zenodo.org/record/6642699/files/steinbock.sh", 
               "data/steinbock/steinbock.sh")
 ```
 
@@ -120,14 +120,14 @@ commands which were used to process the data can be found in
 
 ```{r steinbock-results}
 # download intensities
-url <- "https://zenodo.org/record/6460961/files/intensities.zip"
+url <- "https://zenodo.org/record/6642699/files/intensities.zip"
 destfile <- "data/steinbock/intensities.zip"
 download.file(url, destfile)
 unzip(destfile, exdir="data/steinbock", overwrite=TRUE)
 unlink(destfile)
 
 # download regionprops
-url <- "https://zenodo.org/record/6460961/files/regionprops.zip"
+url <- "https://zenodo.org/record/6642699/files/regionprops.zip"
 destfile <- "data/steinbock/regionprops.zip"
 download.file(url, destfile)
 unzip(destfile, exdir="data/steinbock", overwrite=TRUE)
@@ -135,32 +135,32 @@ unlink(destfile)
 
 
 # download neighbors
-url <- "https://zenodo.org/record/6460961/files/neighbors.zip"
+url <- "https://zenodo.org/record/6642699/files/neighbors.zip"
 destfile <- "data/steinbock/neighbors.zip"
 download.file(url, destfile)
 unzip(destfile, exdir="data/steinbock", overwrite=TRUE)
 unlink(destfile)
 
 # download images
-url <- "https://zenodo.org/record/6460961/files/img.zip"
+url <- "https://zenodo.org/record/6642699/files/img.zip"
 destfile <- "data/steinbock/img.zip"
 download.file(url, destfile)
 unzip(destfile, exdir="data/steinbock", overwrite=TRUE)
 unlink(destfile)
 
 # download masks
-url <- "https://zenodo.org/record/6460961/files/masks_deepcell.zip"
+url <- "https://zenodo.org/record/6642699/files/masks_deepcell.zip"
 destfile <- "data/steinbock/masks_deepcell.zip"
 download.file(url, destfile)
 unzip(destfile, exdir="data/steinbock", overwrite=TRUE)
 unlink(destfile)
 
 # download individual files
-download.file("https://zenodo.org/record/6460961/files/panel.csv", 
+download.file("https://zenodo.org/record/6642699/files/panel.csv", 
               "data/steinbock/panel.csv")
-download.file("https://zenodo.org/record/6460961/files/images.csv", 
+download.file("https://zenodo.org/record/6642699/files/images.csv", 
               "data/steinbock/images.csv")
-download.file("https://zenodo.org/record/6460961/files/steinbock.sh", 
+download.file("https://zenodo.org/record/6642699/files/steinbock.sh", 
               "data/steinbock/steinbock.sh")
 ```
 
@@ -211,7 +211,7 @@ online at [zenodo.org/record/6554611](https://zenodo.org/record/6554611) and
 will be downloaded here for later use:
 
 ```{r download-gated-cells}
-download.file("https://zenodo.org/record/6554611/files/gated_cells.zip",
+download.file("https://zenodo.org/record/6670610/files/gated_cells.zip",
               "data/gated_cells.zip")
 unzip("data/gated_cells.zip", exdir="data", overwrite=TRUE)
 unlink("data/gated_cells.zip")
