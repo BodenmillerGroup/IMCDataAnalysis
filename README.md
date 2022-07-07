@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6806449.svg)](https://doi.org/10.5281/zenodo.6806449)
+
 # R based analysis workflow for IMC data
 
 <!-- badges: start -->
