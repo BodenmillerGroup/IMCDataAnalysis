@@ -38,10 +38,10 @@ You can also add sections by forking the repo, adding your changes and issuing a
 
 ## Contributors
 
-[Vito Zanotelli](https://github.com/votti)
-[Daniel Schulz](https://github.com/SchulzDan)
-[Jonas Windhager](https://github.com/jwindhager) 
-[Michelle Daniel](https://github.com/michdaniel)
+[Vito Zanotelli](https://github.com/votti)  
+[Daniel Schulz](https://github.com/SchulzDan)  
+[Jonas Windhager](https://github.com/jwindhager)   
+[Michelle Daniel](https://github.com/michdaniel)  
 
 ## Citation
 
