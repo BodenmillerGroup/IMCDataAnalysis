@@ -90,14 +90,14 @@ To highlight the basic steps of IMC data analysis, we provide example data that
 were acquired as part of the **I**ntegrated i**MMU**noprofiling of large adaptive
 **CAN**cer patient cohorts projects ([immucan.eu](https://immucan.eu/)). The
 raw data of 4 patients can be accessed online at 
-[zenodo.org/record/5949116](https://zenodo.org/record/5949116).
-Image processing and segmentation has been performed using `steinbock` and
-the IMC segmentation pipeline (see below) and we will only need to access the
-sample/patient information here:
+[zenodo.org/record/5949116](https://zenodo.org/record/5949116) the
+sample/patient metadata information here:
 
 ```{r download-sample-data}
 download.file("https://zenodo.org/record/5949116/files/sample_metadata.xlsx", 
          destfile = "data/sample_metadata.xlsx")
+#TODO
+# I downloaded the file and cannot open it in excel. it says corrupted. Also when trying to read it with `read_xlsx` it says something about that it actually is a zip file.
 ```
 
 ### Processed multiplexed imaging data
@@ -110,12 +110,12 @@ extraction.
 
 **steinbock output**
 
-The needed output of the `steinbock` framework includes the single-cell mean
+The output of the `steinbock` framework required for the analysis presented here includes the single-cell mean
 intensity files, the single-cell morphological features and spatial locations,
-spatial object graphs in form of edge lists indication cells in close proximity,
+spatial object graphs in form of edge lists indicating cells in close proximity,
 hot pixel filtered multi-channel images, segmentation masks, image metadata and
-channel metadata. All these files will be downloaded here for easy access. The
-commands which were used to process the data can be found in
+channel metadata. All these files will be downloaded here for later use. The
+commands which were used to generate this data can be found in
 `data/steinbock/steinbock.sh`.
 
 ```{r steinbock-results}
