@@ -181,7 +181,7 @@ pheatmap(log10(cur_table + 1),
 ```
 
 We can see here, that all pixels were assigned to the right mass and that all
-pixel sets are made up if > 1000 pixels.
+pixel sets are made up of > 1000 pixels.
 
 However, in cases where incorrect assignment occurred or where few pixels were
 measured for some spots, the `imcRtools` package exports a simple helper
@@ -304,7 +304,7 @@ before + after
 ```
 
 We observe that the spillover Yb173 --> Yb174 was successfully corrected.
-To facilitate further downstream analysis, the non-compesnated assays can now be
+To facilitate further downstream analysis, the non-compensated assays can now be
 replaced by their compensated counterparts:
 
 ```{r overwrite-assays}

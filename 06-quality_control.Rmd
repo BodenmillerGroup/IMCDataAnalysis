@@ -350,7 +350,7 @@ These variations arise partly from differences in region selection for
 measurement (it appears that Patient3 contains a higher number of CD11c+ and
 HLADR+ cells) as well as staining differences between samples. While most of the
 selected markers are specifically expressed in immune cell subtypes, we can see
-that E-Cadherin (a marker for tumor cells) shows similar expression across all
+that E-Cadherin (a marker for epithelial (tumor) cells) shows similar expression across all
 patients.
 
 Finally, we will use non-linear dimensionality reduction methods to project

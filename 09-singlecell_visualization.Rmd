@@ -1,0 +1,131 @@
+# Single cell visualization {#single-cell-visualization}
+
+The following section describes how to ...
+
+We will first read in the previously processed data and randomly select 3 images
+for visualization purposes.
+
+## Overview
+
+## Recycled code from previous chapters 
+
+o visualize single-cell expression in form of a
+heatmap. Here, we sub-sample the dataset to 2000 cells for visualization
+purposes and overlay the cancer type from which the cells were extracted.
+
+```{r segmentation-heatmap, message=FALSE, fig.height=7}
+library(dittoSeq)
+library(viridis)
+cur_cells <- sample(seq_len(ncol(spe)), 2000)
+
+dittoHeatmap(spe[,cur_cells], genes = rownames(spe)[rowData(spe)$use_channel],
+             assay = "exprs", cluster_cols = TRUE, scale = "none",
+             heatmap.colors = viridis(100), annot.by = "indication",
+             annotation_colors = list(indication = metadata(spe)$color_vectors$indication))
+```
+
+
+Finally, it can be beneficial to visualize the mean marker expression per image
+to identify images with outlying cell type compositions. This check does not
+indicate image quality _per se_ but can highlight biological differences. Here,
+we will use the `aggregateAcrossCells` function of the 
+`r BiocStyle::Biocpkg("scuttle")` package to compute the mean expression per 
+image. For visualization purposes, we again `asinh` transform the mean expression
+values.
+
+```{r mean-expression-per-image, message=FALSE, fig.height=7}
+library(scuttle)
+
+image_mean <- aggregateAcrossCells(spe, 
+                                   ids = spe$sample_id, 
+                                   statistics="mean",
+                                   use.assay.type = "counts")
+assay(image_mean, "exprs") <- asinh(counts(image_mean))
+
+dittoHeatmap(image_mean, genes = rownames(spe)[rowData(spe)$use_channel],
+             assay = "exprs", cluster_cols = TRUE, scale = "none",
+             heatmap.colors = viridis(100), 
+             annot.by = c("indication", "patient_id", "ROI"),
+             annotation_colors = list(indication = metadata(spe)$color_vectors$indication,
+                                      patient_id = metadata(spe)$color_vectors$patient_id,
+                                      ROI = metadata(spe)$color_vectors$ROI),
+             show_colnames = TRUE)
+```
+
+
+The data presented here were stained on individual slides. Also, samples were
+pre-processed in different locations. These (and other) technical aspects can
+induce staining differences between samples or batches of samples. Observing
+potential staining differences can be crucial to assess data quality.
+We will use ridgeline visualizations to check differences in staining patterns:
+
+```{r ridges, message=FALSE, fig.width=7, fig.height=25}
+multi_dittoPlot(spe, vars = rownames(spe)[rowData(spe)$use_channel],
+               group.by = "patient_id", plots = c("ridgeplot"), 
+               assay = "exprs", 
+               color.panel = metadata(spe)$color_vectors$patient_id)
+```
+
+Visualization of the low-dimensional embedding facilitates assessment of 
+potential "batch effects". The `dittoDimPlot`
+function allows flexible visualization. It returns `ggplot` objects which
+can be further modified.
+
+```{r visualizing-dimred, message=FALSE}
+library(patchwork)
+
+# visualize patient id 
+p1 <- dittoDimPlot(spe, var = "patient_id", reduction.use = "UMAP", size = 0.2) + 
+    scale_color_manual(values = metadata(spe)$color_vectors$patient_id) +
+    ggtitle("Patient ID on UMAP")
+p2 <- dittoDimPlot(spe, var = "patient_id", reduction.use = "TSNE", size = 0.2) + 
+    scale_color_manual(values = metadata(spe)$color_vectors$patient_id) +
+    ggtitle("Patient ID on TSNE")
+
+# visualize region of interest id
+p3 <- dittoDimPlot(spe, var = "ROI", reduction.use = "UMAP", size = 0.2) + 
+    scale_color_manual(values = metadata(spe)$color_vectors$ROI) +
+    ggtitle("ROI ID on UMAP")
+p4 <- dittoDimPlot(spe, var = "ROI", reduction.use = "TSNE", size = 0.2) + 
+    scale_color_manual(values = metadata(spe)$color_vectors$ROI) +
+    ggtitle("ROI ID on TSNE")
+
+(p1 + p2) / (p3 + p4)
+
+# visualize marker expression
+p1 <- dittoDimPlot(spe, var = "Ecad", reduction.use = "UMAP", 
+                   assay = "exprs", size = 0.2) +
+    scale_color_viridis(name = "Ecad") +
+    ggtitle("E-Cadherin expression on UMAP")
+p2 <- dittoDimPlot(spe, var = "CD45RO", reduction.use = "UMAP", 
+                   assay = "exprs", size = 0.2) +
+    scale_color_viridis(name = "CD45RO") +
+    ggtitle("CD45RO expression on UMAP")
+p3 <- dittoDimPlot(spe, var = "Ecad", reduction.use = "TSNE", 
+                   assay = "exprs", size = 0.2) +
+    scale_color_viridis(name = "Ecad") +
+    ggtitle("Ecad expression on TSNE")
+p4 <- dittoDimPlot(spe, var = "CD45RO", reduction.use = "TSNE", 
+                   assay = "exprs", size = 0.2) +
+    scale_color_viridis(name = "CD45RO") +
+    ggtitle("CD45RO expression on TSNE")
+
+(p1 + p2) / (p3 + p4)
+```
+
+## Read in the data
+
+We will first read in the data processed in previous sections:
+
+```{r read-data, message=FALSE}
+spe <- readRDS("data/spe.rds")
+```
+## Session Info
+
+<details>
+   <summary>SessionInfo</summary>
+   
+```{r, echo = FALSE}
+sessionInfo()
+```
+</details>
