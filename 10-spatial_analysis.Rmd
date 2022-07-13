@@ -80,6 +80,7 @@ introduce the
 [plotSpatial](https://bodenmillergroup.github.io/imcRtools/reference/plotSpatial.html)
 function of the `imcRtools` package to visualize the cells' centroids and
 cell-cell interactions as spatial graphs.
+TODO I just noticed now that here you have a hyperlink for cytomapper but not for imcRtools. potentially you may want to be consistent. but just a minor thing.
 
 In the following example, we select one image for visualization purposes. 
 Here, each dot (node) represents a cell and edges are drawn between cells
@@ -240,19 +241,10 @@ In the next step, the fraction of cell types within each
 spatial stromal community is displayed.
 
 ```{r spatial-community-heatmap, message=FALSE}
-library(tidyverse)
 library(pheatmap)
 library(viridis)
 
-for_plot <- colData(spe) %>% as_tibble() %>%
-    filter(celltype != "Tumor") %>%
-    group_by(spatial_community, celltype) %>%
-    summarize(count = n()) %>%
-    mutate(freq = count / sum(count)) %>%
-    pivot_wider(id_cols = spatial_community, names_from = celltype, 
-                values_from = freq, values_fill = 0) %>%
-    ungroup() %>%
-    select(-spatial_community)
+for_plot <- prop.table(table(spe[,spe$celltype != "Tumor"]$spatial_community, spe[,spe$celltype != "Tumor"]$celltype), margin = 1)
 
 pheatmap(for_plot, color = viridis(100), show_rownames = FALSE)
 ```
@@ -311,14 +303,7 @@ The next code chunk visualizes the cell type compositions of the detected
 cellular neighborhoods (CN).
 
 ```{r, message=FALSE}
-for_plot <- colData(spe) %>% as_tibble() %>%
-    group_by(cn_celltypes, celltype) %>%
-    summarize(count = n()) %>%
-    mutate(freq = count / sum(count)) %>%
-    pivot_wider(id_cols = cn_celltypes, names_from = celltype, 
-                values_from = freq, values_fill = 0) %>%
-    ungroup() %>%
-    select(-cn_celltypes)
+for_plot <- prop.table(table(spe$cn_celltypes, spe$celltype), margin = 1)
 
 pheatmap(for_plot, color = colorRampPalette(c("dark blue", "white", "dark red"))(100), 
          scale = "column")
@@ -349,14 +334,7 @@ Also here, we can visualize the cell type composition of each cellular
 neighborhood.
 
 ```{r, message=FALSE}
-for_plot <- colData(spe) %>% as_tibble() %>%
-    group_by(cn_expression, celltype) %>%
-    summarize(count = n()) %>%
-    mutate(freq = count / sum(count)) %>%
-    pivot_wider(id_cols = cn_expression, names_from = celltype, 
-                values_from = freq, values_fill = 0) %>%
-    ungroup() %>%
-    select(-cn_expression)
+for_plot <- prop.table(table(spe$cn_expression, spe$celltype), margin = 1)
 
 pheatmap(for_plot, color = colorRampPalette(c("dark blue", "white", "dark red"))(100), 
          scale = "column")
@@ -370,6 +348,7 @@ BnT cells representing TLS but CN 7 and CN 9 (T cell rich neighborhoods) are
 expanded compared to the previous CN detection approach. CN detection based on
 mean marker expression is therefore sensitive to staining/expression differences
 between samples as well as lateral spillover due to imperfect segmentation.
+TODO not sure I understand why this approach should be sensitive to lateral spillover. I see it more as an unbiased way to cluster cells based on neighborhood expression without having to go through clustering or cell type definition first. potentially the differences observed here are also due to the fact that knn should be smaller for expression based aggregation. It would also be nice to maybe show here a heatmap of aggregated expression instead of cell types.
 
 **Of note:** constructing a 20-nearest neighbor graph and clustering using
 kmeans with `k=10` is only an example. Similar to the analysis done in Section
@@ -436,14 +415,7 @@ Similar to the example above, we can now observe the cell type composition
 per spatial cluster.
 
 ```{r lisaClust-3, message=FALSE}
-for_plot <- colData(spe) %>% as_tibble() %>%
-    group_by(lisa_clusters, celltype) %>%
-    summarize(count = n()) %>%
-    mutate(freq = count / sum(count)) %>%
-    pivot_wider(id_cols = lisa_clusters, names_from = celltype, 
-                values_from = freq, values_fill = 0) %>%
-    ungroup() %>%
-    select(-lisa_clusters)
+for_plot <- prop.table(table(spe$lisa_clusters, spe$celltype), margin = 1)
 
 pheatmap(for_plot, color = colorRampPalette(c("dark blue", "white", "dark red"))(100), 
          scale = "column")
@@ -489,6 +461,7 @@ We can now calculate the fraction of T cells within each tumor patch to roughly
 estimate T cell infiltration.
 
 ```{r patchDetection-2, message=FALSE}
+library(tidyverse)
 colData(spe) %>% as_tibble() %>%
     group_by(patch_id, sample_id) %>%
     summarize(Tcell_count = sum(celltype == "CD8" | celltype == "CD4"),
@@ -500,7 +473,7 @@ colData(spe) %>% as_tibble() %>%
 ```
 
 An increase of T cell infiltration with tumor patch size can be observed. This
-effect is most likely cause by sparse but fully connected tumor cell regions
+effect is most likely caused by sparse but fully connected tumor cell regions
 which contain many stromal cells.
 
 ## Interaction analysis
@@ -514,7 +487,7 @@ function which implements the interaction testing strategy proposed by
 
 Per grouping level (e.g., image), the `testInteractions` function computes the 
 averaged cell type/cell type interaction count and computes this count against
-an empirical null distribution which is generated by permuting all cell labels.
+an empirical null distribution which is generated by permuting all cell labels (while maintaining the tissue strcuture).
 
 In the following example, we use the `steinbock` generated spatial interaction
 graph and estimate the interaction or avoidance between cell types in the
