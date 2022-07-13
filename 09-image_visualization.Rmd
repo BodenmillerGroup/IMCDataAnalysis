@@ -273,10 +273,10 @@ plotCells(cur_masks,
           exprs_values = "exprs")
 ```
 
-While visualizing 6 markers on the pixel-level still may still allow the
-distinction of different structures and expression levels, we can see that the
-distinction of per cell expression levels is difficult when visualizing many markers
-simultaneously due to often overlapping expression.
+While visualizing 6 markers on the pixel-level may still allow the distinction
+of different tissue structures, observing individual expression levels is
+difficult when visualizing many markers simultaneously due to often overlapping
+expression.
 
 Similarly to adjusting marker colors when visualizing pixel intensities, we
 can change the color gradients per marker by setting the `color` argument:

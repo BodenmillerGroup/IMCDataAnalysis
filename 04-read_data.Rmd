@@ -270,10 +270,10 @@ masks <- loadImages("data/steinbock/masks_deepcell/", as.is = TRUE)
 ```
 
 In the case of multi-channel images, it is beneficial to set the `channelNames`
-for easy visualization. Using the `steinbock` framework, the channel order of the
-single-cell data matches the channel order of the multi-channel images. However,
-it is recommended to make sure that the channel order is identical or ordered
-identical beforehand.
+for easy visualization. Using the `steinbock` framework, the channel order of
+the single-cell data matches the channel order of the multi-channel images.
+However, it is recommended to make sure that the channel order is identical
+between the single-cell data and the images.
 
 ```{r set-channelNames}
 channelNames(images) <- rownames(spe)

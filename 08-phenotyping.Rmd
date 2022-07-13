@@ -594,7 +594,7 @@ concat_spe <- do.call("cbind", spes)
 ```
 
 In the following code chunk we will identify cells that were labeled multiple
-times. This occurs when different cells phenotypes are gated per image and can
+times. This occurs when different cell phenotypes are gated per image and can
 affect immune cells that are located inside the tumor compartment.
 
 We will first identify those cells that were uniquely labeled. In the next step,
@@ -861,16 +861,6 @@ cell_labels[colnames(unlab_spe)] <- cell_class
 spe$celltype <- cell_labels 
 
 table(spe$celltype, spe$patient_id)
-```
-
-```{r}
-dittoHeatmap(spe[,cur_cells], 
-             genes = rownames(spe)[rowData(spe)$use_channel],
-             assay = "exprs", scale = "none",
-             heatmap.colors = viridis(100), 
-             annot.by = c("celltype", "patient_id"),
-             annot.colors = c(dittoColors(1)[1:length(unique(spe$celltype))],
-                              metadata(spe)$color_vectors$patient_id))
 ```
 
 We can now compare the cell labels derived by classification to the different
