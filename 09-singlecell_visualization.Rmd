@@ -1,13 +1,194 @@
 # Single cell visualization {#single-cell-visualization}
 
-The following section describes how to ...
+The following section describes common approaches on how to visualize single-cell data. 
+We will specifically focus on visualization downstream of clustering and classification approaches.
+This chapter will recycle methods and functions that we have seen in previous sections and also introduce new ones. 
 
-We will first read in the previously processed data and randomly select 3 images
-for visualization purposes.
+Section \@ref() focuses on dimensionality reduction visualization.
+Section \@ref() spotlights single-cell expression visualization. 
+Section \@ref() highlights methods for aggregated expression visualization (e.g. per cluster) 
+Section \@ref() adds other useful plots for general single-cell analysis. 
 
-## Overview
+## Section overview 
 
-## Recycled code from previous chapters 
+**Dimensionality reduction visualization** 
+-> dittoDimPlot, multiDittoDimPlot, pbMDS, clrDR, fixedPCA/calculatePCA?
+
+**Single-cell expression visualization**
+-> dittoHeatmap, plotExpression, plotPbExprs, plotClusterExprs
+
+**Aggregated expression visualization**
+-> dittoHeatmap, plotExprHeatmap, ComplexHeatmap (“publication-ready-figure”)
+
+**Other useful plots** 
+Cluster-patient plot, patient-cluster-plots? (Via plotCounts/ggplot2)
+
+## Function overview
+
+**dittoSeq**
+dittoHeatmap (already used)
+dittoDimPlot/multi_DittoDimPlot (already used)
+
+**ComplexHeatmap** (“publication_ready figures”) with annotations etc.)
+Heatmap()
+HeatmapAnnotation() etc. 
+
+**CATALYST**
+plotCounts?
+pbMDS
+clrDR
+plotExprHeatmap (based on Complex Heatmap)
+plotPbExprs
+
+**scater**
+plotExpression
+plotDots?
+calculatePCA?
+
+**scran**
+fixedPCA?
+
+**ggplot2**
+
+
+## Read in the data
+
+First, we will read in the `SpatialExperiment` object containing the single-cell
+data and again sample 2000 cells for ease of visualization.
+
+```{r read-data-batch-correction, message=FALSE}
+spe <- readRDS("data/spe.rds")
+```
+
+## Dimensionality reduction visualization
+
+The `dittoDimPlot` function allows flexible visualization. It returns `ggplot` objects which
+can be further modified.
+
+```{r umap}
+library(patchwork)
+library(cowplot)
+library(scater)
+library(ggplot2)
+library(viridis)
+
+## UMAP colored by clusters/cell labels - dittoDimPlot
+p1 <- dittoDimPlot(spe, var = "pg_clusters_corrected", 
+             reduction.use = "UMAP_mnnCorrected", size = 0.2,
+             do.label = TRUE) +
+    ggtitle("Phenograph clusters on UMAP, integrated cells")
+
+p2 <- dittoDimPlot(spe, var = "nn_clusters_corrected", 
+             reduction.use = "UMAP_mnnCorrected", size = 0.2,
+             do.label = TRUE) +
+    ggtitle("SNN clusters on UMAP, integrated cells")
+
+p3 <- dittoDimPlot(spe, var = "som_clusters_corrected", 
+             reduction.use = "UMAP_mnnCorrected", size = 0.2,
+             do.label = TRUE) +
+  ggtitle("SOM clusters on UMAP, integrated cells")
+
+p4 <- dittoDimPlot(spe, var = "celltype", 
+             reduction.use = "UMAP_mnnCorrected", size = 0.2,
+             do.label = TRUE) +
+  scale_color_manual(values = metadata(spe)$color_vectors$celltype)+
+  theme(legend.title = element_blank()) +
+  ggtitle("Classification cell labels on UMAP, integrated cells")
+
+(p1 + p2) / (p3 + p4)
+
+## UMAP colored by expression 
+markers <- c("Ecad", "CD45RO", "CD20", "CD3", "FOXP3", "CD206", "MPO", "SMA", "Ki67")
+
+# Option 1: multi_dittoDimPlot()
+plot_list <- multi_dittoDimPlot(spe, var = markers, reduction.use = "UMAP_mnnCorrected", 
+                   assay = "exprs", size = 0.2, list.out = TRUE) 
+plot_list <- lapply(plot_list, function(x) x + scale_color_viridis())
+plot_grid(plotlist = plot_list) 
+
+# Option 2: plotReducedDim (looks better since it contains legend?)
+plot_list  <- lapply(markers, function(x){
+                      p <- plotReducedDim(spe, dimred = "UMAP_mnnCorrected",
+                                          colour_by = x,
+                                          by_exprs_values = "exprs",
+                                          point_size = 0.5)
+                      return(p)
+                    })
+
+plot_grid(plotlist = plot_list)
+```
+
+Another low-dimensional embedding that we did not cover previously is Principal Component Analysis (PCA)... 
+
+```{r pca}
+### include PCA part? 
+library(scran)
+library(BiocParallel)
+library(dittoSeq)
+library(patchwork)
+library(scater)
+
+#PCA 
+spe <- fixedPCA(spe, subset.row = rowData(spe)$use_channel, assay.type = "exprs", BPPARAM = SerialParam())
+#or
+#runPCA(spe , subset_row = rowData(spe)$use_channel, exprs_values = "exprs") #dimred = "fastMNN",n_dimred = 37)
+
+p1 <- dittoDimPlot(spe, var = "patient_id", reduction.use = "PCA", size = 0.2) + 
+    scale_color_manual(values = metadata(spe)$color_vectors$patient_id) +
+    ggtitle("Patient ID on TSNE")
+
+# visualize region of interest id
+p2 <- dittoDimPlot(spe, var = "ROI", reduction.use = "PCA", size = 0.2) + 
+    scale_color_manual(values = metadata(spe)$color_vectors$ROI) +
+    ggtitle("ROI ID on UMAP")
+
+p1 + p2
+``` 
+
+    
+# pbMDS and clrDR from CATALYST
+
+```{r}
+library(CATALYST)
+
+#save spe in different object due to renaming of colData entries
+spe_cat <- spe 
+
+spe_cat$sample_id <- factor(spe$sample_id)
+spe_cat$condition <- factor(spe$indication)
+spe_cat$cluster_id <- factor(spe$celltype)
+
+#add celltype information to metadata
+metadata(spe_cat)$cluster_codes <- data.frame(celltype = factor(spe$celltype))
+
+## pbMDS plot
+
+# MDS pseudobulk by sample_id 
+pbMDS(spe_cat, by = "sample_id", color_by = "patient_id", features = markers)+
+  scale_color_manual(values = metadata(spe_cat)$color_vectors$patient_id)
+
+# MDS pseudobulk by cell labels 
+pbMDS(spe_cat, by = "cluster_id", features = markers, label_by = "cluster_id", k="celltype")+
+  scale_color_manual(values = metadata(spe_cat)$color_vectors$celltype)
+
+# MDS pseudobulk by sample_id and cell labels
+pbMDS(spe_cat, by = "both", features = markers, k = "celltype", shape_by = "condition", size_by = TRUE)+
+  scale_color_manual(values = metadata(spe_cat)$color_vectors$celltype)
+
+
+## clrDR plot
+
+#CLR on sample proportions across clusters
+clrDR(spe_cat, dr = "PCA", by = "sample_id", point_col = "patient_id",k = "celltype", point_pal = metadata(spe_cat)$color_vectors$patient_id)+
+  scale_color_manual(values = metadata(spe_cat)$color_vectors$celltype)
+
+#CLR on cluster proportions across samples
+clrDR(spe_cat, dr = "PCA", by = "cluster_id", k = "celltype", arrow_col = "sample_id", point_pal = metadata(spe_cat)$color_vectors$celltype)+
+  scale_color_manual(values = metadata(spe_cat)$color_vectors$sample_id)
+
+```
+
+## Single-cell expression visualization 
 
 o visualize single-cell expression in form of a
 heatmap. Here, we sub-sample the dataset to 2000 cells for visualization
@@ -24,16 +205,21 @@ dittoHeatmap(spe[,cur_cells], genes = rownames(spe)[rowData(spe)$use_channel],
              annotation_colors = list(indication = metadata(spe)$color_vectors$indication))
 ```
 
+## Aggregated expression visualization 
 
-Finally, it can be beneficial to visualize the mean marker expression per image
-to identify images with outlying cell type compositions. This check does not
-indicate image quality _per se_ but can highlight biological differences. Here,
-we will use the `aggregateAcrossCells` function of the 
-`r BiocStyle::Biocpkg("scuttle")` package to compute the mean expression per 
-image. For visualization purposes, we again `asinh` transform the mean expression
-values.
+```{r ridges, message=FALSE, fig.width=7, fig.height=15}
+gating_channels <- c("Ecad","SMA","PDGFRb","CD38","MPO","CD15","HLADR","CD20","CD20","CD3","FOXP3","CD4","CD8")
+rowData(spe)$gating_channel <- rowData(spe)$name %in% gating_channels
 
-```{r mean-expression-per-image, message=FALSE, fig.height=7}
+
+multi_dittoPlot(spe, vars = rownames(spe)[rowData(spe)$gating_channel],
+               group.by = "celltype", plots = c("ridgeplot"), 
+               assay = "exprs", 
+               color.panel = metadata(spe)$color_vectors$celltype)
+```
+
+
+```{r mean-expression-per-cluster, message=FALSE, fig.height=7}
 library(scuttle)
 
 image_mean <- aggregateAcrossCells(spe, 
@@ -52,74 +238,8 @@ dittoHeatmap(image_mean, genes = rownames(spe)[rowData(spe)$use_channel],
              show_colnames = TRUE)
 ```
 
+## Other 
 
-The data presented here were stained on individual slides. Also, samples were
-pre-processed in different locations. These (and other) technical aspects can
-induce staining differences between samples or batches of samples. Observing
-potential staining differences can be crucial to assess data quality.
-We will use ridgeline visualizations to check differences in staining patterns:
-
-```{r ridges, message=FALSE, fig.width=7, fig.height=25}
-multi_dittoPlot(spe, vars = rownames(spe)[rowData(spe)$use_channel],
-               group.by = "patient_id", plots = c("ridgeplot"), 
-               assay = "exprs", 
-               color.panel = metadata(spe)$color_vectors$patient_id)
-```
-
-Visualization of the low-dimensional embedding facilitates assessment of 
-potential "batch effects". The `dittoDimPlot`
-function allows flexible visualization. It returns `ggplot` objects which
-can be further modified.
-
-```{r visualizing-dimred, message=FALSE}
-library(patchwork)
-
-# visualize patient id 
-p1 <- dittoDimPlot(spe, var = "patient_id", reduction.use = "UMAP", size = 0.2) + 
-    scale_color_manual(values = metadata(spe)$color_vectors$patient_id) +
-    ggtitle("Patient ID on UMAP")
-p2 <- dittoDimPlot(spe, var = "patient_id", reduction.use = "TSNE", size = 0.2) + 
-    scale_color_manual(values = metadata(spe)$color_vectors$patient_id) +
-    ggtitle("Patient ID on TSNE")
-
-# visualize region of interest id
-p3 <- dittoDimPlot(spe, var = "ROI", reduction.use = "UMAP", size = 0.2) + 
-    scale_color_manual(values = metadata(spe)$color_vectors$ROI) +
-    ggtitle("ROI ID on UMAP")
-p4 <- dittoDimPlot(spe, var = "ROI", reduction.use = "TSNE", size = 0.2) + 
-    scale_color_manual(values = metadata(spe)$color_vectors$ROI) +
-    ggtitle("ROI ID on TSNE")
-
-(p1 + p2) / (p3 + p4)
-
-# visualize marker expression
-p1 <- dittoDimPlot(spe, var = "Ecad", reduction.use = "UMAP", 
-                   assay = "exprs", size = 0.2) +
-    scale_color_viridis(name = "Ecad") +
-    ggtitle("E-Cadherin expression on UMAP")
-p2 <- dittoDimPlot(spe, var = "CD45RO", reduction.use = "UMAP", 
-                   assay = "exprs", size = 0.2) +
-    scale_color_viridis(name = "CD45RO") +
-    ggtitle("CD45RO expression on UMAP")
-p3 <- dittoDimPlot(spe, var = "Ecad", reduction.use = "TSNE", 
-                   assay = "exprs", size = 0.2) +
-    scale_color_viridis(name = "Ecad") +
-    ggtitle("Ecad expression on TSNE")
-p4 <- dittoDimPlot(spe, var = "CD45RO", reduction.use = "TSNE", 
-                   assay = "exprs", size = 0.2) +
-    scale_color_viridis(name = "CD45RO") +
-    ggtitle("CD45RO expression on TSNE")
-
-(p1 + p2) / (p3 + p4)
-```
-
-## Read in the data
-
-We will first read in the data processed in previous sections:
-
-```{r read-data, message=FALSE}
-spe <- readRDS("data/spe.rds")
-```
 ## Session Info
 
 <details>

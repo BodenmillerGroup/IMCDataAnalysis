@@ -19,8 +19,9 @@ The workflow can be largely divided into the following parts:
 2. Image- and cell-level quality control, low-dimensional visualization
 3. Sample/batch effect correction
 4. Cell phenotyping via clustering or classification
-5. Image visualization
-6. Spatial analyses
+5. Single-cell visualization
+6. Image visualization
+7. Spatial analyses
 
 ## Usability
 
@@ -41,7 +42,8 @@ You can also add sections by forking the repo, adding your changes and issuing a
 [Vito Zanotelli](https://github.com/votti)  
 [Daniel Schulz](https://github.com/SchulzDan)  
 [Jonas Windhager](https://github.com/jwindhager)   
-[Michelle Daniel](https://github.com/michdaniel)  
+[Michelle Daniel](https://github.com/michdaniel)
+[Lasse Meyer](https://github.com/lassedochreden)
 
 ## Citation
 

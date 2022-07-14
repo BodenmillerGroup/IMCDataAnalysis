@@ -148,8 +148,9 @@ dittoHeatmap(spe[,cur_cells],
              genes = rownames(spe)[rowData(spe)$use_channel],
              assay = "exprs", scale = "none",
              heatmap.colors = viridis(100), 
-             annot.by = c("pg_clusters_corrected", "patient_id"),
+             annot.by = c("pg_clusters_corrected", "pg_clusters","patient_id"),
              annot.colors = c(dittoColors(1)[1:length(unique(spe$pg_clusters_corrected))],
+                              dittoColors(1)[1:length(unique(spe$pg_clusters))],
                               metadata(spe)$color_vectors$patient_id))
 ```
 
@@ -312,8 +313,9 @@ dittoHeatmap(spe[,cur_cells],
              genes = rownames(spe)[rowData(spe)$use_channel],
              assay = "exprs", scale = "none",
              heatmap.colors = viridis(100), 
-             annot.by = c("nn_clusters_corrected", "patient_id"),
+             annot.by = c("nn_clusters_corrected", "nn_clusters","patient_id"),
              annot.colors = c(dittoColors(1)[1:length(unique(spe$nn_clusters_corrected))],
+                              dittoColors(1)[1:length(unique(spe$nn_clusters))],
                               metadata(spe)$color_vectors$patient_id))
 ```
 
@@ -422,8 +424,9 @@ dittoHeatmap(spe[,cur_cells],
              genes = rownames(spe)[rowData(spe)$use_channel],
              assay = "exprs", scale = "none",
              heatmap.colors = viridis(100), 
-             annot.by = c("som_clusters_corrected", "patient_id"),
+             annot.by = c("som_clusters_corrected", "som_clusters","patient_id"),
              annot.colors = c(dittoColors(1)[1:length(unique(spe$som_clusters_corrected))],
+                              dittoColors(1)[1:length(unique(spe$som_clusters))],
                               metadata(spe)$color_vectors$patient_id))
 ```
 
