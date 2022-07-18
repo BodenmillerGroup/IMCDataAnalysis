@@ -212,53 +212,6 @@ plotSpillmat(sce, isotope_list = isotope_list)
 
 As we can see, the largest spillover appears in `In113 --> In115` and we also
 observe the `+16` oxide impurities for e.g. `Nd148 --> Dy164`.
-TODO potentially the below could be removed
-Here, we will save the spillover matrix as .csv and as image for
-use in the [IMC segmentation
-pipeline](https://github.com/BodenmillerGroup/ImcSegmentationPipeline) as part
-of the `CorrectSpilloverApply` and `CorrectSpilloverMeasurements` module
-[here](https://github.com/BodenmillerGroup/ImcPluginsCP).
-
-### Save spillover matrix as csv
-
-Next, we will write out the spillover matrix as .csv file for possible later use.
-
-```{r write_sm_csv}
-sm <- metadata(sce)$spillover_matrix
-write.csv(sm, "data/spillover_matrix.csv")
-```
-
-### Save spillover matrix as image (optional)
-TODO fix this section, necessary?
-When using the **[ImcPluginsCP](https://github.com/BodenmillerGroup/ImcPluginsCP)
-CellProfiler modules** for spillover correction, the spillover matrix needs to 
-be saved as 32-bit .tiff image. This is not needed when using the `steinbock` framework.
-
-For this to work, the channels need to be ordered in the same way that
-CellProfiler orders them. When using the [IMC segmentation pipeline](https://github.com/BodenmillerGroup/ImcSegmentationPipeline), for each
-image, the order of the channels is written out as .csv file. This file contains
-a single column listing the metal isotopes in the correct order. 
-The `steinbock` framework however orders the channels as they appear in the panel
-file and we can directly extract the channels that should be compensated for.
-
-The `CATALYST` package provides the `adaptSpillmat` function that corrects the
-spillover matrix in a way that rows and columns match a predefined set of metals.
-Please refer to `?compCytof` for more information how metals in the spillover
-matrix are matched to acquired channels in the `SingleCellExperiment` object.
-
-The spillover matrix can now be adapted to exclude channels that are not part of
-the measurement (`keep == 0`)  and saved as .tiff image for the use with
-`CellProfiler`.
-
-```{r save-sm-as-tiff, message=FALSE}
-library(tiff)
-panel <- read.csv("data/steinbock/panel.csv")
-adapted_sm <- adaptSpillmat(sm, paste0(panel$channel[panel$keep == 1], "Di"), 
-                            isotope_list = isotope_list)
-
-writeTIFF(sm, "data/spillover_matrix.tiff", 
-          bits.per.sample = 32)
-```
 
 ## Single-cell data compensation
 

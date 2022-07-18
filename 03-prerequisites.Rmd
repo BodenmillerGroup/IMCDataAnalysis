@@ -96,8 +96,6 @@ sample/patient metadata information here:
 ```{r download-sample-data}
 download.file("https://zenodo.org/record/5949116/files/sample_metadata.xlsx", 
          destfile = "data/sample_metadata.xlsx")
-#TODO
-# I downloaded the file and cannot open it in excel. it says corrupted. Also when trying to read it with `read_xlsx` it says something about that it actually is a zip file.
 ```
 
 ### Processed multiplexed imaging data
