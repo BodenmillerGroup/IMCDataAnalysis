@@ -208,6 +208,9 @@ isotope_list <- CATALYST::isotope_list
 isotope_list$Ar <- 80
 
 plotSpillmat(sce, isotope_list = isotope_list)
+
+# Save spillover matrix in new object
+sm <- metadata(sce)$spillover_matrix
 ```
 
 As we can see, the largest spillover appears in `In113 --> In115` and we also
