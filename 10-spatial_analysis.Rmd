@@ -78,9 +78,8 @@ Section \@ref(image-visualization) highlights the use of the
 package to visualize multichannel images and segmentation masks. Here, we
 introduce the
 [plotSpatial](https://bodenmillergroup.github.io/imcRtools/reference/plotSpatial.html)
-function of the `imcRtools` package to visualize the cells' centroids and
+function of the [imcRtools](https://www.bioconductor.org/packages/release/bioc/html/imcRtools.html) package to visualize the cells' centroids and
 cell-cell interactions as spatial graphs.
-TODO I just noticed now that here you have a hyperlink for cytomapper but not for imcRtools. potentially you may want to be consistent. but just a minor thing.
 
 In the following example, we select one image for visualization purposes. 
 Here, each dot (node) represents a cell and edges are drawn between cells
@@ -330,6 +329,7 @@ plotSpatial(spe,
             node_size_fix = 0.5) +
     scale_color_brewer(palette = "Set3")
 ```
+
 Also here, we can visualize the cell type composition of each cellular 
 neighborhood.
 
@@ -340,21 +340,37 @@ pheatmap(for_plot, color = colorRampPalette(c("dark blue", "white", "dark red"))
          scale = "column")
 ```
 
+In addition, we can visualize the mean marker expression (after
+asinh-transformation) within each CN.
+
+```{r, message=FALSE}
+library(scuttle)
+library(RColorBrewer)
+
+mean_sce <- aggregateAcrossCells(as(spe, "SingleCellExperiment"), 
+                                 ids = spe$cn_expression, statistics = "mean")
+assay(mean_sce, "exprs") <- asinh(counts(mean_sce))
+
+dittoHeatmap(mean_sce, genes = rowData(spe)$use_channel,
+             annot.by = "cn_expression", 
+             annot.colors = brewer.pal(n = 10, name = "Set3"))
+```
+
 When clustering cells based on the mean expression within the direct
 neighborhood, tumor patches are split across CN 2, CN 3 and CN 6 without forming
 a clear tumor/stroma interface. This result reflects patient-to-patient
-differences in the expression of tumor markers. CN 1 again contains B cells and
-BnT cells representing TLS but CN 7 and CN 9 (T cell rich neighborhoods) are
-expanded compared to the previous CN detection approach. CN detection based on
-mean marker expression is therefore sensitive to staining/expression differences
-between samples as well as lateral spillover due to imperfect segmentation.
-TODO not sure I understand why this approach should be sensitive to lateral spillover. I see it more as an unbiased way to cluster cells based on neighborhood expression without having to go through clustering or cell type definition first. potentially the differences observed here are also due to the fact that knn should be smaller for expression based aggregation. It would also be nice to maybe show here a heatmap of aggregated expression instead of cell types.
+differences in the expression of tumor markers (e.g. differences in Ki-67
+expression). CN 1 again contains B cells and BnT cells representing TLS but CN 7
+and CN 9 (T cell rich neighborhoods) are expanded compared to the previous CN
+detection approach. CN detection based on mean marker expression is therefore
+sensitive to staining/expression differences between samples as well as lateral
+spillover due to imperfect segmentation.
 
 **Of note:** constructing a 20-nearest neighbor graph and clustering using
 kmeans with `k=10` is only an example. Similar to the analysis done in Section
 \@ref(snn-graph), it is recommended to perform a parameter sweep across
 different graph construction algorithms and different parmaters `k` for kmeans
-clustering. Finsing the best CN detection settings is also subject to the
+clustering. Finding the best CN detection settings is also subject to the
 question at hand. Constructing graphs with more neighbours usually results in
 larger CNs.
 

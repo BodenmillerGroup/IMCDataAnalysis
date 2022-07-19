@@ -1,10 +1,8 @@
 # Image and cell-level quality control
 
 The following section discusses possible quality indicators for data obtained
-by IMC and other highly multiplexed imaging technologies.
-TODO unclear sentence:
-Due to the complexity of the data, the quality metric range across the image
-and single-cell levels and the chapter is sectioned as such.
+by IMC and other highly multiplexed imaging technologies. Here, we will focus
+on describing quality metrics on the single-cell as well as image level.
 
 ## Read in the data
 
@@ -383,7 +381,7 @@ potential "batch effects". The `dittoDimPlot`
 function allows flexible visualization. It returns `ggplot` objects which
 can be further modified.
 
-```{r visualizing-dimred, message=FALSE}
+```{r visualizing-dimred-1, message=FALSE, fig.height=12}
 library(patchwork)
 
 # visualize patient id 
@@ -402,8 +400,18 @@ p4 <- dittoDimPlot(spe, var = "ROI", reduction.use = "TSNE", size = 0.2) +
     scale_color_manual(values = metadata(spe)$color_vectors$ROI) +
     ggtitle("ROI ID on TSNE")
 
-(p1 + p2) / (p3 + p4)
+# visualize indication
+p5 <- dittoDimPlot(spe, var = "indication", reduction.use = "UMAP", size = 0.2) + 
+    scale_color_manual(values = metadata(spe)$color_vectors$indication) +
+    ggtitle("Indication on UMAP")
+p6 <- dittoDimPlot(spe, var = "indication", reduction.use = "TSNE", size = 0.2) + 
+    scale_color_manual(values = metadata(spe)$color_vectors$indication) +
+    ggtitle("Indication on TSNE")
 
+(p1 + p2) / (p3 + p4) / (p5 + p6)
+```
+
+```{r, visualizing-dimred-2, message=FALSE}
 # visualize marker expression
 p1 <- dittoDimPlot(spe, var = "Ecad", reduction.use = "UMAP", 
                    assay = "exprs", size = 0.2) +
@@ -424,14 +432,16 @@ p4 <- dittoDimPlot(spe, var = "CD45RO", reduction.use = "TSNE",
 
 (p1 + p2) / (p3 + p4)
 ```
-TODO I think you should also plot the indications which may actually explain the patient differences here. then also adapt the text accordingly
-We observe a strong separation of tumor cells (Ecad+ cells) between the patients.
-This separation could be of biological origin since tumor cells tend to display
-differences in expression between patients and/or of technical origin: the panel
-only contains a single tumor marker (E-Cadherin) and therefore slight technical
-differences in staining causes visible separation between cells of different patients.
-Nevertheless, the immune compartment (CD45RO+ cells) mix between patients and we
-can rule out systematic staining differences between patients.
+
+We observe a strong separation of tumor cells (Ecad+ cells) between the
+patients. Here, each patient was diagnosed with a different tumor type. The
+separation of tumor cells could be of biological origin since tumor cells tend
+to display differences in expression between patients and cancer types and/or of
+technical origin: the panel only contains a single tumor marker (E-Cadherin) and
+therefore slight technical differences in staining causes visible separation
+between cells of different patients. Nevertheless, the immune compartment
+(CD45RO+ cells) mix between patients and we can rule out systematic staining
+differences between patients.
 
 ## Save objects
 
