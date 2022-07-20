@@ -289,6 +289,22 @@ images <- readRDS("data/images.rds")
 channelNames(images) <- rowData(spe)$channel_name
 ```
 
+The CATALYST package provides the `adaptSpillmat` function that corrects the
+spillover matrix in a way that rows and columns match a predefined set of
+metals. Please refer to `?compCytof` for more information how metals in the
+spillover matrix are matched to acquired channels in the `SingleCellExperiment`
+object.
+
+The spillover matrix can now be adapted to exclude channels that are not part of
+the measurement (`keep == 0`).
+
+```{r}
+library(tiff)
+panel <- read.csv("data/steinbock/panel.csv")
+adapted_sm <- adaptSpillmat(sm, paste0(panel$channel[panel$keep == 1], "Di"), 
+                            isotope_list = isotope_list)
+```
+
 The adpated spillover matrix now matches the `channelNames` of the
 `CytoImageList` object and can be used to perform pixel-level spillover
 compensation.
