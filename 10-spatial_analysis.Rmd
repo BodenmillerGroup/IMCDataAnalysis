@@ -346,6 +346,7 @@ asinh-transformation) within each CN.
 ```{r, message=FALSE}
 library(scuttle)
 library(RColorBrewer)
+library(dittoSeq)
 
 mean_sce <- aggregateAcrossCells(as(spe, "SingleCellExperiment"), 
                                  ids = spe$cn_expression, statistics = "mean")
