@@ -18,6 +18,28 @@ software dependencies are installed and the needed example data is downloaded.
 
 ## Software requirements
 
+To install all R packages needed for the analysis, please run:
+
+```{r install-packages, eval=FALSE}
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install(c("pheatmap", "viridis",
+                       "zoo", "BiocManager", "devtools", "tiff",
+                       "distill", "openxlsx", "ggrepel", "patchwork", "mclust",
+                       "RColorBrewer", "uwot", "Rtsne", "harmony", "Seurat", 
+                       "SeuratObject", "cowplot", "kohonen", "caret", 
+                       "randomForest", "ggridges", "cowplot", "gridGraphics",
+                       "scales", "tiff", "CATALYST", "scuttle", "scater", 
+                       "dittoSeq", "tidyverse", "batchelor", 
+                       "bluster","scran", "lisaClust", "spicyR"))
+
+# Github dependencies
+devtools::install_github(c("BodenmillerGroup/imcRtools", 
+                           "BodenmillerGroup/cytomapper", 
+                           "i-cyto/Rphenograph"))
+```
+
 ```{r load-libraries, echo = FALSE, message = FALSE}
 options(timeout=10000)
 library(CATALYST)
@@ -29,6 +51,10 @@ library(imcRtools)
 library(cytomapper)
 library(dittoSeq)
 library(tidyverse)
+library(bluster)
+library(scran)
+library(lisaClust)
+library(caret)
 ```
 
 Throughout the analysis, we rely on different R software packages.
@@ -39,15 +65,19 @@ Data containers:
 * [SpatialExperiment](https://bioconductor.org/packages/release/bioc/html/SpatialExperiment.html) version `r packageVersion("SpatialExperiment")`
 * [SingleCellExperiment](https://bioconductor.org/packages/release/bioc/html/SingleCellExperiment.html) version `r packageVersion("SingleCellExperiment")`
 
-Data processing:
+Data analysis:
 
 * [CATALYST](https://bioconductor.org/packages/release/bioc/html/CATALYST.html) version `r packageVersion("CATALYST")`
 * [imcRtools](https://github.com/BodenmillerGroup/imcRtools) version `r packageVersion("imcRtools")` from [Github](https://github.com/BodenmillerGroup/imcRtools)
 * [scuttle](https://bioconductor.org/packages/release/bioc/html/scuttle.html) version `r packageVersion("scuttle")`
 * [scater](https://bioconductor.org/packages/release/bioc/html/scater.html) version `r packageVersion("scater")`
 * [batchelor](https://www.bioconductor.org/packages/release/bioc/html/batchelor.html) version `r packageVersion("batchelor")`
+* [bluster](https://www.bioconductor.org/packages/release/bioc/html/bluster.html) version `r packageVersion("bluster")`
+* [scran](https://www.bioconductor.org/packages/release/bioc/html/scran.html) version `r packageVersion("scran")`
 * [harmony](https://github.com/immunogenomics/harmony) version `r packageVersion("harmony")`
 * [Seurat](https://satijalab.org/seurat/index.html) version `r packageVersion("Seurat")`
+* [lisaClust](https://www.bioconductor.org/packages/release/bioc/html/lisaClust.html) version `r packageVersion("lisaClust")`
+* [caret](https://topepo.github.io/caret/) version `r packageVersion("caret")`
 
 Data visualization:
 
