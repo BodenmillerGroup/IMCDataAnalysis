@@ -346,7 +346,7 @@ channelNames(images_comp) <- rownames(spe)
 In the final step, the compensated images are written out as 16-bit TIFF
 files:
 
-```{r write-images, message=FALSE, results='hide'}
+```{r write-images, message=FALSE, results='hide', eval=FALSE}
 library(tiff)
 dir.create("data/comp_img")
 lapply(names(images_comp), function(x){
