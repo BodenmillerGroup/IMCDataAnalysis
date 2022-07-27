@@ -71,14 +71,14 @@ graph, `colPair(spe, "expansion_interaction_graph")` stores the expansion graph
 and `colPair(spe, "delaunay_interaction_graph")` stores the graph constructed by
 Delaunay triangulation.
 
-## Spatial visualization
+## Spatial visualization {#spatial-viz}
 
 Section \@ref(image-visualization) highlights the use of the
 [cytomapper](https://www.bioconductor.org/packages/release/bioc/html/cytomapper.html)
 package to visualize multichannel images and segmentation masks. Here, we
 introduce the
 [plotSpatial](https://bodenmillergroup.github.io/imcRtools/reference/plotSpatial.html)
-function of the `imcRtools` package to visualize the cells' centroids and
+function of the [imcRtools](https://www.bioconductor.org/packages/release/bioc/html/imcRtools.html) package to visualize the cells' centroids and
 cell-cell interactions as spatial graphs.
 
 In the following example, we select one image for visualization purposes. 
@@ -240,19 +240,10 @@ In the next step, the fraction of cell types within each
 spatial stromal community is displayed.
 
 ```{r spatial-community-heatmap, message=FALSE}
-library(tidyverse)
 library(pheatmap)
 library(viridis)
 
-for_plot <- colData(spe) %>% as_tibble() %>%
-    filter(celltype != "Tumor") %>%
-    group_by(spatial_community, celltype) %>%
-    summarize(count = n()) %>%
-    mutate(freq = count / sum(count)) %>%
-    pivot_wider(id_cols = spatial_community, names_from = celltype, 
-                values_from = freq, values_fill = 0) %>%
-    ungroup() %>%
-    select(-spatial_community)
+for_plot <- prop.table(table(spe[,spe$celltype != "Tumor"]$spatial_community, spe[,spe$celltype != "Tumor"]$celltype), margin = 1)
 
 pheatmap(for_plot, color = viridis(100), show_rownames = FALSE)
 ```
@@ -311,14 +302,7 @@ The next code chunk visualizes the cell type compositions of the detected
 cellular neighborhoods (CN).
 
 ```{r, message=FALSE}
-for_plot <- colData(spe) %>% as_tibble() %>%
-    group_by(cn_celltypes, celltype) %>%
-    summarize(count = n()) %>%
-    mutate(freq = count / sum(count)) %>%
-    pivot_wider(id_cols = cn_celltypes, names_from = celltype, 
-                values_from = freq, values_fill = 0) %>%
-    ungroup() %>%
-    select(-cn_celltypes)
+for_plot <- prop.table(table(spe$cn_celltypes, spe$celltype), margin = 1)
 
 pheatmap(for_plot, color = colorRampPalette(c("dark blue", "white", "dark red"))(100), 
          scale = "column")
@@ -345,37 +329,49 @@ plotSpatial(spe,
             node_size_fix = 0.5) +
     scale_color_brewer(palette = "Set3")
 ```
+
 Also here, we can visualize the cell type composition of each cellular 
 neighborhood.
 
 ```{r, message=FALSE}
-for_plot <- colData(spe) %>% as_tibble() %>%
-    group_by(cn_expression, celltype) %>%
-    summarize(count = n()) %>%
-    mutate(freq = count / sum(count)) %>%
-    pivot_wider(id_cols = cn_expression, names_from = celltype, 
-                values_from = freq, values_fill = 0) %>%
-    ungroup() %>%
-    select(-cn_expression)
+for_plot <- prop.table(table(spe$cn_expression, spe$celltype), margin = 1)
 
 pheatmap(for_plot, color = colorRampPalette(c("dark blue", "white", "dark red"))(100), 
          scale = "column")
 ```
 
+In addition, we can visualize the mean marker expression (after
+asinh-transformation) within each CN.
+
+```{r, message=FALSE}
+library(scuttle)
+library(RColorBrewer)
+library(dittoSeq)
+
+mean_sce <- aggregateAcrossCells(as(spe, "SingleCellExperiment"), 
+                                 ids = spe$cn_expression, statistics = "mean")
+assay(mean_sce, "exprs") <- asinh(counts(mean_sce))
+
+dittoHeatmap(mean_sce, genes = rowData(spe)$use_channel,
+             annot.by = "cn_expression", 
+             annot.colors = brewer.pal(n = 10, name = "Set3"))
+```
+
 When clustering cells based on the mean expression within the direct
 neighborhood, tumor patches are split across CN 2, CN 3 and CN 6 without forming
 a clear tumor/stroma interface. This result reflects patient-to-patient
-differences in the expression of tumor markers. CN 1 again contains B cells and
-BnT cells representing TLS but CN 7 and CN 9 (T cell rich neighborhoods) are
-expanded compared to the previous CN detection approach. CN detection based on
-mean marker expression is therefore sensitive to staining/expression differences
-between samples as well as lateral spillover due to imperfect segmentation.
+differences in the expression of tumor markers (e.g. differences in Ki-67
+expression). CN 1 again contains B cells and BnT cells representing TLS but CN 7
+and CN 9 (T cell rich neighborhoods) are expanded compared to the previous CN
+detection approach. CN detection based on mean marker expression is therefore
+sensitive to staining/expression differences between samples as well as lateral
+spillover due to imperfect segmentation.
 
 **Of note:** constructing a 20-nearest neighbor graph and clustering using
 kmeans with `k=10` is only an example. Similar to the analysis done in Section
 \@ref(snn-graph), it is recommended to perform a parameter sweep across
 different graph construction algorithms and different parmaters `k` for kmeans
-clustering. Finsing the best CN detection settings is also subject to the
+clustering. Finding the best CN detection settings is also subject to the
 question at hand. Constructing graphs with more neighbours usually results in
 larger CNs.
 
@@ -436,14 +432,7 @@ Similar to the example above, we can now observe the cell type composition
 per spatial cluster.
 
 ```{r lisaClust-3, message=FALSE}
-for_plot <- colData(spe) %>% as_tibble() %>%
-    group_by(lisa_clusters, celltype) %>%
-    summarize(count = n()) %>%
-    mutate(freq = count / sum(count)) %>%
-    pivot_wider(id_cols = lisa_clusters, names_from = celltype, 
-                values_from = freq, values_fill = 0) %>%
-    ungroup() %>%
-    select(-lisa_clusters)
+for_plot <- prop.table(table(spe$lisa_clusters, spe$celltype), margin = 1)
 
 pheatmap(for_plot, color = colorRampPalette(c("dark blue", "white", "dark red"))(100), 
          scale = "column")
@@ -489,6 +478,7 @@ We can now calculate the fraction of T cells within each tumor patch to roughly
 estimate T cell infiltration.
 
 ```{r patchDetection-2, message=FALSE}
+library(tidyverse)
 colData(spe) %>% as_tibble() %>%
     group_by(patch_id, sample_id) %>%
     summarize(Tcell_count = sum(celltype == "CD8" | celltype == "CD4"),
@@ -500,7 +490,7 @@ colData(spe) %>% as_tibble() %>%
 ```
 
 An increase of T cell infiltration with tumor patch size can be observed. This
-effect is most likely cause by sparse but fully connected tumor cell regions
+effect is most likely caused by sparse but fully connected tumor cell regions
 which contain many stromal cells.
 
 ## Interaction analysis
@@ -514,7 +504,7 @@ function which implements the interaction testing strategy proposed by
 
 Per grouping level (e.g., image), the `testInteractions` function computes the 
 averaged cell type/cell type interaction count and computes this count against
-an empirical null distribution which is generated by permuting all cell labels.
+an empirical null distribution which is generated by permuting all cell labels (while maintaining the tissue structure).
 
 In the following example, we use the `steinbock` generated spatial interaction
 graph and estimate the interaction or avoidance between cell types in the

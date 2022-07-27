@@ -182,7 +182,7 @@ slot and as pixel information in the segmentation masks. The entry in
 object can be mapped to segmentation masks. For the current dataset, the cell
 IDs are stored in `colData(spe)$ObjectNumber`.
 
-As cell IDs are only unique within a single image, the `plotCells` also requires
+As cell IDs are only unique within a single image, `plotCells` also requires
 the `img_id` argument. This argument specifies the `colData(spe)` as well as the
 `mcols(masks)` entry that stores the unique image name from which each cell was
 extracted. In the current dataset the unique image names are stored in
@@ -259,11 +259,7 @@ plotCells(cur_masks,
           exprs_values = "exprs")
 ```
 
-While visualizing 6 markers on the pixel-level still allows the distinction of
-different cell phenotypes it is not recommended to visualize the mean pixel
-intensities of many (often overlapping) markers on segmentation masks.
-
-Nevertheless and as an example, we will now visualize the maximum number of
+We will now visualize the maximum number of
 allowed markers as composites on the segmentation masks. As above the markers
 indicate the spatial distribution of tumor cells (E-caherin), T cells (CD3), B
 cells (CD20), CD8+ T cells (CD8a), plasma cells (CD38) and proliferating cells
@@ -276,6 +272,11 @@ plotCells(cur_masks,
           colour_by = c("Ecad", "CD3", "CD20", "CD8a", "CD38", "Ki67"),
           exprs_values = "exprs")
 ```
+
+While visualizing 6 markers on the pixel-level may still allow the distinction
+of different tissue structures, observing individual expression levels is
+difficult when visualizing many markers simultaneously due to often overlapping
+expression.
 
 Similarly to adjusting marker colors when visualizing pixel intensities, we
 can change the color gradients per marker by setting the `color` argument:
@@ -294,9 +295,9 @@ plotCells(cur_masks,
 ### Outlining cells on images {#outline-cells}
 
 The following section highlights the combined visualization of pixel- and
-cell-level information at once. For this, the `plotPixels` function accepts,
-next to the multi-channel image `CytoImageList` object, a segmentation mask
-`CytoImageList` object and the `SpatialExperiment` object. By specifying the
+cell-level information at once. For this, besides the `SpatialExperiment` object,
+the `plotPixels` function accepts two `CytoImageList` objects. One for the
+multi-channel images and one for the segmentation masks. By specifying the
 `outline_by` parameter, the outlines of cells can now be colored based on their
 metadata.
 

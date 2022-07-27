@@ -18,6 +18,28 @@ software dependencies are installed and the needed example data is downloaded.
 
 ## Software requirements
 
+To install all R packages needed for the analysis, please run:
+
+```{r install-packages, eval=FALSE}
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install(c("pheatmap", "viridis",
+                       "zoo", "BiocManager", "devtools", "tiff",
+                       "distill", "openxlsx", "ggrepel", "patchwork", "mclust",
+                       "RColorBrewer", "uwot", "Rtsne", "harmony", "Seurat", 
+                       "SeuratObject", "cowplot", "kohonen", "caret", 
+                       "randomForest", "ggridges", "cowplot", "gridGraphics",
+                       "scales", "tiff", "CATALYST", "scuttle", "scater", 
+                       "dittoSeq", "tidyverse", "batchelor", 
+                       "bluster","scran", "lisaClust", "spicyR"))
+
+# Github dependencies
+devtools::install_github(c("BodenmillerGroup/imcRtools", 
+                           "BodenmillerGroup/cytomapper", 
+                           "i-cyto/Rphenograph"))
+```
+
 ```{r load-libraries, echo = FALSE, message = FALSE}
 options(timeout=10000)
 library(CATALYST)
@@ -29,6 +51,10 @@ library(imcRtools)
 library(cytomapper)
 library(dittoSeq)
 library(tidyverse)
+library(bluster)
+library(scran)
+library(lisaClust)
+library(caret)
 ```
 
 Throughout the analysis, we rely on different R software packages.
@@ -39,15 +65,19 @@ Data containers:
 * [SpatialExperiment](https://bioconductor.org/packages/release/bioc/html/SpatialExperiment.html) version `r packageVersion("SpatialExperiment")`
 * [SingleCellExperiment](https://bioconductor.org/packages/release/bioc/html/SingleCellExperiment.html) version `r packageVersion("SingleCellExperiment")`
 
-Data processing:
+Data analysis:
 
 * [CATALYST](https://bioconductor.org/packages/release/bioc/html/CATALYST.html) version `r packageVersion("CATALYST")`
 * [imcRtools](https://github.com/BodenmillerGroup/imcRtools) version `r packageVersion("imcRtools")` from [Github](https://github.com/BodenmillerGroup/imcRtools)
 * [scuttle](https://bioconductor.org/packages/release/bioc/html/scuttle.html) version `r packageVersion("scuttle")`
 * [scater](https://bioconductor.org/packages/release/bioc/html/scater.html) version `r packageVersion("scater")`
 * [batchelor](https://www.bioconductor.org/packages/release/bioc/html/batchelor.html) version `r packageVersion("batchelor")`
+* [bluster](https://www.bioconductor.org/packages/release/bioc/html/bluster.html) version `r packageVersion("bluster")`
+* [scran](https://www.bioconductor.org/packages/release/bioc/html/scran.html) version `r packageVersion("scran")`
 * [harmony](https://github.com/immunogenomics/harmony) version `r packageVersion("harmony")`
 * [Seurat](https://satijalab.org/seurat/index.html) version `r packageVersion("Seurat")`
+* [lisaClust](https://www.bioconductor.org/packages/release/bioc/html/lisaClust.html) version `r packageVersion("lisaClust")`
+* [caret](https://topepo.github.io/caret/) version `r packageVersion("caret")`
 
 Data visualization:
 
@@ -90,10 +120,8 @@ To highlight the basic steps of IMC data analysis, we provide example data that
 were acquired as part of the **I**ntegrated i**MMU**noprofiling of large adaptive
 **CAN**cer patient cohorts projects ([immucan.eu](https://immucan.eu/)). The
 raw data of 4 patients can be accessed online at 
-[zenodo.org/record/5949116](https://zenodo.org/record/5949116).
-Image processing and segmentation has been performed using `steinbock` and
-the IMC segmentation pipeline (see below) and we will only need to access the
-sample/patient information here:
+[zenodo.org/record/5949116](https://zenodo.org/record/5949116) the
+sample/patient metadata information here:
 
 ```{r download-sample-data}
 download.file("https://zenodo.org/record/5949116/files/sample_metadata.xlsx", 
@@ -110,12 +138,12 @@ extraction.
 
 **steinbock output**
 
-The needed output of the `steinbock` framework includes the single-cell mean
+The output of the `steinbock` framework required for the analysis presented here includes the single-cell mean
 intensity files, the single-cell morphological features and spatial locations,
-spatial object graphs in form of edge lists indication cells in close proximity,
+spatial object graphs in form of edge lists indicating cells in close proximity,
 hot pixel filtered multi-channel images, segmentation masks, image metadata and
-channel metadata. All these files will be downloaded here for easy access. The
-commands which were used to process the data can be found in
+channel metadata. All these files will be downloaded here for later use. The
+commands which were used to generate this data can be found in
 `data/steinbock/steinbock.sh`.
 
 ```{r steinbock-results}

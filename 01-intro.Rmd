@@ -109,16 +109,15 @@ Panoramas provide an optical overview of the tissue with a resolution similar to
 10x in microscopy and are intended to help with the selection of regions of
 interest for ablation. The tissue should be centered on the glass side, since
 the imaging mass cytometer cannot access roughly 5 mm from each of the slide
-edges. Currently, the instruments can process one slide at a time and one `.mcd`
+edges. Currently, the instruments can process one slide at a time and usually one `.mcd`
 file per sample slide is generated.
 
 Many regions of interest can be defined on a single slide and acquisition
 parameters such as channels to acquire, acquisition speed (100 Hz, or 200 Hz),
 ablation energy, and other parameters are user-defined. It is recommended that
-all isotope channels are recorded. Some channels provide information on
+all isotope channels are recorded. This will result in larger raw data files but valuable information such as
 potential contamination of the argon gas (e.g., Xenon) or of the samples (e.g.,
-lead, barium). This results in a raw data file larger in size than if only
-channels corresponding to metals used are acquired.
+lead, barium) is stored.
 
 To process a large number of slides or to select regions on whole-slide samples,
 panoramas may not  provide sufficient information. If this is the case,
@@ -129,7 +128,7 @@ same or consecutive sections of the sample, we developed
 [napping](https://github.com/BodenmillerGroup/napping).
 
 Acquisition time is directly proportional to the total size of ablation, and run
-times for samples of large area or for large sample numbers can be calculated by
+times for samples of large area or for large sample numbers can roughly be calculated by
 dividing the ablation area in square micrometer by the ablation speed (e.g.,
 200Hz). In addition to the proprietary `.mcd` file format, `.txt` files can also
 be generated for each region of interest. This is recommended as a back-up

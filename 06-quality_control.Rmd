@@ -1,9 +1,8 @@
 # Image and cell-level quality control
 
 The following section discusses possible quality indicators for data obtained
-by IMC and other highly multiplexed imaging technologies.
-Due to the complexity of the data, the quality metric range across the image
-and single-cell levels and the chapter is sectioned as such.
+by IMC and other highly multiplexed imaging technologies. Here, we will focus
+on describing quality metrics on the single-cell as well as image level.
 
 ## Read in the data
 
@@ -22,7 +21,7 @@ Without having ground-truth data readily available, a common approach to
 segmentation quality control is to overlay segmentation masks on composite images
 displaying channels that were used for segmentation. 
 The [cytomapper](https://www.bioconductor.org/packages/release/bioc/html/cytomapper.html) 
-Bioconductor package supports exactly this tasks by using the `plotPixels` function.
+package supports exactly this tasks by using the `plotPixels` function.
 
 Here, we select 3 random images and perform image- and channel-wise
 normalization (channels are first min-max normalized and scaled to a range of
@@ -53,9 +52,9 @@ plotPixels(cur_images,
                          colour_by.labels.cex = 0.7))
 ```
 
-To zoom into the image you can right click and select `Open Image in New Tab`.
 We can see that nuclei are centered within the segmentation masks and all cell
-types are correctly segmented A common challenge here is to segment large (e.g.
+types are correctly segmented (note: to zoom into the image you can right click
+and select `Open Image in New Tab`). A common challenge here is to segment large (e.g.
 epithelial cells - in cyan) _versus_ small (e.g. B cells - in red). However, the
 segmentation approach here appears to correctly segment cells across different
 sizes.
@@ -87,7 +86,7 @@ graphical user interface such as [QuPath](https://qupath.github.io/) and
 [FIJI](https://imagej.net/software/fiji/). Viewers that were specifically
 developed for IMC data can be seen
 [here](https://bodenmillergroup.github.io/IMCWorkflow/viewers.html). In this
-section, we will specificaly focus on quantitative metrics to assess image
+section, we will specifically focus on quantitative metrics to assess image
 quality.
 
 It is often of interest to calculate the signal-to-noise ratio (SNR) for
@@ -140,8 +139,8 @@ cur_snr %>%
 #                      ymax = log2(mean_snr + ci_snr))) +
     geom_point(aes(log2(mean_ps), log2(mean_snr))) +
     geom_label_repel(aes(log2(mean_ps), log2(mean_snr), label = marker)) +
-    theme_minimal(base_size = 15) + ylab("Signal-to-noise ratio") +
-    xlab("Signal intensity")
+    theme_minimal(base_size = 15) + ylab("Signal-to-noise ratio [log2]") +
+    xlab("Signal intensity [log2]")
 ```
 
 We observe PD1, LAG3 and cleaved PARP to have high SNR but low signal intensity
@@ -195,12 +194,11 @@ plotPixels(cur_images,
                          colour_by.labels.cex = 0.7))
 ```
 
-These two images display less dense tissue structure and `Patient4_007` shows
-signs of under-segmentation potentially due to irregular nuclear shape or 
-missing markers to detect certain cell types (e.g., fibroblasts).
+These two images display less dense tissue structure but overall the images are
+intact and seem segemented correctly.
 
 Finally, it can be beneficial to visualize the mean marker expression per image
-to identify images with outlying cell type compositions. This check does not
+to identify images with outlying marker expression. This check does not
 indicate image quality _per se_ but can highlight biological differences. Here,
 we will use the `aggregateAcrossCells` function of the 
 `r BiocStyle::Biocpkg("scuttle")` package to compute the mean expression per 
@@ -226,10 +224,10 @@ dittoHeatmap(image_mean, genes = rownames(spe)[rowData(spe)$use_channel],
              show_colnames = TRUE)
 ```
 
-We observe extensive biological variation across the 14 images. Some images
-contain a high fraction of macrophages (CD206), B cells (CD20), neutrophils
-(CD15) or proliferating cells (Ki67). These differences will be further studied
-in the following chapters.
+We observe extensive biological variation across the 14 images. Some images show
+high expression of the macrophage marker CD206, the B cell marker CD20, the
+neutrophil marker CD15, and the proliferation marker Ki67. These differences will
+be further studied in the following chapters.
 
 ## Cell-level quality control {#cell-quality}
 
@@ -271,8 +269,8 @@ cur_snr <- t(mat) %>% as.data.frame() %>%
 cur_snr %>% ggplot() +
     geom_point(aes(log2(ps), log2(snr))) +
     geom_label_repel(aes(log2(ps), log2(snr), label = marker)) +
-    theme_minimal(base_size = 15) + ylab("Signal-to-noise ratio") +
-    xlab("Signal intensity")
+    theme_minimal(base_size = 15) + ylab("Signal-to-noise ratio [log2]") +
+    xlab("Signal intensity [log2]")
 ```
 
 Next, we observe the distributions of cell size across the individual images.
@@ -295,10 +293,10 @@ summary(spe$area)
 
 The median cell size is `r median(spe$area)` pixels with a median major axis
 length of `r round(median(spe$major_axis_length), digits = 1)`. The largest cell
-has an area of `r max(spe$area)` pixels which relates to a diameter of `r
-round(sqrt(max(spe$area)), digits = 1)` pixels assuming a circular shape.
-Overall, the distribution of cell sizes is similar across images with image
-`Patient4_005` and `Patient4_007` showing reduces average cell size. These
+has an area of `r max(spe$area)` pixels which relates to a diameter of 
+`r round(sqrt(max(spe$area)), digits = 1)` pixels assuming a circular shape.
+Overall, the distribution of cell sizes is similar across images with images from
+`Patient4_005` and `Patient4_007` showing a reduced average cell size. These
 images contain fewer tumor cells which can explain the smaller average cell size.
 
 We detect very small cells in the dataset and will remove them.
@@ -309,9 +307,7 @@ sum(spe$area < 5)
 spe <- spe[,spe$area >= 5]
 ```
 
-Another quality indicator can be the number of cells per image divided by the
-image size. This measure relates to the percentage of image area covered by
-cells as explained above.
+Another quality indicator can be an absolute measure of cell density often reported in cells per mm$^2$.
 
 ```{r no-cells-per-image, message=FALSE}
 colData(spe) %>%
@@ -329,14 +325,15 @@ colData(spe) %>%
 
 The number of cells per mm$^2$ varies across images which also depends on the
 number of tumor/non-tumor cells. As we can see in the following sections, some
-immune cells appear in cell dense regions while other stromal parts are less
+immune cells appear in cell dense regions while other stromal regions are less
 dense.
 
-The data presented here were stained on individual slides. Also, samples were
-pre-processed in different locations. These (and other) technical aspects can
-induce staining differences between samples or batches of samples. Observing
-potential staining differences can be crucial to assess data quality.
-We will use ridgeline visualizations to check differences in staining patterns:
+The data presented here originate from samples from different locations with
+potential differences in pre-processing and each sample stained individually.
+These (and other) technical aspects can induce staining differences between
+samples or batches of samples. Observing potential staining differences can be
+crucial to assess data quality. We will use ridgeline visualizations to check
+differences in staining patterns:
 
 ```{r ridges, message=FALSE, fig.width=7, fig.height=25}
 multi_dittoPlot(spe, vars = rownames(spe)[rowData(spe)$use_channel],
@@ -346,9 +343,9 @@ multi_dittoPlot(spe, vars = rownames(spe)[rowData(spe)$use_channel],
 ```
 
 We observe variations in the distributions of marker expression across patients.
-These variations arise partly from differences in region selection for
-measurement (it appears that Patient3 contains a higher number of CD11c+ and
-HLADR+ cells) as well as staining differences between samples. While most of the
+These variations may arise partly from different abundances of cells in
+different images (e.g. Patient3 may have higher numbers of CD11c+ and PD1+
+cells) as well as staining differences between samples. While most of the
 selected markers are specifically expressed in immune cell subtypes, we can see
 that E-Cadherin (a marker for tumor cells) shows similar expression across all
 patients.
@@ -384,7 +381,7 @@ potential "batch effects". The `dittoDimPlot`
 function allows flexible visualization. It returns `ggplot` objects which
 can be further modified.
 
-```{r visualizing-dimred, message=FALSE}
+```{r visualizing-dimred-1, message=FALSE, fig.height=12}
 library(patchwork)
 
 # visualize patient id 
@@ -403,8 +400,18 @@ p4 <- dittoDimPlot(spe, var = "ROI", reduction.use = "TSNE", size = 0.2) +
     scale_color_manual(values = metadata(spe)$color_vectors$ROI) +
     ggtitle("ROI ID on TSNE")
 
-(p1 + p2) / (p3 + p4)
+# visualize indication
+p5 <- dittoDimPlot(spe, var = "indication", reduction.use = "UMAP", size = 0.2) + 
+    scale_color_manual(values = metadata(spe)$color_vectors$indication) +
+    ggtitle("Indication on UMAP")
+p6 <- dittoDimPlot(spe, var = "indication", reduction.use = "TSNE", size = 0.2) + 
+    scale_color_manual(values = metadata(spe)$color_vectors$indication) +
+    ggtitle("Indication on TSNE")
 
+(p1 + p2) / (p3 + p4) / (p5 + p6)
+```
+
+```{r, visualizing-dimred-2, message=FALSE}
 # visualize marker expression
 p1 <- dittoDimPlot(spe, var = "Ecad", reduction.use = "UMAP", 
                    assay = "exprs", size = 0.2) +
@@ -426,13 +433,15 @@ p4 <- dittoDimPlot(spe, var = "CD45RO", reduction.use = "TSNE",
 (p1 + p2) / (p3 + p4)
 ```
 
-We observe a strong separation of tumor cells (Ecad+ cells) between the patients.
-This separation could be of biological origin since tumor cells tend to display
-differences in expression between patients and/or of technical origin: the panel
-only contains a single tumor marker (E-Cadherin) and therefore slight technical
-differences in staining causes visible separation between cells of different patients.
-Nevertheless, the immune compartment (CD45RO+ cells) mix between patients and we
-can rule out systematic staining differences between patients.
+We observe a strong separation of tumor cells (Ecad+ cells) between the
+patients. Here, each patient was diagnosed with a different tumor type. The
+separation of tumor cells could be of biological origin since tumor cells tend
+to display differences in expression between patients and cancer types and/or of
+technical origin: the panel only contains a single tumor marker (E-Cadherin) and
+therefore slight technical differences in staining causes visible separation
+between cells of different patients. Nevertheless, the immune compartment
+(CD45RO+ cells) mix between patients and we can rule out systematic staining
+differences between patients.
 
 ## Save objects
 

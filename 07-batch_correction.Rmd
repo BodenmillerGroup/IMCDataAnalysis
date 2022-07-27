@@ -238,7 +238,7 @@ plot_grid(plotlist = plot_list)
 
 We observe a more aggressive merging of cells from different patients compared
 to the results after `fastMNN` correction. Important immune cell and epithelial
-markers are expressed in similar regions of the UMAP. 
+markers are expressed in distinct regions of the UMAP. 
 
 ## Seurat correction
 
