@@ -361,7 +361,7 @@ lapply(names(images_comp), function(x){
 For further downstream analysis, the compensated `SpatialExperiment` and
 `CytoImageList` objects are saved replacing the former objects:
 
-```{r save-objects-spill}
+```{r save-objects-spill, eval=FALSE}
 saveRDS(spe, "data/spe.rds")
 saveRDS(images_comp, "data/images.rds")
 ```
