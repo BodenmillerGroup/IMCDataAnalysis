@@ -12,13 +12,13 @@ Section \@ref() adds other useful plots for general single-cell analysis.
 ## Section overview 
 
 **Dimensionality reduction visualization** 
--> dittoDimPlot, multiDittoDimPlot, pbMDS, clrDR, fixedPCA/calculatePCA?
+-> dittoDimPlot, multiDittoDimPlot, pbMDS, clrDR, (fixedPCA/runPCA?)
 
 **Single-cell expression visualization**
--> dittoHeatmap, plotExpression, plotPbExprs, plotClusterExprs
+-> dittoHeatmap, plotExpression, multi_dittoPlot (Ridge)
 
 **Aggregated expression visualization**
--> dittoHeatmap, plotExprHeatmap, ComplexHeatmap (“publication-ready-figure”)
+-> plotPbExprs, plotExprHeatmap, dittoHeatmap, ComplexHeatmap (“publication-ready-figure”)
 
 **Other useful plots** 
 Cluster-patient plot, patient-cluster-plots? (Via plotCounts/ggplot2)
@@ -65,12 +65,13 @@ spe <- readRDS("data/spe.rds")
 The `dittoDimPlot` function allows flexible visualization. It returns `ggplot` objects which
 can be further modified.
 
-```{r umap}
+```{r umap, fig.width=15, fig.height=15}
 library(patchwork)
 library(cowplot)
 library(scater)
 library(ggplot2)
 library(viridis)
+library(dittoSeq)
 
 ## UMAP colored by clusters/cell labels - dittoDimPlot
 p1 <- dittoDimPlot(spe, var = "pg_clusters_corrected", 
@@ -98,7 +99,7 @@ p4 <- dittoDimPlot(spe, var = "celltype",
 (p1 + p2) / (p3 + p4)
 
 ## UMAP colored by expression 
-markers <- c("Ecad", "CD45RO", "CD20", "CD3", "FOXP3", "CD206", "MPO", "SMA", "Ki67")
+markers <- c("Ecad", "CD45RO", "CD20", "CD3", "FOXP3", "CD206", "MPO", "SMA","CD8a","CD4","HLADR","CD15","CD38","PDGFRb")
 
 # Option 1: multi_dittoDimPlot()
 plot_list <- multi_dittoDimPlot(spe, var = markers, reduction.use = "UMAP_mnnCorrected", 
@@ -118,35 +119,15 @@ plot_list  <- lapply(markers, function(x){
 plot_grid(plotlist = plot_list)
 ```
 
-Another low-dimensional embedding that we did not cover previously is Principal Component Analysis (PCA)... 
-
-```{r pca}
-### include PCA part? 
-library(scran)
-library(BiocParallel)
-library(dittoSeq)
-library(patchwork)
-library(scater)
-
-#PCA 
-spe <- fixedPCA(spe, subset.row = rowData(spe)$use_channel, assay.type = "exprs", BPPARAM = SerialParam())
-#or
-#runPCA(spe , subset_row = rowData(spe)$use_channel, exprs_values = "exprs") #dimred = "fastMNN",n_dimred = 37)
-
-p1 <- dittoDimPlot(spe, var = "patient_id", reduction.use = "PCA", size = 0.2) + 
-    scale_color_manual(values = metadata(spe)$color_vectors$patient_id) +
-    ggtitle("Patient ID on TSNE")
-
-# visualize region of interest id
-p2 <- dittoDimPlot(spe, var = "ROI", reduction.use = "PCA", size = 0.2) + 
-    scale_color_manual(values = metadata(spe)$color_vectors$ROI) +
-    ggtitle("ROI ID on UMAP")
-
-p1 + p2
-``` 
-
-    
 # pbMDS and clrDR from CATALYST
+
+**pbMDS - Pseudobulk-level MDS plot**
+A multi-dimensional scaling (MDS) plot on aggregated measurement values may be rendered with pbMDS. Such a plot will give a sense of similarities between cluster and/or samples in an unsupervised way and of key difference in expression before conducting any formal testing.
+
+**clrDR - Reducded dimension plot on CLR of proportions**
+A dimensionality reduction plot on centered log-ratios (CLR) of sample/cluster proportions across clusters/samples can be rendered with clrDR. Here, we view each sample (cluster) as a vector of cluster (sample) proportions. Complementary to pbMDS, such a plot will give a sense of similarities between samples/clusters in terms of their composition.
+
+For more details refer to CATALYST.
 
 ```{r}
 library(CATALYST)
@@ -185,67 +166,249 @@ clrDR(spe_cat, dr = "PCA", by = "sample_id", point_col = "patient_id",k = "cellt
 #CLR on cluster proportions across samples
 clrDR(spe_cat, dr = "PCA", by = "cluster_id", k = "celltype", arrow_col = "sample_id", point_pal = metadata(spe_cat)$color_vectors$celltype)+
   scale_color_manual(values = metadata(spe_cat)$color_vectors$sample_id)
-
 ```
 
 ## Single-cell expression visualization 
 
-o visualize single-cell expression in form of a
+To visualize single-cell expression in form of a
 heatmap. Here, we sub-sample the dataset to 2000 cells for visualization
 purposes and overlay the cancer type from which the cells were extracted.
 
 ```{r segmentation-heatmap, message=FALSE, fig.height=7}
 library(dittoSeq)
 library(viridis)
-cur_cells <- sample(seq_len(ncol(spe)), 2000)
+cur_cells <- sample(seq_len(ncol(spe)), 4000)
 
-dittoHeatmap(spe[,cur_cells], genes = rownames(spe)[rowData(spe)$use_channel],
-             assay = "exprs", cluster_cols = TRUE, scale = "none",
-             heatmap.colors = viridis(100), annot.by = "indication",
-             annotation_colors = list(indication = metadata(spe)$color_vectors$indication))
+#Heatmap visualization - DittoHeatmap
+dittoHeatmap(spe[,cur_cells], genes = rownames(spe)[rowData(spe)$name %in% markers],
+             assay = "exprs", order.by = c("celltype","nn_clusters_corrected"),
+             cluster_cols = FALSE, scale = "none",
+             heatmap.colors = viridis(100), annot.by = c("celltype","nn_clusters_corrected","indication"),
+             annotation_colors = list(indication = metadata(spe)$color_vectors$indication),
+             celltype = metadata(spe)$color_vectors$celltype)
+
+#Ridge plot - multi_dittoPlot
+multi_dittoPlot(spe[,cur_cells], vars = rownames(spe)[rowData(spe)$name %in% markers],
+               group.by = "celltype", plots = c("ridgeplot"), 
+               assay = "exprs", 
+               color.panel = metadata(spe)$color_vectors$celltype)
+
+multi_dittoPlot(spe[,cur_cells], vars = rownames(spe)[rowData(spe)$name %in% markers],
+               group.by = "nn_clusters_corrected", plots = c("ridgeplot"), 
+               assay = "exprs")
+
+#Violin Plot - plotExpression
+plotExpression(spe[,cur_cells],features = markers, x = "celltype", exprs_values = "exprs", colour_by = "celltype")+
+    scale_color_manual(values = metadata(spe)$color_vectors$celltype)
+
+plotExpression(spe[,cur_cells],features = markers, x = "nn_clusters_corrected", exprs_values = "exprs", colour_by = "nn_clusters_corrected")
 ```
 
 ## Aggregated expression visualization 
 
-```{r ridges, message=FALSE, fig.width=7, fig.height=15}
-gating_channels <- c("Ecad","SMA","PDGFRb","CD38","MPO","CD15","HLADR","CD20","CD20","CD3","FOXP3","CD4","CD8")
-rowData(spe)$gating_channel <- rowData(spe)$name %in% gating_channels
+**plotPbExprs**
+A combined boxplot and jitter of aggregated marker intensities can be generated via `plotPbExprs()`.
 
+```{r}
+spe_cat
 
-multi_dittoPlot(spe, vars = rownames(spe)[rowData(spe)$gating_channel],
-               group.by = "celltype", plots = c("ridgeplot"), 
-               assay = "exprs", 
-               color.panel = metadata(spe)$color_vectors$celltype)
+plotPbExprs(spe_cat, k = "celltype", facet_by = "cluster_id", ncol = 4, features = markers)+
+    scale_color_manual(values = metadata(spe_cat)$color_vectors$indication)
 ```
 
+**aggregateAcrossCells** + **dittoHeatmap and/or Complex Heatmap**
 
 ```{r mean-expression-per-cluster, message=FALSE, fig.height=7}
 library(scuttle)
 
-image_mean <- aggregateAcrossCells(spe, 
-                                   ids = spe$sample_id, 
-                                   statistics="mean",
-                                   use.assay.type = "counts")
-assay(image_mean, "exprs") <- asinh(counts(image_mean))
+## Aggregate + DittoHeatmap 
+sce <- as(spe, "SingleCellExperiment")
 
-dittoHeatmap(image_mean, genes = rownames(spe)[rowData(spe)$use_channel],
+#by cell type
+celltype_mean <- aggregateAcrossCells(sce,  
+                     ids = sce$celltype, 
+                     statistics = "mean",
+                     use.assay.type = "exprs", 
+                     subset.row = rownames(spe)[rowData(spe)$name %in% markers]
+                     )
+
+
+dittoHeatmap(celltype_mean,
              assay = "exprs", cluster_cols = TRUE, scale = "none",
-             heatmap.colors = viridis(100), 
-             annot.by = c("indication", "patient_id", "ROI"),
-             annotation_colors = list(indication = metadata(spe)$color_vectors$indication,
-                                      patient_id = metadata(spe)$color_vectors$patient_id,
-                                      ROI = metadata(spe)$color_vectors$ROI),
-             show_colnames = TRUE)
+             heatmap.colors = viridis(100),
+             annot.by = c("celltype","ncells"),
+             annotation_colors = list(celltype = metadata(sce)$color_vectors$celltype,
+                                      ncells = plasma(100)))
+#by cluster           
+nn_mean <- aggregateAcrossCells(sce,  
+                     ids = sce$nn_clusters_corrected, 
+                     statistics = "mean",
+                     use.assay.type = "exprs", 
+                     subset.row = rownames(spe)[rowData(spe)$name %in% markers]
+                     )
+
+dittoHeatmap(nn_mean,
+             assay = "exprs", cluster_cols = TRUE, scale = "none",
+             heatmap.colors = viridis(100),
+             annot.by = c("nn_clusters_corrected","ncells"),
+             annotation_colors = list(ncells = plasma(100)))
 ```
+
+Rich heatmap based on ComplexHeatmap. 
+
+```{r}
+library(ComplexHeatmap)
+library(circlize)
+library(tidyverse)
+
+# Define cell_type_markers 
+celltype_markers <- markers
+
+# Define cell_state_markers 
+cellstate_markers <- c("CarbonicAnhydrase","Ki67","PD1","GrzB","PDL1","ICOS","TCF7","VISTA")
+
+### 1. Heatmap bodies ###
+
+# By celltype markers
+celltype_mean <- aggregateAcrossCells(sce,  
+                     ids = sce$celltype, 
+                     statistics = "mean",
+                     use.assay.type = "exprs", 
+                     subset.row = rownames(spe)[rowData(spe)$name %in% celltype_markers]
+                     )
+
+# By cellstate markers
+cellstate_mean <- aggregateAcrossCells(sce,  
+                     ids = sce$celltype, 
+                     statistics = "mean",
+                     use.assay.type = "exprs", 
+                     subset.row = rownames(spe)[rowData(spe)$name %in% cellstate_markers]
+                     )
+
+# Heatmap body color 
+col_exprs <- colorRamp2(c(0,1,2,3,4), c("#440154FF","#3B518BFF","#20938CFF","#6ACD5AFF","#FDE725FF"))
+
+
+### 2. Heatmap annotation ###
+
+### 2.1  Metadata features
+
+anno <- colData(celltype_mean) %>% as.data.frame %>% select(celltype, ncells)
+
+# Proportion of indication per celltype
+indication <- colData(sce) %>% as.data.frame() %>% select(celltype,indication) %>% group_by(celltype) %>% table() %>% as.data.frame
+indication <- indication %>% group_by(celltype) %>% mutate(fra = Freq/sum(Freq)) 
+indication <- indication %>% select(-Freq) %>% pivot_wider(id_cols = celltype,names_from = indication,values_from = fra) %>% column_to_rownames("celltype")
+
+# Number of contributing samples per celltype
+cluster_SID <- colData(sce) %>% as.data.frame() %>% select(celltype,sample_id) %>% group_by(celltype) %>% table() %>% as.data.frame
+n_SID <- cluster_SID %>% filter(Freq>0) %>% group_by(celltype) %>% count(name = "n_SID") %>% column_to_rownames("celltype")
+
+# Create two HeatmapAnnotation objects
+ha_anno = HeatmapAnnotation(celltype = anno$celltype,
+                            border = TRUE, 
+                            gap = unit(1,"mm"),
+                            col = list(celltype = metadata(sce)$color_vectors$celltype),
+                            which = "row")
+    
+ha_meta = HeatmapAnnotation(n_cells = anno_barplot(anno$ncells, width = unit(10, "mm")),
+                            n_SID = anno_barplot(n_SID, width = unit(10, "mm")),
+                            indication = anno_barplot(indication,width = unit(10, "mm"),gp = gpar(fill = metadata(sce)$color_vectors$indication)),
+                            col = list(indication = metadata(sce)$color_vectors$indication),
+                            border = TRUE, 
+                            annotation_name_rot = 90,
+                            gap = unit(1,"mm"),
+                            which = "row")
+
+### 2.2 Spatial features
+
+# Add number of neighbors to sce object (saved in ColPair)
+n_neighbors <- colPair(sce) %>% as.data.frame %>% group_by(from) %>% dplyr::count() %>% arrange(desc(n))
+sce$n_neighbors <- n_neighbors$n[match(seq_along(colnames(sce)),n_neighbors$from)]
+sce$n_neighbors <- sce$n_neighbors %>% replace_na(0)
+
+# Select spatial features and average over celltypes
+spatial <- colData(sce) %>% as.data.frame %>% select(area,eccentricity,celltype,n_neighbors)
+spatial <- spatial %>% select(-celltype) %>% aggregate(by = list(celltype = spatial$celltype), FUN = mean) %>% column_to_rownames("celltype")
+
+# Create HeatmapAnnotation object
+ha_spatial = HeatmapAnnotation(
+    area = spatial$area,
+    eccentricity = spatial$eccentricity,
+    n_neighbors = spatial$n_neighbors,
+    border = TRUE,
+    gap = unit(1,"mm"),
+    which = "row")
+
+
+### 3. Plot rich heatmap ###
+
+# Create HeatmapList object
+h <- Heatmap(t(assay(celltype_mean, "exprs")),
+        column_title = "celltype_markers",
+        col = col_exprs,
+        name= "mean exprs",
+        show_row_names = TRUE, 
+        show_column_names = TRUE)+
+    Heatmap(t(assay(cellstate_mean, "exprs")),
+        column_title = "cellstate_channels",
+        col = col_exprs,
+        name= "mean exprs",
+        show_row_names = TRUE,
+        show_column_names = TRUE)+
+    ha_anno+
+    ha_spatial+
+    ha_meta
+
+
+# Add customized legend for anno_barplot()
+lgd = Legend(title = "indication", at = colnames(indication), legend_gp = gpar(fill = metadata(sce)$color_vectors$indication))
+             
+# Plot
+draw(h,annotation_legend_list = list(lgd))
+```
+
+
+**NOTE:** Add note that different expression scales can be looked at e.g. mean exprs values, mean min_max values, Z-scored mean exprs counts etc. different information content
+we suggest to always look at exprs counts?? 
 
 ## Other 
 
-## Session Info
+INCLUDE? Another low-dimensional embedding that we did not cover previously is Principal Component Analysis (PCA)... 
 
-<details>
-   <summary>SessionInfo</summary>
+```{r pca}
+### include PCA part? 
+library(scran)
+library(BiocParallel)
+library(dittoSeq)
+library(patchwork)
+library(scater)
+library(BiocSingular)
+
+#PCA 
+#spe <- fixedPCA(spe, subset.row = rowData(spe)$use_channel, assay.type = "exprs", BPPARAM = SerialParam())
+#or
+spe <- runPCA(spe, subset_row = rowData(spe)$use_channel, exprs_values = "exprs", BSPARAM = RandomParam())
+
+p1 <- dittoDimPlot(spe, var = "patient_id", reduction.use = "PCA", size = 0.2) + 
+    scale_color_manual(values = metadata(spe)$color_vectors$patient_id) +
+    ggtitle("Patient ID on TSNE")
+
+# visualize region of interest id
+p2 <- dittoDimPlot(spe, var = "ROI", reduction.use = "PCA", size = 0.2) + 
+    scale_color_manual(values = metadata(spe)$color_vectors$ROI) +
+    ggtitle("ROI ID on UMAP")
+
+p1 + p2
+``` 
+
+Cluster-patient plot, patient-cluster-plots? (Via plotCounts/ggplot2)?
+
+
+## Session Info
    
 ```{r, echo = FALSE}
 sessionInfo()
 ```
-</details>
+
+
