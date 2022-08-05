@@ -1,18 +1,22 @@
 # Single cell visualization {#single-cell-visualization}
 
-The following section describes common approaches on how to visualize single-cell data. 
+The following section describes typical approaches on how to visualize single-cell data. 
 
 This chapter is divided into three parts. Section \@ref(cell-type-level) will highlight 
 visualization approaches downstream of our cell type classification from Section \@ref(classification). 
 We will then focus on visualization methods that relate single-cell data to the 
-patient level in Section \@ref(patient-level). Lastly, Section \@ref(cell-type-level) 
-will provide a more customized example on how to integrate different single-cell and 
-patient metadata into one heatmap using the [ComplexHeatmap](https://bioconductor.org/packages/release/bioc/html/ComplexHeatmap.html) package. 
+sample level in Section \@ref(sample-level). Lastly, Section \@ref(cell-type-level) 
+will provide a more customized example on how to integrate various single-cell and 
+sample metadata into one heatmap using the [ComplexHeatmap](https://bioconductor.org/packages/release/bioc/html/ComplexHeatmap.html) package. 
 
-Please note that this chapter utilizes visualization functions from popular 
-R packages in single-cell research such as [scater](https://bioconductor.org/packages/release/bioc/html/scater.html), [DittoSeq](https://bioconductor.org/packages/release/bioc/html/dittoSeq.html) and [CATALYST](https://bioconductor.org/packages/release/bioc/html/CATALYST.html). 
-It will recycle methods and functions that we have seen in previous sections, 
+Visualization functions from popular R packages in single-cell research such as [scater](https://bioconductor.org/packages/release/bioc/html/scater.html), [DittoSeq](https://bioconductor.org/packages/release/bioc/html/dittoSeq.html) and [CATALYST](https://bioconductor.org/packages/release/bioc/html/CATALYST.html) will be utilized. 
+We will recycle methods and functions that we have seen in previous sections, 
 while also introducing new ones.
+
+Please note that this chapter aims to provide an overview on **common** 
+visualization options and should be seen as a stepping-stone.
+However, many more options exist and the user should customize the 
+visualization according to the biological question at hand.  
 
 ## Load data
 
@@ -38,14 +42,27 @@ rowData(spe)$state_markers <- rownames(spe) %in% state_markers
 
 ## Cell-type level {#cell-type-level}
 
-In the first section of this chapter, we will highlight 
-
-visualization approaches downstream of our cell type classification from Section \@ref(classification). 
-
+In the first section of this chapter, the grouping-level for the visualization 
+approaches will be the cell type classification from Section \@ref(classification). 
+Other grouping levels (e.g. cluster assignments from Section \@ref(clustering)) 
+are possible and the user should adjust depending on the chosen analysis workflow. 
 
 ### Dimensionality reduction visualization 
 
-The `dittoDimPlot` function allows flexible visualization. It returns `ggplot` objects which
+As seen before, we can visualize single-cells in low-dimensional space. Often 
+used non-linear methods for dimensionality reduction are tSNE and UMAP, which 
+aim to preserve the distances between each cell and its neighbors in the 
+high-dimensional space. 
+
+Interpreting these plots is not trivial, but local neighborhoods in the plot can 
+suggest similarity in expression for given cells. See [Orchestrating Single-Cell Analysis with Bioconductor](https://bioconductor.org/books/release/OSCA/) for more details.
+
+Here, we will use `dittoDimPlot` from [DittoSeq](https://bioconductor.org/packages/release/bioc/html/dittoSeq.html) and
+`plotReducedDim` from [scater](https://bioconductor.org/packages/release/bioc/html/scater.html)
+to visualize the fastMNN-corrected UMAP colored by cell type and expression, 
+respectively. 
+
+Both functions are highly flexible and return `ggplot` objects which
 can be further modified.
 
 ```{r umap}
@@ -86,9 +103,15 @@ plot_grid(plotlist = plot_list)
 
 ### Heatmap visualization 
 
-To visualize single-cell expression in form of a
-heatmap. Here, we sub-sample the dataset to 2000 cells for visualization
-purposes and overlay the cancer type from which the cells were extracted.
+Next, it is often useful to visualize single-cell expression per cell type in form of a
+heatmap. 
+
+
+Here, 
+
+
+Furthermore, we sub-sample the dataset to 2000 cells for ease of visualization
+and overlay the cancer type and patient ID from which the cells were extracted.
 
 ```{r celltype heatmap, message=FALSE}
 library(dittoSeq)
@@ -110,7 +133,7 @@ dittoHeatmap(spe[,cur_cells], genes = rownames(spe)[rowData(spe)$type_markers ==
 library(scuttle)
 ## by cell type
 celltype_mean <- aggregateAcrossCells(as(spe, "SingleCellExperiment"),  
-                     ids = sce$celltype, 
+                     ids = spe$celltype, 
                      statistics = "mean",
                      use.assay.type = "exprs", 
                      subset.row = rownames(spe)[rowData(spe)$type_markers == TRUE]
@@ -122,7 +145,7 @@ dittoHeatmap(celltype_mean,
              scale = "none",
              heatmap.colors = viridis(100),
              annot.by = c("celltype","ncells"),
-             annotation_colors = list(celltype = metadata(sce)$color_vectors$celltype,
+             annotation_colors = list(celltype = metadata(spe)$color_vectors$celltype,
                                       ncells = plasma(100)))
 
 #Row-scaling
@@ -131,7 +154,7 @@ dittoHeatmap(celltype_mean,
              scale = "row",
              heatmap.colors = viridis(100),
              annot.by = c("celltype","ncells"),
-             annotation_colors = list(celltype = metadata(sce)$color_vectors$celltype,
+             annotation_colors = list(celltype = metadata(spe)$color_vectors$celltype,
                                       ncells = plasma(100)))
 
 ```
@@ -140,7 +163,7 @@ dittoHeatmap(celltype_mean,
 
 ```{r celltype violin, message=FALSE}
 #Violin Plot - plotExpression
-plotExpression(spe[,cur_cells],features = markers, x = "celltype", exprs_values = "exprs", colour_by = "celltype")+
+plotExpression(spe[,cur_cells],features = rownames(spe)[rowData(spe)$type_markers == TRUE], x = "celltype", exprs_values = "exprs", colour_by = "celltype")+
     scale_color_manual(values = metadata(spe)$color_vectors$celltype)
 ```
 
@@ -156,11 +179,13 @@ dittoScatterPlot(spe, x.var = "CD3",y.var="CD20", assay.x = "exprs", assay.y = "
 ### Barplot visualization
 
 ```{r barplot celltype}
-dittoBarPlot(spe, var = "celltype", group.by = "patient_id")+
-    scale_fill_manual(values = metadata(spe_cat)$color_vectors$celltype)
-
+#by sample_id
 dittoBarPlot(spe, var = "celltype", group.by = "sample_id")+
-    scale_fill_manual(values = metadata(spe_cat)$color_vectors$celltype)
+    scale_fill_manual(values = metadata(spe)$color_vectors$celltype)
+
+#by patient_id
+dittoBarPlot(spe, var = "celltype", group.by = "patient_id")+
+    scale_fill_manual(values = metadata(spe)$color_vectors$celltype)
 ```
 
 ### CATALYST-based visualization 
@@ -219,13 +244,16 @@ clrDR(spe_cat, dr = "PCA", by = "cluster_id", k = "celltype", arrow_col = "patie
 A combined boxplot and jitter of aggregated marker intensities can be generated via `plotPbExprs()`.
 
 ```{r celltype pbExprs}
-plotPbExprs(spe_cat, k = "celltype", facet_by = "cluster_id", ncol = 4, features = markers)+
+plotPbExprs(spe_cat, k = "celltype", facet_by = "cluster_id", ncol = 4, features = rownames(spe_cat)[rowData(spe_cat)$type_markers == TRUE])+
     scale_color_manual(values = metadata(spe_cat)$color_vectors$indication)
 ```
 
-## Patient-level {#patient-level}
+## Sample-level {#sample-level}
 
 ### Dimensionality reduction visualization 
+
+Furthermore, assessment of potential “batch effects” between samples
+
 
 ```{r umap}
 library(patchwork)
@@ -236,20 +264,19 @@ library(viridis)
 library(dittoSeq)
 
 ## UMAP colored by cell type and expression - dittoDimPlot+
-p1 <- dittoDimPlot(spe, var = "patient_id", 
-             reduction.use = "UMAP_mnnCorrected", size = 0.2,
-             do.label = TRUE) +
-  scale_color_manual(values = metadata(spe)$color_vectors$patient_id)+
-  theme(legend.title = element_blank()) +
-  ggtitle("Patient ID")
-
-
-p2 <- dittoDimPlot(spe, var = "sample_id",
+p1 <- dittoDimPlot(spe, var = "sample_id",
              reduction.use = "UMAP_mnnCorrected", size = 0.2, colors = viridis(100),
              do.label = TRUE)+
     scale_color_manual(values = metadata(spe)$color_vectors$sample_id)+
   theme(legend.title = element_blank()) +
   ggtitle("Sample ID")
+
+p2 <- dittoDimPlot(spe, var = "patient_id", 
+             reduction.use = "UMAP_mnnCorrected", size = 0.2,
+             do.label = TRUE) +
+  scale_color_manual(values = metadata(spe)$color_vectors$patient_id)+
+  theme(legend.title = element_blank()) +
+  ggtitle("Patient ID")
 
 p1+p2
 ```
@@ -259,13 +286,16 @@ p1+p2
 ```{r patient heatmap}
 #Heatmap visualization - DittoHeatmap
 dittoHeatmap(spe[,cur_cells], genes = rownames(spe)[rowData(spe)$type_markers == TRUE],
-             assay = "exprs", order.by = c("patient_id"),
+             assay = "exprs", order.by = c("patient_id","sample_id"),
              cluster_cols = FALSE, scale = "none",
-             heatmap.colors = viridis(100), annot.by = c("celltype","indication","patient_id"),
-             annotation_colors = list(indication = metadata(spe)$color_vectors$indication,
+             heatmap.colors = viridis(100), annot.by = c("celltype","indication","patient_id","sample_id"),
+             annotation_colors = list(celltype = metadata(spe)$color_vectors$celltype,
+                                      indication = metadata(spe)$color_vectors$indication,
                                       patient_id = metadata(spe)$color_vectors$patient_id,
-                                      celltype = metadata(spe)$color_vectors$celltype)
+                                      sample_id = metadata(spe)$color_vectors$sample_id
+                                      )
              )
+
 ```
 
 ```{r celltype mean-expression-per-cluster, message=FALSE, fig.height=7}
@@ -284,7 +314,7 @@ dittoHeatmap(patient_mean,
              scale = "none",
              heatmap.colors = viridis(100),
              annot.by = c("patient_id","ncells"),
-             annotation_colors = list(patient_id = metadata(sce)$color_vectors$patient_id,
+             annotation_colors = list(patient_id = metadata(spe)$color_vectors$patient_id,
                                       ncells = plasma(100)))
 
 #Row-scaling
@@ -293,7 +323,7 @@ dittoHeatmap(patient_mean,
              scale = "row",
              heatmap.colors = viridis(100),
              annot.by = c("patient_id","ncells"),
-             annotation_colors = list(patient_id = metadata(sce)$color_vectors$patient_id,
+             annotation_colors = list(patient_id = metadata(spe)$color_vectors$patient_id,
                                       ncells = plasma(100)))
 
 ```
@@ -302,10 +332,10 @@ dittoHeatmap(patient_mean,
 
 ```{r barplot patient}
 dittoBarPlot(spe, var = "patient_id", group.by = "celltype")+
-    scale_fill_manual(values = metadata(spe_cat)$color_vectors$patient_id)
+    scale_fill_manual(values = metadata(spe)$color_vectors$patient_id)
 
 dittoBarPlot(spe, var = "sample_id", group.by = "celltype")+
-    scale_fill_manual(values = metadata(spe_cat)$color_vectors$sample_id)
+    scale_fill_manual(values = metadata(spe)$color_vectors$sample_id)
 ```
 
 ### CATALYST-based visualization 
@@ -338,7 +368,7 @@ clrDR(spe_cat, dr = "PCA", by = "sample_id", point_col = "sample_id",k = "cellty
 
 ### Publication-ready ComplexHeatmap 
 
-Rich heatmap based on ComplexHeatmap that combines celltype and patient information. 
+Rich heatmap based on ComplexHeatmap that combines celltype and sample information. 
 
 ```{r}
 library(ComplexHeatmap)
