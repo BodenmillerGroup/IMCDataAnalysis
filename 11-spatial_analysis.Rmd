@@ -71,7 +71,7 @@ graph, `colPair(spe, "expansion_interaction_graph")` stores the expansion graph
 and `colPair(spe, "delaunay_interaction_graph")` stores the graph constructed by
 Delaunay triangulation.
 
-## Spatial visualization
+## Spatial visualization {#spatial-viz}
 
 Section \@ref(image-visualization) highlights the use of the
 [cytomapper](https://www.bioconductor.org/packages/release/bioc/html/cytomapper.html)

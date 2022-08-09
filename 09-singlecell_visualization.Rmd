@@ -1,32 +1,50 @@
+---
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
 # Single cell visualization {#single-cell-visualization}
 
-The following section describes typical approaches on how to visualize single-cell data. 
+The following section describes typical approaches on how to visualize
+single-cell data.
 
-This chapter is divided into three parts. Section \@ref(cell-type-level) will highlight 
-visualization approaches downstream of our cell type classification from Section \@ref(classification). 
-We will then focus on visualization methods that relate single-cell data to the 
-sample level in Section \@ref(sample-level). Lastly, Section \@ref(cell-type-level) 
-will provide a more customized example on how to integrate various single-cell and 
-sample metadata into one heatmap using the [ComplexHeatmap](https://bioconductor.org/packages/release/bioc/html/ComplexHeatmap.html) package. 
+This chapter is divided into three parts. Section \@ref(cell-type-level)
+will highlight visualization approaches downstream of our cell type
+classification from Section \@ref(classification). We will then focus on
+visualization methods that relate single-cell data to the sample level
+in Section \@ref(sample-level). Lastly, Section \@ref(rich-example) will
+provide a more customized example on how to integrate various
+single-cell and sample metadata into one heatmap using the
+[ComplexHeatmap](https://bioconductor.org/packages/release/bioc/html/ComplexHeatmap.html)
+package.
 
-Visualization functions from popular R packages in single-cell research such as [scater](https://bioconductor.org/packages/release/bioc/html/scater.html), [DittoSeq](https://bioconductor.org/packages/release/bioc/html/dittoSeq.html) and [CATALYST](https://bioconductor.org/packages/release/bioc/html/CATALYST.html) will be utilized. 
-We will recycle methods and functions that we have seen in previous sections, 
-while also introducing new ones.
+Visualization functions from popular R packages in single-cell research
+such as
+[scater](https://bioconductor.org/packages/release/bioc/html/scater.html),
+[DittoSeq](https://bioconductor.org/packages/release/bioc/html/dittoSeq.html)
+and
+[CATALYST](https://bioconductor.org/packages/release/bioc/html/CATALYST.html)
+will be utilized. We will recycle methods and functions that we have
+seen in previous sections, while also introducing new ones.
 
-Please note that this chapter aims to provide an overview on **common** 
-visualization options and should be seen as a stepping-stone.
-However, many more options exist and the user should customize the 
-visualization according to the biological question at hand.  
+Please note that this chapter aims to provide an overview on **common**
+visualization options and should be seen as a stepping-stone. However,
+many more options exist and the user should customize the visualization
+according to the biological question at hand.
 
 ## Load data
 
-First, we will read in the previously generated `SpatialExperiment` object. 
+First, we will read in the previously generated `SpatialExperiment`
+object.
 
 ```{r read-data-batch-correction, message=FALSE}
 spe <- readRDS("data/spe.rds")
 ```
 
-For visualization purposes, we will define markers that were used for cell type classification and markers that can indicate a specific cell state (e.g. Ki67).
+For visualization purposes, we will define markers that were used for
+cell type classification and markers that can indicate a specific cell
+state (e.g. Ki67).
 
 ```{r}
 # Define cell_type_markers 
@@ -42,28 +60,34 @@ rowData(spe)$state_markers <- rownames(spe) %in% state_markers
 
 ## Cell-type level {#cell-type-level}
 
-In the first section of this chapter, the grouping-level for the visualization 
-approaches will be the cell type classification from Section \@ref(classification). 
-Other grouping levels (e.g. cluster assignments from Section \@ref(clustering)) 
-are possible and the user should adjust depending on the chosen analysis workflow. 
+In the first section of this chapter, the grouping-level for the
+visualization approaches will be the cell type classification from
+Section \@ref(classification). Other grouping levels (e.g. cluster
+assignments from Section \@ref(clustering)) are possible and the user
+should adjust depending on the chosen analysis workflow.
 
-### Dimensionality reduction visualization 
+### Dimensionality reduction visualization
 
-As seen before, we can visualize single-cells in low-dimensional space. Often 
-used non-linear methods for dimensionality reduction are tSNE and UMAP, which 
-aim to preserve the distances between each cell and its neighbors in the 
-high-dimensional space. 
+As seen before, we can visualize single-cells in low-dimensional space.
+Often used non-linear methods for dimensionality reduction are tSNE and
+UMAP, which aim to preserve the distances between each cell and its
+neighbors in the high-dimensional space.
 
-Interpreting these plots is not trivial, but local neighborhoods in the plot can 
-suggest similarity in expression for given cells. See [Orchestrating Single-Cell Analysis with Bioconductor](https://bioconductor.org/books/release/OSCA/) for more details.
+Interpreting these plots is not trivial, but local neighborhoods in the
+plot can suggest similarity in expression for given cells. See
+[Orchestrating Single-Cell Analysis with
+Bioconductor](https://bioconductor.org/books/release/OSCA/) for more
+details.
 
-Here, we will use `dittoDimPlot` from [DittoSeq](https://bioconductor.org/packages/release/bioc/html/dittoSeq.html) and
-`plotReducedDim` from [scater](https://bioconductor.org/packages/release/bioc/html/scater.html)
-to visualize the fastMNN-corrected UMAP colored by cell type and expression, 
-respectively. 
+Here, we will use `dittoDimPlot` from
+[DittoSeq](https://bioconductor.org/packages/release/bioc/html/dittoSeq.html)
+and `plotReducedDim` from
+[scater](https://bioconductor.org/packages/release/bioc/html/scater.html)
+to visualize the fastMNN-corrected UMAP colored by cell type and
+expression, respectively.
 
-Both functions are highly flexible and return `ggplot` objects which
-can be further modified.
+Both functions are highly flexible and return `ggplot` objects which can
+be further modified.
 
 ```{r umap}
 library(patchwork)
@@ -73,7 +97,7 @@ library(ggplot2)
 library(viridis)
 library(dittoSeq)
 
-## UMAP colored by cell type and expression - dittoDimPlot+
+## UMAP colored by cell type and expression - dittoDimPlot
 p1 <- dittoDimPlot(spe, var = "celltype", 
              reduction.use = "UMAP_mnnCorrected", size = 0.2,
              do.label = TRUE) +
@@ -101,17 +125,16 @@ plot_list  <- lapply(rownames(spe)[rowData(spe)$type_markers == TRUE], function(
 plot_grid(plotlist = plot_list)
 ```
 
-### Heatmap visualization 
+### Heatmap visualization
 
-Next, it is often useful to visualize single-cell expression per cell type in form of a
-heatmap. 
+Next, it is often useful to visualize single-cell expression per cell
+type in form of a heatmap. For this, we will use the `dittoHeatmap`
+function from
+[DittoSeq](https://bioconductor.org/packages/release/bioc/html/dittoSeq.html).
 
-
-Here, 
-
-
-Furthermore, we sub-sample the dataset to 2000 cells for ease of visualization
-and overlay the cancer type and patient ID from which the cells were extracted.
+Furthermore, we sub-sample the dataset to 4000 cells for ease of
+visualization and overlay the cancer type and patient ID from which the
+cells were extracted.
 
 ```{r celltype heatmap, message=FALSE}
 library(dittoSeq)
@@ -128,6 +151,12 @@ dittoHeatmap(spe[,cur_cells], genes = rownames(spe)[rowData(spe)$type_markers ==
                                       celltype = metadata(spe)$color_vectors$celltype)
              )
 ```
+
+Similarly, we can visualize the mean marker expression per cell type for
+all cells using `aggregateAcrossCells` from
+[scuttle](https://bioconductor.org/packages/release/bioc/html/scuttle.html)
+and then `dittoHeatmap`. We will annotate the heatmap with the number of
+cells per cell type.
 
 ```{r celltype mean-expression-per-cluster, message=FALSE, fig.height=7}
 library(scuttle)
@@ -148,18 +177,30 @@ dittoHeatmap(celltype_mean,
              annotation_colors = list(celltype = metadata(spe)$color_vectors$celltype,
                                       ncells = plasma(100)))
 
-#Row-scaling
+#Min-max expression scaling
 dittoHeatmap(celltype_mean,
              assay = "exprs", cluster_cols = TRUE, 
-             scale = "row",
-             heatmap.colors = viridis(100),
+             scaled.to.max = TRUE,
+             heatmap.colors.max.scaled = viridis(100),
              annot.by = c("celltype","ncells"),
              annotation_colors = list(celltype = metadata(spe)$color_vectors$celltype,
                                       ncells = plasma(100)))
-
 ```
 
+As illustrated above for not- and min-max-scaled expression values,
+different ways of scaling can have strong effects on visualization
+output and we encourage the user to test multiple options.
+
+Overall, we can observe cell-type specific marker expression (e.g. Tumor
+= Ecad high and B cells = CD20 high) in agreement with the gating scheme
+of Section \@ref(classification).
+
 ### Violin plot visualization
+
+The `plotExpression` function from
+[scater](https://bioconductor.org/packages/release/bioc/html/scater.html)
+allows to plot the distribution of expression values across cell types
+for a chosen set of proteins. The output is a flexible `ggplot` object.
 
 ```{r celltype violin, message=FALSE}
 #Violin Plot - plotExpression
@@ -167,28 +208,55 @@ plotExpression(spe[,cur_cells],features = rownames(spe)[rowData(spe)$type_marker
     scale_color_manual(values = metadata(spe)$color_vectors$celltype)
 ```
 
-### Scatter plot visualization 
+### Scatter plot visualization
+
+Moreover, a protein expression based scatter plot can be generated with
+`dittoScatterPlot` (returns a `ggplot` object). We overlay the plot with the 
+cell type information.
 
 ```{r celltype scatter, message=FALSE}
 #Scatter plot
-dittoScatterPlot(spe, x.var = "CD3",y.var="CD20", assay.x = "exprs", assay.y = "exprs", color.var = "celltype")+
+dittoScatterPlot(spe, x.var = "CD3", y.var="CD20", assay.x = "exprs", assay.y = "exprs", color.var = "celltype")+
     scale_color_manual(values = metadata(spe)$color_vectors$celltype)+
     ggtitle("Scatterplot for CD3/CD20 labelled by celltype")
 ```
 
+We can nicely observe how the "B next to T cell" phenotype (`BnTcell`)
+has high expression values for both CD20 and CD3.
+
+**Of note**, in a setting where the user aims to assign labels to
+clusters based on marker genes/proteins, all of the above plots can be
+particularly helpful.
+
 ### Barplot visualization
+
+In order to display frequencies of cell types per sample/patient, the 
+`dittoBarPlot` function will be used. Data can be represented as percentages or 
+counts and again `ggplot` objects are outputted. 
 
 ```{r barplot celltype}
 #by sample_id
 dittoBarPlot(spe, var = "celltype", group.by = "sample_id")+
     scale_fill_manual(values = metadata(spe)$color_vectors$celltype)
 
-#by patient_id
+#by patient_id - percentage
 dittoBarPlot(spe, var = "celltype", group.by = "patient_id")+
     scale_fill_manual(values = metadata(spe)$color_vectors$celltype)
-```
 
-### CATALYST-based visualization 
+#by patient_id - count
+dittoBarPlot(spe, scale = "count", var = "celltype", group.by = "patient_id")+
+    scale_fill_manual(values = metadata(spe)$color_vectors$celltype)
+```
+We can see that cell type frequencies change between samples/patients and 
+that the highest proportion of *plasma cells* can be observed for Patient 2. 
+
+### CATALYST-based visualization
+
+In the following, we would like to highlight some useful visualization functions 
+from the [CATALYST](https://bioconductor.org/packages/release/bioc/html/CATALYST.html) package. 
+
+To this end, we will first convert the `SpatialExperiment` object into a 
+CATALYST-compatible format. 
 
 ```{r}
 library(CATALYST)
@@ -204,29 +272,42 @@ spe_cat$cluster_id <- factor(spe$celltype)
 metadata(spe_cat)$cluster_codes <- data.frame(celltype = factor(spe_cat$celltype))
 ```
 
+All of the `CATALYST` functions presented below return `ggplot` objects, which 
+allow flexible downstream adjustment. 
+
 #### Pseudobulk-level MDS plot
 
-**pbMDS - Pseudobulk-level MDS plot**
-A multi-dimensional scaling (MDS) plot on aggregated measurement values may be rendered with pbMDS. Such a plot will give a sense of similarities between cluster and/or samples in an unsupervised way and of key difference in expression before conducting any formal testing.
+Pseudobulk-level multi-dimensional scaling (MDS) plots can be rendered with the 
+exported `pbMDS` function.
+
+Here, we will use `pbMDS` to highlight expression similarities between cell types 
+and subsequently for each celltype-sample-combination. 
 
 ```{r celltype pbmds}
 ## pbMDS plot
 
-# MDS pseudobulk by cell labels 
+# MDS pseudobulk by cell type
 pbMDS(spe_cat, by = "cluster_id", features = rownames(spe_cat)[rowData(spe_cat)$type_markers == TRUE], label_by = "cluster_id", k="celltype")+
   scale_color_manual(values = metadata(spe_cat)$color_vectors$celltype)
 
-# MDS pseudobulk by sample_id and cell labels
+# MDS pseudobulk by cell type and sample_id
 pbMDS(spe_cat, by = "both", features = rownames(spe_cat)[rowData(spe_cat)$type_markers == TRUE], k = "celltype", shape_by = "condition", size_by = TRUE)+
   scale_color_manual(values = metadata(spe_cat)$color_vectors$celltype)
 ```
 
+We can see that the pseudobulk-expression profile of *neutrophils* seems markedly 
+distinct from the other cell types, while comparable cell types such as the T 
+cell subtypes group together. Furthermore, pseudobulk cell-type profiles from 
+SCCHN appear different from the other indications. 
+
+
 #### Reduced dimension plot on CLR of proportions
 
-**clrDR - Reducded dimension plot on CLR of proportions**
-A dimensionality reduction plot on centered log-ratios (CLR) of sample/cluster proportions across clusters/samples can be rendered with clrDR. Here, we view each sample (cluster) as a vector of cluster (sample) proportions. Complementary to pbMDS, such a plot will give a sense of similarities between samples/clusters in terms of their composition.
+The `clrDR` function produces dimensionality reduction plots on centered 
+log-ratios (CLR) of sample/cell type proportions across cell type/samples. 
 
-For more details refer to CATALYST.
+As with `pbMDS`, the output plots aim to illustrate the degree of similarity 
+between cell types based on sample proportions. 
 
 ```{r celltype - clrDR}
 ## clrDR plot
@@ -234,26 +315,41 @@ For more details refer to CATALYST.
 #CLR on cluster proportions across samples
 set.seed(22)
 
-clrDR(spe_cat, dr = "PCA", by = "cluster_id", k = "celltype", arrow_col = "patient_id", point_pal = metadata(spe_cat)$color_vectors$celltype)+
+clrDR(spe_cat, dr = "PCA", by = "cluster_id", k = "celltype", label_by = "cluster_id", arrow_col = "patient_id", point_pal = metadata(spe_cat)$color_vectors$celltype)+
   scale_color_manual(values = metadata(spe_cat)$color_vectors$patient_id)
 ```
+We can again observe that *neutrophils* have a divergent profile also in terms 
+of their sample proportions. 
 
-#### Pseudobulk expression boxplot 
+#### Pseudobulk expression boxplot
 
-**plotPbExprs**
-A combined boxplot and jitter of aggregated marker intensities can be generated via `plotPbExprs()`.
+The `plotPbExprs` generates combined box- and jitter-plots of aggregated marker 
+expression per cell type. Here, we further split the data by cancer type.
 
 ```{r celltype pbExprs}
 plotPbExprs(spe_cat, k = "celltype", facet_by = "cluster_id", ncol = 4, features = rownames(spe_cat)[rowData(spe_cat)$type_markers == TRUE])+
     scale_color_manual(values = metadata(spe_cat)$color_vectors$indication)
 ```
+Notably, CD15 levels are elevated in SCCHN in comparison to all other indications 
+for most cell types. 
 
 ## Sample-level {#sample-level}
 
-### Dimensionality reduction visualization 
+In the next section, we will shift the grouping-level focus from the cell type 
+to the sample-level. Sample-levels will be further divided into the 
+sample-(reflecting each image) and patient-level. 
 
-Furthermore, assessment of potential “batch effects” between samples
+Although we will mostly repeat the functions from the previous section \@ref(cell-type-level),
+we believe that image- and patient-level centered visualization can provide 
+additional quality control and biological interpretation. 
 
+### Dimensionality reduction visualization
+
+Visualization of low-dimensional embeddings, here not corrected and fastMNN-corrected UMAPs, 
+and coloring it by sample-levels is often used for "batch effect" assessment 
+as mentioned in Section \@ref(cell-quality). 
+
+We will again use `dittoDimPlot`. 
 
 ```{r umap}
 library(patchwork)
@@ -263,25 +359,47 @@ library(ggplot2)
 library(viridis)
 library(dittoSeq)
 
-## UMAP colored by cell type and expression - dittoDimPlot+
+## UMAP colored by cell type and expression - dittoDimPlot
 p1 <- dittoDimPlot(spe, var = "sample_id",
+             reduction.use = "UMAP", size = 0.2, colors = viridis(100),
+             do.label = TRUE)+
+    scale_color_manual(values = metadata(spe)$color_vectors$sample_id)+
+  theme(legend.title = element_blank()) +
+  ggtitle("Sample ID")
+
+p2 <- dittoDimPlot(spe, var = "sample_id",
              reduction.use = "UMAP_mnnCorrected", size = 0.2, colors = viridis(100),
              do.label = TRUE)+
     scale_color_manual(values = metadata(spe)$color_vectors$sample_id)+
   theme(legend.title = element_blank()) +
   ggtitle("Sample ID")
 
-p2 <- dittoDimPlot(spe, var = "patient_id", 
+p3 <- dittoDimPlot(spe, var = "patient_id", 
+             reduction.use = "UMAP", size = 0.2,
+             do.label = TRUE) +
+  scale_color_manual(values = metadata(spe)$color_vectors$patient_id)+
+  theme(legend.title = element_blank()) +
+  ggtitle("Patient ID")
+
+p4 <- dittoDimPlot(spe, var = "patient_id", 
              reduction.use = "UMAP_mnnCorrected", size = 0.2,
              do.label = TRUE) +
   scale_color_manual(values = metadata(spe)$color_vectors$patient_id)+
   theme(legend.title = element_blank()) +
   ggtitle("Patient ID")
 
-p1+p2
+(p1 + p2) / (p3 + p4)
 ```
 
-### Heatmap visualization 
+As illustrated in Section \@ref(batch-effects), we see that the fastMNN approach
+(right side of the plot) leads to mixing of cells across samples/patients and 
+thus batch effect correction.
+
+### Heatmap visualization
+
+It can be beneficial to use a heatmap to visualize single-cell expression per 
+sample and patient. Such a plot, which we will create using `dittoHeatmap`, 
+can highlight biological differences across samples/patients. 
 
 ```{r patient heatmap}
 #Heatmap visualization - DittoHeatmap
@@ -297,6 +415,13 @@ dittoHeatmap(spe[,cur_cells], genes = rownames(spe)[rowData(spe)$type_markers ==
              )
 
 ```
+
+As in Section \@ref(image-quality), aggregated mean marker expression per sample/patient 
+allow identification of samples/patients with outlying expression patterns. 
+
+Here, we will focus on the patient level and use `aggregateAcrossCells` and 
+`dittoHeatmap`. The heatmap will be annotated with the number of cells per 
+patient and displayed using two scaling options.
 
 ```{r celltype mean-expression-per-cluster, message=FALSE, fig.height=7}
 library(scuttle)
@@ -317,11 +442,11 @@ dittoHeatmap(patient_mean,
              annotation_colors = list(patient_id = metadata(spe)$color_vectors$patient_id,
                                       ncells = plasma(100)))
 
-#Row-scaling
+#Min-max expression scaling
 dittoHeatmap(patient_mean,
              assay = "exprs", cluster_cols = TRUE, 
-             scale = "row",
-             heatmap.colors = viridis(100),
+             scaled.to.max =  TRUE,
+             heatmap.colors.max.scaled = viridis(100),
              annot.by = c("patient_id","ncells"),
              annotation_colors = list(patient_id = metadata(spe)$color_vectors$patient_id,
                                       ncells = plasma(100)))
@@ -330,6 +455,9 @@ dittoHeatmap(patient_mean,
 
 ### Barplot visualization
 
+Complementary to displaying cell type frequencies per sample/patient, 
+we can use `dittoBarPlot` to display sample/patient frequencies per cell type.
+
 ```{r barplot patient}
 dittoBarPlot(spe, var = "patient_id", group.by = "celltype")+
     scale_fill_manual(values = metadata(spe)$color_vectors$patient_id)
@@ -337,38 +465,57 @@ dittoBarPlot(spe, var = "patient_id", group.by = "celltype")+
 dittoBarPlot(spe, var = "sample_id", group.by = "celltype")+
     scale_fill_manual(values = metadata(spe)$color_vectors$sample_id)
 ```
+`Patient2` has the highest and lowest proportion of *plasma cells* and *neutrophils*, respectively. 
 
-### CATALYST-based visualization 
+### CATALYST-based visualization
 
 #### Pseudobulk-level MDS plot
+
+Expression-based pseudobulks for each sample can be compared with the 
+`pbMDS` function. 
 
 ```{r patient-pbmds}
 ## pbMDS plot
 
 # MDS pseudobulk by sample_id 
-pbMDS(spe_cat, by = "sample_id", color_by = "patient_id", features = rownames(spe_cat)[rowData(spe_cat)$type_markers == TRUE])+
-  scale_color_manual(values = metadata(spe_cat)$color_vectors$patient_id)
+pbMDS(spe_cat, by = "sample_id", color_by = "sample_id", features = rownames(spe_cat)[rowData(spe_cat)$type_markers == TRUE])+
+  scale_color_manual(values = metadata(spe_cat)$color_vectors$sample_id)
 ```
 
-#### Reduced dimension plot on CLR of proportions 
+There are marked differences in pseudobulk-expression patterns between samples 
+and across patients, which can be driven by biological differences and also 
+technical aspects such as divergent region selection.
+
+#### Reduced dimension plot on CLR of proportions
+
+The `clrDR` function can also be used to analyze similarity of samples based on 
+cell type proportions. 
 
 ```{r patient-clrDR}
 ## clrDR plot
 
 #CLR on sample proportions across clusters
 set.seed(22)
-clrDR(spe_cat, dr = "PCA", by = "sample_id", point_col = "patient_id",k = "celltype", point_pal = metadata(spe_cat)$color_vectors$patient_id)+
-  scale_color_manual(values = metadata(spe_cat)$color_vectors$celltype)
-
 clrDR(spe_cat, dr = "PCA", by = "sample_id", point_col = "sample_id",k = "celltype", point_pal = metadata(spe_cat)$color_vectors$sample_id)+
   scale_color_manual(values = metadata(spe_cat)$color_vectors$celltype)
 ```
 
+There are notable differences between samples based on their cell type 
+proportions. 
+
+Interestingly, `Patient3_001`, `Patient1_003`, `Patient4_007` and 
+`Patient4_006` group together and the PC loadings indicate a strong contribution 
+of *BnT* and *B* cells, which could propose formation of tertiary lymphoid 
+structures (TLS). In section \@ref(spatial-viz), we will be able to confirm 
+this finding also on the images. 
+
+
 ## Further examples {#rich-example}
 
-### Publication-ready ComplexHeatmap 
+### Publication-ready ComplexHeatmap
 
-Rich heatmap based on ComplexHeatmap that combines celltype and sample information. 
+Rich heatmap based on ComplexHeatmap that combines celltype and sample
+information.
 
 ```{r}
 library(ComplexHeatmap)
@@ -476,9 +623,7 @@ draw(h,annotation_legend_list = list(lgd))
 ```
 
 ## Session Info
-   
+
 ```{r, echo = FALSE}
 sessionInfo()
 ```
-
-
