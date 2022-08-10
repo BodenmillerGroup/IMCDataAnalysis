@@ -499,7 +499,11 @@ metrics should be tested to assess cluster stability.
 To assign cell types to clusters, we manually annotate clusters based on their
 marker expression. For example, SNN cluster 11 (clustering of the integrated
 cells) shows high, homogeneous expression of CD20 and we might therefore label
-this cluster as B cells. Full cell labeling can be seen in the following section.
+this cluster as B cells. The next chapter \@ref(single-cell-visualization) will 
+highlight single-cell visualization methods that can be helpful for manual 
+cluster annotations. 
+
+Full cell labeling can be seen in the following section.
 
 ## Cell type classification {#classification}
 
