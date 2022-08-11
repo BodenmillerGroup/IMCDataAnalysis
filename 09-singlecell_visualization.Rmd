@@ -254,8 +254,8 @@ dittoBarPlot(spe, scale = "count", var = "celltype", group.by = "patient_id") +
 ```
 
 We can see that cell type frequencies change between samples/patients
-and that the highest proportion/counts of *plasma cells* and *stromal
-cells* can be observed for Patient 2 and Patient 4, respectively.
+and that the highest proportion/counts of plasma cells and stromal
+cells can be observed for Patient 2 and Patient 4, respectively.
 
 ### CATALYST-based visualization
 
@@ -309,7 +309,7 @@ pbMDS(spe_cat, by = "both",
   scale_color_manual(values = metadata(spe_cat)$color_vectors$celltype)
 ```
 
-We can see that the pseudobulk-expression profile of *neutrophils* seems
+We can see that the pseudobulk-expression profile of neutrophils seems
 markedly distinct from the other cell types, while comparable cell types
 such as the T cell subtypes group together. Furthermore, pseudobulk
 cell-type profiles from SCCHN appear different from the other
@@ -337,7 +337,7 @@ clrDR(spe_cat, dr = "PCA",
   scale_color_manual(values = metadata(spe_cat)$color_vectors$patient_id)
 ```
 
-We can again observe that *neutrophils* have a divergent profile also in
+We can again observe that neutrophils have a divergent profile also in
 terms of their sample proportions.
 
 #### Pseudobulk expression boxplot
@@ -492,8 +492,8 @@ dittoBarPlot(spe, var = "sample_id", group.by = "celltype") +
     scale_fill_manual(values = metadata(spe)$color_vectors$sample_id)
 ```
 
-`Patient2` has the highest and lowest proportion of *plasma cells* and
-*neutrophils*, respectively.
+`Patient2` has the highest and lowest proportion of plasma cells and
+neutrophils, respectively.
 
 ### CATALYST-based visualization
 
@@ -538,7 +538,7 @@ proportions.
 
 Interestingly, `Patient3_001`, `Patient1_003`, `Patient4_007` and
 `Patient4_006` group together and the PC loadings indicate a strong
-contribution of *BnT* and *B* cells, which could propose formation of
+contribution of BnT and B cells, which could propose formation of
 tertiary lymphoid structures (TLS). In section \@ref(spatial-viz), we
 will be able to confirm this hypothesis visually on the images.
 
@@ -687,9 +687,9 @@ draw(h_list,annotation_legend_list = list(lgd))
 ```
 
 This plot summarizes most of the information we have seen in this
-chapter previously. In addition, we can observe that *tumor cells* have
+chapter previously. In addition, we can observe that tumor cells have
 the largest mean cell area, high number of neighbors and elevated Ki67
-expression. *BnT cells* have the highest number of neighbors on average,
+expression. BnT cells have the highest number of neighbors on average,
 which is biological sound given their predominant location in highly
 immune infiltrated regions (such as TLS).
 
