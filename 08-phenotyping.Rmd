@@ -58,9 +58,9 @@ dataset [@Levine2015]. The algorithm first constructs a graph by detecting the
 next step, edges between nodes (cells) are weighted by their overlap in nearest
 neighbor sets. To quantify the overlap in shared nearest neighbor sets, the
 jaccard index is used. The Louvain modularity optimization approach is used to
-detect connected communities and partition the graph into cluster of cells. This
-clustering strategy was used by Jackson, Fischer _et al._ to
-cluster IMC data [@Jackson2020].
+detect connected communities and partition the graph into clusters of cells.
+This clustering strategy was used by Jackson, Fischer _et al._  and Schulz _et
+al._ to cluster IMC data [@Jackson2020; @Schulz2018].
 
 There are several different PhenoGraph implementations available in R. Here, we
 use the one available at
@@ -232,7 +232,7 @@ Performing a cluster sweep takes some time as multiple function calls are run in
 We do however recommend testing a number of different parameter settings to
 access clustering performance.
 
-Once parameter settings are know, we can either use the `clusterRows` function
+Once parameter settings are known, we can either use the `clusterRows` function
 of the `bluster` package to cluster cells or its convenient wrapper function
 exported by the
 [scran](https://bioconductor.org/packages/release/bioc/html/scran.html) package.
@@ -255,7 +255,7 @@ library(scran)
 
 clusters <- clusterCells(spe[rowData(spe)$use_channel,], 
                          assay.type = "exprs", 
-                         BLUSPARAM = NNGraphParam(k=20, 
+                         BLUSPARAM = SNNGraphParam(k=20, 
                                                   cluster.fun = "louvain",
                                                   type = "rank",
                                                   BPPARAM = bpparam()))
@@ -375,7 +375,7 @@ end_time <- Sys.time()
 Running FlowSOM clustering took `r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
 
 The `CATALYST` package does not provide functionality to perform `FlowSOM` and
-`ConsensusClusterPlus` clustering directly on the integrated cells. As an
+`ConsensusClusterPlus` clustering directly on the batch-corrected, integrated cells. As an
 alternative to the `CATALYST` package, the `bluster` package provides SOM
 clustering when specifying the `SomParam()` parameter. Similar to the `CATALYST`
 approach, we will first cluster the dataset into 100 clusters (also called
@@ -569,7 +569,7 @@ labeled data.
 
 ### Define color vectors
 
-For consistent visualization of cell types, we will no pre-define their colors:
+For consistent visualization of cell types, we will now pre-define their colors:
 
 ```{r cell-type-colors}
 celltype <- setNames(c("#3F1B03", "#F4AD31", "#894F36", "#1C750C", "#EF8ECC", 
@@ -787,7 +787,7 @@ data.frame(cm$byClass) %>%
 ```
 
 We observe high sensitivity and specificity for most cell types. Plasma cells
-show the lowest true positive rate with 88% being sufficiently high. The size of
+show the lowest true positive rate with 92% being sufficiently high. The size of
 the circle specifies the number of cells per class.
 
 Finally, to observe which cell phenotypes were wrongly classified, we can visualize

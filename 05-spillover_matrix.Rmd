@@ -136,7 +136,7 @@ refrain from aggregating across consecutive pixels for this demonstration.
 ### Filtering incorrectly assigned pixels
 
 The following step uses functions provided by the `CATALYST` package to
-"debarcode" the pixels. Based on the intensity distribution of all channel,
+"debarcode" the pixels. Based on the intensity distribution of all channels,
 pixels are assigned to their corresponding barcode; here this is the already
 known metal spot. This procedure serves the purpose to identify pixels that
 cannot be robustly assigned to the spotted metal. Pixels of such kind can be
@@ -208,57 +208,13 @@ isotope_list <- CATALYST::isotope_list
 isotope_list$Ar <- 80
 
 plotSpillmat(sce, isotope_list = isotope_list)
+
+# Save spillover matrix in new object
+sm <- metadata(sce)$spillover_matrix
 ```
 
 As we can see, the largest spillover appears in `In113 --> In115` and we also
 observe the `+16` oxide impurities for e.g. `Nd148 --> Dy164`.
-
-Here, we will save the spillover matrix as .csv and as image for
-use in the [IMC segmentation
-pipeline](https://github.com/BodenmillerGroup/ImcSegmentationPipeline) as part
-of the `CorrectSpilloverApply` and `CorrectSpilloverMeasurements` module
-[here](https://github.com/BodenmillerGroup/ImcPluginsCP).
-
-### Save spillover matrix as csv
-
-Next, we will write out the spillover matrix as .csv file for possible later use.
-
-```{r write_sm_csv}
-sm <- metadata(sce)$spillover_matrix
-write.csv(sm, "data/spillover_matrix.csv")
-```
-
-### Save spillover matrix as image (optional)
-
-When using the **[ImcPluginsCP](https://github.com/BodenmillerGroup/ImcPluginsCP)
-CellProfiler modules** for spillover correction, the spillover matrix needs to 
-be saved as 32-bit .tiff image. This is not needed when using the `steinbock` framework.
-
-For this to work, the channels need to be ordered in the same way that
-CellProfiler orders them. When using the [IMC segmentation pipeline](https://github.com/BodenmillerGroup/ImcSegmentationPipeline), for each
-image, the order of the channels is written out as .csv file. This file contains
-a single column listing the metal isotopes in the correct order. 
-The `steinbock` framework however orders the channels as they appear in the panel
-file and we can directly extract the channels that should be compensated for.
-
-The `CATALYST` package provides the `adaptSpillmat` function that corrects the
-spillover matrix in a way that rows and columns match a predefined set of metals.
-Please refer to `?compCytof` for more information how metals in the spillover
-matrix are matched to acquired channels in the `SingleCellExperiment` object.
-
-The spillover matrix can now be adapted to exclude channels that are not part of
-the measurement (`keep == 0`)  and saved as .tiff image for the use with
-`CellProfiler`.
-
-```{r save-sm-as-tiff, message=FALSE}
-library(tiff)
-panel <- read.csv("data/steinbock/panel.csv")
-adapted_sm <- adaptSpillmat(sm, paste0(panel$channel[panel$keep == 1], "Di"), 
-                            isotope_list = isotope_list)
-
-writeTIFF(sm, "data/spillover_matrix.tiff", 
-          bits.per.sample = 32)
-```
 
 ## Single-cell data compensation
 
@@ -315,13 +271,13 @@ assay(spe, "compcounts") <- assay(spe, "compexprs") <- NULL
 
 ## Image compensation
 
-The [cytomapper](https://github.com/BodenmillerGroup/cytomapper) allows channel
+The [cytomapper](https://github.com/BodenmillerGroup/cytomapper) package allows channel
 spillover compensation directly on **multi-channel images**. 
 The `compImage` function takes a `CytoImageList` object and the estimated
 spillover matrix as input. More info on how to work with `CytoImageList`
 objects can be seen in Section \@ref(image-visualization).
 
-at this point, we can read in the `CytoImageList` object storing multi-channel
+At this point, we can read in the `CytoImageList` object containing multi-channel
 images as generated in Section \@ref(read-data).
 The `channelNames` need to be set according to their metal isotope in the form
 (mt)(mass)Di and therefore match `colnames(sm)`.
@@ -331,6 +287,22 @@ library(cytomapper)
 
 images <- readRDS("data/images.rds")
 channelNames(images) <- rowData(spe)$channel_name
+```
+
+The CATALYST package provides the `adaptSpillmat` function that corrects the
+spillover matrix in a way that rows and columns match a predefined set of
+metals. Please refer to `?compCytof` for more information how metals in the
+spillover matrix are matched to acquired channels in the `SingleCellExperiment`
+object.
+
+The spillover matrix can now be adapted to exclude channels that are not part of
+the measurement (`keep == 0`).
+
+```{r}
+library(tiff)
+panel <- read.csv("data/steinbock/panel.csv")
+adapted_sm <- adaptSpillmat(sm, paste0(panel$channel[panel$keep == 1], "Di"), 
+                            isotope_list = isotope_list)
 ```
 
 The adpated spillover matrix now matches the `channelNames` of the
@@ -348,18 +320,18 @@ As a sanity check, we will visualize the image before and after compensation:
 ```{r image-visualization}
 # Before compensation
 plotPixels(images[5], colour_by = "Yb173Di", 
-           image_title = list(text = "Er166 - before", position = "topleft"), 
+           image_title = list(text = "Yb173 (Ecad) - before", position = "topleft"), 
            legend = NULL, bcg = list(Yb173Di = c(0, 4, 1)))
 plotPixels(images[5], colour_by = "Yb174Di", 
-           image_title = list(text = "Er167 - before", position = "topleft"), 
+           image_title = list(text = "Yb174 (CD303) - before", position = "topleft"), 
            legend = NULL, bcg = list(Yb174Di = c(0, 4, 1)))
 
 # After compensation
 plotPixels(images_comp[5], colour_by = "Yb173Di",
-           image_title = list(text = "Er166 - after", position = "topleft"), 
+           image_title = list(text = "Yb173 (Ecad) - after", position = "topleft"), 
            legend = NULL, bcg = list(Yb173Di = c(0, 4, 1)))
 plotPixels(images_comp[5], colour_by = "Yb174Di", 
-           image_title = list(text = "Er167 - after", position = "topleft"),
+           image_title = list(text = "Yb174 (CD303) - after", position = "topleft"),
            legend = NULL, bcg = list(Yb174Di = c(0, 4, 1)))
 ```
 
@@ -374,7 +346,7 @@ channelNames(images_comp) <- rownames(spe)
 In the final step, the compensated images are written out as 16-bit TIFF
 files:
 
-```{r write-images, message=FALSE, results='hide'}
+```{r write-images, message=FALSE, results='hide', error=TRUE}
 library(tiff)
 dir.create("data/comp_img")
 lapply(names(images_comp), function(x){
@@ -387,9 +359,9 @@ lapply(names(images_comp), function(x){
 ## Save objects
 
 For further downstream analysis, the compensated `SpatialExperiment` and
-`CytoImageList` objects are saved:
+`CytoImageList` objects are saved replacing the former objects:
 
-```{r save-objects-spill}
+```{r save-objects-spill, error=TRUE}
 saveRDS(spe, "data/spe.rds")
 saveRDS(images_comp, "data/images.rds")
 ```
