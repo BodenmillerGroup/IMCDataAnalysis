@@ -1,9 +1,3 @@
----
-editor_options: 
-  markdown: 
-    wrap: 72
----
-
 # Single cell visualization {#single-cell-visualization}
 
 The following section describes typical approaches on how to visualize
@@ -17,7 +11,7 @@ in Section \@ref(sample-level). Lastly, Section \@ref(rich-example) will
 provide a more customized example on how to integrate various
 single-cell and sample metadata into one heatmap using the
 [ComplexHeatmap](https://bioconductor.org/packages/release/bioc/html/ComplexHeatmap.html)
-package.
+package [@Gu2016].
 
 Visualization functions from popular R packages in single-cell research
 such as
@@ -38,7 +32,7 @@ according to the biological question at hand.
 First, we will read in the previously generated `SpatialExperiment`
 object.
 
-```{r read-data-batch-correction, message=FALSE}
+```{r read-data-scviz, message=FALSE}
 spe <- readRDS("data/spe.rds")
 ```
 
@@ -46,16 +40,19 @@ For visualization purposes, we will define markers that were used for
 cell type classification and markers that can indicate a specific cell
 state (e.g. Ki67).
 
-```{r}
+```{r define-markers, message=FALSE}
 # Define cell_type_markers 
-type_markers <- c("Ecad", "CD45RO", "CD20", "CD3", "FOXP3", "CD206", "MPO", "SMA", "CD8a", "CD4", "HLADR", "CD15", "CD38", "PDGFRb")
+type_markers <- c("Ecad", "CD45RO", "CD20", "CD3", "FOXP3", "CD206", "MPO", 
+                  "SMA", "CD8a", "CD4", "HLADR", "CD15", "CD38", "PDGFRb")
 
 # Define cell_state_markers 
-state_markers <- c("CarbonicAnhydrase", "Ki67", "PD1", "GrzB", "PDL1", "ICOS", "TCF7", "VISTA")
+state_markers <- c("CarbonicAnhydrase", "Ki67", "PD1", "GrzB", "PDL1", 
+                   "ICOS", "TCF7", "VISTA")
 
 # Add to spe
-rowData(spe)$type_markers <- rownames(spe) %in% type_markers
-rowData(spe)$state_markers <- rownames(spe) %in% state_markers
+rowData(spe)$marker_class <- ifelse(rownames(spe) %in% type_markers, "type",
+                                    ifelse(rownames(spe) %in% state_markers, "state", 
+                                    "other"))
 ```
 
 ## Cell-type level {#cell-type-level}
@@ -69,8 +66,8 @@ should adjust depending on the chosen analysis workflow.
 ### Dimensionality reduction visualization
 
 As seen before, we can visualize single-cells in low-dimensional space.
-Often used non-linear methods for dimensionality reduction are tSNE and
-UMAP, which aim to preserve the distances between each cell and its
+Often, non-linear methods for dimensionality reduction such as tSNE and
+UMAP are sued. They aim to preserve the distances between each cell and its
 neighbors in the high-dimensional space.
 
 Interpreting these plots is not trivial, but local neighborhoods in the
@@ -79,17 +76,17 @@ plot can suggest similarity in expression for given cells. See
 Bioconductor](https://bioconductor.org/books/release/OSCA/) for more
 details.
 
-Here, we will use `dittoDimPlot` from
+Here, we will use `dittoDimPlot` from the
 [DittoSeq](https://bioconductor.org/packages/release/bioc/html/dittoSeq.html)
-and `plotReducedDim` from
-[scater](https://bioconductor.org/packages/release/bioc/html/scater.html)
+package and `plotReducedDim` from the 
+[scater](https://bioconductor.org/packages/release/bioc/html/scater.html) package
 to visualize the fastMNN-corrected UMAP colored by cell type and
 expression, respectively.
 
 Both functions are highly flexible and return `ggplot` objects which can
 be further modified.
 
-```{r cell type umap, fig.width=8, fig.height=8, message=FALSE}
+```{r cell type umap, fig.width=10, fig.height=5, message=FALSE}
 library(dittoSeq)
 library(scater)
 library(patchwork)
@@ -103,7 +100,7 @@ p1 <- dittoDimPlot(spe, var = "celltype",
              do.label = TRUE) +
   scale_color_manual(values = metadata(spe)$color_vectors$celltype) +
   theme(legend.title = element_blank()) +
-  ggtitle("Classification cell labels on UMAP, integrated cells")
+  ggtitle("Cell types on UMAP, integrated cells")
 
 
 p2 <- dittoDimPlot(spe, var = "Ecad", assay = "exprs",
@@ -113,12 +110,15 @@ p2 <- dittoDimPlot(spe, var = "Ecad", assay = "exprs",
   
 p1 + p2
 
+```
+
+```{r cell type umap 2, fig.width=8, fig.height=8, message=FALSE}
 # UMAP colored by expression for all markers - plotReducedDim
-plot_list  <- lapply(rownames(spe)[rowData(spe)$type_markers == TRUE], function(x){
+plot_list  <- lapply(rownames(spe)[rowData(spe)$marker_class == "type"], function(x){
                       p <- plotReducedDim(spe, dimred = "UMAP_mnnCorrected",
                                           colour_by = x,
                                           by_exprs_values = "exprs",
-                                          point_size = 0.5)
+                                          point_size = 0.2)
                       return(p)
                     })
 
@@ -129,18 +129,20 @@ plot_grid(plotlist = plot_list)
 
 Next, it is often useful to visualize single-cell expression per cell
 type in form of a heatmap. For this, we will use the `dittoHeatmap`
-function from
-[DittoSeq](https://bioconductor.org/packages/release/bioc/html/dittoSeq.html).
+function from the 
+[DittoSeq](https://bioconductor.org/packages/release/bioc/html/dittoSeq.html)
+package.
 
 We sub-sample the dataset to 4000 cells for ease of visualization and
 overlay the cancer type and patient ID from which the cells were
 extracted.
 
 ```{r celltype heatmap, fig.height = 7,fig.width = 7, message=FALSE}
+set.seed(220818)
 cur_cells <- sample(seq_len(ncol(spe)), 4000)
 
 #Heatmap visualization - DittoHeatmap
-dittoHeatmap(spe[,cur_cells], genes = rownames(spe)[rowData(spe)$type_markers == TRUE],
+dittoHeatmap(spe[,cur_cells], genes = rownames(spe)[rowData(spe)$marker_class == "type"],
              assay = "exprs", order.by = c("celltype"),
              cluster_cols = FALSE, scale = "none",
              heatmap.colors = viridis(100), annot.by = c("celltype","indication","patient_id"),
@@ -153,7 +155,7 @@ dittoHeatmap(spe[,cur_cells], genes = rownames(spe)[rowData(spe)$type_markers ==
 Similarly, we can visualize the mean marker expression per cell type for
 all cells using `aggregateAcrossCells` from
 [scuttle](https://bioconductor.org/packages/release/bioc/html/scuttle.html)
-and then `dittoHeatmap`. We will annotate the heatmap with the number of
+and then use `dittoHeatmap`. We will annotate the heatmap with the number of
 cells per cell type.
 
 ```{r celltype mean-expression-per-cluster, fig.height=5}
@@ -164,10 +166,10 @@ celltype_mean <- aggregateAcrossCells(as(spe, "SingleCellExperiment"),
                      ids = spe$celltype, 
                      statistics = "mean",
                      use.assay.type = "exprs", 
-                     subset.row = rownames(spe)[rowData(spe)$type_markers == TRUE]
+                     subset.row = rownames(spe)[rowData(spe)$marker_class == "type"]
                      )
 
-#No scaling
+# No scaling
 dittoHeatmap(celltype_mean,
              assay = "exprs", cluster_cols = TRUE, 
              scale = "none",
@@ -176,11 +178,11 @@ dittoHeatmap(celltype_mean,
              annotation_colors = list(celltype = metadata(spe)$color_vectors$celltype,
                                       ncells = plasma(100)))
 
-#Min-max expression scaling
+# Min-max expression scaling
 dittoHeatmap(celltype_mean,
              assay = "exprs", cluster_cols = TRUE, 
              scaled.to.max = TRUE,
-             heatmap.colors.max.scaled = viridis(100),
+             heatmap.colors.max.scaled = inferno(100),
              annot.by = c("celltype","ncells"),
              annotation_colors = list(celltype = metadata(spe)$color_vectors$celltype,
                                       ncells = plasma(100)))
@@ -196,14 +198,15 @@ of Section \@ref(classification).
 
 ### Violin plot visualization
 
-The `plotExpression` function from
-[scater](https://bioconductor.org/packages/release/bioc/html/scater.html)
+The `plotExpression` function from the
+[scater](https://bioconductor.org/packages/release/bioc/html/scater.html) package
 allows to plot the distribution of expression values across cell types
 for a chosen set of proteins. The output is a flexible `ggplot` object.
 
-```{r celltype violin, message=FALSE, fig.width=8, fig.height=7}
+```{r celltype violin, message=FALSE, fig.height=12}
 #Violin Plot - plotExpression
-plotExpression(spe[,cur_cells], features = rownames(spe)[rowData(spe)$type_markers == TRUE],
+plotExpression(spe[,cur_cells], 
+               features = rownames(spe)[rowData(spe)$marker_class == "type"],
                x = "celltype", exprs_values = "exprs", 
                colour_by = "celltype") +
     theme(axis.text.x =  element_text(angle = 90))+
@@ -239,16 +242,16 @@ In order to display frequencies of cell types per sample/patient, the
 `dittoBarPlot` function will be used. Data can be represented as
 percentages or counts and again `ggplot` objects are outputted.
 
-```{r barplot celltype}
-#by sample_id
+```{r barplot celltype, message=FALSE}
+# by sample_id
 dittoBarPlot(spe, var = "celltype", group.by = "sample_id") +
     scale_fill_manual(values = metadata(spe)$color_vectors$celltype)
 
-#by patient_id - percentage
+# by patient_id - percentage
 dittoBarPlot(spe, var = "celltype", group.by = "patient_id") +
     scale_fill_manual(values = metadata(spe)$color_vectors$celltype)
 
-#by patient_id - count
+# by patient_id - count
 dittoBarPlot(spe, scale = "count", var = "celltype", group.by = "patient_id") +
     scale_fill_manual(values = metadata(spe)$color_vectors$celltype)
 ```
@@ -259,7 +262,7 @@ cells can be observed for Patient 2 and Patient 4, respectively.
 
 ### CATALYST-based visualization
 
-In the following, we would like to highlight some useful visualization
+In the following, we highlight some useful visualization
 functions from the
 [CATALYST](https://bioconductor.org/packages/release/bioc/html/CATALYST.html)
 package.
@@ -270,7 +273,8 @@ CATALYST-compatible format.
 ```{r celltype CATALYST}
 library(CATALYST)
 
-#save spe in CATALYST-compatible object with renamed colData entries and new metadata information
+# save spe in CATALYST-compatible object with renamed colData entries and 
+# new metadata information
 spe_cat <- spe 
 
 spe_cat$sample_id <- factor(spe$sample_id)
@@ -292,18 +296,16 @@ with the exported `pbMDS` function.
 Here, we will use `pbMDS` to highlight expression similarities between
 cell types and subsequently for each celltype-sample-combination.
 
-```{r celltype pbmds}
-## pbMDS plot
-
+```{r celltype pbmds, message=FALSE}
 # MDS pseudobulk by cell type
 pbMDS(spe_cat, by = "cluster_id", 
-      features = rownames(spe_cat)[rowData(spe_cat)$type_markers == TRUE], 
-      label_by = "cluster_id", k="celltype") +
+      features = rownames(spe_cat)[rowData(spe_cat)$marker_class == "type"], 
+      label_by = "cluster_id", k = "celltype") +
   scale_color_manual(values = metadata(spe_cat)$color_vectors$celltype)
 
 # MDS pseudobulk by cell type and sample_id
 pbMDS(spe_cat, by = "both", 
-      features = rownames(spe_cat)[rowData(spe_cat)$type_markers == TRUE], 
+      features = rownames(spe_cat)[rowData(spe_cat)$marker_class == "type"], 
       k = "celltype", shape_by = "condition", 
       size_by = TRUE) +
   scale_color_manual(values = metadata(spe_cat)$color_vectors$celltype)
@@ -324,12 +326,8 @@ type/samples.
 As with `pbMDS`, the output plots aim to illustrate the degree of
 similarity between cell types based on sample proportions.
 
-```{r celltype - clrDR}
-## clrDR plot
-
-#CLR on cluster proportions across samples
-set.seed(22)
-
+```{r celltype - clrDR, message=FALSE}
+# CLR on cluster proportions across samples
 clrDR(spe_cat, dr = "PCA", 
       by = "cluster_id", k = "celltype", 
       label_by = "cluster_id", arrow_col = "patient_id", 
@@ -346,10 +344,10 @@ The `plotPbExprs` generates combined box- and jitter-plots of aggregated
 marker expression per cell type. Here, we further split the data by
 cancer type.
 
-```{r celltype pbExprs, fig.width=10, fig.height=6}
+```{r celltype pbExprs, fig.width=15, fig.height=6, message=FALSE}
 plotPbExprs(spe_cat, k = "celltype", 
             facet_by = "cluster_id", ncol = 4, 
-            features = rownames(spe_cat)[rowData(spe_cat)$type_markers == TRUE]) +
+            features = rownames(spe_cat)[rowData(spe_cat)$marker_class == "type"]) +
     scale_color_manual(values = metadata(spe_cat)$color_vectors$indication)
 ```
 
@@ -368,7 +366,7 @@ can provide additional quality control and biological interpretation.
 
 ### Dimensionality reduction visualization
 
-Visualization of low-dimensional embeddings, here not corrected and
+Visualization of low-dimensional embeddings, here comparing non-corrected and
 fastMNN-corrected UMAPs, and coloring it by sample-levels is often used
 for "batch effect" assessment as mentioned in Section
 \@ref(cell-quality).
@@ -421,7 +419,7 @@ samples/patients.
 
 ```{r sample heatmap, fig.height = 8,fig.width = 8}
 #Heatmap visualization - DittoHeatmap
-dittoHeatmap(spe[,cur_cells], genes = rownames(spe)[rowData(spe)$type_markers == TRUE],
+dittoHeatmap(spe[,cur_cells], genes = rownames(spe)[rowData(spe)$marker_class == "type"],
              assay = "exprs", order.by = c("patient_id","sample_id"),
              cluster_cols = FALSE, scale = "none",
              heatmap.colors = viridis(100), 
@@ -429,10 +427,7 @@ dittoHeatmap(spe[,cur_cells], genes = rownames(spe)[rowData(spe)$type_markers ==
              annotation_colors = list(celltype = metadata(spe)$color_vectors$celltype,
                                       indication = metadata(spe)$color_vectors$indication,
                                       patient_id = metadata(spe)$color_vectors$patient_id,
-                                      sample_id = metadata(spe)$color_vectors$sample_id
-                                      )
-             )
-
+                                      sample_id = metadata(spe)$color_vectors$sample_id))
 ```
 
 As in Section \@ref(image-quality), aggregated mean marker expression
@@ -450,10 +445,10 @@ patient_mean <- aggregateAcrossCells(as(spe, "SingleCellExperiment"),
                      ids = spe$patient_id, 
                      statistics = "mean",
                      use.assay.type = "exprs", 
-                     subset.row = rownames(spe)[rowData(spe)$type_markers == TRUE]
+                     subset.row = rownames(spe)[rowData(spe)$marker_class == "type"]
                      )
 
-#No scaling
+# No scaling
 dittoHeatmap(patient_mean,
              assay = "exprs", cluster_cols = TRUE, 
              scale = "none",
@@ -463,11 +458,11 @@ dittoHeatmap(patient_mean,
                                       indication = metadata(spe)$color_vectors$indication,
                                       ncells = plasma(100)))
 
-#Min-max expression scaling
+# Min-max expression scaling
 dittoHeatmap(patient_mean,
              assay = "exprs", cluster_cols = TRUE, 
              scaled.to.max =  TRUE,
-             heatmap.colors.max.scaled = viridis(100),
+             heatmap.colors.max.scaled = inferno(100),
              annot.by = c("patient_id","indication","ncells"),
              annotation_colors = list(patient_id = metadata(spe)$color_vectors$patient_id,
                                       indication = metadata(spe)$color_vectors$indication,
@@ -484,7 +479,7 @@ Complementary to displaying cell type frequencies per sample/patient, we
 can use `dittoBarPlot` to display sample/patient frequencies per cell
 type.
 
-```{r barplot sample}
+```{r barplot sample, message=FALSE}
 dittoBarPlot(spe, var = "patient_id", group.by = "celltype") +
     scale_fill_manual(values = metadata(spe)$color_vectors$patient_id)
 
@@ -503,11 +498,10 @@ Expression-based pseudobulks for each sample can be compared with the
 `pbMDS` function.
 
 ```{r sample-pbmds}
-## pbMDS plot
-
 # MDS pseudobulk by sample_id 
 pbMDS(spe_cat, by = "sample_id", 
-      color_by = "sample_id", features = rownames(spe_cat)[rowData(spe_cat)$type_markers == TRUE]) +
+      color_by = "sample_id", 
+      features = rownames(spe_cat)[rowData(spe_cat)$marker_class == "type"]) +
   scale_color_manual(values = metadata(spe_cat)$color_vectors$sample_id)
 ```
 
@@ -522,11 +516,7 @@ The `clrDR` function can also be used to analyze similarity of samples
 based on cell type proportions.
 
 ```{r sample-clrDR}
-## clrDR plot
-
-#CLR on sample proportions across clusters
-set.seed(22)
-
+# CLR on sample proportions across clusters
 clrDR(spe_cat, dr = "PCA", 
       by = "sample_id", point_col = "sample_id",
       k = "celltype", point_pal = metadata(spe_cat)$color_vectors$sample_id) +
@@ -586,7 +576,9 @@ set.seed(22)
 ### 1. Heatmap bodies ###
 
 # Heatmap body color 
-col_exprs <- colorRamp2(c(0,1,2,3,4), c("#440154FF","#3B518BFF","#20938CFF","#6ACD5AFF","#FDE725FF"))
+col_exprs <- colorRamp2(c(0,1,2,3,4), 
+                        c("#440154FF","#3B518BFF","#20938CFF",
+                          "#6ACD5AFF","#FDE725FF"))
 
 # Create Heatmap objects
 # By celltype markers
@@ -594,8 +586,7 @@ celltype_mean <- aggregateAcrossCells(as(spe, "SingleCellExperiment"),
                      ids = spe$celltype, 
                      statistics = "mean",
                      use.assay.type = "exprs", 
-                     subset.row = rownames(spe)[rowData(spe)$type_markers == TRUE]
-                     )
+                     subset.row = rownames(spe)[rowData(spe)$marker_class == "type"])
 
 h_type <- Heatmap(t(assay(celltype_mean, "exprs")),
         column_title = "type_markers",
@@ -609,8 +600,7 @@ cellstate_mean <- aggregateAcrossCells(as(spe, "SingleCellExperiment"),
                      ids = spe$celltype, 
                      statistics = "mean",
                      use.assay.type = "exprs", 
-                     subset.row = rownames(spe)[rowData(spe)$state_markers == TRUE]
-                     )
+                     subset.row = rownames(spe)[rowData(spe)$marker_class == "state"])
 
 h_state <- Heatmap(t(assay(cellstate_mean, "exprs")),
         column_title = "state_markers",
@@ -627,13 +617,36 @@ h_state <- Heatmap(t(assay(cellstate_mean, "exprs")),
 anno <- colData(celltype_mean) %>% as.data.frame %>% select(celltype, ncells)
 
 # Proportion of indication per celltype
-indication <- colData(spe) %>% as.data.frame %>% select(celltype, indication) %>% group_by(celltype) %>% table() %>% as.data.frame
-indication <- indication %>% group_by(celltype) %>% mutate(fra = Freq/sum(Freq)) 
-indication <- indication %>% select(-Freq) %>% pivot_wider(id_cols = celltype, names_from = indication, values_from = fra) %>% column_to_rownames("celltype")
+indication <- colData(spe) %>% 
+    as.data.frame() %>% 
+    select(celltype, indication) %>% 
+    group_by(celltype) %>% 
+    table() %>% 
+    as.data.frame()
+
+indication <- indication %>% 
+    group_by(celltype) %>% 
+    mutate(fra = Freq/sum(Freq)) 
+
+indication <- indication %>% 
+    select(-Freq) %>% 
+    pivot_wider(id_cols = celltype, 
+                names_from = indication, 
+                values_from = fra) %>% 
+    column_to_rownames("celltype")
 
 # Number of contributing patients per celltype
-cluster_PID <- colData(spe) %>% as.data.frame %>% select(celltype, patient_id) %>% group_by(celltype) %>% table() %>% as.data.frame
-n_PID <- cluster_PID %>% filter(Freq>0) %>% group_by(celltype) %>% count(name = "n_PID") %>% column_to_rownames("celltype")
+cluster_PID <- colData(spe) %>% 
+    as.data.frame() %>% 
+    select(celltype, patient_id) %>% 
+    group_by(celltype) %>% table() %>% 
+    as.data.frame()
+
+n_PID <- cluster_PID %>% 
+    filter(Freq>0) %>% 
+    group_by(celltype) %>% 
+    count(name = "n_PID") %>% 
+    column_to_rownames("celltype")
 
 # Create HeatmapAnnotation objects
 ha_anno <- HeatmapAnnotation(celltype = anno$celltype,
@@ -644,7 +657,8 @@ ha_anno <- HeatmapAnnotation(celltype = anno$celltype,
     
 ha_meta <- HeatmapAnnotation(n_cells = anno_barplot(anno$ncells, width = unit(10, "mm")),
                             n_PID = anno_barplot(n_PID, width = unit(10, "mm")),
-                            indication = anno_barplot(indication,width = unit(10, "mm"),gp = gpar(fill = metadata(spe)$color_vectors$indication)),
+                            indication = anno_barplot(indication,width = unit(10, "mm"),
+                                                      gp = gpar(fill = metadata(spe)$color_vectors$indication)),
                             border = TRUE, 
                             annotation_name_rot = 90,
                             gap = unit(1,"mm"),
@@ -653,13 +667,24 @@ ha_meta <- HeatmapAnnotation(n_cells = anno_barplot(anno$ncells, width = unit(10
 ### 2.2 Spatial features
 
 # Add number of neighbors to spe object (saved in colPair)
-n_neighbors <- colPair(spe) %>% as.data.frame %>% group_by(from) %>% count() %>% arrange(desc(n))
-spe$n_neighbors <- n_neighbors$n[match(seq_along(colnames(spe)),n_neighbors$from)]
+n_neighbors <- colPair(spe) %>% 
+    as.data.frame() %>% 
+    group_by(from) %>% 
+    count() %>% 
+    arrange(desc(n))
+
+spe$n_neighbors <- n_neighbors$n[match(seq_along(colnames(spe)), n_neighbors$from)]
 spe$n_neighbors <- spe$n_neighbors %>% replace_na(0)
 
 # Select spatial features and average over celltypes
-spatial <- colData(spe) %>% as.data.frame %>% select(area, celltype, n_neighbors)
-spatial <- spatial %>% select(-celltype) %>% aggregate(by = list(celltype = spatial$celltype), FUN = mean) %>% column_to_rownames("celltype")
+spatial <- colData(spe) %>% 
+    as.data.frame() %>% 
+    select(area, celltype, n_neighbors)
+
+spatial <- spatial %>% 
+    select(-celltype) %>% 
+    aggregate(by = list(celltype = spatial$celltype), FUN = mean) %>% 
+    column_to_rownames("celltype")
 
 # Create HeatmapAnnotation object
 ha_spatial <- HeatmapAnnotation(
@@ -668,7 +693,6 @@ ha_spatial <- HeatmapAnnotation(
     border = TRUE,
     gap = unit(1,"mm"),
     which = "row")
-
 
 ### 3. Plot rich heatmap ###
 
@@ -680,7 +704,8 @@ h_list <- h_type +
     ha_meta
 
 # Add customized legend for anno_barplot()
-lgd <- Legend(title = "indication", at = colnames(indication), legend_gp = gpar(fill = metadata(spe)$color_vectors$indication))
+lgd <- Legend(title = "indication", at = colnames(indication), 
+              legend_gp = gpar(fill = metadata(spe)$color_vectors$indication))
              
 # Plot
 draw(h_list,annotation_legend_list = list(lgd))
@@ -695,6 +720,10 @@ immune infiltrated regions (such as TLS).
 
 ## Session Info
 
+<details>
+   <summary>SessionInfo</summary>
+   
 ```{r, echo = FALSE}
 sessionInfo()
 ```
+</details>

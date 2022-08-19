@@ -302,6 +302,7 @@ The next code chunk visualizes the cell type compositions of the
 detected cellular neighborhoods (CN).
 
 ```{r, message=FALSE}
+library(tidyverse)
 for_plot <- colData(spe) %>% as_tibble() %>%
     group_by(cn_celltypes, celltype) %>%
     summarize(count = n()) %>%
@@ -486,6 +487,7 @@ For more details and biological validation, please refer to
 
 ```{r detectSpatialContext, fig.height=12, fig.width=15}
 library(circlize)
+library(RColorBrewer)
 
 # Generate k-nearest neighbor graph for SC detection (k=40) 
 spe <- buildSpatialGraph(spe, img_id = "sample_id", 
