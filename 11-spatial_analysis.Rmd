@@ -191,12 +191,14 @@ the `SpatialExperiment` object.
 ```{r spatial-community, message=FALSE}
 library(igraph)
 
+set.seed(220819)
+
 # Spatial community detection - tumor
 tumor_spe <- spe[,spe$celltype == "Tumor"]
 
 gr <- graph_from_data_frame(as.data.frame(colPair(tumor_spe, "neighborhood")), 
                             directed = FALSE, 
-                            vertices = data.frame(index = seq_len(ncol(stroma_sce))))
+                            vertices = data.frame(index = seq_len(ncol(tumor_spe))))
 
 cl_comm <- cluster_louvain(gr)
 comm_tumor <- paste0("Tumor_", membership(cl_comm))
@@ -206,9 +208,9 @@ names(comm_tumor) <- colnames(tumor_spe)
 # Spatial community detection - non-tumor
 stroma_spe <- spe[,spe$celltype != "Tumor"]
 
-gr <- graph_from_data_frame(as.data.frame(colPair(stroma_sce, "neighborhood")), 
+gr <- graph_from_data_frame(as.data.frame(colPair(stroma_spe, "neighborhood")), 
                             directed = FALSE, 
-                            vertices = data.frame(index = seq_len(ncol(stroma_sce))))
+                            vertices = data.frame(index = seq_len(ncol(stroma_spe))))
 
 cl_comm <- cluster_louvain(gr)
 comm_stroma <- paste0("Stroma_", membership(cl_comm))
@@ -289,7 +291,7 @@ neighborhoods. We will first compute the fraction of the different cell
 types among the 20-nearest neighbors and use kmeans clustering to group
 cells into 6 cellular neighborhoods.
 
-```{r cn-analysis}
+```{r cn-analysis, fig.height=12, fig.width=12}
 # By celltypes
 spe <- aggregateNeighbors(spe, colPairName = "knn_interaction_graph", 
                           aggregate_by = "metadata", count_by = "celltype")
@@ -469,7 +471,7 @@ coined by Bhate and colleagues [@Bhate2022] and describes tissue regions
 in which distinct CNs may be interacting. Hence, SCs may be interesting
 regions of specialized biological events.
 
-Here, we will first detect SCs using `detectSpatialContext`. This
+Here, we will first detect SCs using the `detectSpatialContext` function. This
 function relies on CN fractions for each cell in a spatial interaction
 graph (originally a KNN graph), which we will calculate using
 `buildSpatialGraph` and `aggregateNeighbors`. We will focus on the CNs
@@ -493,7 +495,7 @@ window.
 For more details and biological validation, please refer to
 [@Bhate2022].
 
-```{r detectSpatialContext, fig.height=12, fig.width=15}
+```{r detectSpatialContext, fig.height=12, fig.width=15, message=FALSE}
 library(circlize)
 library(RColorBrewer)
 
@@ -535,7 +537,7 @@ SCs across this dataset.
 For ease of interpretation, we will directly compare the CN and SC
 assignments for `Patient3_001`.
 
-```{r compare cn sc, fig.height=5, fig.width=8}
+```{r compare cn sc, fig.height=5, fig.width=10}
 library(patchwork)
 
 # Compare CN and SC for one patient 
