@@ -193,7 +193,11 @@ library(igraph)
 
 # Spatial community detection - tumor
 tumor_spe <- spe[,spe$celltype == "Tumor"]
-gr <- graph_from_edgelist(as.matrix(colPair(tumor_spe, "neighborhood")), directed = FALSE)
+
+gr <- graph_from_data_frame(as.data.frame(colPair(tumor_spe, "neighborhood")), 
+                            directed = FALSE, 
+                            vertices = data.frame(index = seq_len(ncol(stroma_sce))))
+
 cl_comm <- cluster_louvain(gr)
 comm_tumor <- paste0("Tumor_", membership(cl_comm))
 comm_tumor[membership(cl_comm) %in% which(sizes(cl_comm) < 10)] <- NA
@@ -201,7 +205,11 @@ names(comm_tumor) <- colnames(tumor_spe)
 
 # Spatial community detection - non-tumor
 stroma_spe <- spe[,spe$celltype != "Tumor"]
-gr <- graph_from_edgelist(as.matrix(colPair(stroma_spe, "neighborhood")), directed = FALSE)
+
+gr <- graph_from_data_frame(as.data.frame(colPair(stroma_sce, "neighborhood")), 
+                            directed = FALSE, 
+                            vertices = data.frame(index = seq_len(ncol(stroma_sce))))
+
 cl_comm <- cluster_louvain(gr)
 comm_stroma <- paste0("Stroma_", membership(cl_comm))
 comm_stroma[membership(cl_comm) %in% which(sizes(cl_comm) < 10)] <- NA
