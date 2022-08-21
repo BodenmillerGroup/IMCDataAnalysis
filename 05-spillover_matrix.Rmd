@@ -181,7 +181,7 @@ pheatmap(log10(cur_table + 1),
 ```
 
 We can see here, that all pixels were assigned to the right mass and that all
-pixel sets are made up if > 1000 pixels.
+pixel sets are made up of > 1000 pixels.
 
 However, in cases where incorrect assignment occurred or where few pixels were
 measured for some spots, the `imcRtools` package exports a simple helper

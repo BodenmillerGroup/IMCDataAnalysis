@@ -317,7 +317,7 @@ saveRDS(masks, "data/masks.rds")
 ```
 
 ```{r integration-test-read-single-cell, include = FALSE}
-library(testthat)
+#library(testthat)
 #expect_equal(names(colData(spe)), c("sample_id", "ObjectNumber", "area", "major_axis_length", "minor_axis_length", 
 #"eccentricity", "width_px", "height_px", "patient_id", "ROI", 
 #"indication"))

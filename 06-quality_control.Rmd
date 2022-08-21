@@ -14,7 +14,7 @@ masks <- readRDS("data/masks.rds")
 spe <- readRDS("data/spe.rds")
 ```
 
-## Segmentation quality control
+## Segmentation quality control {#seg-quality}
 
 The first step after image segmentation is to observe its accuracy.
 Without having ground-truth data readily available, a common approach to 
@@ -79,7 +79,7 @@ We can differentiate between epithelial cells (Ecad+) and immune cells (CD45RO).
 Some of the markers are specifically detected (e.g., Ki67, CD20, Ecad) and
 others are more broadly detected (e.g. HLADR, B2M, CD4).
 
-## Image-level quality control
+## Image-level quality control {#image-quality}
 
 Image-level quality control is often performed using tools that offer a
 graphical user interface such as [QuPath](https://qupath.github.io/) and
@@ -347,7 +347,7 @@ These variations may arise partly from different abundances of cells in
 different images (e.g. Patient3 may have higher numbers of CD11c+ and PD1+
 cells) as well as staining differences between samples. While most of the
 selected markers are specifically expressed in immune cell subtypes, we can see
-that E-Cadherin (a marker for tumor cells) shows similar expression across all
+that E-Cadherin (a marker for epithelial (tumor) cells) shows similar expression across all
 patients.
 
 Finally, we will use non-linear dimensionality reduction methods to project
