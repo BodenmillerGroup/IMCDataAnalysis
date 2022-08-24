@@ -1,0 +1,200 @@
+---
+title: "An end-to-end workflow for multiplexed image processing and analysis"
+date: "`r BiocStyle::doc_date()`"
+author:
+- name: Jonas Windhager
+  affiliation: 
+  - Department of Quantitative Biomedicine, University of Zurich, Zurich, Switzerland
+  - Institute for Molecular Health Sciences, ETH Zurich, Zurich, Switzerland
+  - Life Science Zurich Graduate School, ETH Zurich and University of Zurich, Zurich, Switzerland
+- name: Vito Riccardo Tomaso Zanotelli
+  affiliation: 
+  - Department of Quantitative Biomedicine, University of Zurich, Zurich, Switzerland
+  - Institute for Molecular Health Sciences, ETH Zurich, Zurich, Switzerland
+- name: Daniel Schulz
+  affiliation: 
+  - Department of Quantitative Biomedicine, University of Zurich, Zurich, Switzerland
+  - Institute for Molecular Health Sciences, ETH Zurich, Zurich, Switzerland
+- name: Lasse Meyer
+  affiliation: 
+  - Department of Quantitative Biomedicine, University of Zurich, Zurich, Switzerland
+  - Institute for Molecular Health Sciences, ETH Zurich, Zurich, Switzerland
+- name: Michelle Daniel
+  affiliation: 
+  - Department of Quantitative Biomedicine, University of Zurich, Zurich, Switzerland
+  - Institute for Molecular Health Sciences, ETH Zurich, Zurich, Switzerland
+- name: Bernd Bodenmiller
+  affiliation: 
+  - Department of Quantitative Biomedicine, University of Zurich, Zurich, Switzerland
+  - Institute for Molecular Health Sciences, ETH Zurich, Zurich, Switzerland
+  email: bernd.bodenmiller@uzh.ch
+- name: Nils Eling
+  affiliation: 
+  - Department of Quantitative Biomedicine, University of Zurich, Zurich, Switzerland
+  - Institute for Molecular Health Sciences, ETH Zurich, Zurich, Switzerland
+  email: nils.eling@dqbm.uzh.ch
+output:
+    BiocStyle::html_document:
+        toc_float: yes
+abstract: |
+    TODO
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Materials
+
+## Data
+
+```{r download-data, eval=FALSE}
+dir.create("data/steinbock/raw", recursive = TRUE)
+download.file("https://zenodo.org/record/5949116/files/panel.csv",
+              "data/steinbock/raw/panel.csv")
+download.file("https://zenodo.org/record/5949116/files/Patient1.zip",
+              "data/steinbock/raw/Patient1.zip")
+download.file("https://zenodo.org/record/5949116/files/Patient2.zip",
+              "data/steinbock/raw/Patient2.zip")
+download.file("https://zenodo.org/record/5949116/files/Patient3.zip",
+              "data/steinbock/raw/Patient3.zip")
+download.file("https://zenodo.org/record/5949116/files/Patient4.zip",
+              "data/steinbock/raw/Patient4.zip")
+download.file("https://zenodo.org/record/5949116/files/compensation.zip",
+              "data/compensation.zip")
+unzip("data/compensation.zip", exdir="data", overwrite=TRUE)
+unlink("data/compensation.zip")
+download.file("https://zenodo.org/record/5949116/files/sample_metadata.xlsx", 
+         destfile = "data/sample_metadata.xlsx")
+```
+
+# Equipment setup
+
+## Installation instructions
+
+```{r install-libraries, eval=FALSE}
+if (!requireNamespace("devtools", quietly = TRUE))
+install.packages("devtools")
+
+devtools::install_github(c("BodenmillerGroup/imcRtools", 
+                           "BodenmillerGroup/cytomapper"))
+
+
+if (!requireNamespace("BiocManager", quietly = TRUE))
+install.packages("BiocManager")
+
+BiocManager::install(c("pheatmap", "viridis",
+                       "zoo", "BiocManager", "devtools", "tiff",
+                       "distill", "openxlsx", "ggrepel", "patchwork", "mclust",
+                       "RColorBrewer", "uwot", "Rtsne", "harmony", "Seurat", 
+                       "SeuratObject", "cowplot", "kohonen", "caret", 
+                       "randomForest", "ggridges", "cowplot", "gridGraphics",
+                       "scales", "tiff", "CATALYST", "scuttle", "scater", 
+                       "dittoSeq", "tidyverse", "batchelor", 
+                       "bluster","scran", "lisaClust", "spicyR"))
+```
+
+# Procedure
+
+```{r, echo=FALSE}
+start_time <- Sys.time()
+```
+
+```{bash preprocess-panel}
+shopt -s expand_aliases
+alias steinbock="docker run -v /Users/nils/Github/IMCDataAnalysis/data/steinbock:/data -u $(id -u):$(id -g) ghcr.io/bodenmillergroup/steinbock:0.14.1"
+steinbock preprocess imc panel --namecol Clean_Target
+```
+
+```{r, echo=FALSE}
+end_time <- Sys.time()
+```
+
+The step took 
+`r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
+
+```{r, echo=FALSE}
+start_time <- Sys.time()
+```
+
+```{bash preprocess-images}
+shopt -s expand_aliases
+alias steinbock="docker run -v /Users/nils/Github/IMCDataAnalysis/data/steinbock:/data -u $(id -u):$(id -g) ghcr.io/bodenmillergroup/steinbock:0.14.1"
+steinbock preprocess imc images --hpf 50
+```
+
+```{r, echo=FALSE}
+end_time <- Sys.time()
+```
+
+The step took 
+`r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
+
+```{r, echo=FALSE}
+start_time <- Sys.time()
+```
+
+```{bash segment-cells}
+shopt -s expand_aliases
+alias steinbock="docker run -v /Users/nils/Github/IMCDataAnalysis/data/steinbock:/data -u $(id -u):$(id -g) ghcr.io/bodenmillergroup/steinbock:0.14.1"
+steinbock segment deepcell --minmax
+```
+
+```{r, echo=FALSE}
+end_time <- Sys.time()
+```
+
+The step took 
+`r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
+
+```{r, echo=FALSE}
+start_time <- Sys.time()
+```
+
+```{bash measure-intensities}
+shopt -s expand_aliases
+alias steinbock="docker run -v /Users/nils/Github/IMCDataAnalysis/data/steinbock:/data -u $(id -u):$(id -g) ghcr.io/bodenmillergroup/steinbock:0.14.1"
+steinbock measure intensities
+```
+
+```{r, echo=FALSE}
+end_time <- Sys.time()
+```
+
+The step took 
+`r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
+
+```{r, echo=FALSE}
+start_time <- Sys.time()
+```
+
+```{bash measure-regionprops}
+shopt -s expand_aliases
+alias steinbock="docker run -v /Users/nils/Github/IMCDataAnalysis/data/steinbock:/data -u $(id -u):$(id -g) ghcr.io/bodenmillergroup/steinbock:0.14.1"
+steinbock measure regionprops
+```
+
+```{r, echo=FALSE}
+end_time <- Sys.time()
+```
+
+The step took 
+`r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
+
+```{r, echo=FALSE}
+start_time <- Sys.time()
+```
+
+```{bash measure-neighbors}
+shopt -s expand_aliases
+alias steinbock="docker run -v /Users/nils/Github/IMCDataAnalysis/data/steinbock:/data -u $(id -u):$(id -g) ghcr.io/bodenmillergroup/steinbock:0.14.1"
+steinbock measure neighbors --type expansion --dmax 4
+```
+
+```{r, echo=FALSE}
+end_time <- Sys.time()
+```
+
+The step took 
+`r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
+
