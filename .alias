@@ -1,0 +1,2 @@
+shopt -s expand_aliases	
+alias steinbock="docker run -v /Users/nils/Github/IMCDataAnalysis/data/steinbock:/data -u $(id -u):$(id -g) ghcr.io/bodenmillergroup/steinbock:0.14.1"

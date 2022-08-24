@@ -96,13 +96,13 @@ BiocManager::install(c("pheatmap", "viridis",
 
 # Procedure
 
+## Preprocessing
+
 ```{r, echo=FALSE}
 start_time <- Sys.time()
 ```
 
-```{bash preprocess-panel}
-shopt -s expand_aliases
-alias steinbock="docker run -v /Users/nils/Github/IMCDataAnalysis/data/steinbock:/data -u $(id -u):$(id -g) ghcr.io/bodenmillergroup/steinbock:0.14.1"
+```{bash preprocess-panel, engine.opts="--init-file /Users/nils/IMCDataAnalysis/.alias -i"}
 steinbock preprocess imc panel --namecol Clean_Target
 ```
 
@@ -117,9 +117,7 @@ The step took
 start_time <- Sys.time()
 ```
 
-```{bash preprocess-images}
-shopt -s expand_aliases
-alias steinbock="docker run -v /Users/nils/Github/IMCDataAnalysis/data/steinbock:/data -u $(id -u):$(id -g) ghcr.io/bodenmillergroup/steinbock:0.14.1"
+```{bash preprocess-images, engine.opts="--init-file /Users/nils/IMCDataAnalysis/.alias -i"}
 steinbock preprocess imc images --hpf 50
 ```
 
@@ -134,9 +132,7 @@ The step took
 start_time <- Sys.time()
 ```
 
-```{bash segment-cells}
-shopt -s expand_aliases
-alias steinbock="docker run -v /Users/nils/Github/IMCDataAnalysis/data/steinbock:/data -u $(id -u):$(id -g) ghcr.io/bodenmillergroup/steinbock:0.14.1"
+```{bash segment-cells, engine.opts="--init-file /Users/nils/IMCDataAnalysis/.alias -i"}
 steinbock segment deepcell --minmax
 ```
 
@@ -151,9 +147,7 @@ The step took
 start_time <- Sys.time()
 ```
 
-```{bash measure-intensities}
-shopt -s expand_aliases
-alias steinbock="docker run -v /Users/nils/Github/IMCDataAnalysis/data/steinbock:/data -u $(id -u):$(id -g) ghcr.io/bodenmillergroup/steinbock:0.14.1"
+```{bash measure-intensities, engine.opts="--init-file /Users/nils/IMCDataAnalysis/.alias -i"}
 steinbock measure intensities
 ```
 
@@ -168,9 +162,7 @@ The step took
 start_time <- Sys.time()
 ```
 
-```{bash measure-regionprops}
-shopt -s expand_aliases
-alias steinbock="docker run -v /Users/nils/Github/IMCDataAnalysis/data/steinbock:/data -u $(id -u):$(id -g) ghcr.io/bodenmillergroup/steinbock:0.14.1"
+```{bash measure-regionprops, engine.opts="--init-file /Users/nils/IMCDataAnalysis/.alias -i"}
 steinbock measure regionprops
 ```
 
@@ -185,9 +177,7 @@ The step took
 start_time <- Sys.time()
 ```
 
-```{bash measure-neighbors}
-shopt -s expand_aliases
-alias steinbock="docker run -v /Users/nils/Github/IMCDataAnalysis/data/steinbock:/data -u $(id -u):$(id -g) ghcr.io/bodenmillergroup/steinbock:0.14.1"
+```{bash measure-neighbors, engine.opts="--init-file /Users/nils/IMCDataAnalysis/.alias -i"}
 steinbock measure neighbors --type expansion --dmax 4
 ```
 
@@ -197,4 +187,882 @@ end_time <- Sys.time()
 
 The step took 
 `r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
+
+## Reading in data
+
+```{r, echo=FALSE}
+start_time <- Sys.time()
+```
+
+```{r}
+library(imcRtools)
+spe <- read_steinbock("data/steinbock/")
+```
+
+```{r, echo=FALSE}
+end_time <- Sys.time()
+```
+
+The step took 
+`r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
+
+```{r, echo=FALSE}
+start_time <- Sys.time()
+```
+
+```{r, message=FALSE}
+library(openxlsx)
+library(tidyverse)
+colnames(spe) <- paste0(spe$sample_id, "_", spe$ObjectNumber)
+
+meta <- read.xlsx("data/sample_metadata.xlsx")
+spe$patient_id <- as.vector(str_extract_all(spe$sample_id, "Patient[1-4]", 
+   simplify = TRUE))
+spe$ROI <- as.vector(str_extract_all(spe$sample_id, "00[1-8]",  
+   simplify = TRUE))
+spe$indication <- meta$Indication[match(spe$patient_id, meta$Sample.ID)]
+
+rowData(spe)$use_channel <- !grepl("DNA|Histone", rownames(spe))
+
+assay(spe, "exprs") <- asinh(counts(spe)/1)
+```
+
+```{r, echo=FALSE}
+end_time <- Sys.time()
+```
+
+The step took 
+`r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
+
+```{r, echo=FALSE}
+start_time <- Sys.time()
+```
+
+```{r, message=FALSE}
+library(cytomapper)
+images <- loadImages("data/steinbock/img/")
+channelNames(images) <- rownames(spe)
+```
+
+```{r, echo=FALSE}
+end_time <- Sys.time()
+```
+
+The step took 
+`r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
+
+```{r, echo=FALSE}
+start_time <- Sys.time()
+```
+
+```{r}
+masks <- loadImages("data/steinbock/masks/", as.is = TRUE)
+```
+
+```{r, echo=FALSE}
+end_time <- Sys.time()
+```
+
+The step took 
+`r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
+
+```{r, echo=FALSE}
+start_time <- Sys.time()
+```
+
+```{r}
+patient_id <- str_extract_all(names(images), "Patient[1-4]", simplify = TRUE)
+indication <- meta$Indication[match(patient_id, meta$Sample.ID)] 
+
+mcols(images) <- mcols(masks) <- DataFrame(sample_id = names(images),
+                                           patient_id = patient_id,
+                                           indication = indication)
+```
+
+```{r, echo=FALSE}
+end_time <- Sys.time()
+```
+
+The step took 
+`r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
+
+```{r, echo=FALSE}
+start_time <- Sys.time()
+```
+
+```{r}
+cytomapper_sce <- measureObjects(masks, image = images, img_id = "sample_id")
+```
+
+```{r, echo=FALSE}
+end_time <- Sys.time()
+```
+
+The step took 
+`r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
+
+```{r, echo=FALSE}
+start_time <- Sys.time()
+```
+
+## Spillover correction
+
+```{r}
+sce <- readSCEfromTXT("data/compensation/")
+assay(sce, "exprs") <- asinh(counts(sce)/5)
+```
+
+```{r, echo=FALSE}
+end_time <- Sys.time()
+```
+
+The step took 
+`r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
+
+```{r, echo=FALSE}
+start_time <- Sys.time()
+```
+
+```{r}
+plotSpotHeatmap(sce)
+```
+
+```{r, echo=FALSE}
+end_time <- Sys.time()
+```
+
+```{r, include=FALSE}
+if (!dir.exists("outputs")) dir.create("outputs", recursive = TRUE)
+pdf("outputs/plotSpotHeatmap.pdf")
+plotSpotHeatmap(sce)
+dev.off()
+```
+
+```{r, echo=FALSE}
+end_time <- Sys.time()
+```
+
+```{r}
+sce2 <- binAcrossPixels(sce, bin_size = 10)
+```
+
+```{r, echo=FALSE}
+end_time <- Sys.time()
+```
+
+The step took 
+`r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
+
+```{r, echo=FALSE}
+start_time <- Sys.time()
+```
+
+```{r}
+library(CATALYST)
+
+bc_key <- as.numeric(unique(sce$sample_mass))
+bc_key <- bc_key[order(bc_key)]
+
+sce <- assignPrelim(sce, bc_key = bc_key)
+sce <- estCutoffs(sce)
+sce <- applyCutoffs(sce)
+
+sce <- filterPixels(sce, minevents = 40, correct_pixels = TRUE)
+```
+
+```{r, echo=FALSE}
+end_time <- Sys.time()
+```
+
+The step took 
+`r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
+
+```{r, echo=FALSE}
+start_time <- Sys.time()
+```
+
+```{r}
+sce <- computeSpillmat(sce)
+sm <- metadata(sce)$spillover_matrix
+
+isotope_list <- CATALYST::isotope_list
+isotope_list$Ar <- 80
+
+plotSpillmat(sce, isotope_list = isotope_list)
+```
+
+```{r, echo=FALSE}
+end_time <- Sys.time()
+```
+
+The step took 
+`r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
+
+```{r, include=FALSE}
+pdf("outputs/plotSpillmat.pdf")
+plotSpillmat(sce, isotope_list = isotope_list)
+dev.off()
+```
+
+```{r}
+library(dittoSeq)
+library(patchwork)
+    
+rowData(spe)$channel_name <- paste0(rowData(spe)$channel, "Di")
+
+spe <- compCytof(spe, sm, 
+                 transform = TRUE, cofactor = 1,
+                 isotope_list = isotope_list, 
+                 overwrite = FALSE)
+
+before <- dittoScatterPlot(spe, x.var = "Ecad", y.var = "CD303",
+                           assay.x = "exprs", assay.y = "exprs") +
+    ggtitle("Before compensation")
+
+after <- dittoScatterPlot(spe, x.var = "Ecad", y.var = "CD303",
+                          assay.x = "compexprs", assay.y = "compexprs") +
+    ggtitle("After compensation")
+
+before + after
+
+assay(spe, "counts") <- assay(spe, "compcounts") 
+assay(spe, "exprs") <- assay(spe, "compexprs") 
+assay(spe, "compcounts") <- assay(spe, "compexprs") <- NULL
+```
+
+```{r, include=FALSE}
+pdf("outputs/before_after_single-cell.pdf")
+before + after
+dev.off()
+```
+
+
+```{r, echo=FALSE}
+start_time <- Sys.time()
+```
+
+```{r}
+channelNames(images) <- rowData(spe)$channel_name
+adapted_sm <- adaptSpillmat(sm, paste0(rowData(spe)$channel, "Di"), 
+                            isotope_list = isotope_list)
+images_comp <- compImage(images, adapted_sm)
+
+plotPixels(images[5], colour_by = "Yb173Di", 
+           image_title = list(text = "Yb173 (Ecad) - before", 
+                       position = "topleft"), 
+           legend = NULL, bcg = list(Yb173Di = c(0, 4, 1)))
+plotPixels(images[5], colour_by = "Yb174Di", 
+           image_title = list(text = "Yb174 (CD303) - before", 
+                              position = "topleft"), 
+           legend = NULL, bcg = list(Yb174Di = c(0, 4, 1)))
+plotPixels(images_comp[5], colour_by = "Yb173Di",
+           image_title = list(text = "Yb173 (Ecad) - after", 
+                              position = "topleft"), 
+           legend = NULL, bcg = list(Yb173Di = c(0, 4, 1)))
+plotPixels(images_comp[5], colour_by = "Yb174Di", 
+           image_title = list(text = "Yb174 (CD303) - after", 
+                              position = "topleft"),
+           legend = NULL, bcg = list(Yb174Di = c(0, 4, 1)))
+
+channelNames(images_comp) <- rownames(spe)
+```
+
+```{r, echo=FALSE}
+end_time <- Sys.time()
+```
+
+The step took 
+`r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
+
+```{r, include=FALSE}
+channelNames(images_comp) <- rowData(spe)$channel_name
+pdf("outputs/before_after_images.pdf")
+plotPixels(images[5], colour_by = "Yb173Di", 
+           image_title = list(text = "Yb173 (Ecad) - before", 
+                       position = "topleft"), 
+           legend = NULL, bcg = list(Yb173Di = c(0, 4, 1)))
+plotPixels(images[5], colour_by = "Yb174Di", 
+           image_title = list(text = "Yb174 (CD303) - before", 
+                              position = "topleft"), 
+           legend = NULL, bcg = list(Yb174Di = c(0, 4, 1)))
+plotPixels(images_comp[5], colour_by = "Yb173Di",
+           image_title = list(text = "Yb173 (Ecad) - after", 
+                              position = "topleft"), 
+           legend = NULL, bcg = list(Yb173Di = c(0, 4, 1)))
+plotPixels(images_comp[5], colour_by = "Yb174Di", 
+           image_title = list(text = "Yb174 (CD303) - after", 
+                              position = "topleft"),
+           legend = NULL, bcg = list(Yb174Di = c(0, 4, 1)))
+dev.off()
+channelNames(images_comp) <- rownames(spe)
+rm(images)
+```
+
+## Quality control
+
+```{r}
+set.seed(20220118)
+img_ids <- sample(seq_len(length(images_comp)), 3)
+
+cur_images <- images_comp[img_ids]
+cur_images <- normalize(cur_images, separateImages = TRUE)
+cur_images <- normalize(cur_images, inputRange = c(0, 0.2))
+
+plotPixels(cur_images,
+           mask = masks[img_ids],
+           img_id = "sample_id",
+           missing_colour = "white",
+           colour_by = c("CD163", "CD20", "CD3", "Ecad", "DNA1"),
+           colour = list(CD163 = c("black", "yellow"),
+                         CD20 = c("black", "red"),
+                         CD3 = c("black", "green"),
+                         Ecad = c("black", "cyan"),
+                         DNA1 = c("black", "blue")),
+           image_title = NULL,
+           legend = list(colour_by.title.cex = 0.7,
+                         colour_by.labels.cex = 0.7))
+```
+
+```{r, include=FALSE}
+pdf("outputs/segmentation-quality.pdf")
+plotPixels(cur_images,
+           mask = masks[img_ids],
+           img_id = "sample_id",
+           missing_colour = "white",
+           colour_by = c("CD163", "CD20", "CD3", "Ecad", "DNA1"),
+           colour = list(CD163 = c("black", "yellow"),
+                         CD20 = c("black", "red"),
+                         CD3 = c("black", "green"),
+                         Ecad = c("black", "cyan"),
+                         DNA1 = c("black", "blue")),
+           image_title = NULL,
+           legend = list(colour_by.title.cex = 0.7,
+                         colour_by.labels.cex = 0.7))
+dev.off()
+```
+
+```{r}
+colData(spe) %>%
+    as.data.frame() %>%
+    group_by(sample_id) %>%
+    ggplot() +
+        geom_boxplot(aes(sample_id, area)) +
+        theme_minimal(base_size = 15) + 
+        theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 8)) +
+        ylab("Cell area") + xlab("")
+
+spe <- spe[,spe$area >= 5]
+```
+
+```{r, include=FALSE}
+pdf("outputs/cell-size.pdf")
+colData(spe) %>%
+    as.data.frame() %>%
+    group_by(sample_id) %>%
+    ggplot() +
+        geom_boxplot(aes(sample_id, area)) +
+        theme_minimal(base_size = 15) + 
+        theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 8)) +
+        ylab("Cell area") + xlab("")
+dev.off()
+```
+
+```{r}
+multi_dittoPlot(spe, vars = c("HLADR", "CD3", "Ecad", "PDGFRb"),
+               group.by = "patient_id", plots = c("ridgeplot"), 
+               assay = "exprs")
+```
+
+```{r, include=FALSE}
+pdf("outputs/marker-distribution.pdf")
+multi_dittoPlot(spe, vars = c("HLADR", "CD3", "Ecad", "PDGFRb"),
+               group.by = "patient_id", plots = c("ridgeplot"), 
+               assay = "exprs")
+dev.off()
+```
+
+```{r, echo=FALSE}
+start_time <- Sys.time()
+```
+
+```{r}
+library(scater)
+
+set.seed(220225)
+spe <- runUMAP(spe, subset_row = rowData(spe)$use_channel, 
+ exprs_values = "exprs") 
+
+dittoDimPlot(spe, var = "patient_id", 
+     reduction.use = "UMAP", size = 0.2)  +
+    ggtitle("Patient ID on UMAP")
+```
+
+```{r, echo=FALSE}
+end_time <- Sys.time()
+```
+
+The step took 
+`r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
+
+```{r, include=FALSE}
+pdf("outputs/UMAP.pdf")
+dittoDimPlot(spe, var = "patient_id", 
+     reduction.use = "UMAP", size = 0.2)  +
+    ggtitle("Patient ID on UMAP")
+dev.off()
+```
+
+```{r, echo=FALSE}
+start_time <- Sys.time()
+```
+
+```{r}
+library(batchelor)
+set.seed(220228)
+out <- fastMNN(spe, batch = spe$patient_id,
+               auto.merge = TRUE,
+               subset.row = rowData(spe)$use_channel,
+               assay.type = "exprs")
+
+reducedDim(spe, "fastMNN") <- reducedDim(out, "corrected")
+
+spe <- runUMAP(spe, dimred= "fastMNN", name = "UMAP_mnnCorrected")
+
+dittoDimPlot(spe, var = "patient_id", 
+                   reduction.use = "UMAP_mnnCorrected", size = 0.2) + 
+    ggtitle("Patient ID on UMAP after correction")
+```
+
+```{r, echo=FALSE}
+end_time <- Sys.time()
+```
+
+```{r, include=FALSE}
+pdf("outputs/UMAP_corrected.pdf")
+dittoDimPlot(spe, var = "patient_id", 
+                   reduction.use = "UMAP_mnnCorrected", size = 0.2) + 
+    ggtitle("Patient ID on UMAP after correction")
+dev.off()
+```
+
+The step took 
+`r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
+
+## Cell phenotyping
+
+```{r, echo=FALSE}
+start_time <- Sys.time()
+```
+
+```{r}
+library(bluster)
+library(BiocParallel)
+
+mat <- t(assay(spe, "exprs")[rowData(spe)$use_channel,])
+
+combinations <- clusterSweep(mat, BLUSPARAM=SNNGraphParam(),
+                             k=c(10L, 20L), 
+                             type = c("rank", "jaccard"), 
+                             cluster.fun=c("walktrap", "louvain"),
+                             BPPARAM = MulticoreParam(RNGseed = 220427))
+
+sil <- vapply(as.list(combinations$clusters), 
+              function(x) mean(approxSilhouette(mat[sam_cells,],
+    x)$width), 0)
+
+ggplot(data.frame(method = names(sil),
+                  sil = sil)) +
+    geom_point(aes(method, sil)) +
+    theme_classic(base_size = 15) +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+    xlab("Cluster parameter combination") +
+    ylab("Average silhouette width")
+```
+
+```{r, echo=FALSE}
+end_time <- Sys.time()
+```
+
+The step took 
+`r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
+
+```{r, include=FALSE}
+pdf("outputs/clusterSweep.pdf")
+ggplot(data.frame(method = names(sil),
+                  sil = sil)) +
+    geom_point(aes(method, sil)) +
+    theme_classic(base_size = 15) +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+    xlab("Cluster parameter combination") +
+    ylab("Average silhouette width")
+dev.off()
+```
+
+```{r, echo=FALSE}
+start_time <- Sys.time()
+```
+
+```{r}
+library(scran)
+
+clusters <- clusterCells(spe[rowData(spe)$use_channel,], 
+                         assay.type = "exprs", 
+                         BLUSPARAM = SNNGraphParam(k=20, 
+                                                cluster.fun = "louvain",
+                                                type = "rank",
+                                                BPPARAM = bpparam()))
+spe$nn_clusters <- clusters
+```
+
+```{r, echo=FALSE}
+end_time <- Sys.time()
+```
+
+The step took 
+`r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
+
+```{r}
+if (interactive()){
+    cytomapperShiny(object = spe, mask = masks, image = images_comp, 
+                cell_id = "ObjectNumber", img_id = "sample_id")   
+}
+```
+
+```{r}
+library(SingleCellExperiment)
+label_files <- list.files("data/gated_cells", 
+                          full.names = TRUE, pattern = ".rds$")
+
+spes <- lapply(label_files, readRDS)
+
+concat_spe <- do.call("cbind", spes)
+```
+
+```{r}
+cur_tab <- unclass(table(colnames(concat_spe), 
+                         concat_spe$cytomapper_CellLabel))
+cur_labels <- rep("doublets", nrow(cur_tab))
+names(cur_labels) <- rownames(cur_tab)
+
+# Single assignments
+single_index <- rowSums(cur_tab) == 1
+cur_labels[single_index] <- colnames(cur_tab)[
+apply(cur_tab[single_index,], 1, which.max)]
+
+# Double assignment within the tumor
+double_index <- rowSums(cur_tab) == 2 & cur_tab[,"Tumor"] == 1
+no_tumor <- cur_tab[,colnames(cur_tab) != "Tumor"]
+cur_labels[double_index] <- colnames(no_tumor)[
+apply(no_tumor[double_index,], 1, which.max)]
+
+# Remove doublets
+cur_labels <- cur_labels[cur_labels != "doublets"]
+
+# Transfer labels to SPE object
+spe_labels <- rep("unlabeled", ncol(spe))
+names(spe_labels) <- colnames(spe)
+spe_labels[names(cur_labels)] <- cur_labels
+spe$cell_labels <- spe_labels
+```
+
+```{r, echo=FALSE}
+start_time <- Sys.time()
+```
+
+```{r}
+library(caret)
+
+# Split between labeled and unlabeled cells
+lab_spe <- spe[,spe$cell_labels != "unlabeled"]
+unlab_spe <- spe[,spe$cell_labels == "unlabeled"]
+
+# Randomly split into train and test data
+set.seed(220510)
+trainIndex <- createDataPartition(factor(lab_spe$cell_labels), p = 0.75)
+train_spe <- lab_spe[,trainIndex$Resample1]
+test_spe <- lab_spe[,-trainIndex$Resample1]
+
+fitControl <- trainControl(method = "cv",
+                           number = 5)
+
+cur_mat <- t(assay(train_spe, "exprs")[rowData(train_spe)$use_channel,])
+
+rffit <- train(x = cur_mat, 
+               y = factor(train_spe$cell_labels),
+               method = "rf", ntree = 1000,
+               tuneLength = 5,
+               trControl = fitControl)
+```
+
+```{r, echo=FALSE}
+end_time <- Sys.time()
+```
+
+The step took 
+`r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
+
+```{r}
+cur_mat <- t(assay(test_spe, "exprs")[rowData(test_spe)$use_channel,])
+
+cur_pred <- predict(rffit, 
+                    newdata = cur_mat)
+
+confusionMatrix(data = cur_pred, 
+                      reference = factor(test_spe$cell_labels), 
+                      mode = "everything")
+```
+
+```{r}
+cur_mat <- t(assay(unlab_spe, "exprs")[rowData(unlab_spe)$use_channel,])
+
+cell_class <- as.character(predict.train(rffit, 
+                                         newdata = cur_mat, 
+                                         type = "raw"))
+names(cell_class) <- rownames(cur_mat)
+
+cell_prob <- predict.train(rffit, 
+                           newdata = cur_mat, 
+                           type = "prob")
+cell_class[rowMax(as.matrix(cell_prob)) < 0.4] <- "undefined"
+
+cell_labels <- spe$cell_labels
+cell_labels[colnames(unlab_spe)] <- cell_class
+spe$celltype <- cell_labels
+```
+
+```{r}
+p1 <- dittoDimPlot(spe, var = "celltype", 
+             reduction.use = "UMAP_mnnCorrected", size = 0.2,
+             do.label = TRUE) +
+  ggtitle("Cell types on UMAP, integrated cells")
+
+p2 <- dittoDimPlot(spe, var = "nn_clusters", 
+             reduction.use = "UMAP_mnnCorrected", size = 0.2,
+             do.label = TRUE) +
+  ggtitle("Clusters on UMAP, integrated cells")
+
+p1 + p2
+```
+
+```{r}
+library(scuttle)
+
+celltype_mean <- aggregateAcrossCells(as(spe, "SingleCellExperiment"),  
+                     ids = spe$celltype, 
+                     statistics = "mean",
+                     use.assay.type = "exprs")
+
+dittoHeatmap(celltype_mean,
+             assay = "exprs", cluster_cols = TRUE, 
+             scale = "none",
+             heatmap.colors = viridis(100),
+             annot.by = c("celltype","ncells"))
+
+cluster_mean <- aggregateAcrossCells(as(spe, "SingleCellExperiment"),  
+                     ids = spe$nn_clusters, 
+                     statistics = "mean",
+                     use.assay.type = "exprs")
+
+dittoHeatmap(celltype_mean,
+             assay = "exprs", cluster_cols = TRUE, 
+             scale = "none",
+             heatmap.colors = viridis(100),
+             annot.by = c("nn_clusters","ncells"))
+```
+
+## Spatial analysis
+
+```{r, echo=FALSE}
+start_time <- Sys.time()
+```
+
+```{r}
+library(igraph)
+
+# Spatial community detection - tumor
+tumor_spe <- spe[,spe$celltype == "Tumor"]
+
+gr <- graph_from_data_frame(as.data.frame(colPair(tumor_spe, "neighborhood")), 
+                            directed = FALSE, 
+                            vertices = data.frame(index = seq_len(ncol(tumor_spe))))
+
+cl_comm <- cluster_louvain(gr)
+comm_tumor <- paste0("Tumor_", membership(cl_comm))
+comm_tumor[membership(cl_comm) %in% which(sizes(cl_comm) < 10)] <- NA
+names(comm_tumor) <- colnames(tumor_spe)
+
+# Spatial community detection - non-tumor
+stroma_spe <- spe[,spe$celltype != "Tumor"]
+
+gr <- graph_from_data_frame(as.data.frame(colPair(stroma_spe, "neighborhood")), 
+                            directed = FALSE, 
+                            vertices = data.frame(index = seq_len(ncol(stroma_spe))))
+
+cl_comm <- cluster_louvain(gr)
+comm_stroma <- paste0("Stroma_", membership(cl_comm))
+comm_stroma[membership(cl_comm) %in% which(sizes(cl_comm) < 10)] <- NA
+names(comm_stroma) <- colnames(stroma_spe)
+
+comm <- c(comm_tumor, comm_stroma)
+
+spe$spatial_community <- comm[colnames(spe)]
+```
+
+```{r, echo=FALSE}
+end_time <- Sys.time()
+```
+
+The step took 
+`r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
+
+```{r}
+plotSpatial(spe[,spe$celltype == "Tumor"], 
+            node_color_by = "spatial_community", 
+            img_id = "sample_id", 
+            node_size_fix = 0.5) +
+    theme(legend.position = "none") +
+    ggtitle("Spatial tumor communities") +
+    scale_color_manual(values = rev(colors()))
+```
+
+```{r, echo=FALSE}
+start_time <- Sys.time()
+```
+
+```{r}
+spe <- buildSpatialGraph(spe, img_id = "sample_id", type = "knn", k = 20)
+
+
+spe <- aggregateNeighbors(spe, colPairName = "knn_interaction_graph", 
+                          aggregate_by = "metadata", count_by = "celltype")
+
+cn_1 <- kmeans(spe$aggregatedNeighbors, centers = 6)
+spe$cn_celltypes <- as.factor(cn_1$cluster)
+
+plotSpatial(spe, 
+            node_color_by = "cn_celltypes", 
+            img_id = "sample_id", 
+            node_size_fix = 0.5) +
+    scale_color_brewer(palette = "Set3")
+
+mat <- colData(spe) %>% as_tibble() %>%
+    group_by(cn_celltypes, celltype) %>%
+    summarize(count = n()) %>%
+    mutate(freq = count / sum(count)) %>%
+    pivot_wider(id_cols = cn_celltypes, names_from = celltype, 
+                values_from = freq, values_fill = 0) %>%
+    ungroup() %>%
+    select(-cn_celltypes)
+
+pheatmap(mat, 
+  color = colorRampPalette(c("dark blue", "white", "dark red"))(100), 
+  scale = "column")
+```
+
+```{r, echo=FALSE}
+end_time <- Sys.time()
+```
+
+The step took 
+`r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
+
+```{r, echo=FALSE}
+start_time <- Sys.time()
+```
+
+```{r}
+spe <- buildSpatialGraph(spe, img_id = "sample_id", 
+                         type = "knn", 
+                         name = "knn_spatialcontext_graph", 
+                         k = 40)
+
+spe <- aggregateNeighbors(spe, 
+                          colPairName = "knn_spatialcontext_graph",
+                          aggregate_by = "metadata",
+                          count_by = "cn_celltypes",
+                          name = "aggregatedNeighborhood")
+
+spe <- detectSpatialContext(spe, 
+                            entry = "aggregatedNeighborhood",
+                            threshold = 0.90,
+                            name = "spatial_context")
+
+plotSpatial(spe, 
+            node_color_by = "spatial_context", 
+            img_id = "sample_id", 
+            node_size_fix = 0.5, 
+            colPairName = "knn_spatialcontext_graph")
+
+plotSpatialContext(spe, 
+                   entry = "spatial_context_filtered",
+                   group_by = "sample_id",
+                   node_color_by = "name",
+                   node_size_by = "n_cells",
+                   node_label_color_by = "name")
+```
+
+```{r, echo=FALSE}
+end_time <- Sys.time()
+```
+
+The step took 
+`r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
+
+```{r, echo=FALSE}
+start_time <- Sys.time()
+```
+
+```{r}
+spe <- patchDetection(spe, 
+                      patch_cells = spe$celltype == "Tumor",
+                      img_id = "sample_id",
+                      expand_by = 1,
+                      min_patch_size = 10,
+                      colPairName = "neighborhood")
+
+plotSpatial(spe, 
+            node_color_by = "patch_id", 
+            img_id = "sample_id", 
+            node_size_fix = 0.5) +
+    theme(legend.position = "none") +
+    scale_color_manual(values = colors())
+```
+
+```{r, echo=FALSE}
+end_time <- Sys.time()
+```
+
+The step took 
+`r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
+
+```{r, echo=FALSE}
+start_time <- Sys.time()
+```
+
+```{r}
+out <- testInteractions(spe, 
+                        group_by = "sample_id",
+                        label = "celltype", 
+                        colPairName = "neighborhood")
+
+out %>% as_tibble() %>%
+    group_by(from_label, to_label) %>%
+    summarize(sum_sigval = sum(sigval, na.rm = TRUE)) %>%
+    ggplot() +
+        geom_tile(aes(from_label, to_label, fill = sum_sigval)) +
+        scale_fill_gradient2(low = muted("blue"), mid = "white", 
+  high = muted("red")) +
+        theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+```{r, echo=FALSE}
+end_time <- Sys.time()
+```
+
+The step took 
+`r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
+
+```{r}
+sessionInfo()
+```
 
