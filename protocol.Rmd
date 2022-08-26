@@ -66,6 +66,10 @@ unzip("data/compensation.zip", exdir="data", overwrite=TRUE)
 unlink("data/compensation.zip")
 download.file("https://zenodo.org/record/5949116/files/sample_metadata.xlsx", 
          destfile = "data/sample_metadata.xlsx")
+download.file("https://zenodo.org/record/6810879/files/gated_cells.zip",
+              "data/gated_cells.zip")
+unzip("data/gated_cells.zip", exdir="data", overwrite=TRUE)
+unlink("data/gated_cells.zip")
 ```
 
 # Equipment setup
@@ -102,7 +106,7 @@ BiocManager::install(c("pheatmap", "viridis",
 start_time <- Sys.time()
 ```
 
-```{bash preprocess-panel, engine.opts="--init-file /Users/nils/IMCDataAnalysis/.alias -i"}
+```{bash preprocess-panel, engine.opts="--init-file .alias -i"}
 steinbock preprocess imc panel --namecol Clean_Target
 ```
 
@@ -117,7 +121,7 @@ The step took
 start_time <- Sys.time()
 ```
 
-```{bash preprocess-images, engine.opts="--init-file /Users/nils/IMCDataAnalysis/.alias -i"}
+```{bash preprocess-images, engine.opts="--init-file .alias -i"}
 steinbock preprocess imc images --hpf 50
 ```
 
@@ -132,7 +136,7 @@ The step took
 start_time <- Sys.time()
 ```
 
-```{bash segment-cells, engine.opts="--init-file /Users/nils/IMCDataAnalysis/.alias -i"}
+```{bash segment-cells, engine.opts="--init-file .alias -i"}
 steinbock segment deepcell --minmax
 ```
 
@@ -147,7 +151,7 @@ The step took
 start_time <- Sys.time()
 ```
 
-```{bash measure-intensities, engine.opts="--init-file /Users/nils/IMCDataAnalysis/.alias -i"}
+```{bash measure-intensities, engine.opts="--init-file .alias -i"}
 steinbock measure intensities
 ```
 
@@ -162,7 +166,7 @@ The step took
 start_time <- Sys.time()
 ```
 
-```{bash measure-regionprops, engine.opts="--init-file /Users/nils/IMCDataAnalysis/.alias -i"}
+```{bash measure-regionprops, engine.opts="--init-file .alias -i"}
 steinbock measure regionprops
 ```
 
@@ -177,7 +181,7 @@ The step took
 start_time <- Sys.time()
 ```
 
-```{bash measure-neighbors, engine.opts="--init-file /Users/nils/IMCDataAnalysis/.alias -i"}
+```{bash measure-neighbors, engine.opts="--init-file .alias -i"}
 steinbock measure neighbors --type expansion --dmax 4
 ```
 
@@ -194,7 +198,7 @@ The step took
 start_time <- Sys.time()
 ```
 
-```{r}
+```{r, message=FALSE}
 library(imcRtools)
 spe <- read_steinbock("data/steinbock/")
 ```
@@ -333,7 +337,7 @@ end_time <- Sys.time()
 
 ```{r, include=FALSE}
 if (!dir.exists("outputs")) dir.create("outputs", recursive = TRUE)
-pdf("outputs/plotSpotHeatmap.pdf")
+pdf("outputs/Fig5_plotSpotHeatmap.pdf", width = 7, height = 6)
 plotSpotHeatmap(sce)
 dev.off()
 ```
@@ -399,7 +403,7 @@ The step took
 `r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
 
 ```{r, include=FALSE}
-pdf("outputs/plotSpillmat.pdf")
+pdf("outputs/Fig5_plotSpillmat.pdf", height = 7, width = 7)
 plotSpillmat(sce, isotope_list = isotope_list)
 dev.off()
 ```
@@ -431,9 +435,7 @@ assay(spe, "compcounts") <- assay(spe, "compexprs") <- NULL
 ```
 
 ```{r, include=FALSE}
-pdf("outputs/before_after_single-cell.pdf")
-before + after
-dev.off()
+ggsave("outputs/Fig5_before_after_single-cell.pdf", before + after, width = 5, height = 3)
 ```
 
 
@@ -476,19 +478,25 @@ The step took
 
 ```{r, include=FALSE}
 channelNames(images_comp) <- rowData(spe)$channel_name
-pdf("outputs/before_after_images.pdf")
+pdf("outputs/Fig5_before_after_images_1.pdf")
 plotPixels(images[5], colour_by = "Yb173Di", 
            image_title = list(text = "Yb173 (Ecad) - before", 
                        position = "topleft"), 
            legend = NULL, bcg = list(Yb173Di = c(0, 4, 1)))
+dev.off()
+pdf("outputs/Fig5_before_after_images_2.pdf")
 plotPixels(images[5], colour_by = "Yb174Di", 
            image_title = list(text = "Yb174 (CD303) - before", 
                               position = "topleft"), 
            legend = NULL, bcg = list(Yb174Di = c(0, 4, 1)))
+dev.off()
+pdf("outputs/Fig5_before_after_images_3.pdf")
 plotPixels(images_comp[5], colour_by = "Yb173Di",
            image_title = list(text = "Yb173 (Ecad) - after", 
                               position = "topleft"), 
            legend = NULL, bcg = list(Yb173Di = c(0, 4, 1)))
+dev.off()
+pdf("outputs/Fig5_before_after_images_4.pdf")
 plotPixels(images_comp[5], colour_by = "Yb174Di", 
            image_title = list(text = "Yb174 (CD303) - after", 
                               position = "topleft"),
@@ -519,12 +527,12 @@ plotPixels(cur_images,
                          Ecad = c("black", "cyan"),
                          DNA1 = c("black", "blue")),
            image_title = NULL,
-           legend = list(colour_by.title.cex = 0.7,
-                         colour_by.labels.cex = 0.7))
+           legend = list(colour_by.title.cex = 0.9,
+                         colour_by.labels.cex = 0.9))
 ```
 
 ```{r, include=FALSE}
-pdf("outputs/segmentation-quality.pdf")
+pdf("outputs/Fig6_segmentation-quality.pdf")
 plotPixels(cur_images,
            mask = masks[img_ids],
            img_id = "sample_id",
@@ -536,9 +544,21 @@ plotPixels(cur_images,
                          Ecad = c("black", "cyan"),
                          DNA1 = c("black", "blue")),
            image_title = NULL,
-           legend = list(colour_by.title.cex = 0.7,
-                         colour_by.labels.cex = 0.7))
+           legend = list(colour_by.title.cex = 1.2,
+                         colour_by.labels.cex = 0.9))
 dev.off()
+```
+
+```{r, include=FALSE}
+p <- colData(spe) %>%
+    as.data.frame() %>%
+    group_by(sample_id) %>%
+    ggplot() +
+        geom_boxplot(aes(sample_id, area)) +
+        theme_minimal(base_size = 15) + 
+        theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 15)) +
+        ylab("Cell area") + xlab("")
+ggsave("outputs/Fig7_cell-size.pdf", width = 7, height = 5)
 ```
 
 ```{r}
@@ -554,19 +574,6 @@ colData(spe) %>%
 spe <- spe[,spe$area >= 5]
 ```
 
-```{r, include=FALSE}
-pdf("outputs/cell-size.pdf")
-colData(spe) %>%
-    as.data.frame() %>%
-    group_by(sample_id) %>%
-    ggplot() +
-        geom_boxplot(aes(sample_id, area)) +
-        theme_minimal(base_size = 15) + 
-        theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 8)) +
-        ylab("Cell area") + xlab("")
-dev.off()
-```
-
 ```{r}
 multi_dittoPlot(spe, vars = c("HLADR", "CD3", "Ecad", "PDGFRb"),
                group.by = "patient_id", plots = c("ridgeplot"), 
@@ -574,10 +581,10 @@ multi_dittoPlot(spe, vars = c("HLADR", "CD3", "Ecad", "PDGFRb"),
 ```
 
 ```{r, include=FALSE}
-pdf("outputs/marker-distribution.pdf")
-multi_dittoPlot(spe, vars = c("HLADR", "CD3", "Ecad", "PDGFRb"),
+pdf("outputs/Fig8_marker-distribution.pdf", width = 7, height = 5)
+p <- multi_dittoPlot(spe, vars = c("HLADR", "CD3", "Ecad", "PDGFRb"),
                group.by = "patient_id", plots = c("ridgeplot"), 
-               assay = "exprs")
+               assay = "exprs") + theme(axis.text.x = element_text(size = 18))
 dev.off()
 ```
 
@@ -605,11 +612,10 @@ The step took
 `r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
 
 ```{r, include=FALSE}
-pdf("outputs/UMAP.pdf")
-dittoDimPlot(spe, var = "patient_id", 
+p <- dittoDimPlot(spe, var = "patient_id", 
      reduction.use = "UMAP", size = 0.2)  +
     ggtitle("Patient ID on UMAP")
-dev.off()
+ggsave("outputs/Fig9_UMAP.pdf", p, width = 6, height = 4)
 ```
 
 ```{r, echo=FALSE}
@@ -638,11 +644,10 @@ end_time <- Sys.time()
 ```
 
 ```{r, include=FALSE}
-pdf("outputs/UMAP_corrected.pdf")
-dittoDimPlot(spe, var = "patient_id", 
+p <- dittoDimPlot(spe, var = "patient_id", 
                    reduction.use = "UMAP_mnnCorrected", size = 0.2) + 
     ggtitle("Patient ID on UMAP after correction")
-dev.off()
+ggsave("outputs/Fig9_UMAP_corrected.pdf", p, width = 6, height = 4)
 ```
 
 The step took 
@@ -658,23 +663,22 @@ start_time <- Sys.time()
 library(bluster)
 library(BiocParallel)
 
-mat <- t(assay(spe, "exprs")[rowData(spe)$use_channel,])
+mat <- reducedDim(spe, "fastMNN")
 
+set.seed(220825)
 combinations <- clusterSweep(mat, BLUSPARAM=SNNGraphParam(),
                              k=c(10L, 20L), 
                              type = c("rank", "jaccard"), 
-                             cluster.fun=c("walktrap", "louvain"),
-                             BPPARAM = MulticoreParam(RNGseed = 220427))
+                             cluster.fun = "louvain")
 
 sil <- vapply(as.list(combinations$clusters), 
-              function(x) mean(approxSilhouette(mat[sam_cells,],
-    x)$width), 0)
+              function(x) mean(approxSilhouette(mat, x)$width), 0)
 
 ggplot(data.frame(method = names(sil),
                   sil = sil)) +
     geom_point(aes(method, sil)) +
     theme_classic(base_size = 15) +
-    theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
     xlab("Cluster parameter combination") +
     ylab("Average silhouette width")
 ```
@@ -687,15 +691,14 @@ The step took
 `r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
 
 ```{r, include=FALSE}
-pdf("outputs/clusterSweep.pdf")
-ggplot(data.frame(method = names(sil),
+p <- ggplot(data.frame(method = names(sil),
                   sil = sil)) +
     geom_point(aes(method, sil)) +
     theme_classic(base_size = 15) +
-    theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
     xlab("Cluster parameter combination") +
     ylab("Average silhouette width")
-dev.off()
+ggsave("outputs/Fig10_clusterSweep.pdf", p, width = 6, height = 5)
 ```
 
 ```{r, echo=FALSE}
@@ -706,7 +709,7 @@ start_time <- Sys.time()
 library(scran)
 
 clusters <- clusterCells(spe[rowData(spe)$use_channel,], 
-                         assay.type = "exprs", 
+                         use.dimred = "fastMNN", 
                          BLUSPARAM = SNNGraphParam(k=20, 
                                                 cluster.fun = "louvain",
                                                 type = "rank",
@@ -769,7 +772,7 @@ spe$cell_labels <- spe_labels
 start_time <- Sys.time()
 ```
 
-```{r}
+```{r, message=FALSE}
 library(caret)
 
 # Split between labeled and unlabeled cells
@@ -844,13 +847,21 @@ p2 <- dittoDimPlot(spe, var = "nn_clusters",
 p1 + p2
 ```
 
+```{r, include=FALSE}
+p1 + p2
+ggsave("outputs/Fig11_celltype-UMAP.pdf", p1, width = 6, height = 4)
+ggsave("outputs/Fig11_cluster-UMAP.pdf", p2, width = 6, height = 4)
+```
+
 ```{r}
 library(scuttle)
+library(viridis)
 
 celltype_mean <- aggregateAcrossCells(as(spe, "SingleCellExperiment"),  
                      ids = spe$celltype, 
                      statistics = "mean",
-                     use.assay.type = "exprs")
+                     use.assay.type = "exprs",
+                     subset_row = rowData(spe)$use_channel)
 
 dittoHeatmap(celltype_mean,
              assay = "exprs", cluster_cols = TRUE, 
@@ -861,13 +872,32 @@ dittoHeatmap(celltype_mean,
 cluster_mean <- aggregateAcrossCells(as(spe, "SingleCellExperiment"),  
                      ids = spe$nn_clusters, 
                      statistics = "mean",
-                     use.assay.type = "exprs")
+                     use.assay.type = "exprs",
+                     subset_row = rowData(spe)$use_channel)
 
-dittoHeatmap(celltype_mean,
+dittoHeatmap(cluster_mean,
              assay = "exprs", cluster_cols = TRUE, 
              scale = "none",
              heatmap.colors = viridis(100),
              annot.by = c("nn_clusters","ncells"))
+```
+
+```{r, include=FALSE}
+pdf("outputs/Fig12_celltype-heatmap.pdf")
+dittoHeatmap(celltype_mean,
+             assay = "exprs", cluster_cols = TRUE, 
+             scale = "none",
+             heatmap.colors = viridis(100),
+             annot.by = c("celltype","ncells"))
+dev.off()
+
+pdf("outputs/Fig12_cluster-heatmap.pdf")
+dittoHeatmap(cluster_mean,
+             assay = "exprs", cluster_cols = TRUE, 
+             scale = "none",
+             heatmap.colors = viridis(100),
+             annot.by = c("nn_clusters","ncells"))
+dev.off()
 ```
 
 ## Spatial analysis
@@ -876,7 +906,7 @@ dittoHeatmap(celltype_mean,
 start_time <- Sys.time()
 ```
 
-```{r}
+```{r, message=FALSE}
 library(igraph)
 
 # Spatial community detection - tumor
@@ -921,7 +951,6 @@ plotSpatial(spe[,spe$celltype == "Tumor"],
             img_id = "sample_id", 
             node_size_fix = 0.5) +
     theme(legend.position = "none") +
-    ggtitle("Spatial tumor communities") +
     scale_color_manual(values = rev(colors()))
 ```
 
@@ -929,12 +958,25 @@ plotSpatial(spe[,spe$celltype == "Tumor"],
 start_time <- Sys.time()
 ```
 
+```{r, include=FALSE}
+p <- plotSpatial(spe[,spe$celltype == "Tumor"], 
+            node_color_by = "spatial_community", 
+            img_id = "sample_id", 
+            node_size_fix = 0.5) +
+    theme(legend.position = "none") +
+    scale_color_manual(values = rev(colors()))
+ggsave("outputs/Fig13_spatial-communities.pdf", p)
+```
+
 ```{r}
+library(pheatmap)
 spe <- buildSpatialGraph(spe, img_id = "sample_id", type = "knn", k = 20)
 
 
 spe <- aggregateNeighbors(spe, colPairName = "knn_interaction_graph", 
                           aggregate_by = "metadata", count_by = "celltype")
+
+set.seed(220705)
 
 cn_1 <- kmeans(spe$aggregatedNeighbors, centers = 6)
 spe$cn_celltypes <- as.factor(cn_1$cluster)
@@ -963,6 +1005,21 @@ pheatmap(mat,
 end_time <- Sys.time()
 ```
 
+```{r, include=FALSE}
+p <- plotSpatial(spe, 
+            node_color_by = "cn_celltypes", 
+            img_id = "sample_id", 
+            node_size_fix = 0.5) +
+    scale_color_brewer(palette = "Set3")
+ggsave("outputs/Fig14_cellular-neighborhoods.pdf", p)
+
+pdf("outputs/Fig14_cn-heatmap.pdf", width = 4, height = 4)
+pheatmap(mat, 
+  color = colorRampPalette(c("dark blue", "white", "dark red"))(100), 
+  scale = "column")
+dev.off()
+```
+
 The step took 
 `r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
 
@@ -987,8 +1044,14 @@ spe <- detectSpatialContext(spe,
                             threshold = 0.90,
                             name = "spatial_context")
 
+spe <- filterSpatialContext(spe, 
+                            entry = "spatial_context",
+                            group_by = "patient_id", 
+                            group_threshold = 3,
+                            cells_threshold = 100)
+
 plotSpatial(spe, 
-            node_color_by = "spatial_context", 
+            node_color_by = "spatial_context_filtered", 
             img_id = "sample_id", 
             node_size_fix = 0.5, 
             colPairName = "knn_spatialcontext_graph")
@@ -1003,6 +1066,23 @@ plotSpatialContext(spe,
 
 ```{r, echo=FALSE}
 end_time <- Sys.time()
+```
+
+```{r include=FALSE}
+p <- plotSpatial(spe, 
+            node_color_by = "spatial_context_filtered", 
+            img_id = "sample_id", 
+            node_size_fix = 0.5, 
+            colPairName = "knn_spatialcontext_graph")
+ggsave("outputs/Fig15_spatial-contexts.pdf", p)
+
+p <- plotSpatialContext(spe, 
+                   entry = "spatial_context_filtered",
+                   group_by = "sample_id",
+                   node_color_by = "name",
+                   node_size_by = "n_cells",
+                   node_label_color_by = "name")
+ggsave("outputs/Fig15_spatial-context-graph.pdf", p, width = 6, height = 4)
 ```
 
 The step took 
@@ -1025,11 +1105,22 @@ plotSpatial(spe,
             img_id = "sample_id", 
             node_size_fix = 0.5) +
     theme(legend.position = "none") +
-    scale_color_manual(values = colors())
+    scale_color_manual(values = rev(colors()))
 ```
 
 ```{r, echo=FALSE}
 end_time <- Sys.time()
+```
+
+
+```{r, include=FALSE}
+p <- plotSpatial(spe,
+            node_color_by = "patch_id", 
+            img_id = "sample_id", 
+            node_size_fix = 0.5) +
+    theme(legend.position = "none") +
+    scale_color_manual(values = rev(colors()))
+ggsave("outputs/Fig16_patch-detection.pdf", p)
 ```
 
 The step took 
@@ -1039,7 +1130,10 @@ The step took
 start_time <- Sys.time()
 ```
 
-```{r}
+```{r, message=FALSE}
+library(scales)
+
+set.seed(220825)
 out <- testInteractions(spe, 
                         group_by = "sample_id",
                         label = "celltype", 
@@ -1057,6 +1151,18 @@ out %>% as_tibble() %>%
 
 ```{r, echo=FALSE}
 end_time <- Sys.time()
+```
+
+```{r, include=FALSE}
+p <- out %>% as_tibble() %>%
+    group_by(from_label, to_label) %>%
+    summarize(sum_sigval = sum(sigval, na.rm = TRUE)) %>%
+    ggplot() +
+        geom_tile(aes(from_label, to_label, fill = sum_sigval)) +
+        scale_fill_gradient2(low = muted("blue"), mid = "white", 
+  high = muted("red")) +
+        theme(axis.text.x = element_text(angle = 45, hjust = 1))
+ggsave("outputs/Fig17_interaction-testing.pdf", p, width = 5, height = 3)
 ```
 
 The step took 
