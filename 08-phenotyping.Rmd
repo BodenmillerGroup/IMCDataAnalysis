@@ -644,209 +644,274 @@ all remaining, unlabeled cells.
 
 ### Train classifier
 
-In this section, we will use the
-[caret](https://topepo.github.io/caret/index.html) framework for machine
-learning in R. This package provides an interface to train a number of
-regression and classification models in a coherent fashion. We use a random
-forest classifier due to low number of parameters, high speed and an observed
-high performance for cell type classification [@Hoch2022].
+In this section, we will use the [tidymodels](http://www.tidymodels.org)
+framework to build our classifier for cell type annotation. `Tidymodels`
+is a collection of different packages which break down the machine
+learning workflow in individual steps with specialized packages for each step. 
+This ensures flexibility for the entire workflow and the packages adherence 
+to the tidyverse principles in terms of used data structures, grammar and 
+general design allows for easy usage and integration with other [tidyverse](https://www.tidyverse.org/) 
+packages, e.g. `dplyr`.
 
-In the following section, we will first split the `SpatialExperiment` object
-into labeled and unlabeled cells. Based on the labeled cells, we split
-the data into a train (75% of the data) and test (25% of the data) dataset. 
-We currently do not provide an independently labeled validation dataset.
+For our purposes, we will use a random forest multiclass classifier due to low 
+number of parameters, high speed and an observed high performance for cell type 
+classification [@Hoch2022].
 
-The `caret` package provides the `trainControl` function, which specifies model
-training parameters and the `train` function, which performs the actual model
-training. While training the model, we also want to estimate the best model
-parameters. In the case of the chosen random forest model (`method = "rf"`), we
-only need to estimate a single parameters (`mtry`) which corresponds to the
-number of variables randomly sampled as candidates at each split. To estimate
-the best parameter, we will perform a 5-fold cross validation (set within
-`trainControl`) over a tune length of 5 entries to `mtry`.
+In the following section, we will first split the `SpatialExperiment` object 
+into labeled and unlabeled cells. Based on the labeled cells, we split the data 
+into a train (75% of the data) and test (25% of the data) dataset using the the 
+`initial_split` command from the `rsample` package. We currently do not provide 
+an independently labeled validation dataset.
+
+Via the `parsnip` package we define the actual model which we want to build: In 
+the `rand_forest()` function we set the hyperparameters which we want to tune 
+during the model building process (in the case of the the chosen random forest 
+model we will estimate only the best values for the `mtry` paramter, which 
+corresponds to the number of variables sampled as candidates at each split). 
+The `set_engine` command is used to defines the engine for our model (which are 
+implementations of the respective model types in different packages: e.g. in our 
+case we will use the standard `ranger` implementation, which is comparably fast 
+and well suited for high-dimensional data).
+
+Via the `workflow` package we can create a workflow object by adding the 
+model (`add_model`) and the formula (`add_formula`), which defines the outcome 
+variable we want to predict. This workflow object can later be easily updated 
+with the best model parameters which we defined during the hyperparameter tuning.
+
+To estimate the best hyperparameters for our random forest model, we will perform 
+resampling with a 5-fold cross validation of the training dataset (`vfold_cv`) 
+and lastly perform the hyperparamter tuning using the `tune_grid` function: 
+
+Here we define the resampled training dataset (`resamples = train_folds`), the 
+grid-length (`grid = 5`) and the performance metrices we want to optimize during 
+the tuning process (`metrics = metric_set(accuracy)`).
 
 ```{r, echo=FALSE}
 start_time <- Sys.time()
 ```
 
-```{r train-classifier, message=FALSE}
-library(caret)
+```{r, train-classifier_tidymodels}
+library(tidymodels)
 
-# Split between labeled and unlabeled cells
+# Split the SPE object between labeled and unlabeled cells
 lab_spe <- spe[,spe$cell_labels != "unlabeled"]
 unlab_spe <- spe[,spe$cell_labels == "unlabeled"]
 
-# Randomly split into train and test data
-set.seed(220510)
-trainIndex <- createDataPartition(factor(lab_spe$cell_labels), p = 0.75)
-train_spe <- lab_spe[,trainIndex$Resample1]
-test_spe <- lab_spe[,-trainIndex$Resample1]
+# Extract relevant data from lab_spe
+lab_data <- t(assay(lab_spe, "exprs")[rowData(train_spe)$use_channel,])
+# Combine with outcome variable
+lab_data <- as_tibble(cbind(lab_data, cell_labels = lab_spe$cell_labels))
+# Change variable types
+lab_data <- lab_data %>%
+    mutate(cell_labels = as.factor(cell_labels)) %>%
+    mutate_if(is.character, as.numeric)
 
-# Specify train parameters for 5-fold cross validation
-fitControl <- trainControl(method = "cv",
-                           number = 5)
+# Split dataset in train and test data
+set.seed(1234)
+split <- initial_split(lab_data, prop = 0.75)
+train_data <- training(split)
+test_data <- testing(split)
 
-# Select the data for training
-cur_mat <- t(assay(train_spe, "exprs")[rowData(train_spe)$use_channel,])
+# Define and initiate model with the respective model engine
+# Set model hyperparameters (trees = 1000 and mtry, which we want to tune)
+rf_mod <-
+    rand_forest(mtry = tune(),
+                trees = 1000) %>%
+    set_engine("ranger", 
+               importance = "impurity") %>%
+    set_mode("classification")
 
-# Train a random forest model for predicting cell labels
-# This call also performs parameter tuning
-set.seed(220510)
-rffit <- train(x = cur_mat, 
-               y = factor(train_spe$cell_labels),
-               method = "rf", ntree = 1000,
-               tuneLength = 5,
-               trControl = fitControl)
+# Create workflow
+rf_wf <-
+    workflow() %>%
+    add_model(rf_mod) %>%
+    add_formula(cell_labels ~ .)
 
-rffit
+# Resample using cross-validation (5-fold) for hyperparameter tuning
+set.seed(1234)
+train_folds <- vfold_cv(train_data, v = 5)
+
+# Tune hyperparameters
+doParallel::registerDoParallel()
+set.seed(1234)
+tune_res <- rf_wf %>%
+    tune_grid(
+        resamples = train_folds,
+        grid = 10,
+        metrics = metric_set(accuracy)
+        )
 ```
 
 ```{r, echo=FALSE}
 end_time <- Sys.time()
 ```
 
-Training the classifier took 
-`r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
+Training the classifier took
+`r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)`
+minutes.
 
-### Classifier performance
+#### Tuning performance
 
-We next observe the accuracy of the classifer when predicting cell 
-phenotypes across the cross-validation as well as the test dataset.
+We can extract the performance metrices of the resampled tuning process when 
+predicting cell phenotypes using `collect_metrics()`.
 
-First, we can visualize the classification accuracy during parameter
-tuning:
+```{r performance-metrices}
+tune_res %>% collect_metrics()
+```
+
+Now we can visualize the classification accuracy during hyperparameter tuning:
 
 ```{r accuracy-tuning}
-ggplot(rffit) + 
-  geom_errorbar(data = rffit$results,
-                aes(ymin = Accuracy - AccuracySD,
-                    ymax = Accuracy + AccuracySD),
+# Plot tuning results (accuracy +/-SD for each mtry)
+tune_res %>% collect_metrics() %>%
+    filter(.metric == "accuracy") %>%
+    select(mean, mtry, std_err) %>%
+    pivot_longer(mtry,
+                 values_to = "value",
+                 names_to = "parameter"
+                 ) %>%
+    ggplot() +
+    geom_line(aes(x = value, y = mean)) +
+    geom_errorbar(aes(x=value,
+                      ymin = mean - std_err,
+                      ymax = mean + std_err),
                 width = 0.4) +
     theme_classic(base_size = 15)
 ```
 
-The best value for `mtry` is 28 and is used when predicting new data.
+Next, we will select the best value for the `mtry` hyperparameter using
+`select_best()` (which in this case is `16`), finalize the model workflow
+(`finalize_workflow()`) and fit the final model on the training dataset
+and test it on the testing dataset (`last_fit()`).
 
-It is often recommended to visualize the variable importance of the
-classifier. The following plot specifies which variables (markers) are 
-most important for classifying the data.
+#### Final model fit
 
-```{r variable-importance, fig.height = 10}
-plot(varImp(rffit))
+```{r select-hyperparameter}
+# Select best value for mtry
+param_final <- tune_res %>% select_best(metric = "accuracy")
+
+# Finalize workflow
+final_wf <- rf_wf %>%
+  finalize_workflow(param_final)
+
+# Now we fit on the final model on the training dataset and evaluate it on the test set (which we defined in the "split" object)
+final_fit <-
+  final_wf %>%
+  last_fit(split)
 ```
 
-As expected, the markers that were used for gating (Ecad, CD3, CD20, HLADR,
-CD8a, CD38, FOXP3) were important for classification.
+#### Performance on test data
 
-To assess the accuracy, sensitivity, specificity, among other quality measures of
-the classifier, we will now predict cell phenotypes in the test data.
-
-```{r model-testing, message=FALSE}
-# Select test data
-cur_mat <- t(assay(test_spe, "exprs")[rowData(test_spe)$use_channel,])
-
-# Predict cell phenotypes in test data
-cur_pred <- predict(rffit, 
-                    newdata = cur_mat)
-```
-
+Now we evaluate how our model performed on the unseen test dataset.
+With `collect_metrics()` we can retrieve the classification accuracy of our 
+final model fit.
 While the overall classification accuracy can appear high, we also want
 to check if each cell phenotype class is correctly predicted.
 For this, we will calculate the confusion matrix between predicted and actual 
 cell labels. This measure highlights individual cell phenotype classes that 
 were not correctly predicted by the classifier. When setting `mode = "everything"`,
-the `confusionMatrix` function returns all available prediction measures including
-sensitivity, specificity, precision, recall and the F1 score per cell 
-phenotype class.
+the `confusionMatrix` function from the `caret` package returns all available 
+prediction measures including sensitivity, specificity, precision, recall and 
+the F1 score per celltype. 
 
-```{r confusion-matrix}
-cm <- confusionMatrix(data = cur_pred, 
-                      reference = factor(test_spe$cell_labels), 
+```{r, test-performance}
+final_fit %>% collect_metrics()
+
+# Extract predictions
+test_pred <- final_fit %>% collect_predictions()
+
+library(caret)
+# Generate confusion matrix for each class
+cm <- confusionMatrix(data = test_pred$cell_labels,
+                      reference = test_pred$.pred_class,
                       mode = "everything")
 
-cm
-```
-
-To easily visualize these results, we can now plot the true positive rate (sensitivity)
-versus the false positive rate (1 - specificity):
-
-```{r specificity-sensitivity, message=FALSE}
-library(tidyverse)
-
+# Plot model sensitivity and specificity for each cell type class
 data.frame(cm$byClass) %>%
   mutate(class = sub("Class: ", "", rownames(cm$byClass))) %>%
-  ggplot() + 
-  geom_point(aes(1 - Specificity, Sensitivity, 
+  ggplot() +
+  geom_point(aes(1 - Specificity, Sensitivity,
                  size = Detection.Rate,
                  fill = class),
-             shape = 21) + 
+             shape = 21) +
   scale_fill_manual(values = metadata(spe)$color_vectors$celltype) +
-  theme_classic(base_size = 15) + 
+  theme_classic(base_size = 15) +
   ylab("Sensitivity (TPR)") +
   xlab("1 - Specificity (FPR)")
 ```
 
-We observe high sensitivity and specificity for most cell types. Plasma cells
-show the lowest true positive rate with 92% being sufficiently high. The size of
+We observe high sensitivity and specificity for most cell types. Tregs
+show the lowest true positive rate with 93% being sufficiently high. The size of
 the circle specifies the number of cells per class.
 
 Finally, to observe which cell phenotypes were wrongly classified, we can visualize
 the distribution of classification probabilities per cell phenotype class:
 
 ```{r prediciton-probability, fig.height=15}
-cur_pred <- predict(rffit, 
-                    newdata = cur_mat, 
-                    type = "prob")
-cur_pred$truth <- factor(test_spe$cell_labels)
-
-cur_pred %>%
-  pivot_longer(cols = Bcell:Tumor) %>%
+test_pred %>%
+  pivot_longer(cols = .pred_Bcell:.pred_Tumor, names_prefix = ".pred_") %>%
   ggplot() +
   geom_boxplot(aes(x = name, y = value, fill = name), outlier.size = 0.5) +
-  facet_wrap(. ~ truth, ncol = 1) + 
+  facet_wrap(. ~ cell_labels, ncol = 1) +
   scale_fill_manual(values = metadata(spe)$color_vectors$celltype)  +
-  theme(panel.background = element_blank(), 
+  theme(panel.background = element_blank(),
         axis.text.x = element_text(angle = 45, hjust = 1))
 ```
-
 The boxplots indicate the classification probabilities per class. The classifier
 is well trained if classification probabilities are only high for the one 
 specific class.
 
+It is often recommended to visualize the variable importance of the
+classifier. Via the `extract_fit_parsnip()` command we can extract the fit from
+the workflow object and then use the `vip` package to visualize the variable 
+importance for the top 10 variables (markers). 
+
+```{r variable-importance}
+library(vip)
+
+final_fit %>% 
+  extract_fit_parsnip() %>% 
+  vip(num_features = 10)
+```
+
+As expected, the markers that were used for gating (Ecad, CD3, CD20, CD8a, 
+CD38, HLADR, FOXP3) among others were most important for classification. 
+
 ### Classification of new data
 
-In the final section, we will now use the tuned and tested random forest 
+In the final section, we will now use the tuned and tested random forest
 classifier to predict the cell phenotypes of the unlabeled data.
 
 First, we predict the cell phenotypes and extract their classification
 probabilities.
 
-```{r, unlabeled-prediction}
-# Select unlabeled data
-cur_mat <- t(assay(unlab_spe, "exprs")[rowData(unlab_spe)$use_channel,])
+```{r predict-new-data}
+# Fitting the final model using the entire labeled dataset (training + testing) to use it for the prediction of new data:
+final_model <- fit(final_wf, lab_data)
+
+# Extract unlabeled data from the unlab_spe object
+unlab_data <- t(assay(unlab_spe, "exprs")[rowData(train_spe)$use_channel,])
 
 # Predict cell phenotypes
-cell_class <- as.character(predict.train(rffit, 
-                                         newdata = cur_mat, 
-                                         type = "raw"))
-names(cell_class) <- rownames(cur_mat)
+cell_class <- predict(final_model, new_data = unlab_data) %>% pull(.pred_class) %>% as.character()
+
+names(cell_class) <- rownames(unlab_data)
 
 # Extract classification probabilities
-cell_prob <- predict.train(rffit, 
-                           newdata = cur_mat, 
-                           type = "prob")
+cell_prob <- predict(final_model,
+                     new_data = unlab_data,
+                     type = "prob")
 ```
 
-Each cell is assigned to the class with highest probability. There are however
+Each cell is assigned to the class with the highest probability. There are however
 cases, where the highest probability is low meaning the cell can not be uniquely
 assigned to a class. We next want to identify these cells and label them as 
 "undefined". Here, we select a maximum classification probability threshold 
 of 40% but this threshold needs to be adjusted for other datasets. The adjusted
 cell labels are then stored in the `SpatialExperiment` object.
 
-```{r, undefined-cells}
+```{r undefined-cells}
 library(ggridges)
-
 # Distribution of maximum probabilities
 tibble(max_prob = rowMax(as.matrix(cell_prob)),
        type = cell_class) %>%
@@ -855,20 +920,19 @@ tibble(max_prob = rowMax(as.matrix(cell_prob)),
         scale_fill_manual(values = metadata(spe)$color_vectors$celltype) +
         theme_classic(base_size = 15) +
         xlab("Maximum probability") +
-        ylab("Cell type") + 
+        ylab("Cell type") +
         xlim(c(0,1.2))
 
 # Label undefined cells
 cell_class[rowMax(as.matrix(cell_prob)) < 0.4] <- "undefined"
 
-# Store labels in SpatialExperiment onject
+# Store labels in SpatialExperiment object
 cell_labels <- spe$cell_labels
 cell_labels[colnames(unlab_spe)] <- cell_class
-spe$celltype <- cell_labels 
+spe$celltype <- cell_labels
 
 table(spe$celltype, spe$patient_id)
 ```
-
 We can now compare the cell labels derived by classification to the different
 clustering strategies. The first comparison is against the clustering results
 using the asinh-transformed counts.
