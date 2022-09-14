@@ -767,6 +767,12 @@ main difference comes from the lack of symmetry. We can now for example see that
 3 or more myeloid cells sit around CD4$^+$ T cells while this interaction is not
 as strong when considering CD4$^+$ T cells sitting around myeloid cells.
 
+Finally, we save the updated `SpatialExperiment` object.
+
+```{r spatial-save-object}
+saveRDS(spe, "data/spe.rds")
+```
+
 ## Session Info
 
 <details>
