@@ -12,3 +12,4 @@ _bookdown_files/
 *~*
 *.md
 *.rds
+outputs/*
