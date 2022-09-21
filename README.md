@@ -42,7 +42,7 @@ You can also add sections by forking the repo, adding your changes and issuing a
 [Vito Zanotelli](https://github.com/votti)  
 [Daniel Schulz](https://github.com/SchulzDan)  
 [Jonas Windhager](https://github.com/jwindhager)   
-[Michelle Daniel](https://github.com/michdaniel)
+[Michelle Daniel](https://github.com/michdaniel)  
 [Lasse Meyer](https://github.com/lassedochreden)
 
 ## Citation
