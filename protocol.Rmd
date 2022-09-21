@@ -106,7 +106,7 @@ BiocManager::install(c("pheatmap", "viridis",
 start_time <- Sys.time()
 ```
 
-```{bash preprocess-panel, engine.opts="--init-file .alias -i"}
+```{bash preprocess-panel, engine.opts="--init-file .alias -i", eval=FALSE}
 steinbock preprocess imc panel --namecol Clean_Target
 ```
 
@@ -121,7 +121,7 @@ The step took
 start_time <- Sys.time()
 ```
 
-```{bash preprocess-images, engine.opts="--init-file .alias -i"}
+```{bash preprocess-images, engine.opts="--init-file .alias -i", eval=FALSE}
 steinbock preprocess imc images --hpf 50
 ```
 
@@ -136,7 +136,7 @@ The step took
 start_time <- Sys.time()
 ```
 
-```{bash segment-cells, engine.opts="--init-file .alias -i"}
+```{bash segment-cells, engine.opts="--init-file .alias -i", eval=FALSE}
 steinbock segment deepcell --minmax
 ```
 
@@ -151,7 +151,7 @@ The step took
 start_time <- Sys.time()
 ```
 
-```{bash measure-intensities, engine.opts="--init-file .alias -i"}
+```{bash measure-intensities, engine.opts="--init-file .alias -i", eval=FALSE}
 steinbock measure intensities
 ```
 
@@ -166,7 +166,7 @@ The step took
 start_time <- Sys.time()
 ```
 
-```{bash measure-regionprops, engine.opts="--init-file .alias -i"}
+```{bash measure-regionprops, engine.opts="--init-file .alias -i", eval=FALSE}
 steinbock measure regionprops
 ```
 
@@ -181,7 +181,7 @@ The step took
 start_time <- Sys.time()
 ```
 
-```{bash measure-neighbors, engine.opts="--init-file .alias -i"}
+```{bash measure-neighbors, engine.opts="--init-file .alias -i", eval=FALSE}
 steinbock measure neighbors --type expansion --dmax 4
 ```
 
@@ -1066,7 +1066,7 @@ end_time <- Sys.time()
 p <- plotSpatial(spe, 
             node_color_by = "spatial_context_filtered", 
             img_id = "sample_id", 
-            node_size_fix = 0.5, 
+            node_size_fix = 0.1, 
             colPairName = "knn_spatialcontext_graph")
 ggsave("outputs/Fig15_spatial-contexts.pdf", p)
 
