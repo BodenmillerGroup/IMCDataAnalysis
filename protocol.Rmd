@@ -388,11 +388,6 @@ start_time <- Sys.time()
 ```{r}
 sce <- computeSpillmat(sce)
 sm <- metadata(sce)$spillover_matrix
-
-isotope_list <- CATALYST::isotope_list
-isotope_list$Ar <- 80
-
-plotSpillmat(sce, isotope_list = isotope_list)
 ```
 
 ```{r, echo=FALSE}
@@ -402,17 +397,14 @@ end_time <- Sys.time()
 The step took 
 `r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
 
-```{r, include=FALSE}
-pdf("outputs/Fig5_plotSpillmat.pdf", height = 7, width = 7)
-plotSpillmat(sce, isotope_list = isotope_list)
-dev.off()
-```
-
 ```{r}
 library(dittoSeq)
 library(patchwork)
     
 rowData(spe)$channel_name <- paste0(rowData(spe)$channel, "Di")
+
+isotope_list <- CATALYST::isotope_list
+isotope_list$Ar <- 80
 
 spe <- compCytof(spe, sm, 
                  transform = TRUE, cofactor = 1,
@@ -1048,7 +1040,8 @@ spe <- filterSpatialContext(spe,
                             entry = "spatial_context",
                             group_by = "patient_id", 
                             group_threshold = 3,
-                            cells_threshold = 100)
+                            cells_threshold = 100,
+                            name = "spatial_context_filtered")
 
 plotSpatial(spe, 
             node_color_by = "spatial_context_filtered", 
@@ -1056,12 +1049,13 @@ plotSpatial(spe,
             node_size_fix = 0.5, 
             colPairName = "knn_spatialcontext_graph")
 
-plotSpatialContext(spe, 
+plotSpatialContext(spe,
                    entry = "spatial_context_filtered",
                    group_by = "sample_id",
-                   node_color_by = "name",
-                   node_size_by = "n_cells",
-                   node_label_color_by = "name")
+                   node_color_by = "n_cells",
+                   node_size_by = "n_group",
+                   node_label_color_by = "n_cells") +
+    scale_color_viridis()
 ```
 
 ```{r, echo=FALSE}
@@ -1076,12 +1070,13 @@ p <- plotSpatial(spe,
             colPairName = "knn_spatialcontext_graph")
 ggsave("outputs/Fig15_spatial-contexts.pdf", p)
 
-p <- plotSpatialContext(spe, 
+p <- plotSpatialContext(spe,
                    entry = "spatial_context_filtered",
                    group_by = "sample_id",
-                   node_color_by = "name",
-                   node_size_by = "n_cells",
-                   node_label_color_by = "name")
+                   node_color_by = "n_cells",
+                   node_size_by = "n_group",
+                   node_label_color_by = "n_cells") +
+    scale_color_viridis()
 ggsave("outputs/Fig15_spatial-context-graph.pdf", p, width = 6, height = 4)
 ```
 
