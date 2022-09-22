@@ -49,6 +49,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ## Data
 
 ```{r download-data, eval=FALSE}
+options(timeout = 10000)
 dir.create("data/steinbock/raw", recursive = TRUE)
 download.file("https://zenodo.org/record/5949116/files/panel.csv",
               "data/steinbock/raw/panel.csv")
@@ -66,7 +67,7 @@ unzip("data/compensation.zip", exdir="data", overwrite=TRUE)
 unlink("data/compensation.zip")
 download.file("https://zenodo.org/record/5949116/files/sample_metadata.xlsx", 
          destfile = "data/sample_metadata.xlsx")
-download.file("https://zenodo.org/record/6810879/files/gated_cells.zip",
+download.file("https://zenodo.org/record/7079294/files/gated_cells.zip",
               "data/gated_cells.zip")
 unzip("data/gated_cells.zip", exdir="data", overwrite=TRUE)
 unlink("data/gated_cells.zip")
@@ -782,6 +783,7 @@ fitControl <- trainControl(method = "cv",
 
 cur_mat <- t(assay(train_spe, "exprs")[rowData(train_spe)$use_channel,])
 
+set.seed(220510)
 rffit <- train(x = cur_mat, 
                y = factor(train_spe$cell_labels),
                method = "rf", ntree = 1000,
