@@ -691,7 +691,7 @@ cur_mat <- t(assay(train_spe, "exprs")[rowData(train_spe)$use_channel,])
 
 # Train a random forest model for predicting cell labels
 # This call also performs parameter tuning
-set.seed(220922)
+set.seed(220510)
 rffit <- train(x = cur_mat, 
                y = factor(train_spe$cell_labels),
                method = "rf", ntree = 1000,
