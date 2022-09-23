@@ -998,6 +998,8 @@ Finally, we save the updated `SpatialExperiment` object.
 saveRDS(spe, "data/spe.rds")
 ```
 
+Test
+
 ## Session Info
 
 <details>
