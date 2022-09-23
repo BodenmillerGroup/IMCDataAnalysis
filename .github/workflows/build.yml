@@ -57,10 +57,9 @@ jobs:
          name: docs # optional
          path: docs # optional
      - name: Deploy to GitHub Pages
-       uses: Cecilapp/GitHub-Pages-deploy@v2
+       uses: peaceiris/actions-gh-pages@v3
        env:
-          EMAIL: ${{ secrets.EMAIL }}               # must be a verified email
-          GH_TOKEN: ${{ secrets.GH_PAT }} # https://github.com/settings/tokens
-          BUILD_DIR: docs/                     # "_site/" by default
+          github_token: ${{ secrets.GH_PAT }} # https://github.com/settings/tokens
+          publish_dir: docs/                     # "_site/" by default
     
  
