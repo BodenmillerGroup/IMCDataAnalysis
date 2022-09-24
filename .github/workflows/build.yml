@@ -59,7 +59,7 @@ jobs:
      - name: Deploy to GitHub Pages
        uses: peaceiris/actions-gh-pages@v3
        env:
-          github_token: ${{ secrets.GH_PAT }} # https://github.com/settings/tokens
-          publish_dir: docs/                     # "_site/" by default
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: docs/                     
     
  
