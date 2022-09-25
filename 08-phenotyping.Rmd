@@ -682,6 +682,8 @@ trainIndex <- createDataPartition(factor(lab_spe$cell_labels), p = 0.75)
 train_spe <- lab_spe[,trainIndex$Resample1]
 test_spe <- lab_spe[,-trainIndex$Resample1]
 
+table(train_spe$cell_labels)
+
 # Specify train parameters for 5-fold cross validation
 fitControl <- trainControl(method = "cv",
                            number = 5)
@@ -747,6 +749,8 @@ cur_mat <- t(assay(test_spe, "exprs")[rowData(test_spe)$use_channel,])
 # Predict cell phenotypes in test data
 cur_pred <- predict(rffit, 
                     newdata = cur_mat)
+
+table(cur_pred)
 ```
 
 While the overall classification accuracy can appear high, we also want
@@ -829,6 +833,8 @@ cell_class <- as.character(predict.train(rffit,
                                          newdata = cur_mat, 
                                          type = "raw"))
 names(cell_class) <- rownames(cur_mat)
+
+table(cell_class)
 
 # Extract classification probabilities
 cell_prob <- predict.train(rffit, 
