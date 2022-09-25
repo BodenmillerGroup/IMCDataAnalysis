@@ -677,7 +677,7 @@ lab_spe <- spe[,spe$cell_labels != "unlabeled"]
 unlab_spe <- spe[,spe$cell_labels == "unlabeled"]
 
 # Randomly split into train and test data
-set.seed(220510)
+set.seed(220925)
 trainIndex <- createDataPartition(factor(lab_spe$cell_labels), p = 0.75)
 train_spe <- lab_spe[,trainIndex$Resample1]
 test_spe <- lab_spe[,-trainIndex$Resample1]
@@ -691,7 +691,6 @@ cur_mat <- t(assay(train_spe, "exprs")[rowData(train_spe)$use_channel,])
 
 # Train a random forest model for predicting cell labels
 # This call also performs parameter tuning
-set.seed(220510)
 rffit <- train(x = cur_mat, 
                y = factor(train_spe$cell_labels),
                method = "rf", ntree = 1000,
