@@ -39,7 +39,7 @@ jobs:
       - name: Install Github dependencies
         run: Rscript -e 'devtools::install_github(c("BodenmillerGroup/imcRtools", "BodenmillerGroup/cytomapper", "i-cyto/Rphenograph"))'    
       - name: Render Book
-        run: Rscript -e 'bookdown::render_book("index.Rmd")'
+        run: Rscript -e 'bookdown::render_book("index.Rmd", new_session = TRUE)'
       - uses: actions/upload-artifact@v2
         with:
           name: docs
