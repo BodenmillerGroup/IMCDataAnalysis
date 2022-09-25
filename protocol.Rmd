@@ -51,8 +51,8 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r download-data, eval=FALSE}
 options(timeout = 10000)
 dir.create("data/steinbock/raw", recursive = TRUE)
-download.file("https://zenodo.org/record/5949116/files/panel.csv",
-              "data/steinbock/raw/panel.csv")
+download.file("https://zenodo.org/record/6642699/files/panel.csv",
+              "data/steinbock/panel.csv")
 download.file("https://zenodo.org/record/5949116/files/Patient1.zip",
               "data/steinbock/raw/Patient1.zip")
 download.file("https://zenodo.org/record/5949116/files/Patient2.zip",
@@ -89,34 +89,16 @@ if (!requireNamespace("BiocManager", quietly = TRUE))
 install.packages("BiocManager")
 
 BiocManager::install(c("pheatmap", "viridis",
-                       "zoo", "BiocManager", "devtools", "tiff",
-                       "distill", "openxlsx", "ggrepel", "patchwork", "mclust",
-                       "RColorBrewer", "uwot", "Rtsne", "harmony", "Seurat", 
-                       "SeuratObject", "cowplot", "kohonen", "caret", 
-                       "randomForest", "ggridges", "cowplot", "gridGraphics",
-                       "scales", "tiff", "CATALYST", "scuttle", "scater", 
-                       "dittoSeq", "tidyverse", "batchelor", 
-                       "bluster","scran", "lisaClust", "spicyR"))
+                       "tiff", "distill", "openxlsx", "ggrepel", "patchwork",
+                       "mclust", "RColorBrewer", "uwot", "Rtsne", "caret",                                                
+                       "randomForest", "ggridges", "gridGraphics", "scales", 
+                       "CATALYST", "scuttle", "scater", "dittoSeq", 
+                       "tidyverse", "batchelor", "bluster","scran"))
 ```
 
 # Procedure
 
 ## Preprocessing
-
-```{r, echo=FALSE}
-start_time <- Sys.time()
-```
-
-```{bash preprocess-panel, engine.opts="--init-file .alias -i", eval=FALSE}
-steinbock preprocess imc panel --namecol Clean_Target
-```
-
-```{r, echo=FALSE}
-end_time <- Sys.time()
-```
-
-The step took 
-`r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
 
 ```{r, echo=FALSE}
 start_time <- Sys.time()
@@ -291,26 +273,11 @@ end_time <- Sys.time()
 The step took 
 `r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
 
-```{r, echo=FALSE}
-start_time <- Sys.time()
-```
-
-```{r}
-cytomapper_sce <- measureObjects(masks, image = images, img_id = "sample_id")
-```
-
-```{r, echo=FALSE}
-end_time <- Sys.time()
-```
-
-The step took 
-`r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
-
-```{r, echo=FALSE}
-start_time <- Sys.time()
-```
-
 ## Spillover correction
+
+```{r, echo=FALSE}
+start_time <- Sys.time()
+```
 
 ```{r}
 sce <- readSCEfromTXT("data/compensation/")
@@ -773,7 +740,7 @@ lab_spe <- spe[,spe$cell_labels != "unlabeled"]
 unlab_spe <- spe[,spe$cell_labels == "unlabeled"]
 
 # Randomly split into train and test data
-set.seed(220510)
+set.seed(220925)
 trainIndex <- createDataPartition(factor(lab_spe$cell_labels), p = 0.75)
 train_spe <- lab_spe[,trainIndex$Resample1]
 test_spe <- lab_spe[,-trainIndex$Resample1]
@@ -783,7 +750,6 @@ fitControl <- trainControl(method = "cv",
 
 cur_mat <- t(assay(train_spe, "exprs")[rowData(train_spe)$use_channel,])
 
-set.seed(220510)
 rffit <- train(x = cur_mat, 
                y = factor(train_spe$cell_labels),
                method = "rf", ntree = 1000,
