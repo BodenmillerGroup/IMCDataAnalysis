@@ -685,8 +685,15 @@ test_spe <- lab_spe[,-trainIndex$Resample1]
 table(train_spe$cell_labels)
 
 # Specify train parameters for 5-fold cross validation
+seeds <- vector(mode = "list", length = 6)
+for (i in 1:5) {
+  seeds[[i]] <- sample(5000, 5)
+}
+seeds[[6]] <- sample(5000, 1)
+
 fitControl <- trainControl(method = "cv",
-                           number = 5)
+                           number = 5,
+                           seeds = seeds)
 
 # Select the data for training
 cur_mat <- t(assay(train_spe, "exprs")[rowData(train_spe)$use_channel,])
