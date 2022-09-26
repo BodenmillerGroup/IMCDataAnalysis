@@ -671,6 +671,7 @@ start_time <- Sys.time()
 
 ```{r train-classifier, message=FALSE}
 library(caret)
+library(doParallel)
 
 # Split between labeled and unlabeled cells
 lab_spe <- spe[,spe$cell_labels != "unlabeled"]
@@ -683,21 +684,32 @@ train_spe <- lab_spe[,trainIndex$Resample1]
 test_spe <- lab_spe[,-trainIndex$Resample1]
 
 # Specify train parameters for 5-fold cross validation
+set.seed(222)
+seeds <- vector(mode = "list", length = 6)
+for (i in 1:5) {
+  seeds[[i]] <- sample(5000, 5)
+}
+seeds[[6]] <- sample(5000, 1)
+
 fitControl <- trainControl(method = "cv",
                            number = 5,
-                           seeds = NULL)
+                           seeds = seeds)
+
+cl <- makePSOCKcluster(6, setup_strategy = "sequential")
+registerDoParallel(cl)
 
 # Select the data for training
 cur_mat <- t(assay(train_spe, "exprs")[rowData(train_spe)$use_channel,])
 
 # Train a random forest model for predicting cell labels
 # This call also performs parameter tuning
-.Random.seed[1:20]
+set.seed(1234)
 rffit <- train(x = cur_mat, 
                y = factor(train_spe$cell_labels),
                method = "rf", ntree = 1000,
                tuneLength = 5,
                trControl = fitControl)
+stopCluster(cl)
 
 rffit
 ```
