@@ -690,12 +690,9 @@ fitControl <- trainControl(method = "cv",
 
 # Select the data for training
 cur_mat <- t(assay(train_spe, "exprs")[rowData(train_spe)$use_channel,])
-```
 
-```{r}
 # Train a random forest model for predicting cell labels
 # This call also performs parameter tuning
-set.seed(1234)
 rffit <- train(x = cur_mat, 
                y = factor(train_spe$cell_labels),
                method = "rf", ntree = 1000,
@@ -752,8 +749,6 @@ cur_mat <- t(assay(test_spe, "exprs")[rowData(test_spe)$use_channel,])
 # Predict cell phenotypes in test data
 cur_pred <- predict(rffit, 
                     newdata = cur_mat)
-
-table(cur_pred)
 ```
 
 While the overall classification accuracy can appear high, we also want
