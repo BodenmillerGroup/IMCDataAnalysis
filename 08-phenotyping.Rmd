@@ -682,17 +682,17 @@ trainIndex <- createDataPartition(factor(lab_spe$cell_labels), p = 0.75)
 train_spe <- lab_spe[,trainIndex$Resample1]
 test_spe <- lab_spe[,-trainIndex$Resample1]
 
-table(train_spe$cell_labels)
-
 # Specify train parameters for 5-fold cross validation
 fitControl <- trainControl(method = "cv",
-                           number = 5)
+                           number = 5,
+                           seeds = NULL)
 
 # Select the data for training
 cur_mat <- t(assay(train_spe, "exprs")[rowData(train_spe)$use_channel,])
 
 # Train a random forest model for predicting cell labels
 # This call also performs parameter tuning
+.Random.seed[1:20]
 rffit <- train(x = cur_mat, 
                y = factor(train_spe$cell_labels),
                method = "rf", ntree = 1000,
