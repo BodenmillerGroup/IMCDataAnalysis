@@ -10,7 +10,7 @@ name: build
 
 jobs:
   bookdown:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     container: rocker/verse:latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
@@ -18,13 +18,13 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       
+      - uses: r-lib/actions/setup-r@master
+
+      - uses: r-lib/actions/setup-pandoc@master
+      
       - name: Install system requirements
         run: |
-          apt-get update 
-          apt-get install -y --no-install-recommends apt-utils 
-          apt-get install -y --no-install-recommends zlib1g-dev libfftw3-dev libxml2-dev libxt-dev curl libcairo2-dev libproj-dev libgdal-dev libudunits2-dev
-          apt-get clean
-          rm -rf /var/lib/apt/ilists/*
+          brew install zlib fftw libxml2 libxt curl cairo proj gdal udunits
           
       - name: Install CRAN dependencies
         run: Rscript -e 'install.packages(c("rmarkdown", "bookdown", "pheatmap", "viridis", 
