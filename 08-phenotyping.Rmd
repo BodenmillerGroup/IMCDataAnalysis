@@ -693,7 +693,7 @@ cur_mat <- t(assay(train_spe, "exprs")[rowData(train_spe)$use_channel,])
 # This call also performs parameter tuning
 rffit <- train(x = cur_mat, 
                y = factor(train_spe$cell_labels),
-               method = "rf", ntree = 1000,
+               method = "ranger", ntree = 1000,
                tuneLength = 5,
                trControl = fitControl)
 
