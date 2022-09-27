@@ -48,7 +48,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Data
 
-```{r download-data, eval=FALSE}
+```{r download-data}
 options(timeout = 10000)
 dir.create("data/steinbock/raw", recursive = TRUE)
 download.file("https://zenodo.org/record/6642699/files/panel.csv",
@@ -78,19 +78,17 @@ unlink("data/gated_cells.zip")
 ## Installation instructions
 
 ```{r install-libraries, eval=FALSE}
-if (!requireNamespace("devtools", quietly = TRUE))
-install.packages("devtools")
+if (!requireNamespace("devtools", quietly = TRUE)) install.packages("devtools")
 
 devtools::install_github(c("BodenmillerGroup/imcRtools", 
                            "BodenmillerGroup/cytomapper"))
 
 
-if (!requireNamespace("BiocManager", quietly = TRUE))
-install.packages("BiocManager")
+if (!requireNamespace("BiocManager", quietly = TRUE)) install.packages("BiocManager")
 
 BiocManager::install(c("pheatmap", "viridis",
                        "tiff", "distill", "openxlsx", "ggrepel", "patchwork",
-                       "mclust", "RColorBrewer", "uwot", "Rtsne", "caret",                                                
+                       "mclust", "RColorBrewer", "uwot", "Rtsne", "caret",                                               
                        "randomForest", "ggridges", "gridGraphics", "scales", 
                        "CATALYST", "scuttle", "scater", "dittoSeq", 
                        "tidyverse", "batchelor", "bluster","scran"))
@@ -104,7 +102,7 @@ BiocManager::install(c("pheatmap", "viridis",
 start_time <- Sys.time()
 ```
 
-```{bash preprocess-images, engine.opts="--init-file .alias -i", eval=FALSE}
+```{bash preprocess-images, engine.opts="--init-file .alias -i"}
 steinbock preprocess imc images --hpf 50
 ```
 
@@ -119,7 +117,7 @@ The step took
 start_time <- Sys.time()
 ```
 
-```{bash segment-cells, engine.opts="--init-file .alias -i", eval=FALSE}
+```{bash segment-cells, engine.opts="--init-file .alias -i"}
 steinbock segment deepcell --minmax
 ```
 
@@ -134,7 +132,7 @@ The step took
 start_time <- Sys.time()
 ```
 
-```{bash measure-intensities, engine.opts="--init-file .alias -i", eval=FALSE}
+```{bash measure-intensities, engine.opts="--init-file .alias -i"}
 steinbock measure intensities
 ```
 
@@ -149,7 +147,7 @@ The step took
 start_time <- Sys.time()
 ```
 
-```{bash measure-regionprops, engine.opts="--init-file .alias -i", eval=FALSE}
+```{bash measure-regionprops, engine.opts="--init-file .alias -i"}
 steinbock measure regionprops
 ```
 
@@ -164,7 +162,7 @@ The step took
 start_time <- Sys.time()
 ```
 
-```{bash measure-neighbors, engine.opts="--init-file .alias -i", eval=FALSE}
+```{bash measure-neighbors, engine.opts="--init-file .alias -i"}
 steinbock measure neighbors --type expansion --dmax 4
 ```
 
@@ -535,13 +533,44 @@ spe <- spe[,spe$area >= 5]
 ```
 
 ```{r}
+colData(spe) %>%
+    as.data.frame() %>%
+    group_by(sample_id) %>%
+    summarize(cell_area = sum(area),
+           no_pixels = mean(width_px) * mean(height_px)) %>%
+    mutate(covered_area = cell_area / no_pixels) %>%
+    ggplot() +
+        geom_point(aes(sample_id, covered_area)) + 
+        theme_minimal(base_size = 15) +
+        ylim(c(0, 1)) + 
+        theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 8)) +
+        ylab("% covered area") + xlab("")
+```
+
+```{r, include=FALSE}
+p <- colData(spe) %>%
+    as.data.frame() %>%
+    group_by(sample_id) %>%
+    summarize(cell_area = sum(area),
+           no_pixels = mean(width_px) * mean(height_px)) %>%
+    mutate(covered_area = cell_area / no_pixels) %>%
+    ggplot() +
+        geom_point(aes(sample_id, covered_area)) + 
+        theme_minimal(base_size = 15) +
+        ylim(c(0, 1)) + 
+        theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 8)) +
+        ylab("% covered area") + xlab("")
+ggsave("outputs/Fig8_cell-density.pdf", width = 7, height = 5)
+```
+
+```{r}
 multi_dittoPlot(spe, vars = c("HLADR", "CD3", "Ecad", "PDGFRb"),
                group.by = "patient_id", plots = c("ridgeplot"), 
                assay = "exprs")
 ```
 
 ```{r, include=FALSE}
-pdf("outputs/Fig8_marker-distribution.pdf", width = 7, height = 5)
+pdf("outputs/Fig9_marker-distribution.pdf", width = 7, height = 5)
 p <- multi_dittoPlot(spe, vars = c("HLADR", "CD3", "Ecad", "PDGFRb"),
                group.by = "patient_id", plots = c("ridgeplot"), 
                assay = "exprs") + theme(axis.text.x = element_text(size = 18))
@@ -575,7 +604,7 @@ The step took
 p <- dittoDimPlot(spe, var = "patient_id", 
      reduction.use = "UMAP", size = 0.2)  +
     ggtitle("Patient ID on UMAP")
-ggsave("outputs/Fig9_UMAP.pdf", p, width = 6, height = 4)
+ggsave("outputs/Fig10_UMAP.pdf", p, width = 6, height = 4)
 ```
 
 ```{r, echo=FALSE}
@@ -607,7 +636,7 @@ end_time <- Sys.time()
 p <- dittoDimPlot(spe, var = "patient_id", 
                    reduction.use = "UMAP_mnnCorrected", size = 0.2) + 
     ggtitle("Patient ID on UMAP after correction")
-ggsave("outputs/Fig9_UMAP_corrected.pdf", p, width = 6, height = 4)
+ggsave("outputs/Fig10_UMAP_corrected.pdf", p, width = 6, height = 4)
 ```
 
 The step took 
@@ -658,7 +687,7 @@ p <- ggplot(data.frame(method = names(sil),
     theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
     xlab("Cluster parameter combination") +
     ylab("Average silhouette width")
-ggsave("outputs/Fig10_clusterSweep.pdf", p, width = 6, height = 5)
+ggsave("outputs/Fig11_clusterSweep.pdf", p, width = 6, height = 5)
 ```
 
 ```{r, echo=FALSE}
@@ -809,8 +838,8 @@ p1 + p2
 
 ```{r, include=FALSE}
 p1 + p2
-ggsave("outputs/Fig11_celltype-UMAP.pdf", p1, width = 6, height = 4)
-ggsave("outputs/Fig11_cluster-UMAP.pdf", p2, width = 6, height = 4)
+ggsave("outputs/Fig12_celltype-UMAP.pdf", p1, width = 6, height = 4)
+ggsave("outputs/Fig12_cluster-UMAP.pdf", p2, width = 6, height = 4)
 ```
 
 ```{r}
@@ -843,7 +872,7 @@ dittoHeatmap(cluster_mean,
 ```
 
 ```{r, include=FALSE}
-pdf("outputs/Fig12_celltype-heatmap.pdf")
+pdf("outputs/Fig13_celltype-heatmap.pdf")
 dittoHeatmap(celltype_mean,
              assay = "exprs", cluster_cols = TRUE, 
              scale = "none",
@@ -851,7 +880,7 @@ dittoHeatmap(celltype_mean,
              annot.by = c("celltype","ncells"))
 dev.off()
 
-pdf("outputs/Fig12_cluster-heatmap.pdf")
+pdf("outputs/Fig13_cluster-heatmap.pdf")
 dittoHeatmap(cluster_mean,
              assay = "exprs", cluster_cols = TRUE, 
              scale = "none",
@@ -896,16 +925,7 @@ names(comm_stroma) <- colnames(stroma_spe)
 comm <- c(comm_tumor, comm_stroma)
 
 spe$spatial_community <- comm[colnames(spe)]
-```
 
-```{r, echo=FALSE}
-end_time <- Sys.time()
-```
-
-The step took 
-`r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
-
-```{r}
 plotSpatial(spe[,spe$celltype == "Tumor"], 
             node_color_by = "spatial_community", 
             img_id = "sample_id", 
@@ -915,8 +935,11 @@ plotSpatial(spe[,spe$celltype == "Tumor"],
 ```
 
 ```{r, echo=FALSE}
-start_time <- Sys.time()
+end_time <- Sys.time()
 ```
+
+The step took 
+`r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
 
 ```{r, include=FALSE}
 p <- plotSpatial(spe[,spe$celltype == "Tumor"], 
@@ -925,7 +948,11 @@ p <- plotSpatial(spe[,spe$celltype == "Tumor"],
             node_size_fix = 0.5) +
     theme(legend.position = "none") +
     scale_color_manual(values = rev(colors()))
-ggsave("outputs/Fig13_spatial-communities.pdf", p)
+ggsave("outputs/Fig14_spatial-communities.pdf", p)
+```
+
+```{r, echo=FALSE}
+start_time <- Sys.time()
 ```
 
 ```{r}
@@ -971,9 +998,9 @@ p <- plotSpatial(spe,
             img_id = "sample_id", 
             node_size_fix = 0.5) +
     scale_color_brewer(palette = "Set3")
-ggsave("outputs/Fig14_cellular-neighborhoods.pdf", p)
+ggsave("outputs/Fig15_cellular-neighborhoods.pdf", p)
 
-pdf("outputs/Fig14_cn-heatmap.pdf", width = 4, height = 4)
+pdf("outputs/Fig15_cn-heatmap.pdf", width = 4, height = 4)
 pheatmap(mat, 
   color = colorRampPalette(c("dark blue", "white", "dark red"))(100), 
   scale = "column")
@@ -1036,7 +1063,7 @@ p <- plotSpatial(spe,
             img_id = "sample_id", 
             node_size_fix = 0.1, 
             colPairName = "knn_spatialcontext_graph")
-ggsave("outputs/Fig15_spatial-contexts.pdf", p)
+ggsave("outputs/Fig16_spatial-contexts.pdf", p)
 
 p <- plotSpatialContext(spe,
                    entry = "spatial_context_filtered",
@@ -1045,7 +1072,7 @@ p <- plotSpatialContext(spe,
                    node_size_by = "n_group",
                    node_label_color_by = "n_cells") +
     scale_color_viridis()
-ggsave("outputs/Fig15_spatial-context-graph.pdf", p, width = 6, height = 4)
+ggsave("outputs/Fig16_spatial-context-graph.pdf", p, width = 6, height = 4)
 ```
 
 The step took 
@@ -1083,7 +1110,7 @@ p <- plotSpatial(spe,
             node_size_fix = 0.5) +
     theme(legend.position = "none") +
     scale_color_manual(values = rev(colors()))
-ggsave("outputs/Fig16_patch-detection.pdf", p)
+ggsave("outputs/Fig17_patch-detection.pdf", p)
 ```
 
 The step took 
@@ -1125,7 +1152,7 @@ p <- out %>% as_tibble() %>%
         scale_fill_gradient2(low = muted("blue"), mid = "white", 
   high = muted("red")) +
         theme(axis.text.x = element_text(angle = 45, hjust = 1))
-ggsave("outputs/Fig17_interaction-testing.pdf", p, width = 5, height = 3)
+ggsave("outputs/Fig18_interaction-testing.pdf", p, width = 5, height = 3)
 ```
 
 The step took 
