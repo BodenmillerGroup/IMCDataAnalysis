@@ -16,6 +16,11 @@ jobs:
     steps:
     - name: Checkout the repository
       uses: actions/checkout@v2
+      
+    - name: set NOW
+      id: now
+      run: |
+        echo "::set-output name=NOW::$(date +'%Y-%m-%d')"
 
     - name: Login to GitHub Container registry
       uses: docker/login-action@v1
@@ -35,4 +40,4 @@ jobs:
         target: final
         push: true
         tags: |
-          ghcr.io/bodenmillergroup/${{ github.repository }}:$(date +'%Y-%m-%d'),ghcr.io/bodenmillergroup/${{ github.repository }}:latest
+          ghcr.io/${{ github.repository }}:${{ steps.now.outputs.NOW }},ghcr.io/${{ github.repository }}:latest
