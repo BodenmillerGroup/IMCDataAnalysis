@@ -40,4 +40,4 @@ jobs:
         target: final
         push: true
         tags: |
-          ghcr.io/${{ github.repository }}:${{ steps.now.outputs.NOW }},ghcr.io/${{ github.repository }}:latest
+          ghcr.io/bodenmillergroup/imcdataanalysis:${{ steps.now.outputs.NOW }},ghcr.io/bodenmillergroup/imcdataanalysis:latest
