@@ -37,7 +37,6 @@ jobs:
       with:
         context: .
         file: ./Dockerfile
-        target: final
         push: true
         tags: |
           ghcr.io/bodenmillergroup/imcdataanalysis:${{ steps.now.outputs.NOW }},ghcr.io/bodenmillergroup/imcdataanalysis:latest
