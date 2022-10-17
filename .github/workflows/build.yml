@@ -12,15 +12,13 @@ jobs:
   docker-build-push:
     name: Build and push Docker image to GitHub Container registry
     runs-on: ubuntu-latest
-    outputs:
-      output1: ${{ steps.filter.outputs.workflows }}
     permissions:
       packages: write
       contents: read
       
     steps:
     - name: Checkout the repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       
     - name: set NOW
       id: now
@@ -37,15 +35,16 @@ jobs:
         username: $GITHUB_USER
         password: ${{ secrets.GITHUB_TOKEN }}
         
-    - uses: dorny/paths-filter@v2
+    - name: Check Dockerfile
+      uses: dorny/paths-filter@v2
       id: filter
       with:
         filters: |
-          workflows:
+          docker:
             - 'Dockerfile'
         
     - name: Build and Push Docker Image
-      if: steps.filter.outputs.workflows == 'true' || ${{ github.event_name == 'schedule' }}
+      if: steps.filter.outputs.docker == 'true' || ${{ github.event_name == 'schedule' }}
       uses: docker/build-push-action@v2
       with:
         context: .
