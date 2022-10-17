@@ -10,7 +10,7 @@ RUN apt-get -y update \
 RUN R -e 'install.packages(c("rmarkdown", "bookdown", "pheatmap", "viridis", "zoo", "BiocManager", "devtools", "testthat", "tiff", \
                              "distill", "openxlsx", "ggrepel", "patchwork", "mclust", "RColorBrewer", "uwot", "Rtsne", "harmony", \
                              "Seurat", "SeuratObject", "cowplot", "kohonen", "caret", "randomForest", "ggridges", "cowplot", \
-                             "gridGraphics", "scales", "tiff"))'
+                             "gridGraphics", "scales", "tiff", "test"))'
 RUN R -e 'BiocManager::install(c("CATALYST", "scuttle", "scater", "dittoSeq", "tidyverse", "BiocStyle", "batchelor", "bluster", \
                                  "scran", "lisaClust", "spicyR"))'
 RUN R -e 'devtools::install_github(c("BodenmillerGroup/imcRtools", "BodenmillerGroup/cytomapper", "i-cyto/Rphenograph"))'
