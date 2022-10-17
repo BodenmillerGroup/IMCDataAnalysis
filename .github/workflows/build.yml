@@ -9,7 +9,6 @@ on:
 name: build
 
 jobs:
-
   docker-build-push:
     name: Build and push Docker image to GitHub Container registry
     runs-on: ubuntu-latest
