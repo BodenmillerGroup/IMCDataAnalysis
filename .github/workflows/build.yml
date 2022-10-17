@@ -38,16 +38,16 @@ jobs:
     - name: Check Dockerfile change
       shell: pwsh
       id: check_dockerfile_changed
-       run: |
-         # Diff HEAD with the previous commit
-         $diff = git diff --name-only HEAD^ HEAD
+      run: |
+        # Diff HEAD with the previous commit
+        $diff = git diff --name-only HEAD^ HEAD
 
-         # Check if the Dockerfile has changed (added, modified, deleted)
-         $SourceDiff = $diff | Where-Object { $_ -match 'Dockerfile' }
-         $HasDiff = $SourceDiff.Length -gt 0
+        # Check if the Dockerfile has changed (added, modified, deleted)
+        $SourceDiff = $diff | Where-Object { $_ -match 'Dockerfile' }
+        $HasDiff = $SourceDiff.Length -gt 0
 
-         # Set the output named "dockerfile_changed"
-         Write-Host "::set-output name=dockerfile_changed::$HasDiff"
+        # Set the output named "dockerfile_changed"
+        Write-Host "::set-output name=dockerfile_changed::$HasDiff"
         
     - name: Build and Push Docker Image
       if: steps.check_dockerfile_changed.outputs.dockerfile_changed == 'True' || ${{ github.event_name == 'schedule' }}
