@@ -44,7 +44,7 @@ jobs:
             - 'Dockerfile'
         
     - name: Build and Push Docker Image
-      if: steps.filter.outputs.docker == 'true' # || ${{ github.event_name == 'schedule' }}
+      if: (steps.filter.outputs.docker == 'true' || ${{ github.event_name == 'schedule' }})
       uses: docker/build-push-action@v3
       with:
         context: .
