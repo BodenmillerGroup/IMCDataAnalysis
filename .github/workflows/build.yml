@@ -12,6 +12,8 @@ jobs:
   docker-build-push:
     name: Build and push Docker image to GitHub Container registry
     runs-on: ubuntu-latest
+    outputs:
+      output1: ${{ steps.filter.outputs.workflows }}
     permissions:
       packages: write
       contents: read
@@ -35,22 +37,15 @@ jobs:
         username: $GITHUB_USER
         password: ${{ secrets.GITHUB_TOKEN }}
         
-    - name: Check Dockerfile change
-      shell: pwsh
-      id: check_dockerfile_changed
-      run: |
-        # Diff HEAD with the previous commit
-        $diff = git diff --name-only HEAD^ HEAD
-
-        # Check if the Dockerfile has changed (added, modified, deleted)
-        $SourceDiff = $diff | Where-Object { $_ -match 'Dockerfile' }
-        $HasDiff = $SourceDiff.Length -gt 0
-
-        # Set the output named "dockerfile_changed"
-        Write-Host "::set-output name=dockerfile_changed::$HasDiff"
+    - uses: dorny/paths-filter@v2
+      id: filter
+      with:
+        filters: |
+          workflows:
+            - 'Dockerfile'
         
     - name: Build and Push Docker Image
-      if: steps.check_dockerfile_changed.outputs.dockerfile_changed == 'True' || ${{ github.event_name == 'schedule' }}
+      if: steps.filter.outputs.workflows == 'true' || ${{ github.event_name == 'schedule' }}
       uses: docker/build-push-action@v2
       with:
         context: .
