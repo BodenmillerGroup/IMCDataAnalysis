@@ -41,14 +41,8 @@ jobs:
           check-name: 'Build and Push Docker Image'
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           wait-interval: 10
-        run: Rscript -e 'bookdown::render_book("index.Rmd", new_session = TRUE)'
-        uses: actions/upload-artifact@v2
-        with:
-          name: docs
-          path: docs/
           
       - name: Render Book conditional 2
-        if: steps.check_dockerfile_changed.outputs.dockerfile_changed == 'False'
         run: Rscript -e 'bookdown::render_book("index.Rmd", new_session = TRUE)'
         uses: actions/upload-artifact@v2
         with:
