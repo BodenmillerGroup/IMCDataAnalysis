@@ -4,13 +4,67 @@ on:
   pull_request:
     branches: [ main ]
   schedule:
-    - cron: '0 8 * * 5'
+    - cron: '0 8 1 * *'
 
 name: build
 
 jobs:
+
+  docker-build-push:
+    name: Build and push Docker image to GitHub Container registry
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+      
+    steps:
+    - name: Checkout the repository
+      uses: actions/checkout@v2
+      
+    - name: set NOW
+      id: now
+      run: |
+        echo "::set-output name=NOW::$(date +'%Y-%m-%d')"
+
+    - name: Login to GitHub Container registry
+      uses: docker/login-action@v1
+      env:
+        GITHUB_USER: ${{ github.actor }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        registry: ghcr.io
+        username: $GITHUB_USER
+        password: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: Check Dockerfile change
+      shell: pwsh
+      id: check_dockerfile_changed
+       run: |
+         # Diff HEAD with the previous commit
+         $diff = git diff --name-only HEAD^ HEAD
+
+         # Check if the Dockerfile has changed (added, modified, deleted)
+         $SourceDiff = $diff | Where-Object { $_ -match 'Dockerfile' }
+         $HasDiff = $SourceDiff.Length -gt 0
+
+         # Set the output named "dockerfile_changed"
+         Write-Host "::set-output name=dockerfile_changed::$HasDiff"
+        
+    - name: Build and Push Docker Image
+      if: steps.check_dockerfile_changed.outputs.dockerfile_changed == 'True' || ${{ github.event_name == 'schedule' }}
+      uses: docker/build-push-action@v2
+      with:
+        context: .
+        file: ./Dockerfile
+        push: true
+        tags: |
+          ghcr.io/bodenmillergroup/imcdataanalysis:${{ steps.now.outputs.NOW }}
+          ghcr.io/bodenmillergroup/imcdataanalysis:latest
+
   bookdown:
     runs-on: ubuntu-latest
+    if: ${{ always() }}
+    needs: docker-build-push
     container: ghcr.io/bodenmillergroup/imcdataanalysis:latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
@@ -19,31 +73,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       
-      - name: Check Dockerfile change
-        shell: pwsh
-        id: check_dockerfile_changed
-        run: |
-          # Diff HEAD with the previous commit
-          $diff = git diff --name-only HEAD^ HEAD
-
-          # Check if the Dockerfile has changed (added, modified, deleted)
-          $SourceDiff = $diff | Where-Object { $_ -match 'Dockerfile' }
-          $HasDiff = $SourceDiff.Length -gt 0
-
-          # Set the output named "dockerfile_changed"
-          Write-Host "::set-output name=dockerfile_changed::$HasDiff"
-      
-      - name: Render Book conditional 1
-        if: steps.check_dockerfile_changed.outputs.dockerfile_changed == 'True'
-        uses: lewagon/wait-on-check-action@v1.0.0
-        with: 
-          ref: ${{ github.ref }}
-          check-name: 'Build and Push Docker Image'
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          wait-interval: 10
-          
-      - name: Render Book conditional 2
+      - name: Render Book
         run: Rscript -e 'bookdown::render_book("index.Rmd", new_session = TRUE)'
+        
+      - name: Upload artifact    
         uses: actions/upload-artifact@v2
         with:
           name: docs
