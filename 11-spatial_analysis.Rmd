@@ -457,9 +457,9 @@ pheatmap(for_plot, color = colorRampPalette(c("dark blue", "white", "dark red"))
          scale = "column")
 ```
 
-In this case, only CN 3 contains tumor cells and no CN is forming the
-tumor/stroma interface. CN 6 represents TLS. CN 5 indicates T cell
-subtypes and plasma cells are aggregated to CN 4.
+In this case, CN 1 and 4 contain tumor cells but no CN is forming the
+tumor/stroma interface. CN 5 represents TLS. CN 6 indicates T cell
+subtypes and plasma cells are aggregated to CN 2.
 
 ## Spatial context analysis
 
