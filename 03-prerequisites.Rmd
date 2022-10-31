@@ -18,6 +18,26 @@ software dependencies are installed and the needed example data is downloaded.
 
 ## Software requirements
 
+### Using Docker
+
+For reproducibility purposes, we provide a Docker container [here](https://github.com/BodenmillerGroup/IMCDataAnalysis/pkgs/container/imcdataanalysis).
+
+1. After installing [Docker](https://docs.docker.com/get-docker/) you can run the container via:
+
+```
+docker run –v /path/to/IMCDataAnalysis:/home/rstudio/IMCDataAnalysis \
+	-e PASSWORD=bioc -p 8787:8787  \
+	ghcr.io/bodenmillergroup/imcdataanalysis:latest
+```
+
+2. An RStudio server session can be accessed via a browser at `localhost:8787` using `Username: rstudio` and `Password: bioc`.  
+3. Navigate to `IMCDataAnalysis` and open the `IMCDataAnalysis.Rproj` file.  
+4. Code in the individual files can now be executed or the whole workflow can be build by entering `bookdown::render_book()`.
+
+### Manual installation
+
+The following section describes how to manually install all needed R packages
+when not using the provided Docker container.
 To install all R packages needed for the analysis, please run:
 
 ```{r install-packages, eval=FALSE}
@@ -27,7 +47,7 @@ if (!requireNamespace("BiocManager", quietly = TRUE))
 BiocManager::install(c("pheatmap", "viridis",
                        "zoo", "BiocManager", "devtools", "tiff",
                        "distill", "openxlsx", "ggrepel", "patchwork", "mclust",
-                       "RColorBrewer", "uwot", "Rtsne", "harmony", "Seurat", 
+                       "RColorBrewer", "uwot", "Rtsne", "Seurat", 
                        "SeuratObject", "cowplot", "kohonen", "caret", 
                        "randomForest", "ggridges", "cowplot", "gridGraphics",
                        "scales", "tiff", "CATALYST", "scuttle", "scater", 
@@ -37,7 +57,8 @@ BiocManager::install(c("pheatmap", "viridis",
 # Github dependencies
 devtools::install_github(c("BodenmillerGroup/imcRtools", 
                            "BodenmillerGroup/cytomapper", 
-                           "i-cyto/Rphenograph"))
+                           "i-cyto/Rphenograph",
+                           "immunogenomics/harmony"))
 ```
 
 ```{r load-libraries, echo = FALSE, message = FALSE}

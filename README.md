@@ -1,18 +1,18 @@
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6806449.svg)](https://doi.org/10.5281/zenodo.6806449)
 
-# R based analysis workflow for IMC data
+# R based analysis workflow for multiplexed imaging data
 
 <!-- badges: start -->
 [![build](https://github.com/BodenmillerGroup/IMCDataAnalysis/actions/workflows/build.yml/badge.svg)](https://github.com/BodenmillerGroup/IMCDataAnalysis/actions/workflows/build.yml)
 <!-- badges: end -->
 
-R workflow highlighting analyses approaches for imaging mass cytometry (IMC; or other multiplexed imaging) data.
+R workflow highlighting analyses approaches for multiplexed imaging data.
 
 ## Scope
 
 
-This workflow explains the use of common R/Bioconductor packages to pre-process and analyse single-cell data obtained from segmented IMC images.
-While we use IMC data as an example, the concepts presented here can be applied to images obtained by other technologies (e.g. CODEX, MIBI, mIF, etc.).
+This workflow explains the use of common R/Bioconductor packages to pre-process and analyse single-cell data obtained from segmented multichannel images.
+While we use imaging mass cytometry (IMC) data as an example, the concepts presented here can be applied to images obtained by other technologies (e.g. CODEX, MIBI, mIF, CyCIF, etc.).
 The workflow can be largely divided into the following parts:
 
 1. Preprocessing (reading in the data, spillover correction)
@@ -23,15 +23,35 @@ The workflow can be largely divided into the following parts:
 6. Image visualization
 7. Spatial analyses
 
-## Usability
+## Usage
 
-After cloning the repository, the code can be run as is.
-It is continously tested on a ubuntu system using the newest release versions of the used R packages.
+To reproduce the analysis displayed at [https://bodenmillergroup.github.io/IMCDataAnalysis/](https://bodenmillergroup.github.io/IMCDataAnalysis/) clone the repository via:
 
-## Contribution
+```
+git clone https://github.com/BodenmillerGroup/IMCDataAnalysis.git
+```
+
+For reproducibility purposes, we provide a Docker container [here](https://github.com/BodenmillerGroup/IMCDataAnalysis/pkgs/container/imcdataanalysis).
+
+1. After installing [Docker](https://docs.docker.com/get-docker/) you can run the container via:
+
+```
+docker run –v /path/to/IMCDataAnalysis:/home/rstudio/IMCDataAnalysis \
+	-e PASSWORD=bioc -p 8787:8787  \
+	ghcr.io/bodenmillergroup/imcdataanalysis:latest
+```
+
+2. An RStudio server session can be accessed via a browser at `localhost:8787` using `Username: rstudio` and `Password: bioc`.  
+3. Navigate to `IMCDataAnalysis` and open the `IMCDataAnalysis.Rproj` file.  
+4. Code in the individual files can now be executed or the whole workflow can be build by entering `bookdown::render_book()`.
+
+## Contributing guidelines
 
 For feature requests and bug reports, please raise an issue [here](https://github.com/BodenmillerGroup/IMCDataAnalysis/issues).
-You can also add sections by forking the repo, adding your changes and issuing a pull request.
+
+For adding new content to the book please work inside the Docker container as explained above.
+You can fork the repository, add your changes and open a pull request.
+To add new libraries to the container please add them to the [Dockerfile](Dockerfile).
 
 ## Maintainer
 

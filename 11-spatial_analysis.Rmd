@@ -178,48 +178,28 @@ spatial object graph. In the following example, we perform spatial community
 detection separately for tumor and stromal cells.
 
 The general procedure is as follows:    
-1. subset the object to contain either tumor or stromal cells      
-2. create an `igraph` object from the edge list stored in 
-`colPair(tumor_spe, "neighborhood")`
-3. perform community detection using the Louvain algorithm      
-4. store the community IDs in a vector and replace all communities with a size 
-smaller than 10 by `NA`    
+1. create a `colData(spe)` entry that specifies if a cell is part of the tumor
+or stroma compartment. 
+2. use the `detectCommunity` function of the `imcRtools`
+package to cluster cells within the tumor or stoma compartment solely based on
+their spatial interaction graph as constructed by the `steinbock` package.  
 
 Both tumor and stromal spatial communities are stored in the `colData` of
-the `SpatialExperiment` object.
+the `SpatialExperiment` object under the `spatial_community` identifier.
+
+We set the seed argument within the `SerialParam` function for reproducibility
+purposes. This is important as the global seed is not recognized by functions
+provided by the `BiocParallel` package.
 
 ```{r spatial-community, message=FALSE}
-library(igraph)
+spe$tumor_stroma <- ifelse(spe$celltype == "Tumor", "Tumor", "Stroma")
 
-set.seed(220819)
-
-# Spatial community detection - tumor
-tumor_spe <- spe[,spe$celltype == "Tumor"]
-
-gr <- graph_from_data_frame(as.data.frame(colPair(tumor_spe, "neighborhood")), 
-                            directed = FALSE, 
-                            vertices = data.frame(index = seq_len(ncol(tumor_spe))))
-
-cl_comm <- cluster_louvain(gr)
-comm_tumor <- paste0("Tumor_", membership(cl_comm))
-comm_tumor[membership(cl_comm) %in% which(sizes(cl_comm) < 10)] <- NA
-names(comm_tumor) <- colnames(tumor_spe)
-
-# Spatial community detection - non-tumor
-stroma_spe <- spe[,spe$celltype != "Tumor"]
-
-gr <- graph_from_data_frame(as.data.frame(colPair(stroma_spe, "neighborhood")), 
-                            directed = FALSE, 
-                            vertices = data.frame(index = seq_len(ncol(stroma_spe))))
-
-cl_comm <- cluster_louvain(gr)
-comm_stroma <- paste0("Stroma_", membership(cl_comm))
-comm_stroma[membership(cl_comm) %in% which(sizes(cl_comm) < 10)] <- NA
-names(comm_stroma) <- colnames(stroma_spe)
-
-comm <- c(comm_tumor, comm_stroma)
-
-spe$spatial_community <- comm[colnames(spe)]
+library(BiocParallel)
+spe <- detectCommunity(spe, 
+                       colPairName = "neighborhood", 
+                       size_threshold = 10,
+                       group_by = "tumor_stroma",
+                       BPPARAM = SerialParam(RNGseed = 220819))
 ```
 
 We can now separately visualize the tumor and stromal communities.
@@ -457,9 +437,9 @@ pheatmap(for_plot, color = colorRampPalette(c("dark blue", "white", "dark red"))
          scale = "column")
 ```
 
-In this case, only CN 3 contains tumor cells and no CN is forming the
-tumor/stroma interface. CN 6 represents TLS. CN 5 indicates T cell
-subtypes and plasma cells are aggregated to CN 4.
+In this case, CN 1 and 4 contain tumor cells but no CN is forming the
+tumor/stroma interface. CN 5 represents TLS. CN 6 indicates T cell
+subtypes and plasma cells are aggregated to CN 2.
 
 ## Spatial context analysis
 
@@ -682,6 +662,52 @@ An increase of T cell infiltration with tumor patch size can be observed. This
 effect is most likely caused by sparse but fully connected tumor cell regions
 which contain many stromal cells.
 
+We can now measure the size of each patch using the
+[patchSize](https://bodenmillergroup.github.io/imcRtools/reference/patchSize.html)
+function and visualize tumor patch distribution per patient.
+
+```{r patch-size}
+patch_size <- patchSize(spe, "patch_id")
+
+patch_size <- merge(patch_size, 
+                    colData(spe)[match(patch_size$patch_id, spe$patch_id),], 
+                    by = "patch_id")
+
+ggplot(as.data.frame(patch_size)) + 
+    geom_boxplot(aes(patient_id, log10(size))) +
+    geom_point(aes(patient_id, log10(size)))
+```
+
+The
+[minDistToCells](https://bodenmillergroup.github.io/imcRtools/reference/minDistToCells.html)
+function can be used to calculate the minimum distance between each cell and a
+cell set of interest. Here, we highlight its use to calculate the minimum
+distance of all cells to the detected tumor patches. Negative values indicate
+the minimum distance of each tumor patch cell to a non-tumor patch cell.
+
+```{r minDistCells, fig.height=12, fig.width=12}
+spe <- minDistToCells(spe, 
+                      x_cells = !is.na(spe$patch_id), 
+                      img_id = "sample_id")
+
+plotSpatial(spe, 
+            node_color_by = "distToCells", 
+            img_id = "sample_id", 
+            node_size_fix = 0.5) +
+    scale_color_gradient2(low = "dark blue", mid = "white", high = "dark red")
+```
+
+Finally, we can  observe the minimum distances to tumor patches in a cell type specific
+manner.
+
+```{r celltype-distance, message=FALSE}
+library(ggridges)
+ggplot(as.data.frame(colData(spe))) + 
+    geom_density_ridges(aes(distToCells, celltype, fill = celltype)) +
+    geom_vline(xintercept = 0, color = "dark red", size = 2) +
+    scale_fill_manual(values = metadata(spe)$color_vectors$celltype)
+```
+
 ## Interaction analysis
 
 The next section focuses on statistically testing the pairwise interaction
@@ -704,7 +730,8 @@ library(scales)
 out <- testInteractions(spe, 
                         group_by = "sample_id",
                         label = "celltype", 
-                        colPairName = "neighborhood")
+                        colPairName = "neighborhood",
+                        BPPARAM = SerialParam(RNGseed = 221029))
 
 head(out)
 ```
@@ -751,7 +778,8 @@ out <- testInteractions(spe,
                         label = "celltype", 
                         colPairName = "neighborhood",
                         method = "patch", 
-                        patch_size = 3)
+                        patch_size = 3,
+                        BPPARAM = SerialParam(RNGseed = 221029))
 
 out %>% as_tibble() %>%
     group_by(from_label, to_label) %>%
