@@ -47,7 +47,7 @@ if (!requireNamespace("BiocManager", quietly = TRUE))
 BiocManager::install(c("pheatmap", "viridis",
                        "zoo", "BiocManager", "devtools", "tiff",
                        "distill", "openxlsx", "ggrepel", "patchwork", "mclust",
-                       "RColorBrewer", "uwot", "Rtsne", "harmony", "Seurat", 
+                       "RColorBrewer", "uwot", "Rtsne", "Seurat", 
                        "SeuratObject", "cowplot", "kohonen", "caret", 
                        "randomForest", "ggridges", "cowplot", "gridGraphics",
                        "scales", "tiff", "CATALYST", "scuttle", "scater", 
@@ -57,7 +57,8 @@ BiocManager::install(c("pheatmap", "viridis",
 # Github dependencies
 devtools::install_github(c("BodenmillerGroup/imcRtools", 
                            "BodenmillerGroup/cytomapper", 
-                           "i-cyto/Rphenograph"))
+                           "i-cyto/Rphenograph",
+                           "immunogenomics/harmony"))
 ```
 
 ```{r load-libraries, echo = FALSE, message = FALSE}

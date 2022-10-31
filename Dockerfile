@@ -13,5 +13,5 @@ RUN R -e 'install.packages(c("rmarkdown", "bookdown", "pheatmap", "viridis", "zo
                              "gridGraphics", "scales", "tiff"))'
 RUN R -e 'BiocManager::install(c("CATALYST", "scuttle", "scater", "dittoSeq", "tidyverse", "BiocStyle", "batchelor", "bluster", \
                                  "scran", "lisaClust", "spicyR"))'
-RUN R -e 'devtools::install_github(c("BodenmillerGroup/imcRtools", "BodenmillerGroup/cytomapper", "i-cyto/Rphenograph"))'
+RUN R -e 'devtools::install_github(c("BodenmillerGroup/imcRtools", "BodenmillerGroup/cytomapper", "i-cyto/Rphenograph", "immunogenomics/harmony"))'
 

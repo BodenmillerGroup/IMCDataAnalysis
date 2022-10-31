@@ -180,7 +180,7 @@ low-dimensional coordinates for each cell. These can be saved in the
 start_time <- Sys.time()
 ```
 
-```{r batch-correction-harmony, message=FALSE, warning=FALSE, eval=FALSE}
+```{r batch-correction-harmony, message=FALSE, warning=FALSE}
 library(harmony)
 
 mat <- t(assay(spe, "exprs")[rowData(spe)$use_channel,])
@@ -201,12 +201,12 @@ The computational time of the `HarmonyMatrix` function call is
 
 We will now again visualize the cells in low dimensions after UMAP embedding.
 
-```{r dimred-batch-correction-harmony, message=FALSE, eval=FALSE}
+```{r dimred-batch-correction-harmony, message=FALSE}
 set.seed(220228)
 spe <- runUMAP(spe, dimred = "harmony", name = "UMAP_harmony") 
 ```
 
-```{r visualizing-batch-correction-harmony-1, message=FALSE, warning=FALSE, fig.height=3, eval=FALSE}
+```{r visualizing-batch-correction-harmony-1, message=FALSE, warning=FALSE, fig.height=3}
 # visualize patient id 
 p1 <- dittoDimPlot(spe, var = "patient_id", 
                    reduction.use = "UMAP", size = 0.2) + 
@@ -222,7 +222,7 @@ plot_grid(p1, p2)
 
 And we visualize selected marker expression as defined above.
 
-```{r visualizing-batch-correction-harmony-2, warning=FALSE, message=FALSE, fig.height=8, eval=FALSE}
+```{r visualizing-batch-correction-harmony-2, warning=FALSE, message=FALSE, fig.height=8}
 # Before correction
 plot_list <- multi_dittoDimPlot(spe, var = markers, reduction.use = "UMAP", 
                    assay = "exprs", size = 0.2, list.out = TRUE) 
