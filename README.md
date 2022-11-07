@@ -36,7 +36,7 @@ For reproducibility purposes, we provide a Docker container [here](https://githu
 1. After installing [Docker](https://docs.docker.com/get-docker/) you can run the container via:
 
 ```
-docker run –v /path/to/IMCDataAnalysis:/home/rstudio/IMCDataAnalysis \
+docker run -v /path/to/IMCDataAnalysis:/home/rstudio/IMCDataAnalysis \
 	-e PASSWORD=bioc -p 8787:8787  \
 	ghcr.io/bodenmillergroup/imcdataanalysis:latest
 ```
