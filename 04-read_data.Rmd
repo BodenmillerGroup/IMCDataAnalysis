@@ -291,7 +291,10 @@ ROI <- setNames(brewer.pal(length(unique(spe$ROI)), name = "BrBG"),
                 unique(spe$ROI))
 patient_id <- setNames(brewer.pal(length(unique(spe$patient_id)), name = "Set1"), 
                 unique(spe$patient_id))
-sample_id <- setNames(dittoColors(reps = 1)[seq_along(unique(spe$sample_id))], 
+sample_id <- setNames(c(brewer.pal(6, "YlOrRd")[3:5],
+                        brewer.pal(6, "PuBu")[3:6],
+                        brewer.pal(6, "YlGn")[3:5],
+                        brewer.pal(6, "BuPu")[3:6]),
                 unique(spe$sample_id))
 indication <- setNames(brewer.pal(length(unique(spe$indication)), name = "Set2"), 
                 unique(spe$indication))

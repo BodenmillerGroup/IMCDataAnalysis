@@ -213,6 +213,10 @@ plotSpillmat(sce, isotope_list = isotope_list)
 sm <- metadata(sce)$spillover_matrix
 ```
 
+**Of note: the visualization of the spillover matrix using CATALYST does currently
+not visualize spillover between the larger channels.** In this case, the 
+spillover matrix is clipped at Yb171.
+
 As we can see, the largest spillover appears in `In113 --> In115` and we also
 observe the `+16` oxide impurities for e.g. `Nd148 --> Dy164`.
 
