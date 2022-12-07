@@ -233,7 +233,8 @@ spatial stromal community is displayed.
 library(pheatmap)
 library(viridis)
 
-for_plot <- prop.table(table(spe[,spe$celltype != "Tumor"]$spatial_community, spe[,spe$celltype != "Tumor"]$celltype), margin = 1)
+for_plot <- prop.table(table(spe[,spe$celltype != "Tumor"]$spatial_community, 
+                             spe[,spe$celltype != "Tumor"]$celltype), margin = 1)
 
 pheatmap(for_plot, color = viridis(100), show_rownames = FALSE)
 ```
@@ -270,6 +271,14 @@ Based on these measures, cells can now be clustered into cellular
 neighborhoods. We will first compute the fraction of the different cell
 types among the 20-nearest neighbors and use kmeans clustering to group
 cells into 6 cellular neighborhoods.
+
+**Of note:** constructing a 20-nearest neighbor graph and clustering
+using kmeans with `k=6` is only an example. Similar to the analysis done
+in Section \@ref(snn-graph), it is recommended to perform a parameter
+sweep across different graph construction algorithms and different
+parmaters `k` for kmeans clustering. Finding the best CN detection
+settings is also subject to the question at hand. Constructing graphs
+with more neighbors usually results in larger CNs.
 
 ```{r cn-analysis, fig.height=12, fig.width=12}
 # By celltypes
@@ -357,14 +366,6 @@ cells, therefore it is less representative of TLS compared to CN 3 in
 previous CN approach. CN detection based on mean marker expression is
 therefore sensitive to staining/expression differences between samples
 as well as lateral spillover due to imperfect segmentation.
-
-**Of note:** constructing a 20-nearest neighbor graph and clustering
-using kmeans with `k=6` is only an example. Similar to the analysis done
-in Section \@ref(snn-graph), it is recommended to perform a parameter
-sweep across different graph construction algorithms and different
-parmaters `k` for kmeans clustering. Finding the best CN detection
-settings is also subject to the question at hand. Constructing graphs
-with more neighbors usually results in larger CNs.
 
 An alternative to the `aggregateNeighbors` function is provided by the
 [lisaClust](https://bioconductor.org/packages/release/bioc/html/lisaClust.html)
