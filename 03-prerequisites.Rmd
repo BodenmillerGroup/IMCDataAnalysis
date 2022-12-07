@@ -52,13 +52,13 @@ BiocManager::install(c("pheatmap", "viridis",
                        "randomForest", "ggridges", "cowplot", "gridGraphics",
                        "scales", "tiff", "CATALYST", "scuttle", "scater", 
                        "dittoSeq", "tidyverse", "batchelor", 
-                       "bluster","scran", "lisaClust", "spicyR"))
+                       "bluster","scran", "lisaClust", "spicyR",
+                       "iSEE", "harmony"))
 
 # Github dependencies
 devtools::install_github(c("BodenmillerGroup/imcRtools", 
                            "BodenmillerGroup/cytomapper", 
-                           "i-cyto/Rphenograph",
-                           "immunogenomics/harmony"))
+                           "i-cyto/Rphenograph"))
 ```
 
 ```{r load-libraries, echo = FALSE, message = FALSE}
