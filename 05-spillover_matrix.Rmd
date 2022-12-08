@@ -324,7 +324,7 @@ library(BiocParallel)
 library(parallel)
 
 images_comp <- compImage(images, adapted_sm, 
-                         BPPARAM = MulticoreParam(workers = detectCores() - 4))
+                         BPPARAM = MulticoreParam())
 ```
 
 As a sanity check, we will visualize the image before and after compensation:
