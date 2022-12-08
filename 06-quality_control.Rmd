@@ -288,7 +288,7 @@ summary(spe$area)
 ```
 
 The median cell size is `r median(spe$area)` pixels with a median major axis
-length of `r round(median(spe$major_axis_length), digits = 1)`. The largest cell
+length of `r round(median(spe$axis_major_length), digits = 1)`. The largest cell
 has an area of `r max(spe$area)` pixels which relates to a diameter of 
 `r round(sqrt(max(spe$area)), digits = 1)` pixels assuming a circular shape.
 Overall, the distribution of cell sizes is similar across images with images from
@@ -448,7 +448,7 @@ The modified `SpatialExperiment` object is saved for further downstream analysis
 saveRDS(spe, "data/spe.rds")
 ```
 
-```{r testing}
+```{r testing, include=FALSE}
 library(testthat)
 
 expect_equal(reducedDimNames(spe), c("UMAP", "TSNE"))

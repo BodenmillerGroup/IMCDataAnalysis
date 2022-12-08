@@ -142,6 +142,8 @@ as part of the `ImcSegmentationPipeline`.
 First we will read in the single-cell features stored in a CSV file:
 
 ```{r read-csv, message=FALSE}
+library(readr)
+
 cur_features <- read_csv("data/ImcSegmentationPipeline/analysis/cpout/cell.csv")
 
 dim(cur_features)
