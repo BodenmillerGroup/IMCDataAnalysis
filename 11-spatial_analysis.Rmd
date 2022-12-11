@@ -705,7 +705,7 @@ manner.
 library(ggridges)
 ggplot(as.data.frame(colData(spe))) + 
     geom_density_ridges(aes(distToCells, celltype, fill = celltype)) +
-    geom_vline(xintercept = 0, color = "dark red", size = 2) +
+    geom_vline(xintercept = 0, color = "dark red", linewidth = 2) +
     scale_fill_manual(values = metadata(spe)$color_vectors$celltype)
 ```
 
