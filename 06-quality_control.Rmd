@@ -101,9 +101,9 @@ and pixels containing noise is not trivial and different approaches can be
 chosen. Here, we use the `otsu` thresholding approach to find pixels of the
 "foreground" (i.e., signal) and "background" (i.e., noise). The SNR is then
 defined as the mean intensity of foreground pixels divided by the mean intensity
-of background pixels. We compute this measure as well as mean signal intensity
-per image as well as the 95% confidence interval. The plot below shows the  
-average SNR _versus_ the average signal intensity across all images.  
+of background pixels. We compute this measure as well as the mean signal intensity
+per image. The plot below shows the  
+average SNR _versus_ the average signal intensity across all images. 
 
 ```{r image-snr, message=FALSE, warning=FALSE}
 library(tidyverse)
@@ -133,10 +133,6 @@ cur_snr %>%
               ci = qnorm(0.975)*sd(value)/sqrt(n())) %>%
     pivot_wider(names_from = name, values_from = c(mean, ci)) %>%
     ggplot() +
-#    geom_errorbar(aes(y = log2(mean_snr), xmin = log2(mean_ps - ci_ps), 
-#                      xmax = log2(mean_ps + ci_ps))) +
-#    geom_errorbar(aes(x = log2(mean_ps), ymin = log2(mean_snr - ci_snr), 
-#                      ymax = log2(mean_snr + ci_snr))) +
     geom_point(aes(log2(mean_ps), log2(mean_snr))) +
     geom_label_repel(aes(log2(mean_ps), log2(mean_snr), label = marker)) +
     theme_minimal(base_size = 15) + ylab("Signal-to-noise ratio [log2]") +
@@ -164,7 +160,7 @@ colData(spe) %>%
            no_pixels = mean(width_px) * mean(height_px)) %>%
     mutate(covered_area = cell_area / no_pixels) %>%
     ggplot() +
-        geom_point(aes(sample_id, covered_area)) + 
+        geom_point(aes(reorder(sample_id,covered_area), covered_area)) + 
         theme_minimal(base_size = 15) +
         ylim(c(0, 1)) + 
         theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 8)) +
@@ -292,7 +288,7 @@ summary(spe$area)
 ```
 
 The median cell size is `r median(spe$area)` pixels with a median major axis
-length of `r round(median(spe$major_axis_length), digits = 1)`. The largest cell
+length of `r round(median(spe$axis_major_length), digits = 1)`. The largest cell
 has an area of `r max(spe$area)` pixels which relates to a diameter of 
 `r round(sqrt(max(spe$area)), digits = 1)` pixels assuming a circular shape.
 Overall, the distribution of cell sizes is similar across images with images from
@@ -307,7 +303,8 @@ sum(spe$area < 5)
 spe <- spe[,spe$area >= 5]
 ```
 
-Another quality indicator can be an absolute measure of cell density often reported in cells per mm$^2$.
+Another quality indicator can be an absolute measure of cell density often 
+reported in cells per mm$^2$.
 
 ```{r no-cells-per-image, message=FALSE}
 colData(spe) %>%
@@ -449,6 +446,88 @@ The modified `SpatialExperiment` object is saved for further downstream analysis
 
 ```{r save-objects-quality-control}
 saveRDS(spe, "data/spe.rds")
+```
+
+```{r testing, include=FALSE}
+library(testthat)
+
+expect_equal(reducedDimNames(spe), c("UMAP", "TSNE"))
+
+# expect_equal(head(reducedDim(spe, "UMAP"), n = 10), 
+#              structure(c(-4.81016665957092, -4.39734727404236, -4.36988336107849, 
+# -4.08161431810974, -6.23401195070862, -5.66659671328186, -4.13260585329651, 
+# -0.930108251787412, -6.33803874514221, -5.40764981768249, -3.77736220987329, 
+# -3.45603595407495, -3.44556103380213, -3.16211901338587, -2.43397555978784, 
+# -3.42805753381739, -3.22162519128809, 4.09678735105505, -2.20264754922876, 
+# -3.72411928804407), dim = c(10L, 2L), dimnames = list(c("Patient1_001_1", 
+# "Patient1_001_2", "Patient1_001_3", "Patient1_001_4", "Patient1_001_5", 
+# "Patient1_001_6", "Patient1_001_7", "Patient1_001_8", "Patient1_001_9", 
+# "Patient1_001_10"), NULL)), tolerance = 0.01)
+# 
+# expect_equal(reducedDim(spe, "UMAP")[100:130,], 
+#              structure(c(-3.89626533053039, -7.13317567370056, -6.77943021319031, 
+# -7.11419230959533, -2.78164083025574, -3.94929200670837, -5.95046884081482, 
+# 0.763116416715395, -5.68849593660949, -6.22845536730407, -6.58062154314636, 
+# -5.80118590853332, -6.25312644503235, -5.86530810854553, -7.08645230791687, 
+# -4.12036305925964, -5.97095376513122, -4.08220035097717, -5.91776162645935, 
+# 0.557355967544329, -7.09781867525696, -5.62668353579162, -5.04605323336242, 
+# -4.7885444786322, -7.22946149370788, -5.26700240633606, -4.82962876818298, 
+# -4.25380879900573, 1.08371841647507, 1.44114249684693, -4.87143928072571, 
+# -3.41620216997156, -3.93748961122522, -2.58227525384912, -4.26784573228846, 
+# -5.4897724214364, -3.4107941213418, -3.86142430933008, 3.20950664846411, 
+# -3.71332822473535, -3.86072955759058, -2.47767458589563, -3.84708223970423, 
+# -4.17958079011927, -3.9504874769021, -2.7868140760232, -3.12866697938928, 
+# -2.78958783777246, -2.86517844827661, -3.41490874917993, 1.00301005212774, 
+# -3.6809254709054, -3.49266205461511, -2.95477948816309, -2.56105003984461, 
+# -3.1081076684762, -3.18702707918177, -3.78098068864832, -3.24055348070154, 
+# 0.368578153533841, 0.224757569713498, -2.99749766023645), dim = c(31L, 
+# 2L), dimnames = list(c("Patient1_001_100", "Patient1_001_101", 
+# "Patient1_001_102", "Patient1_001_103", "Patient1_001_104", "Patient1_001_105", 
+# "Patient1_001_106", "Patient1_001_107", "Patient1_001_108", "Patient1_001_109", 
+# "Patient1_001_110", "Patient1_001_111", "Patient1_001_112", "Patient1_001_113", 
+# "Patient1_001_114", "Patient1_001_115", "Patient1_001_116", "Patient1_001_117", 
+# "Patient1_001_118", "Patient1_001_119", "Patient1_001_120", "Patient1_001_121", 
+# "Patient1_001_122", "Patient1_001_123", "Patient1_001_124", "Patient1_001_125", 
+# "Patient1_001_126", "Patient1_001_127", "Patient1_001_128", "Patient1_001_129", 
+# "Patient1_001_130"), NULL)), tolerance = 0.01)
+# 
+# expect_equal(head(reducedDim(spe, "TSNE"), n = 10), 
+#              structure(c(8.5000231819133, 8.69417707607171, 8.66506409812202, 
+# 8.70346540608834, -4.85956000801397, -3.50347074831182, 8.62888756799549, 
+# -8.0907749992851, 3.45775862206781, 7.54108785460927, -30.1566664235465, 
+# -28.3558044334759, -28.2668374978953, -26.5385662781522, -21.5856934742621, 
+# -26.4730337308963, -26.8568530864791, 19.6159281655837, 20.5991986552636, 
+# -32.2252709733315), dim = c(10L, 2L), dimnames = list(c("Patient1_001_1", 
+# "Patient1_001_2", "Patient1_001_3", "Patient1_001_4", "Patient1_001_5", 
+# "Patient1_001_6", "Patient1_001_7", "Patient1_001_8", "Patient1_001_9", 
+# "Patient1_001_10"), NULL)), tolerance = 0.01)
+# 
+# expect_equal(reducedDim(spe, "TSNE")[100:130,], 
+#              structure(c(10.6418413622177, -8.19603725541398, -7.57330997290384, 
+# -11.9649205211375, 21.7044793746905, 10.5299308898414, -2.89361532839768, 
+# -14.1479057033804, 7.04881694519824, -2.27845635304146, -6.55119000983192, 
+# -1.82422115143277, -2.4097229038924, -1.64709145874245, -9.64650462467637, 
+# 8.35520499244715, -2.63232041735159, -6.92707082054738, -2.87217958426136, 
+# -8.06273786914118, -12.041109790411, 7.21278447587393, 2.78699525470502, 
+# 2.34486289464684, -9.89574054981405, 2.1828274368045, 8.49912719972949, 
+# 8.11668313724476, -5.71319426232428, -0.190728643680821, 3.48920576978465, 
+# -25.9423147604023, -32.0648373504634, -24.1480435193885, -33.8780988685417, 
+# -23.1903399682141, -26.1356569942554, -33.8181999524557, 0.0329466224873345, 
+# -32.6325983943606, -32.6301008178222, -24.1756860322692, -32.9821005945978, 
+# -35.8676859419689, -34.0911214749092, -25.5808689943855, -26.7586018145491, 
+# -25.6034715982434, -20.3596025910865, -28.0932829916676, -5.40775249366363, 
+# -31.3872828096166, -32.5651665675897, -27.111323151666, -24.101850440361, 
+# -26.9341083442237, -28.5420714838967, -30.3678523339134, -27.0214667414901, 
+# -5.02684547281321, -16.0298817965721, -26.769553922745), dim = c(31L, 
+# 2L), dimnames = list(c("Patient1_001_100", "Patient1_001_101", 
+# "Patient1_001_102", "Patient1_001_103", "Patient1_001_104", "Patient1_001_105", 
+# "Patient1_001_106", "Patient1_001_107", "Patient1_001_108", "Patient1_001_109", 
+# "Patient1_001_110", "Patient1_001_111", "Patient1_001_112", "Patient1_001_113", 
+# "Patient1_001_114", "Patient1_001_115", "Patient1_001_116", "Patient1_001_117", 
+# "Patient1_001_118", "Patient1_001_119", "Patient1_001_120", "Patient1_001_121", 
+# "Patient1_001_122", "Patient1_001_123", "Patient1_001_124", "Patient1_001_125", 
+# "Patient1_001_126", "Patient1_001_127", "Patient1_001_128", "Patient1_001_129", 
+# "Patient1_001_130"), NULL)), tolerance = 0.01)
 ```
 
 ## Session Info

@@ -33,12 +33,25 @@ git clone https://github.com/BodenmillerGroup/IMCDataAnalysis.git
 
 For reproducibility purposes, we provide a Docker container [here](https://github.com/BodenmillerGroup/IMCDataAnalysis/pkgs/container/imcdataanalysis).
 
-1. After installing [Docker](https://docs.docker.com/get-docker/) you can run the container via:
+1. After installing [Docker](https://docs.docker.com/get-docker/) you can first pull the container via:
+
+```
+docker pull ghcr.io/bodenmillergroup/imcdataanalysis:latest
+```
+
+and then run the container:
 
 ```
 docker run -v /path/to/IMCDataAnalysis:/home/rstudio/IMCDataAnalysis \
 	-e PASSWORD=bioc -p 8787:8787  \
 	ghcr.io/bodenmillergroup/imcdataanalysis:latest
+```
+
+**Of note: it is recommended to use a date-tagged version of the container to ensure reproducibility**. 
+This can be done via:
+
+```
+docker pull ghcr.io/bodenmillergroup/imcdataanalysis:<year-month-date>
 ```
 
 2. An RStudio server session can be accessed via a browser at `localhost:8787` using `Username: rstudio` and `Password: bioc`.  

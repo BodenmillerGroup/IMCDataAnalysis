@@ -81,6 +81,9 @@ cluster IDs for each cell. These cluster IDs are then stored within the
 the UMAP embedding and single-cell marker expression within each cluster are
 visualized in form of a heatmap.
 
+It is recommended to test different inputs to `k` as shown in the next section.
+Selecting larger values for `k` results in larger clusters.
+
 ```{r, echo=FALSE}
 start_time <- Sys.time()
 ```
@@ -178,16 +181,14 @@ we select the asinh-transformed mean pixel intensities and subset the markers
 of interest. The resulting matrix is transposed to fit to the requirements of 
 the bluster package (cells in rows).
 
-We test two different settings for `k`, two for `type` and two for `cluster.fun`.
+We test two different settings for `k`, two for `type` and fix the `cluster.fun`
+to `louvain` as this is the most common approach for community detection.
 This function call is parallelized by setting the `BPPARAM` parameter. We use
 the `approxSilhouette` function to compute the silhouette width for each cell
 and compute the average across all cells per parameter setting. 
 Please see `?silhouette` for more information on how the silhouette 
 width id computed for each cell. A large average silhouette width indicates 
 cells that are well clustered.
-
-For time reasons, we sample 10000 cells but it is recommended to increase
-this number to include rare cells into parameter testing.
 
 ```{r, echo=FALSE}
 start_time <- Sys.time()
@@ -198,23 +199,22 @@ library(bluster)
 library(BiocParallel)
 library(ggplot2)
 
-sam_cells <- sample(seq_len(ncol(spe)), 10000)
-
 mat <- t(assay(spe, "exprs")[rowData(spe)$use_channel,])
 
-combinations <- clusterSweep(mat[sam_cells,], BLUSPARAM=SNNGraphParam(),
+combinations <- clusterSweep(mat, 
+                             BLUSPARAM=SNNGraphParam(),
                              k=c(10L, 20L), 
                              type = c("rank", "jaccard"), 
-                             cluster.fun=c("walktrap", "louvain"),
+                             cluster.fun = "louvain",
                              BPPARAM = MulticoreParam(RNGseed = 220427))
 
 sil <- vapply(as.list(combinations$clusters), 
-              function(x) mean(approxSilhouette(mat[sam_cells,], x)$width), 
+              function(x) mean(approxSilhouette(mat, x)$width), 
               0)
 
 ggplot(data.frame(method = names(sil),
                   sil = sil)) +
-    geom_point(aes(method, sil)) +
+    geom_point(aes(reorder(method, sil), sil)) +
     theme_classic(base_size = 15) +
     theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
     xlab("Cluster parameter combination") +
@@ -242,9 +242,8 @@ function detects the 10 nearest neighbours for each cell, performs rank-based
 weighting of edges (see `?makeSNNGraph` for more information) and uses the
 `cluster_walktrap` function to detect communities in the graph.
 
-As we can see above, the `louvain` community detection approach outperforms the
-default `walktrap` approach in this dataset with `k` being 20 and rank-based
-edge weighting.
+As we can see above, the clustering approach in this dataset with `k` being 
+20 and rank-based edge weighting leads to the highest silouhette width.
 
 ```{r, echo=FALSE}
 start_time <- Sys.time()
@@ -258,7 +257,7 @@ clusters <- clusterCells(spe[rowData(spe)$use_channel,],
                          BLUSPARAM = SNNGraphParam(k=20, 
                                                   cluster.fun = "louvain",
                                                   type = "rank",
-                                                  BPPARAM = bpparam()))
+                                                  BPPARAM = MulticoreParam(RNGseed = 220427)))
 
 spe$nn_clusters <- clusters
 
@@ -463,9 +462,9 @@ pheatmap(log10(tab3 + 10), color = viridis(100))
 
 We observe that `Rphenograph` and the shared nearest neighbor (SNN) approach by
 `scran` show similar results (first heatmap above). For example, Rphenograph
-cluster 17 (a tumor cluster) is perfectly captured by SNN cluster 12. On the
-other hand, the Neutrophil cluster (SNN cluster 8) is split into Rphenograph
-cluster 8 and Rphenograph cluster 10. A common approach
+cluster 18 (a tumor cluster) is perfectly captured by SNN cluster 13. On the
+other hand, the Neutrophil cluster (SNN cluster 4) is split into Rphenograph
+cluster 5 and Rphenograph cluster 9. A common approach
 is to now merge clusters that contain similar cell types and annotate them by
 hand.
 
@@ -505,7 +504,7 @@ cluster annotations.
 
 Full cell labeling can be seen in the following section.
 
-## Cell type classification {#classification}
+## Classification approach {#classification}
 
 In this section, we will highlight a cell type classification approach based
 on ground truth labeling and random forest classification. The rational for
@@ -786,7 +785,7 @@ data.frame(cm$byClass) %>%
 ```
 
 We observe high sensitivity and specificity for most cell types. Plasma cells
-show the lowest true positive rate with 92% being sufficiently high. The size of
+show the lowest true positive rate with 88% being sufficiently high. The size of
 the circle specifies the number of cells per class.
 
 Finally, to observe which cell phenotypes were wrongly classified, we can visualize
@@ -997,6 +996,427 @@ Finally, we save the updated `SpatialExperiment` object.
 
 ```{r phenotyping-save-object}
 saveRDS(spe, "data/spe.rds")
+```
+
+```{r testing, include=FALSE}
+library(testthat)
+
+expect_equal(table(spe$pg_clusters), 
+             structure(c(`1` = 3063L, `2` = 2145L, `3` = 1502L, `4` = 2953L, 
+`5` = 2185L, `6` = 2973L, `7` = 1366L, `8` = 1508L, `9` = 1769L, 
+`10` = 572L, `11` = 1778L, `12` = 4123L, `13` = 3251L, `14` = 4003L, 
+`15` = 3880L, `16` = 2387L, `17` = 686L, `18` = 2030L, `19` = 1709L, 
+`20` = 702L, `21` = 1159L, `22` = 173L, `23` = 817L, `24` = 1060L
+), dim = 24L, dimnames = structure(list(c("1", "2", "3", "4", 
+"5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", 
+"16", "17", "18", "19", "20", "21", "22", "23", "24")), names = ""), class = "table"))
+
+expect_equal(spe$pg_clusters[1000:1200],
+             structure(c(`1000` = 1L, `1001` = 6L, `1002` = 2L, `1003` = 1L, 
+`1004` = 1L, `1005` = 1L, `1006` = 1L, `1007` = 2L, `1008` = 1L, 
+`1009` = 2L, `1010` = 2L, `1011` = 1L, `1012` = 2L, `1013` = 2L, 
+`1014` = 1L, `1015` = 2L, `1016` = 2L, `1017` = 1L, `1018` = 2L, 
+`1019` = 1L, `1020` = 1L, `1021` = 2L, `1022` = 2L, `1023` = 1L, 
+`1024` = 1L, `1025` = 1L, `1026` = 2L, `1027` = 2L, `1028` = 2L, 
+`1029` = 1L, `1030` = 2L, `1031` = 5L, `1032` = 6L, `1033` = 1L, 
+`1034` = 1L, `1035` = 5L, `1036` = 1L, `1037` = 1L, `1038` = 1L, 
+`1039` = 1L, `1040` = 2L, `1041` = 1L, `1042` = 1L, `1043` = 1L, 
+`1044` = 1L, `1045` = 2L, `1046` = 2L, `1047` = 1L, `1048` = 1L, 
+`1049` = 1L, `1050` = 6L, `1051` = 1L, `1052` = 1L, `1053` = 1L, 
+`1054` = 1L, `1055` = 1L, `1056` = 7L, `1057` = 1L, `1058` = 2L, 
+`1059` = 2L, `1060` = 1L, `1061` = 2L, `1062` = 2L, `1063` = 1L, 
+`1064` = 1L, `1065` = 7L, `1066` = 1L, `1067` = 1L, `1068` = 1L, 
+`1069` = 1L, `1070` = 1L, `1071` = 1L, `1072` = 1L, `1073` = 1L, 
+`1074` = 1L, `1075` = 1L, `1076` = 1L, `1077` = 7L, `1078` = 1L, 
+`1079` = 1L, `1080` = 13L, `1081` = 1L, `1082` = 1L, `1083` = 1L, 
+`1084` = 1L, `1085` = 1L, `1086` = 2L, `1087` = 14L, `1088` = 1L, 
+`1089` = 1L, `1090` = 1L, `1091` = 1L, `1092` = 1L, `1093` = 1L, 
+`1094` = 5L, `1095` = 1L, `1096` = 7L, `1097` = 1L, `1098` = 1L, 
+`1099` = 1L, `1100` = 6L, `1101` = 1L, `1102` = 2L, `1103` = 2L, 
+`1104` = 1L, `1105` = 1L, `1106` = 1L, `1107` = 1L, `1108` = 1L, 
+`1109` = 1L, `1110` = 5L, `1111` = 13L, `1112` = 2L, `1113` = 2L, 
+`1114` = 1L, `1115` = 1L, `1116` = 1L, `1117` = 1L, `1118` = 1L, 
+`1119` = 1L, `1120` = 1L, `1121` = 13L, `1122` = 1L, `1123` = 1L, 
+`1124` = 1L, `1125` = 1L, `1126` = 2L, `1127` = 1L, `1128` = 7L, 
+`1129` = 2L, `1130` = 5L, `1131` = 1L, `1132` = 1L, `1133` = 1L, 
+`1134` = 1L, `1135` = 1L, `1136` = 3L, `1137` = 6L, `1138` = 1L, 
+`1139` = 5L, `1140` = 2L, `1141` = 2L, `1142` = 1L, `1143` = 1L, 
+`1144` = 1L, `1145` = 1L, `1146` = 1L, `1147` = 14L, `1148` = 14L, 
+`1149` = 7L, `1150` = 1L, `1151` = 3L, `1152` = 1L, `1153` = 2L, 
+`1154` = 13L, `1155` = 1L, `1156` = 2L, `1157` = 2L, `1158` = 1L, 
+`1159` = 1L, `1160` = 1L, `1161` = 2L, `1162` = 7L, `1163` = 1L, 
+`1164` = 1L, `1165` = 2L, `1166` = 1L, `1167` = 2L, `1168` = 7L, 
+`1169` = 1L, `1170` = 5L, `1171` = 1L, `1172` = 2L, `1173` = 1L, 
+`1174` = 2L, `1175` = 1L, `1176` = 1L, `1177` = 2L, `1178` = 2L, 
+`1179` = 2L, `1180` = 1L, `1181` = 1L, `1182` = 3L, `1183` = 2L, 
+`1184` = 1L, `1185` = 1L, `1186` = 1L, `1187` = 1L, `1188` = 1L, 
+`1189` = 1L, `1190` = 14L, `1191` = 2L, `1192` = 1L, `1193` = 2L, 
+`1194` = 2L, `1195` = 1L, `1196` = 1L, `1197` = 6L, `1198` = 9L, 
+`1199` = 14L, `1200` = 6L), levels = c("1", "2", "3", "4", "5", 
+"6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", 
+"17", "18", "19", "20", "21", "22", "23", "24"), class = "factor"))
+
+expect_equal(table(spe$pg_clusters_corrected), 
+             structure(c(`1` = 3485L, `2` = 1613L, `3` = 2412L, `4` = 2634L, 
+`5` = 2647L, `6` = 1140L, `7` = 1031L, `8` = 4856L, `9` = 699L, 
+`10` = 3064L, `11` = 1488L, `12` = 2062L, `13` = 4984L, `14` = 1500L, 
+`15` = 1746L, `16` = 594L, `17` = 3167L, `18` = 754L, `19` = 1174L, 
+`20` = 2844L, `21` = 758L, `22` = 955L, `23` = 743L, `24` = 1094L, 
+`25` = 350L), dim = 25L, dimnames = structure(list(c("1", "2", 
+"3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", 
+"15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25"
+)), names = ""), class = "table"))
+
+expect_equal(spe$pg_clusters_corrected[1000:1200],
+             structure(c(`1000` = 1L, `1001` = 10L, `1002` = 1L, `1003` = 1L, 
+`1004` = 1L, `1005` = 1L, `1006` = 1L, `1007` = 1L, `1008` = 1L, 
+`1009` = 3L, `1010` = 12L, `1011` = 1L, `1012` = 1L, `1013` = 1L, 
+`1014` = 1L, `1015` = 12L, `1016` = 1L, `1017` = 1L, `1018` = 4L, 
+`1019` = 1L, `1020` = 2L, `1021` = 12L, `1022` = 12L, `1023` = 6L, 
+`1024` = 1L, `1025` = 13L, `1026` = 1L, `1027` = 1L, `1028` = 1L, 
+`1029` = 2L, `1030` = 1L, `1031` = 14L, `1032` = 10L, `1033` = 1L, 
+`1034` = 6L, `1035` = 14L, `1036` = 1L, `1037` = 1L, `1038` = 1L, 
+`1039` = 1L, `1040` = 1L, `1041` = 1L, `1042` = 1L, `1043` = 2L, 
+`1044` = 1L, `1045` = 1L, `1046` = 1L, `1047` = 2L, `1048` = 1L, 
+`1049` = 1L, `1050` = 10L, `1051` = 2L, `1052` = 1L, `1053` = 1L, 
+`1054` = 1L, `1055` = 1L, `1056` = 1L, `1057` = 1L, `1058` = 12L, 
+`1059` = 1L, `1060` = 1L, `1061` = 1L, `1062` = 12L, `1063` = 16L, 
+`1064` = 1L, `1065` = 8L, `1066` = 1L, `1067` = 1L, `1068` = 1L, 
+`1069` = 1L, `1070` = 1L, `1071` = 6L, `1072` = 6L, `1073` = 4L, 
+`1074` = 1L, `1075` = 2L, `1076` = 1L, `1077` = 14L, `1078` = 1L, 
+`1079` = 1L, `1080` = 13L, `1081` = 1L, `1082` = 7L, `1083` = 1L, 
+`1084` = 6L, `1085` = 1L, `1086` = 1L, `1087` = 8L, `1088` = 1L, 
+`1089` = 1L, `1090` = 1L, `1091` = 6L, `1092` = 7L, `1093` = 1L, 
+`1094` = 8L, `1095` = 6L, `1096` = 7L, `1097` = 1L, `1098` = 1L, 
+`1099` = 6L, `1100` = 10L, `1101` = 1L, `1102` = 1L, `1103` = 12L, 
+`1104` = 7L, `1105` = 2L, `1106` = 6L, `1107` = 1L, `1108` = 1L, 
+`1109` = 2L, `1110` = 14L, `1111` = 13L, `1112` = 2L, `1113` = 1L, 
+`1114` = 1L, `1115` = 1L, `1116` = 1L, `1117` = 1L, `1118` = 1L, 
+`1119` = 6L, `1120` = 2L, `1121` = 13L, `1122` = 6L, `1123` = 1L, 
+`1124` = 1L, `1125` = 1L, `1126` = 1L, `1127` = 1L, `1128` = 14L, 
+`1129` = 1L, `1130` = 8L, `1131` = 1L, `1132` = 1L, `1133` = 1L, 
+`1134` = 7L, `1135` = 1L, `1136` = 13L, `1137` = 10L, `1138` = 6L, 
+`1139` = 10L, `1140` = 1L, `1141` = 1L, `1142` = 7L, `1143` = 1L, 
+`1144` = 1L, `1145` = 1L, `1146` = 1L, `1147` = 6L, `1148` = 6L, 
+`1149` = 6L, `1150` = 7L, `1151` = 5L, `1152` = 1L, `1153` = 1L, 
+`1154` = 13L, `1155` = 1L, `1156` = 12L, `1157` = 19L, `1158` = 7L, 
+`1159` = 1L, `1160` = 1L, `1161` = 1L, `1162` = 11L, `1163` = 1L, 
+`1164` = 1L, `1165` = 4L, `1166` = 1L, `1167` = 1L, `1168` = 8L, 
+`1169` = 1L, `1170` = 17L, `1171` = 1L, `1172` = 2L, `1173` = 1L, 
+`1174` = 1L, `1175` = 2L, `1176` = 7L, `1177` = 1L, `1178` = 1L, 
+`1179` = 6L, `1180` = 1L, `1181` = 1L, `1182` = 5L, `1183` = 1L, 
+`1184` = 2L, `1185` = 1L, `1186` = 1L, `1187` = 7L, `1188` = 7L, 
+`1189` = 1L, `1190` = 8L, `1191` = 1L, `1192` = 2L, `1193` = 3L, 
+`1194` = 3L, `1195` = 1L, `1196` = 1L, `1197` = 10L, `1198` = 3L, 
+`1199` = 6L, `1200` = 10L), levels = c("1", "2", "3", "4", "5", 
+"6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", 
+"17", "18", "19", "20", "21", "22", "23", "24", "25"), class = "factor"))
+
+expect_equal(table(spe$nn_clusters), 
+             structure(c(`1` = 5493L, `2` = 3166L, `3` = 3029L, `4` = 4179L, 
+`5` = 2882L, `6` = 3867L, `7` = 2042L, `8` = 3958L, `9` = 3392L, 
+`10` = 1103L, `11` = 3503L, `12` = 4095L, `13` = 2120L, `14` = 3401L, 
+`15` = 767L, `16` = 797L), dim = 16L, dimnames = structure(list(
+    c("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", 
+    "12", "13", "14", "15", "16")), names = ""), class = "table"))
+
+expect_equal(spe$nn_clusters[1000:1200],
+             structure(c(1L, 5L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 
+1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 
+1L, 1L, 4L, 4L, 1L, 1L, 4L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 
+1L, 1L, 1L, 1L, 1L, 5L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 
+1L, 1L, 1L, 1L, 4L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 
+1L, 1L, 1L, 4L, 1L, 1L, 1L, 1L, 1L, 1L, 11L, 1L, 1L, 1L, 1L, 
+1L, 1L, 4L, 1L, 10L, 1L, 1L, 1L, 5L, 1L, 1L, 1L, 1L, 1L, 1L, 
+1L, 1L, 1L, 4L, 6L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 
+1L, 1L, 1L, 1L, 1L, 1L, 1L, 4L, 1L, 1L, 1L, 1L, 1L, 6L, 4L, 1L, 
+4L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 11L, 11L, 1L, 1L, 2L, 1L, 1L, 
+6L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 10L, 1L, 1L, 1L, 1L, 1L, 1L, 
+1L, 4L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 2L, 1L, 1L, 
+1L, 1L, 1L, 1L, 1L, 11L, 1L, 1L, 1L, 1L, 1L, 1L, 5L, 4L, 11L, 
+5L), levels = c("1", "2", "3", "4", "5", "6", "7", "8", "9", 
+"10", "11", "12", "13", "14", "15", "16"), class = "factor"))
+
+expect_equal(table(spe$nn_clusters_corrected), 
+             structure(c(`1` = 5972L, `2` = 3508L, `3` = 2966L, `4` = 4682L, 
+`5` = 4456L, `6` = 2180L, `7` = 4333L, `8` = 348L, `9` = 5230L, 
+`10` = 3603L, `11` = 5017L, `12` = 3697L, `13` = 1612L, `14` = 190L
+), dim = 14L, dimnames = structure(list(c("1", "2", "3", "4", 
+"5", "6", "7", "8", "9", "10", "11", "12", "13", "14")), names = ""), class = "table"))
+
+expect_equal(spe$nn_clusters_corrected[1000:1200],
+             structure(c(1L, 10L, 1L, 2L, 1L, 1L, 1L, 1L, 1L, 3L, 1L, 1L, 
+1L, 1L, 2L, 1L, 1L, 1L, 2L, 2L, 2L, 1L, 1L, 1L, 1L, 2L, 1L, 1L, 
+1L, 2L, 1L, 11L, 10L, 1L, 1L, 11L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 
+2L, 1L, 1L, 1L, 2L, 1L, 1L, 10L, 2L, 1L, 1L, 1L, 1L, 11L, 1L, 
+1L, 3L, 1L, 1L, 1L, 9L, 1L, 9L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 4L, 
+1L, 2L, 1L, 11L, 2L, 1L, 5L, 1L, 1L, 1L, 1L, 1L, 1L, 9L, 1L, 
+1L, 1L, 1L, 6L, 2L, 7L, 1L, 5L, 1L, 1L, 1L, 10L, 1L, 1L, 1L, 
+1L, 2L, 1L, 1L, 6L, 2L, 11L, 7L, 2L, 1L, 1L, 2L, 1L, 1L, 1L, 
+1L, 2L, 7L, 6L, 1L, 1L, 1L, 4L, 1L, 11L, 1L, 9L, 1L, 1L, 1L, 
+6L, 2L, 5L, 10L, 6L, 10L, 1L, 1L, 6L, 2L, 2L, 1L, 2L, 9L, 9L, 
+9L, 6L, 5L, 1L, 1L, 7L, 1L, 1L, 4L, 6L, 1L, 1L, 1L, 6L, 1L, 1L, 
+4L, 1L, 1L, 9L, 1L, 7L, 1L, 2L, 1L, 1L, 2L, 6L, 1L, 1L, 1L, 1L, 
+1L, 5L, 1L, 2L, 1L, 1L, 6L, 1L, 1L, 9L, 1L, 2L, 3L, 3L, 1L, 1L, 
+10L, 3L, 9L, 10L), levels = c("1", "2", "3", "4", "5", "6", "7", 
+"8", "9", "10", "11", "12", "13", "14"), class = "factor"))
+
+expect_equal(table(spe$som_clusters), 
+             structure(c(`1` = 10805L, `2` = 1605L, `3` = 6697L, `4` = 510L, 
+`5` = 3497L, `6` = 7977L, `7` = 718L, `8` = 834L, `9` = 5882L, 
+`10` = 2139L, `11` = 5634L, `12` = 819L, `13` = 677L), dim = 13L, dimnames = structure(list(
+    c("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", 
+    "12", "13")), names = ""), class = "table"))
+
+expect_equal(spe$som_clusters[1000:1200],
+             structure(c(10L, 1L, 6L, 10L, 6L, 10L, 10L, 6L, 6L, 6L, 6L, 10L, 
+10L, 6L, 12L, 6L, 6L, 6L, 10L, 10L, 12L, 6L, 6L, 10L, 6L, 10L, 
+6L, 6L, 6L, 12L, 6L, 5L, 9L, 6L, 6L, 5L, 10L, 6L, 6L, 10L, 6L, 
+6L, 10L, 12L, 10L, 10L, 6L, 12L, 10L, 10L, 1L, 12L, 6L, 10L, 
+10L, 10L, 10L, 6L, 6L, 6L, 6L, 10L, 6L, 12L, 10L, 5L, 10L, 10L, 
+10L, 10L, 6L, 10L, 10L, 10L, 10L, 12L, 6L, 5L, 10L, 6L, 9L, 10L, 
+10L, 10L, 10L, 10L, 10L, 3L, 6L, 6L, 10L, 10L, 12L, 10L, 9L, 
+10L, 8L, 6L, 6L, 10L, 1L, 10L, 6L, 6L, 10L, 12L, 10L, 10L, 10L, 
+10L, 5L, 1L, 10L, 6L, 10L, 12L, 6L, 10L, 10L, 10L, 12L, 12L, 
+10L, 6L, 10L, 10L, 6L, 10L, 5L, 6L, 9L, 12L, 10L, 6L, 12L, 10L, 
+1L, 9L, 10L, 1L, 6L, 6L, 12L, 10L, 10L, 12L, 12L, 11L, 6L, 11L, 
+12L, 1L, 10L, 10L, 9L, 10L, 6L, 6L, 12L, 10L, 6L, 6L, 8L, 10L, 
+6L, 6L, 6L, 6L, 12L, 10L, 9L, 10L, 10L, 6L, 6L, 10L, 12L, 10L, 
+10L, 6L, 10L, 10L, 1L, 6L, 12L, 10L, 10L, 12L, 10L, 6L, 9L, 6L, 
+10L, 6L, 6L, 10L, 10L, 1L, 6L, 11L, 1L), levels = c("1", "2", 
+"3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13"), class = "factor"))
+
+expect_equal(table(spe$som_clusters_corrected), 
+             structure(c(`1` = 3076L, `2` = 1549L, `3` = 3576L, `4` = 5166L, 
+`5` = 6495L, `6` = 1076L, `7` = 2633L, `8` = 5684L, `9` = 4740L, 
+`10` = 450L, `11` = 7538L, `12` = 314L, `13` = 1445L, `14` = 3081L, 
+`15` = 513L, `16` = 458L), dim = 16L, dimnames = structure(list(
+    c("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", 
+    "12", "13", "14", "15", "16")), names = ""), class = "table"))
+
+expect_equal(spe$som_clusters_corrected[1000:1200],
+             structure(c(V58 = 8L, V62 = 9L, V60 = 8L, V57 = 7L, V58 = 8L, 
+V38 = 8L, V60 = 8L, V58 = 8L, V59 = 8L, V89 = 14L, V70 = 8L, 
+V38 = 8L, V67 = 11L, V60 = 8L, V38 = 8L, V70 = 8L, V48 = 8L, 
+V58 = 8L, V67 = 11L, V67 = 11L, V57 = 7L, V70 = 8L, V70 = 8L, 
+V78 = 2L, V60 = 8L, V95 = 11L, V48 = 8L, V48 = 8L, V60 = 8L, 
+V47 = 5L, V79 = 8L, V7 = 3L, V53 = 9L, V58 = 8L, V69 = 8L, V6 = 3L, 
+V58 = 8L, V58 = 8L, V60 = 8L, V59 = 8L, V48 = 8L, V58 = 8L, V58 = 8L, 
+V56 = 5L, V58 = 8L, V48 = 8L, V48 = 8L, V57 = 7L, V38 = 8L, V98 = 14L, 
+V71 = 9L, V56 = 5L, V59 = 8L, V60 = 8L, V58 = 8L, V38 = 8L, V17 = 3L, 
+V59 = 8L, V70 = 8L, V98 = 14L, V48 = 8L, V67 = 11L, V70 = 8L, 
+V44 = 9L, V48 = 8L, V24 = 4L, V58 = 8L, V60 = 8L, V58 = 8L, V38 = 8L, 
+V58 = 8L, V69 = 8L, V69 = 8L, V96 = 11L, V58 = 8L, V56 = 5L, 
+V58 = 8L, V7 = 3L, V67 = 11L, V58 = 8L, V64 = 5L, V49 = 7L, V49 = 7L, 
+V48 = 8L, V69 = 8L, V60 = 8L, V48 = 8L, V22 = 4L, V58 = 8L, V58 = 8L, 
+V48 = 8L, V69 = 8L, V57 = 7L, V38 = 8L, V34 = 4L, V60 = 8L, V50 = 7L, 
+V58 = 8L, V58 = 8L, V69 = 8L, V71 = 9L, V58 = 8L, V60 = 8L, V79 = 8L, 
+V49 = 7L, V56 = 5L, V69 = 8L, V58 = 8L, V57 = 7L, V67 = 11L, 
+V7 = 3L, V10 = 5L, V67 = 11L, V60 = 8L, V60 = 8L, V57 = 7L, V58 = 8L, 
+V69 = 8L, V59 = 8L, V69 = 8L, V66 = 11L, V64 = 5L, V58 = 8L, 
+V58 = 8L, V49 = 7L, V49 = 7L, V67 = 11L, V58 = 8L, V7 = 3L, V98 = 14L, 
+V34 = 4L, V57 = 7L, V38 = 8L, V59 = 8L, V30 = 7L, V57 = 7L, V95 = 11L, 
+V53 = 9L, V49 = 7L, V52 = 9L, V48 = 8L, V60 = 8L, V56 = 5L, V67 = 11L, 
+V38 = 8L, V57 = 7L, V57 = 7L, V78 = 2L, V78 = 2L, V78 = 2L, V30 = 7L, 
+V82 = 13L, V57 = 7L, V48 = 8L, V10 = 5L, V38 = 8L, V70 = 8L, 
+V67 = 11L, V57 = 7L, V58 = 8L, V58 = 8L, V60 = 8L, V50 = 7L, 
+V38 = 8L, V60 = 8L, V97 = 11L, V38 = 8L, V48 = 8L, V24 = 4L, 
+V38 = 8L, V19 = 4L, V49 = 7L, V66 = 11L, V58 = 8L, V60 = 8L, 
+V57 = 7L, V30 = 7L, V48 = 8L, V38 = 8L, V69 = 8L, V60 = 8L, V58 = 8L, 
+V82 = 13L, V48 = 8L, V66 = 11L, V58 = 8L, V60 = 8L, V30 = 7L, 
+V49 = 7L, V59 = 8L, V34 = 4L, V48 = 8L, V57 = 7L, V89 = 14L, 
+V89 = 14L, V60 = 8L, V60 = 8L, V72 = 9L, V100 = 14L, V78 = 2L, 
+V72 = 9L), levels = c("1", "2", "3", "4", "5", "6", "7", "8", 
+"9", "10", "11", "12", "13", "14", "15", "16"), class = "factor"))
+
+expect_equal(table(spe$cell_labels), 
+             structure(c(Bcell = 780L, BnTcell = 1702L, CD4 = 688L, CD8 = 822L, 
+Myeloid = 1750L, Neutrophil = 134L, Plasma_cell = 716L, Stroma = 442L, 
+Treg = 361L, Tumor = 5999L, unlabeled = 34400L), dim = 11L, dimnames = structure(list(
+    c("Bcell", "BnTcell", "CD4", "CD8", "Myeloid", "Neutrophil", 
+    "Plasma_cell", "Stroma", "Treg", "Tumor", "unlabeled")), names = ""), class = "table"))
+
+expect_equal(spe$cell_labels[1000:1200],
+             c(Patient1_001_1001 = "unlabeled", Patient1_001_1002 = "unlabeled", 
+Patient1_001_1003 = "unlabeled", Patient1_001_1004 = "unlabeled", 
+Patient1_001_1005 = "unlabeled", Patient1_001_1006 = "unlabeled", 
+Patient1_001_1007 = "unlabeled", Patient1_001_1008 = "unlabeled", 
+Patient1_001_1009 = "unlabeled", Patient1_001_1010 = "unlabeled", 
+Patient1_001_1011 = "unlabeled", Patient1_001_1012 = "unlabeled", 
+Patient1_001_1013 = "unlabeled", Patient1_001_1014 = "unlabeled", 
+Patient1_001_1015 = "unlabeled", Patient1_001_1016 = "unlabeled", 
+Patient1_001_1017 = "unlabeled", Patient1_001_1018 = "unlabeled", 
+Patient1_001_1019 = "unlabeled", Patient1_001_1020 = "unlabeled", 
+Patient1_001_1021 = "unlabeled", Patient1_001_1022 = "unlabeled", 
+Patient1_001_1023 = "unlabeled", Patient1_001_1024 = "unlabeled", 
+Patient1_001_1025 = "unlabeled", Patient1_001_1026 = "unlabeled", 
+Patient1_001_1027 = "unlabeled", Patient1_001_1028 = "unlabeled", 
+Patient1_001_1029 = "unlabeled", Patient1_001_1030 = "unlabeled", 
+Patient1_001_1031 = "unlabeled", Patient1_001_1032 = "unlabeled", 
+Patient1_001_1033 = "unlabeled", Patient1_001_1034 = "unlabeled", 
+Patient1_001_1035 = "unlabeled", Patient1_001_1036 = "unlabeled", 
+Patient1_001_1037 = "unlabeled", Patient1_001_1038 = "unlabeled", 
+Patient1_001_1039 = "unlabeled", Patient1_001_1040 = "unlabeled", 
+Patient1_001_1041 = "unlabeled", Patient1_001_1042 = "unlabeled", 
+Patient1_001_1043 = "unlabeled", Patient1_001_1044 = "unlabeled", 
+Patient1_001_1045 = "unlabeled", Patient1_001_1046 = "unlabeled", 
+Patient1_001_1047 = "unlabeled", Patient1_001_1048 = "unlabeled", 
+Patient1_001_1049 = "unlabeled", Patient1_001_1050 = "unlabeled", 
+Patient1_001_1051 = "unlabeled", Patient1_001_1052 = "unlabeled", 
+Patient1_001_1053 = "unlabeled", Patient1_001_1054 = "unlabeled", 
+Patient1_001_1055 = "unlabeled", Patient1_001_1056 = "unlabeled", 
+Patient1_001_1057 = "unlabeled", Patient1_001_1058 = "unlabeled", 
+Patient1_001_1059 = "unlabeled", Patient1_001_1060 = "unlabeled", 
+Patient1_001_1061 = "unlabeled", Patient1_001_1062 = "unlabeled", 
+Patient1_001_1063 = "unlabeled", Patient1_001_1064 = "unlabeled", 
+Patient1_001_1065 = "unlabeled", Patient1_001_1066 = "unlabeled", 
+Patient1_001_1067 = "unlabeled", Patient1_001_1068 = "unlabeled", 
+Patient1_001_1069 = "unlabeled", Patient1_001_1070 = "unlabeled", 
+Patient1_001_1071 = "unlabeled", Patient1_001_1072 = "unlabeled", 
+Patient1_001_1073 = "unlabeled", Patient1_001_1074 = "unlabeled", 
+Patient1_001_1075 = "unlabeled", Patient1_001_1076 = "unlabeled", 
+Patient1_001_1077 = "unlabeled", Patient1_001_1078 = "unlabeled", 
+Patient1_001_1079 = "unlabeled", Patient1_001_1080 = "unlabeled", 
+Patient1_001_1081 = "unlabeled", Patient1_001_1082 = "unlabeled", 
+Patient1_001_1083 = "unlabeled", Patient1_001_1084 = "unlabeled", 
+Patient1_001_1085 = "unlabeled", Patient1_001_1086 = "unlabeled", 
+Patient1_001_1087 = "unlabeled", Patient1_001_1088 = "unlabeled", 
+Patient1_001_1089 = "unlabeled", Patient1_001_1090 = "unlabeled", 
+Patient1_001_1091 = "unlabeled", Patient1_001_1092 = "unlabeled", 
+Patient1_001_1093 = "unlabeled", Patient1_001_1094 = "unlabeled", 
+Patient1_001_1095 = "unlabeled", Patient1_001_1096 = "unlabeled", 
+Patient1_001_1097 = "unlabeled", Patient1_001_1098 = "unlabeled", 
+Patient1_001_1099 = "unlabeled", Patient1_001_1100 = "unlabeled", 
+Patient1_001_1101 = "unlabeled", Patient1_001_1102 = "unlabeled", 
+Patient1_001_1103 = "unlabeled", Patient1_001_1104 = "unlabeled", 
+Patient1_001_1105 = "unlabeled", Patient1_001_1106 = "unlabeled", 
+Patient1_001_1107 = "unlabeled", Patient1_001_1108 = "unlabeled", 
+Patient1_001_1109 = "unlabeled", Patient1_001_1110 = "unlabeled", 
+Patient1_001_1111 = "unlabeled", Patient1_001_1112 = "unlabeled", 
+Patient1_001_1113 = "unlabeled", Patient1_001_1114 = "unlabeled", 
+Patient1_001_1115 = "unlabeled", Patient1_001_1116 = "unlabeled", 
+Patient1_001_1117 = "unlabeled", Patient1_001_1118 = "unlabeled", 
+Patient1_001_1119 = "unlabeled", Patient1_001_1120 = "unlabeled", 
+Patient1_001_1121 = "unlabeled", Patient1_001_1122 = "unlabeled", 
+Patient1_001_1123 = "unlabeled", Patient1_001_1124 = "unlabeled", 
+Patient1_001_1125 = "unlabeled", Patient1_001_1126 = "unlabeled", 
+Patient1_001_1127 = "unlabeled", Patient1_001_1128 = "unlabeled", 
+Patient1_001_1129 = "unlabeled", Patient1_001_1130 = "unlabeled", 
+Patient1_001_1131 = "unlabeled", Patient1_001_1132 = "unlabeled", 
+Patient1_001_1133 = "unlabeled", Patient1_001_1134 = "unlabeled", 
+Patient1_001_1135 = "unlabeled", Patient1_001_1136 = "unlabeled", 
+Patient1_001_1137 = "unlabeled", Patient1_001_1138 = "unlabeled", 
+Patient1_001_1139 = "unlabeled", Patient1_001_1140 = "unlabeled", 
+Patient1_001_1141 = "unlabeled", Patient1_001_1142 = "unlabeled", 
+Patient1_001_1143 = "unlabeled", Patient1_001_1144 = "unlabeled", 
+Patient1_001_1145 = "unlabeled", Patient1_001_1146 = "unlabeled", 
+Patient1_001_1147 = "unlabeled", Patient1_001_1148 = "unlabeled", 
+Patient1_001_1149 = "unlabeled", Patient1_001_1150 = "unlabeled", 
+Patient1_001_1151 = "unlabeled", Patient1_001_1152 = "Stroma", 
+Patient1_001_1153 = "unlabeled", Patient1_001_1154 = "unlabeled", 
+Patient1_001_1155 = "unlabeled", Patient1_001_1156 = "unlabeled", 
+Patient1_001_1157 = "unlabeled", Patient1_001_1158 = "unlabeled", 
+Patient1_001_1159 = "unlabeled", Patient1_001_1160 = "unlabeled", 
+Patient1_001_1161 = "unlabeled", Patient1_001_1162 = "unlabeled", 
+Patient1_001_1163 = "unlabeled", Patient1_001_1164 = "unlabeled", 
+Patient1_001_1165 = "unlabeled", Patient1_001_1166 = "unlabeled", 
+Patient1_001_1167 = "unlabeled", Patient1_001_1168 = "unlabeled", 
+Patient1_001_1169 = "unlabeled", Patient1_001_1170 = "unlabeled", 
+Patient1_001_1171 = "unlabeled", Patient1_001_1172 = "unlabeled", 
+Patient1_001_1173 = "unlabeled", Patient1_001_1174 = "unlabeled", 
+Patient1_001_1175 = "unlabeled", Patient1_001_1176 = "unlabeled", 
+Patient1_001_1177 = "unlabeled", Patient1_001_1178 = "unlabeled", 
+Patient1_001_1179 = "unlabeled", Patient1_001_1180 = "unlabeled", 
+Patient1_001_1181 = "unlabeled", Patient1_001_1182 = "unlabeled", 
+Patient1_001_1183 = "Stroma", Patient1_001_1184 = "unlabeled", 
+Patient1_001_1185 = "unlabeled", Patient1_001_1186 = "unlabeled", 
+Patient1_001_1187 = "unlabeled", Patient1_001_1188 = "unlabeled", 
+Patient1_001_1189 = "unlabeled", Patient1_001_1190 = "unlabeled", 
+Patient1_001_1191 = "unlabeled", Patient1_001_1192 = "unlabeled", 
+Patient1_001_1193 = "unlabeled", Patient1_001_1194 = "unlabeled", 
+Patient1_001_1195 = "unlabeled", Patient1_001_1196 = "unlabeled", 
+Patient1_001_1197 = "unlabeled", Patient1_001_1198 = "unlabeled", 
+Patient1_001_1199 = "unlabeled", Patient1_001_1200 = "unlabeled", 
+Patient1_001_1201 = "unlabeled"))
+
+expect_equal(table(spe$celltype), 
+             structure(c(Bcell = 1594L, BnTcell = 2675L, CD4 = 3845L, CD8 = 3504L, 
+Myeloid = 8020L, Neutrophil = 681L, Plasma_cell = 3397L, Stroma = 5306L, 
+Treg = 1515L, Tumor = 16625L, undefined = 632L), dim = 11L, dimnames = structure(list(
+    c("Bcell", "BnTcell", "CD4", "CD8", "Myeloid", "Neutrophil", 
+    "Plasma_cell", "Stroma", "Treg", "Tumor", "undefined")), names = ""), class = "table"))
+
+expect_equal(spe$celltype[1000:1200],
+             c(Patient1_001_1001 = "Tumor", Patient1_001_1002 = "Plasma_cell", 
+Patient1_001_1003 = "Tumor", Patient1_001_1004 = "Tumor", Patient1_001_1005 = "Tumor", 
+Patient1_001_1006 = "Tumor", Patient1_001_1007 = "Tumor", Patient1_001_1008 = "Tumor", 
+Patient1_001_1009 = "Tumor", Patient1_001_1010 = "Tumor", Patient1_001_1011 = "Tumor", 
+Patient1_001_1012 = "Tumor", Patient1_001_1013 = "Tumor", Patient1_001_1014 = "Tumor", 
+Patient1_001_1015 = "Tumor", Patient1_001_1016 = "Tumor", Patient1_001_1017 = "Tumor", 
+Patient1_001_1018 = "Tumor", Patient1_001_1019 = "Tumor", Patient1_001_1020 = "Tumor", 
+Patient1_001_1021 = "Tumor", Patient1_001_1022 = "Tumor", Patient1_001_1023 = "Tumor", 
+Patient1_001_1024 = "Tumor", Patient1_001_1025 = "Tumor", Patient1_001_1026 = "Tumor", 
+Patient1_001_1027 = "Tumor", Patient1_001_1028 = "Tumor", Patient1_001_1029 = "Tumor", 
+Patient1_001_1030 = "Tumor", Patient1_001_1031 = "Tumor", Patient1_001_1032 = "Treg", 
+Patient1_001_1033 = "Plasma_cell", Patient1_001_1034 = "Tumor", 
+Patient1_001_1035 = "Tumor", Patient1_001_1036 = "Treg", Patient1_001_1037 = "Tumor", 
+Patient1_001_1038 = "Tumor", Patient1_001_1039 = "Tumor", Patient1_001_1040 = "Tumor", 
+Patient1_001_1041 = "Tumor", Patient1_001_1042 = "Tumor", Patient1_001_1043 = "Tumor", 
+Patient1_001_1044 = "CD4", Patient1_001_1045 = "Tumor", Patient1_001_1046 = "Tumor", 
+Patient1_001_1047 = "Tumor", Patient1_001_1048 = "Tumor", Patient1_001_1049 = "Tumor", 
+Patient1_001_1050 = "Tumor", Patient1_001_1051 = "Plasma_cell", 
+Patient1_001_1052 = "Tumor", Patient1_001_1053 = "Tumor", Patient1_001_1054 = "Tumor", 
+Patient1_001_1055 = "Tumor", Patient1_001_1056 = "Tumor", Patient1_001_1057 = "CD4", 
+Patient1_001_1058 = "Tumor", Patient1_001_1059 = "Tumor", Patient1_001_1060 = "Tumor", 
+Patient1_001_1061 = "Tumor", Patient1_001_1062 = "Tumor", Patient1_001_1063 = "Tumor", 
+Patient1_001_1064 = "Tumor", Patient1_001_1065 = "Tumor", Patient1_001_1066 = "CD8", 
+Patient1_001_1067 = "Tumor", Patient1_001_1068 = "Tumor", Patient1_001_1069 = "Tumor", 
+Patient1_001_1070 = "Tumor", Patient1_001_1071 = "Tumor", Patient1_001_1072 = "Treg", 
+Patient1_001_1073 = "Tumor", Patient1_001_1074 = "Tumor", Patient1_001_1075 = "Tumor", 
+Patient1_001_1076 = "Tumor", Patient1_001_1077 = "Tumor", Patient1_001_1078 = "Treg", 
+Patient1_001_1079 = "Tumor", Patient1_001_1080 = "Tumor", Patient1_001_1081 = "CD4", 
+Patient1_001_1082 = "Tumor", Patient1_001_1083 = "Tumor", Patient1_001_1084 = "Tumor", 
+Patient1_001_1085 = "Tumor", Patient1_001_1086 = "Tumor", Patient1_001_1087 = "Tumor", 
+Patient1_001_1088 = "CD8", Patient1_001_1089 = "Tumor", Patient1_001_1090 = "Tumor", 
+Patient1_001_1091 = "Tumor", Patient1_001_1092 = "CD8", Patient1_001_1093 = "Tumor", 
+Patient1_001_1094 = "Tumor", Patient1_001_1095 = "Myeloid", Patient1_001_1096 = "Tumor", 
+Patient1_001_1097 = "Stroma", Patient1_001_1098 = "Tumor", Patient1_001_1099 = "Tumor", 
+Patient1_001_1100 = "Tumor", Patient1_001_1101 = "Plasma_cell", 
+Patient1_001_1102 = "Tumor", Patient1_001_1103 = "Tumor", Patient1_001_1104 = "Tumor", 
+Patient1_001_1105 = "Tumor", Patient1_001_1106 = "Tumor", Patient1_001_1107 = "Tumor", 
+Patient1_001_1108 = "Tumor", Patient1_001_1109 = "Tumor", Patient1_001_1110 = "Tumor", 
+Patient1_001_1111 = "Treg", Patient1_001_1112 = "Myeloid", Patient1_001_1113 = "Tumor", 
+Patient1_001_1114 = "Tumor", Patient1_001_1115 = "Tumor", Patient1_001_1116 = "Tumor", 
+Patient1_001_1117 = "Tumor", Patient1_001_1118 = "Tumor", Patient1_001_1119 = "Tumor", 
+Patient1_001_1120 = "CD8", Patient1_001_1121 = "Tumor", Patient1_001_1122 = "Tumor", 
+Patient1_001_1123 = "Tumor", Patient1_001_1124 = "Tumor", Patient1_001_1125 = "Tumor", 
+Patient1_001_1126 = "Tumor", Patient1_001_1127 = "Tumor", Patient1_001_1128 = "Tumor", 
+Patient1_001_1129 = "Treg", Patient1_001_1130 = "Tumor", Patient1_001_1131 = "CD8", 
+Patient1_001_1132 = "Tumor", Patient1_001_1133 = "Tumor", Patient1_001_1134 = "Tumor", 
+Patient1_001_1135 = "Tumor", Patient1_001_1136 = "Tumor", Patient1_001_1137 = "Tumor", 
+Patient1_001_1138 = "Plasma_cell", Patient1_001_1139 = "Tumor", 
+Patient1_001_1140 = "Stroma", Patient1_001_1141 = "Tumor", Patient1_001_1142 = "Tumor", 
+Patient1_001_1143 = "Tumor", Patient1_001_1144 = "Tumor", Patient1_001_1145 = "Tumor", 
+Patient1_001_1146 = "Tumor", Patient1_001_1147 = "Tumor", Patient1_001_1148 = "CD8", 
+Patient1_001_1149 = "Tumor", Patient1_001_1150 = "Treg", Patient1_001_1151 = "Tumor", 
+Patient1_001_1152 = "Stroma", Patient1_001_1153 = "Tumor", Patient1_001_1154 = "Tumor", 
+Patient1_001_1155 = "Myeloid", Patient1_001_1156 = "Tumor", Patient1_001_1157 = "Tumor", 
+Patient1_001_1158 = "Tumor", Patient1_001_1159 = "Tumor", Patient1_001_1160 = "Tumor", 
+Patient1_001_1161 = "Tumor", Patient1_001_1162 = "Tumor", Patient1_001_1163 = "CD4", 
+Patient1_001_1164 = "Tumor", Patient1_001_1165 = "Tumor", Patient1_001_1166 = "Tumor", 
+Patient1_001_1167 = "Tumor", Patient1_001_1168 = "Tumor", Patient1_001_1169 = "CD8", 
+Patient1_001_1170 = "Tumor", Patient1_001_1171 = "Myeloid", Patient1_001_1172 = "Tumor", 
+Patient1_001_1173 = "Tumor", Patient1_001_1174 = "Tumor", Patient1_001_1175 = "Tumor", 
+Patient1_001_1176 = "Tumor", Patient1_001_1177 = "Tumor", Patient1_001_1178 = "Tumor", 
+Patient1_001_1179 = "Tumor", Patient1_001_1180 = "Tumor", Patient1_001_1181 = "Tumor", 
+Patient1_001_1182 = "Tumor", Patient1_001_1183 = "Stroma", Patient1_001_1184 = "Tumor", 
+Patient1_001_1185 = "Tumor", Patient1_001_1186 = "Tumor", Patient1_001_1187 = "Tumor", 
+Patient1_001_1188 = "Tumor", Patient1_001_1189 = "Tumor", Patient1_001_1190 = "Tumor", 
+Patient1_001_1191 = "Plasma_cell", Patient1_001_1192 = "Tumor", 
+Patient1_001_1193 = "Tumor", Patient1_001_1194 = "Tumor", Patient1_001_1195 = "Tumor", 
+Patient1_001_1196 = "Tumor", Patient1_001_1197 = "Tumor", Patient1_001_1198 = "Plasma_cell", 
+Patient1_001_1199 = "Tumor", Patient1_001_1200 = "CD8", Patient1_001_1201 = "Plasma_cell"
+))
 ```
 
 ## Session Info

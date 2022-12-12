@@ -718,6 +718,21 @@ expression. BnT cells have the highest number of neighbors on average,
 which is biological sound given their predominant location in highly
 immune infiltrated regions (such as TLS).
 
+### Interactive visualization
+
+For interactive visualization of the single-cell data the 
+[iSEE](https://www.bioconductor.org/packages/release/bioc/html/iSEE.html) shiny 
+application can be used. For a comprehensive tutorial, please refer to the
+[iSEE vignette](https://www.bioconductor.org/packages/release/bioc/vignettes/iSEE/inst/doc/basic.html).
+
+```{r iSEE, message=FALSE}
+if (interactive()) {
+    library(iSEE)
+
+    iSEE(spe)   
+}
+```
+
 ## Session Info
 
 <details>
