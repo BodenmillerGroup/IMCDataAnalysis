@@ -1,0 +1,93 @@
+2023-01-24 14:43:07,240 INFO steinbock - img/Patient4_005.tiff
+2023-01-24 14:43:07,987 INFO steinbock - img/Patient4_006.tiff
+2023-01-24 14:43:08,855 INFO steinbock - img/Patient4_007.tiff
+2023-01-24 14:43:09,576 INFO steinbock - img/Patient4_008.tiff
+2023-01-24 14:43:15,282 INFO steinbock - img/Patient3_001.tiff
+2023-01-24 14:43:16,275 INFO steinbock - img/Patient3_002.tiff
+2023-01-24 14:43:17,216 INFO steinbock - img/Patient3_003.tiff
+2023-01-24 14:43:24,132 INFO steinbock - img/Patient2_001.tiff
+2023-01-24 14:43:25,279 INFO steinbock - img/Patient2_002.tiff
+2023-01-24 14:43:26,442 INFO steinbock - img/Patient2_003.tiff
+2023-01-24 14:43:27,402 INFO steinbock - img/Patient2_004.tiff
+2023-01-24 14:43:33,623 INFO steinbock - img/Patient1_001.tiff
+2023-01-24 14:43:34,649 INFO steinbock - img/Patient1_002.tiff
+2023-01-24 14:43:36,243 INFO steinbock - img/Patient1_003.tiff
+2023-01-24 14:43:36,340 INFO steinbock - images.csv
+
+real	0m40.006s
+user	0m0.061s
+sys	0m0.108s
+/opt/venv/lib/python3.8/site-packages/deepcell_toolbox/deep_watershed.py:179: FutureWarning: `selem` is a deprecated argument name for `h_maxima`. It will be removed in version 1.0. Please use `footprint` instead.
+  markers = h_maxima(image=maxima,
+2023-01-24 14:44:15,264 INFO steinbock - masks/Patient1_001.tiff
+2023-01-24 14:44:34,349 INFO steinbock - masks/Patient1_002.tiff
+2023-01-24 14:44:51,286 INFO steinbock - masks/Patient1_003.tiff
+2023-01-24 14:45:07,462 INFO steinbock - masks/Patient2_001.tiff
+2023-01-24 14:45:22,946 INFO steinbock - masks/Patient2_002.tiff
+2023-01-24 14:45:39,348 INFO steinbock - masks/Patient2_003.tiff
+2023-01-24 14:45:55,488 INFO steinbock - masks/Patient2_004.tiff
+2023-01-24 14:46:11,692 INFO steinbock - masks/Patient3_001.tiff
+2023-01-24 14:46:28,797 INFO steinbock - masks/Patient3_002.tiff
+2023-01-24 14:46:45,362 INFO steinbock - masks/Patient3_003.tiff
+2023-01-24 14:47:00,876 INFO steinbock - masks/Patient4_005.tiff
+2023-01-24 14:47:17,204 INFO steinbock - masks/Patient4_006.tiff
+2023-01-24 14:47:32,934 INFO steinbock - masks/Patient4_007.tiff
+2023-01-24 14:47:52,838 INFO steinbock - masks/Patient4_008.tiff
+
+real	4m19.153s
+user	0m0.110s
+sys	0m0.195s
+2023-01-24 14:48:00,143 INFO steinbock - intensities/Patient1_001.csv
+2023-01-24 14:48:01,483 INFO steinbock - intensities/Patient1_002.csv
+2023-01-24 14:48:03,383 INFO steinbock - intensities/Patient1_003.csv
+2023-01-24 14:48:04,832 INFO steinbock - intensities/Patient2_001.csv
+2023-01-24 14:48:06,050 INFO steinbock - intensities/Patient2_002.csv
+2023-01-24 14:48:07,346 INFO steinbock - intensities/Patient2_003.csv
+2023-01-24 14:48:08,660 INFO steinbock - intensities/Patient2_004.csv
+2023-01-24 14:48:09,777 INFO steinbock - intensities/Patient3_001.csv
+2023-01-24 14:48:10,837 INFO steinbock - intensities/Patient3_002.csv
+2023-01-24 14:48:12,141 INFO steinbock - intensities/Patient3_003.csv
+2023-01-24 14:48:13,119 INFO steinbock - intensities/Patient4_005.csv
+2023-01-24 14:48:14,335 INFO steinbock - intensities/Patient4_006.csv
+2023-01-24 14:48:15,436 INFO steinbock - intensities/Patient4_007.csv
+2023-01-24 14:48:17,587 INFO steinbock - intensities/Patient4_008.csv
+
+real	0m21.670s
+user	0m0.072s
+sys	0m0.104s
+2023-01-24 14:48:21,989 INFO steinbock - regionprops/Patient1_001.csv
+2023-01-24 14:48:23,825 INFO steinbock - regionprops/Patient1_002.csv
+2023-01-24 14:48:25,558 INFO steinbock - regionprops/Patient1_003.csv
+2023-01-24 14:48:28,504 INFO steinbock - regionprops/Patient2_001.csv
+2023-01-24 14:48:29,743 INFO steinbock - regionprops/Patient2_002.csv
+2023-01-24 14:48:30,845 INFO steinbock - regionprops/Patient2_003.csv
+2023-01-24 14:48:32,670 INFO steinbock - regionprops/Patient2_004.csv
+2023-01-24 14:48:34,206 INFO steinbock - regionprops/Patient3_001.csv
+2023-01-24 14:48:35,882 INFO steinbock - regionprops/Patient3_002.csv
+2023-01-24 14:48:38,303 INFO steinbock - regionprops/Patient3_003.csv
+2023-01-24 14:48:39,697 INFO steinbock - regionprops/Patient4_005.csv
+2023-01-24 14:48:41,936 INFO steinbock - regionprops/Patient4_006.csv
+2023-01-24 14:48:43,660 INFO steinbock - regionprops/Patient4_007.csv
+2023-01-24 14:48:45,108 INFO steinbock - regionprops/Patient4_008.csv
+
+real	0m27.506s
+user	0m0.073s
+sys	0m0.083s
+2023-01-24 14:48:52,305 INFO steinbock - neighbors/Patient1_001.csv
+2023-01-24 14:48:56,261 INFO steinbock - neighbors/Patient1_002.csv
+2023-01-24 14:49:00,056 INFO steinbock - neighbors/Patient1_003.csv
+2023-01-24 14:49:03,479 INFO steinbock - neighbors/Patient2_001.csv
+2023-01-24 14:49:06,431 INFO steinbock - neighbors/Patient2_002.csv
+2023-01-24 14:49:09,874 INFO steinbock - neighbors/Patient2_003.csv
+2023-01-24 14:49:13,934 INFO steinbock - neighbors/Patient2_004.csv
+2023-01-24 14:49:23,731 INFO steinbock - neighbors/Patient3_001.csv
+2023-01-24 14:49:29,767 INFO steinbock - neighbors/Patient3_002.csv
+2023-01-24 14:49:34,046 INFO steinbock - neighbors/Patient3_003.csv
+2023-01-24 14:49:37,226 INFO steinbock - neighbors/Patient4_005.csv
+2023-01-24 14:49:42,126 INFO steinbock - neighbors/Patient4_006.csv
+2023-01-24 14:49:48,673 INFO steinbock - neighbors/Patient4_007.csv
+2023-01-24 14:49:52,942 INFO steinbock - neighbors/Patient4_008.csv
+
+real	1m7.947s
+user	0m0.071s
+sys	0m0.085s
