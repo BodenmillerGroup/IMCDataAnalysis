@@ -45,61 +45,34 @@ abstract: |
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Materials
+# Procedure
 
-## Data
+### Example data
 
-The example data needed to run the protocol can be downloaded as follows:
-
-```{r download-data}
+```{r, message=FALSE}
 options(timeout = 10000)
 dir.create("data/steinbock/raw", recursive = TRUE)
 download.file("https://zenodo.org/record/7412972/files/panel.csv",
               "data/steinbock/panel.csv")
-download.file("https://zenodo.org/record/5949116/files/Patient1.zip",
+download.file("https://zenodo.org/record/7575859/files/Patient1.zip",
               "data/steinbock/raw/Patient1.zip")
-download.file("https://zenodo.org/record/5949116/files/Patient2.zip",
+download.file("https://zenodo.org/record/7575859/files/Patient2.zip",
               "data/steinbock/raw/Patient2.zip")
-download.file("https://zenodo.org/record/5949116/files/Patient3.zip",
+download.file("https://zenodo.org/record/7575859/files/Patient3.zip",
               "data/steinbock/raw/Patient3.zip")
-download.file("https://zenodo.org/record/5949116/files/Patient4.zip",
+download.file("https://zenodo.org/record/7575859/files/Patient4.zip",
               "data/steinbock/raw/Patient4.zip")
-download.file("https://zenodo.org/record/5949116/files/compensation.zip",
+download.file("https://zenodo.org/record/7575859/files/compensation.zip",
               "data/compensation.zip")
 unzip("data/compensation.zip", exdir="data", overwrite=TRUE)
 unlink("data/compensation.zip")
-download.file("https://zenodo.org/record/5949116/files/sample_metadata.xlsx", 
-         destfile = "data/sample_metadata.xlsx")
+download.file("https://zenodo.org/record/7575859/files/sample_metadata.csv", 
+         destfile = "data/sample_metadata.csv")
 download.file("https://zenodo.org/record/7432486/files/gated_cells.zip",
               "data/gated_cells.zip")
 unzip("data/gated_cells.zip", exdir="data", overwrite=TRUE)
 unlink("data/gated_cells.zip")
 ```
-
-# Equipment setup
-
-## Installation instructions
-
-To install all needed R packages, run the following code:
-
-```{r install-libraries, eval=FALSE}
-if (!requireNamespace("devtools", quietly = TRUE)) install.packages("devtools")
-
-devtools::install_github(c("BodenmillerGroup/imcRtools", 
-                           "BodenmillerGroup/cytomapper"))
-
-
-if (!requireNamespace("BiocManager", quietly = TRUE)) install.packages("BiocManager")
-
-BiocManager::install(c("pheatmap", "viridis",
-                       "tiff", "distill", "openxlsx", "ggrepel", "patchwork",
-                       "mclust", "RColorBrewer", "uwot", "Rtsne", "caret",                                               
-                       "randomForest", "ggridges", "gridGraphics", "scales", 
-                       "CATALYST", "scuttle", "scater", "dittoSeq", 
-                       "tidyverse", "batchelor", "bluster","scran"))
-```
-
-# Procedure
 
 ## Setting the steinbock alias 
 
@@ -114,96 +87,52 @@ alias steinbock="docker run -v /path/to/IMCDataAnalysis/data/steinbock:/data -u 
 In this protocol, data pre-processing refers to the extraction of multi-channel images from raw imaging data, and to preparing them for downstream processing. 
 The required steps are dependent on the imaging technology; here, we showcase the pre-processing of raw IMC data which includes a hot pixel filtering step. 
 
-```{r, echo=FALSE}
-start_time <- Sys.time()
-```
-
-```{bash preprocess-images, engine.opts="--init-file .alias -i"}
+```{bash preprocess-images, eval = FALSE}
 steinbock preprocess imc images --hpf 50
 ```
 
-```{r, echo=FALSE}
-end_time <- Sys.time()
-```
 
-The step took 
-`r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
+The step took `TODO` minutes.
 
 ## Image segmentation
 
 Perform automatic deep learning-enabled single-cell segmentation using the pre-trained Mesmer neural network implemented in DeepCell. 
 In the following command, channels will be min-max-normalized and mean-aggregated according to the deepcell column in the panel file. 
 
-```{r, echo=FALSE}
-start_time <- Sys.time()
-```
-
-```{bash segment-cells, engine.opts="--init-file .alias -i"}
+```{bash segment-cells, eval = FALSE}
 steinbock segment deepcell --minmax
 ```
 
-```{r, echo=FALSE}
-end_time <- Sys.time()
-```
-
-The step took 
-`r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
+The step took `TODO` minutes.
 
 ## Single-cell data extraction
 
 For each image, extract the mean pixel intensity per cell and marker. 
 The resulting cell-level intensity values are stored as separate CSV files (one file per image):
 
-```{r, echo=FALSE}
-start_time <- Sys.time()
-```
-
-```{bash measure-intensities, engine.opts="--init-file .alias -i"}
+```{bash measure-intensities, eval = FALSE}
 steinbock measure intensities
 ```
 
-```{r, echo=FALSE}
-end_time <- Sys.time()
-```
-
-The step took 
-`r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
+The step took `TODO` minutes.
 
 For each image, extract standard morphological features (e.g., area, eccentricity) per cell. 
 The resulting cell-level features are stored as separate CSV files (one file per image):
 
-```{r, echo=FALSE}
-start_time <- Sys.time()
-```
-
-```{bash measure-regionprops, engine.opts="--init-file .alias -i"}
+```{bash measure-regionprops, eval = FALSE}
 steinbock measure regionprops
 ```
 
-```{r, echo=FALSE}
-end_time <- Sys.time()
-```
-
-The step took 
-`r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
+The step took `TODO` minutes.
 
 In each image, detect cells in close spatial proximity. 
 The resulting spatial cell graphs are stored as separate directed edge lists in CSV format (one file per image):
 
-```{r, echo=FALSE}
-start_time <- Sys.time()
-```
-
-```{bash measure-neighbors, engine.opts="--init-file .alias -i"}
+```{bash measure-neighbors, eval = FALSE}
 steinbock measure neighbors --type expansion --dmax 4
 ```
 
-```{r, echo=FALSE}
-end_time <- Sys.time()
-```
-
-The step took 
-`r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
+The step took  `TODO` minutes.
 
 ## Reading in data
 
@@ -237,19 +166,23 @@ start_time <- Sys.time()
 ```
 
 ```{r read-metadata, message=FALSE}
-library(openxlsx)
 library(tidyverse)
 colnames(spe) <- paste0(spe$sample_id, "_", spe$ObjectNumber)
 
-meta <- read.xlsx("data/sample_metadata.xlsx")
-spe$patient_id <- as.vector(str_extract_all(spe$sample_id, "Patient[1-4]", 
-   simplify = TRUE))
-spe$ROI <- as.vector(str_extract_all(spe$sample_id, "00[1-8]",  
-   simplify = TRUE))
-spe$indication <- meta$Indication[match(spe$patient_id, meta$Sample.ID)]
+# Read patient metadata
+meta <- read_csv("data/sample_metadata.csv")
 
+# Extract patient id and ROI id from sample name
+spe$patient_id <- str_extract(spe$sample_id, "Patient[1-4]")
+spe$ROI <- str_extract(spe$sample_id, "00[1-8]")
+
+# Store cancer type in SPE object
+spe$indication <- meta$Indication[match(spe$patient_id, meta$`Sample ID`)]
+
+# Specify which channels to use for downstream analysis
 rowData(spe)$use_channel <- !grepl("DNA|Histone", rownames(spe))
 
+# Transform the counts
 assay(spe, "exprs") <- asinh(counts(spe)/1)
 ```
 
@@ -304,9 +237,13 @@ start_time <- Sys.time()
 ```
 
 ```{r set-image-metadata}
-patient_id <- str_extract_all(names(images), "Patient[1-4]", simplify = TRUE)
-indication <- meta$Indication[match(patient_id, meta$Sample.ID)] 
+# Extract patient id from image name
+patient_id <- str_extract(names(images), "Patient[1-4]")
 
+# Retrieve cancer type per patient from metadata file
+indication <- meta$Indication[match(patient_id, meta$`Sample ID`)] 
+
+# Store patient and image level information in elementMetadata
 mcols(images) <- mcols(masks) <- DataFrame(sample_id = names(images),
                                            patient_id = patient_id,
                                            indication = indication)
@@ -408,8 +345,6 @@ bc_key <- bc_key[order(bc_key)]
 sce <- assignPrelim(sce, bc_key = bc_key)
 sce <- estCutoffs(sce)
 sce <- applyCutoffs(sce)
-
-sce <- filterPixels(sce, minevents = 40, correct_pixels = TRUE)
 ```
 
 ```{r, echo=FALSE}
@@ -418,6 +353,32 @@ end_time <- Sys.time()
 
 The step took 
 `r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
+
+Assess incorretly assigned pixels:
+
+```{r, message=FALSE}
+library(pheatmap)
+cur_table <- table(sce$bc_id, sce$sample_mass)
+
+# Visualize the correctly and incorrectly assigned pixels
+pheatmap(log10(cur_table + 1),
+         cluster_rows = FALSE,
+         cluster_cols = FALSE)
+
+# Compute the fraction of unassigned pixels per spot
+cur_table["0",] / colSums(cur_table)
+
+# Filter pixels that were assigned to a mass other than the spotted mass
+sce <- filterPixels(sce, minevents = 40, correct_pixels = TRUE)
+```
+
+```{r, include=FALSE}
+pdf("outputs/Fig5_filterPixels.pdf", width = 7, height = 6)
+pheatmap(log10(cur_table + 1),
+         cluster_rows = FALSE,
+         cluster_cols = FALSE)
+dev.off()
+```
 
 Compute and store the spillover matrix using the CATALYST package. 
 
@@ -449,9 +410,11 @@ start_time <- Sys.time()
 ```{r compCytof}
 library(dittoSeq)
 library(patchwork)
-    
+
+# Specify the channel_name entry for use with CATALYST    
 rowData(spe)$channel_name <- paste0(rowData(spe)$channel, "Di")
 
+# Add the missing metal isotope to the isotope_list
 isotope_list <- CATALYST::isotope_list
 isotope_list$Ar <- 80
 
@@ -460,6 +423,7 @@ spe <- compCytof(spe, sm,
                  isotope_list = isotope_list, 
                  overwrite = FALSE)
 
+# Visualize biaxial plots before/after compensation
 before <- dittoScatterPlot(spe, x.var = "Ecad", y.var = "CD303",
                            assay.x = "exprs", assay.y = "exprs") +
     ggtitle("Before compensation")
@@ -470,6 +434,7 @@ after <- dittoScatterPlot(spe, x.var = "Ecad", y.var = "CD303",
 
 before + after
 
+# Replace uncompensated assays
 assay(spe, "counts") <- assay(spe, "compcounts") 
 assay(spe, "exprs") <- assay(spe, "compexprs") 
 assay(spe, "compcounts") <- assay(spe, "compexprs") <- NULL
@@ -503,11 +468,17 @@ start_time <- Sys.time()
 ```
 
 ```{r compImage}
+# Use mass tags as channel names
 channelNames(images) <- rowData(spe)$channel_name
-adapted_sm <- adaptSpillmat(sm, paste0(rowData(spe)$channel, "Di"), 
+
+# Adapt spillover matrix to retain channels contained in the multi-channel images
+adapted_sm <- adaptSpillmat(sm, channelNames(images), 
                             isotope_list = isotope_list)
+
+# Perform image compensation
 images_comp <- compImage(images, adapted_sm)
 
+# Visualize neighboring channels before/ after compensation
 plotPixels(images[5], colour_by = "Yb173Di", 
            image_title = list(text = "Yb173 (Ecad) - before", 
                        position = "topleft"), 
@@ -525,6 +496,7 @@ plotPixels(images_comp[5], colour_by = "Yb174Di",
                               position = "topleft"),
            legend = NULL, bcg = list(Yb174Di = c(0, 4, 1)))
 
+# Switch back to using target names as channel names
 channelNames(images_comp) <- rownames(spe)
 ```
 
@@ -575,7 +547,11 @@ set.seed(20220118)
 img_ids <- sample(seq_len(length(images_comp)), 3)
 
 cur_images <- images_comp[img_ids]
+
+# Normalize each channel between 0 and 1 
 cur_images <- normalize(cur_images, separateImages = TRUE)
+
+# Clip channel intensities at 0 and 0.2
 cur_images <- normalize(cur_images, inputRange = c(0, 0.2))
 
 plotPixels(cur_images,
@@ -612,13 +588,7 @@ dev.off()
 ```
 
 ```{r, include=FALSE}
-p <- colData(spe) %>%
-    as.data.frame() %>%
-    group_by(sample_id) %>%
-    ggplot() +
-        geom_boxplot(aes(sample_id, area)) +
-        theme_minimal(base_size = 15) + 
-        theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 15)) +
+p <- dittoPlot(spe, "area", group.by = "sample_id", plots = "boxplot") +
         ylab("Cell area") + xlab("")
 ggsave("outputs/Fig7_cell-size.pdf", width = 7, height = 5)
 ```
@@ -626,13 +596,9 @@ ggsave("outputs/Fig7_cell-size.pdf", width = 7, height = 5)
 Visualize the distribution of the cell area and filter out small cells.
 
 ```{r cell-size}
-colData(spe) %>%
-    as.data.frame() %>%
-    group_by(sample_id) %>%
-    ggplot() +
-        geom_boxplot(aes(sample_id, area)) +
-        theme_minimal(base_size = 15) + 
-        theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 15)) +
+dittoPlot(spe, var = "area", 
+          group.by = "sample_id", 
+          plots = "boxplot") +
         ylab("Cell area") + xlab("")
 
 spe <- spe[,spe$area >= 5]
@@ -641,13 +607,18 @@ spe <- spe[,spe$area >= 5]
 Visualize the cell density per image.
 
 ```{r cell-density}
-colData(spe) %>%
+# Compute the cell density per image
+cell_density <- colData(spe) %>%
     as.data.frame() %>%
     group_by(sample_id) %>%
+    # Compute the number of pixels covered by cells and the total number of pixels
     summarize(cell_area = sum(area),
            no_pixels = mean(width_px) * mean(height_px)) %>%
-    mutate(covered_area = cell_area / no_pixels) %>%
-    ggplot() +
+    # Divide the total number of pixels by the number of pixels covered by cells
+    mutate(covered_area = cell_area / no_pixels)
+
+# Visualize the cell density per image
+ggplot(cell_density) +
         geom_point(aes(sample_id, covered_area)) + 
         theme_minimal(base_size = 15) +
         theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 15)) +
@@ -702,6 +673,7 @@ set.seed(220225)
 spe <- runUMAP(spe, subset_row = rowData(spe)$use_channel, 
  exprs_values = "exprs") 
 
+# Visualize the UMAP embedding and color cells by patient ID
 dittoDimPlot(spe, var = "patient_id", 
      reduction.use = "UMAP", size = 0.2)  +
     ggtitle("Patient ID on UMAP")
@@ -735,16 +707,21 @@ start_time <- Sys.time()
 
 ```{r batch-correction, message=FALSE, warning=FALSE}
 library(batchelor)
+
 set.seed(220228)
+# Perform batch correction
 out <- fastMNN(spe, batch = spe$patient_id,
                auto.merge = TRUE,
                subset.row = rowData(spe)$use_channel,
                assay.type = "exprs")
 
+# Store corrected embeddings in SPE object
 reducedDim(spe, "fastMNN") <- reducedDim(out, "corrected")
 
+# Compute UMAP on corrected embeddings
 spe <- runUMAP(spe, dimred= "fastMNN", name = "UMAP_mnnCorrected")
 
+# Visualize corrected UMAP
 dittoDimPlot(spe, var = "patient_id", 
                    reduction.use = "UMAP_mnnCorrected", size = 0.2) + 
     ggtitle("Patient ID on UMAP after correction")
@@ -792,17 +769,21 @@ start_time <- Sys.time()
 library(bluster)
 library(BiocParallel)
 
+# Select the corrected cell embeddings for clustering
 mat <- reducedDim(spe, "fastMNN")
 
 set.seed(220825)
+# Perform the cluster sweep
 combinations <- clusterSweep(mat, BLUSPARAM=SNNGraphParam(),
                              k=c(10L, 20L), 
                              type = c("rank", "jaccard"), 
                              cluster.fun = "louvain")
 
+# Compute the average silhouette width per parameter combination
 sil <- vapply(as.list(combinations$clusters), 
               function(x) mean(approxSilhouette(mat, x)$width), 0)
 
+# Visualize the average silhouette width per parameter combination
 ggplot(data.frame(method = names(sil),
                   sil = sil)) +
     geom_point(aes(method, sil), size = 3) +
@@ -856,6 +837,54 @@ end_time <- Sys.time()
 The step took 
 `r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
 
+Visualize the marker expression per cluster
+
+```{r message=FALSE}
+library(viridis)
+
+set.seed(220619)
+cur_cells <- sample(seq_len(ncol(spe)), 2000)
+
+dittoHeatmap(spe[,cur_cells], 
+             genes = rownames(spe)[rowData(spe)$use_channel],
+             assay = "exprs", scale = "none",
+             heatmap.colors = viridis(100), 
+             annot.by = c("nn_clusters", "patient_id"))
+```
+
+
+```{r, include=FALSE}
+pdf("outputs/Fig13_cluster-heatmap.pdf")
+dittoHeatmap(spe[,cur_cells], 
+             genes = rownames(spe)[rowData(spe)$use_channel],
+             assay = "exprs", scale = "none",
+             heatmap.colors = viridis(100), 
+             annot.by = c("nn_clusters", "patient_id"))
+dev.off()
+```
+
+Label clusters
+
+```{r, message=FALSE}
+cluster_celltypes <- recode(spe$nn_clusters,
+                            "1" = "Tumor_proliferating",
+                            "2" = "Tumor",
+                            "3" = "Tumor",
+                            "4" = "Tumor",
+                            "5" = "Stroma",
+                            "6" = "Tumor_proliferating",
+                            "7" = "Myeloid",
+                            "8" = "CD8",
+                            "9" = "Plasma_cell",
+                            "10" = "CD4",
+                            "11" = "Neutrophil",
+                            "12" = "Bcell",
+                            "13" = "Stroma",
+                            "14" = "unknown")
+
+spe$cluster_celltypes <- cluster_celltypes
+```
+
 ### (B) Classification-based cell phenotyping
 
 Gate individual cell types based on their marker expression. 
@@ -878,8 +907,10 @@ library(SingleCellExperiment)
 label_files <- list.files("data/gated_cells", 
                           full.names = TRUE, pattern = ".rds$")
 
+# Read in individual files containing gated cells
 spes <- lapply(label_files, readRDS)
 
+# Concatenate the individual objects into one
 concat_spe <- do.call("cbind", spes)
 ```
 
@@ -888,30 +919,37 @@ As a result of the multi-step labeling approach, some cells may have been labele
 In cases where one cell was labeled as both tumor and immune cell, we keep the immune cell label, as these cells are most likely immune cells residing within the tumor. 
 All other cells that were labeled multiple times are removed. Finally, the labels are stored in the main SpatialExperiment object.
 
+Define filtering function:
+
+```{r}
+filter_labels <- function(object, 
+                          label = "cytomapper_CellLabel") {
+    cur_tab <- unclass(table(colnames(object), object[[label]]))
+    
+    cur_labels <- colnames(cur_tab)[apply(cur_tab, 1, which.max)]
+    names(cur_labels) <- rownames(cur_tab)
+    
+    cur_labels <- cur_labels[rowSums(cur_tab) == 1]
+    
+    return(cur_labels)
+}
+```
+
 ```{r remove-doublets}
-cur_tab <- unclass(table(colnames(concat_spe), 
-                         concat_spe$cytomapper_CellLabel))
-cur_labels <- rep("doublets", nrow(cur_tab))
-names(cur_labels) <- rownames(cur_tab)
+labels <- filter_labels(concat_spe)
 
-# Single assignments
-single_index <- rowSums(cur_tab) == 1
-cur_labels[single_index] <- colnames(cur_tab)[
-apply(cur_tab[single_index,], 1, which.max)]
+cur_spe <- concat_spe[,concat_spe$cytomapper_CellLabel != "Tumor"]
 
-# Double assignment within the tumor
-double_index <- rowSums(cur_tab) == 2 & cur_tab[,"Tumor"] == 1
-no_tumor <- cur_tab[,colnames(cur_tab) != "Tumor"]
-cur_labels[double_index] <- colnames(no_tumor)[
-apply(no_tumor[double_index,], 1, which.max)]
+non_tumor_labels <- filter_labels(cur_spe)
 
-# Remove doublets
-cur_labels <- cur_labels[cur_labels != "doublets"]
+additional_cells <- setdiff(names(non_tumor_labels), names(labels))
+
+final_labels <- c(labels, non_tumor_labels[additional_cells])
 
 # Transfer labels to SPE object
 spe_labels <- rep("unlabeled", ncol(spe))
 names(spe_labels) <- colnames(spe)
-spe_labels[names(cur_labels)] <- cur_labels
+spe_labels[names(final_labels)] <- final_labels
 spe$cell_labels <- spe_labels
 ```
 
@@ -937,11 +975,14 @@ trainIndex <- createDataPartition(factor(lab_spe$cell_labels), p = 0.75)
 train_spe <- lab_spe[,trainIndex$Resample1]
 test_spe <- lab_spe[,-trainIndex$Resample1]
 
+# Define fit parameters for 5-fold cross validation
 fitControl <- trainControl(method = "cv",
                            number = 5)
 
+# Select the asinh-transformed counts for training
 cur_mat <- t(assay(train_spe, "exprs")[rowData(train_spe)$use_channel,])
 
+# Train a random forest classifier
 rffit <- train(x = cur_mat, 
                y = factor(train_spe$cell_labels),
                method = "rf", ntree = 1000,
@@ -974,6 +1015,7 @@ confusionMatrix(data = cur_pred,
 Predict cell labels of unlabelled cells. Cells for which the highest class probability is below 40% are labeled as “unknown”.
 
 ```{r predict-cells}
+# Select the asinh-transformed counts for prediction
 cur_mat <- t(assay(unlab_spe, "exprs")[rowData(unlab_spe)$use_channel,])
 
 cell_class <- as.character(predict.train(rffit, 
@@ -1001,10 +1043,10 @@ p1 <- dittoDimPlot(spe, var = "celltype",
              do.label = TRUE) +
   ggtitle("Cell types on UMAP, integrated cells")
 
-p2 <- dittoDimPlot(spe, var = "nn_clusters", 
+p2 <- dittoDimPlot(spe, var = "cluster_celltypes", 
              reduction.use = "UMAP_mnnCorrected", size = 0.2,
              do.label = TRUE) +
-  ggtitle("Clusters on UMAP, integrated cells")
+  ggtitle("Cluster cell types on UMAP, integrated cells")
 
 p1 + p2
 ```
@@ -1030,7 +1072,6 @@ Visualize mean marker expression per cell type and per cluster as heatmaps.
 
 ```{r celltype-cluster-heatmap, fig.height=8}
 library(scuttle)
-library(viridis)
 
 celltype_mean <- aggregateAcrossCells(as(spe, "SingleCellExperiment"),  
                      ids = spe$celltype, 
@@ -1154,7 +1195,6 @@ start_time <- Sys.time()
 ```
 
 ```{r cellular-neighbourhood, fig.height=12, fig.width=12}
-library(pheatmap)
 spe <- buildSpatialGraph(spe, img_id = "sample_id", type = "knn", k = 20)
 
 
