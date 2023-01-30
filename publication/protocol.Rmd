@@ -866,7 +866,7 @@ dev.off()
 Label clusters
 
 ```{r, message=FALSE}
-cluster_celltypes <- recode(spe$nn_clusters,
+cluster_celltype <- recode(spe$nn_clusters,
                             "1" = "Tumor_proliferating",
                             "2" = "Tumor",
                             "3" = "Tumor",
@@ -882,7 +882,7 @@ cluster_celltypes <- recode(spe$nn_clusters,
                             "13" = "Stroma",
                             "14" = "unknown")
 
-spe$cluster_celltypes <- cluster_celltypes
+spe$cluster_celltype <- cluster_celltype
 ```
 
 ### (B) Classification-based cell phenotyping
@@ -1002,11 +1002,14 @@ The confusionMatrix function compares the predicted cell labels to the ground tr
 A high sensitivity and a high specificity for each cell type label is to be desired.
 
 ```{r confusionMatrix}
+# Select the arsinh-transformed counts of the test data
 cur_mat <- t(assay(test_spe, "exprs")[rowData(test_spe)$use_channel,])
 
+# Predict the cell phenotype labels of the test data
 cur_pred <- predict(rffit, 
                     newdata = cur_mat)
 
+# Compute the confusion matrix between predicted and actual labels
 confusionMatrix(data = cur_pred, 
                       reference = factor(test_spe$cell_labels), 
                       mode = "everything")
@@ -1015,19 +1018,24 @@ confusionMatrix(data = cur_pred,
 Predict cell labels of unlabelled cells. Cells for which the highest class probability is below 40% are labeled as “unknown”.
 
 ```{r predict-cells}
-# Select the asinh-transformed counts for prediction
+# Select the arsinh-transformed counts of the unlabeled data for prediction
 cur_mat <- t(assay(unlab_spe, "exprs")[rowData(unlab_spe)$use_channel,])
 
-cell_class <- as.character(predict.train(rffit, 
-                                         newdata = cur_mat, 
-                                         type = "raw"))
+# Predict the cell phenotype labels of the unlabeled data
+cell_class <- as.character(predict(rffit,
+                                   newdata = cur_mat,
+                                   type = "raw"))
 names(cell_class) <- rownames(cur_mat)
 
-cell_prob <- predict.train(rffit, 
-                           newdata = cur_mat, 
-                           type = "prob")
+# Extract prediction probabilities for each cell
+cell_prob <- predict(rffit, 
+                     newdata = cur_mat, 
+                     type = "prob")
+
+# Label cells with a low prediction probability as undefined
 cell_class[rowMax(as.matrix(cell_prob)) < 0.4] <- "undefined"
 
+# Store cell phenotype labels in SPE object
 cell_labels <- spe$cell_labels
 cell_labels[colnames(unlab_spe)] <- cell_class
 spe$celltype <- cell_labels
@@ -1043,7 +1051,7 @@ p1 <- dittoDimPlot(spe, var = "celltype",
              do.label = TRUE) +
   ggtitle("Cell types on UMAP, integrated cells")
 
-p2 <- dittoDimPlot(spe, var = "cluster_celltypes", 
+p2 <- dittoDimPlot(spe, var = "cluster_celltype", 
              reduction.use = "UMAP_mnnCorrected", size = 0.2,
              do.label = TRUE) +
   ggtitle("Cluster cell types on UMAP, integrated cells")
@@ -1068,11 +1076,12 @@ ggsave("outputs/Fig12_celltype-UMAP.pdf", p1_new, width = 8, height = 5)
 ggsave("outputs/Fig12_cluster-UMAP.pdf", p2_new, width = 8, height = 5)
 ```
 
-Visualize mean marker expression per cell type and per cluster as heatmaps.
+Visualize mean marker expression per cell type and per annotated cluster as heatmaps.
 
 ```{r celltype-cluster-heatmap, fig.height=8}
 library(scuttle)
 
+# Calculate the mean of the arsinh-transformed counts per cell phenotype
 celltype_mean <- aggregateAcrossCells(as(spe, "SingleCellExperiment"),  
                      ids = spe$celltype, 
                      statistics = "mean",
@@ -1085,8 +1094,9 @@ dittoHeatmap(celltype_mean,
              heatmap.colors = viridis(100),
              annot.by = c("celltype","ncells"))
 
+# Calculate the mean of the arsinh-transformed counts per annotated cluster
 cluster_mean <- aggregateAcrossCells(as(spe, "SingleCellExperiment"),  
-                     ids = spe$nn_clusters, 
+                     ids = spe$cluster_celltype, 
                      statistics = "mean",
                      use.assay.type = "exprs",
                      subset_row = rowData(spe)$use_channel)
@@ -1095,7 +1105,7 @@ dittoHeatmap(cluster_mean,
              assay = "exprs", cluster_cols = TRUE, 
              scale = "none",
              heatmap.colors = viridis(100),
-             annot.by = c("nn_clusters","ncells"))
+             annot.by = c("cluster_celltype","ncells"))
 ```
 
 ```{r, include=FALSE}
@@ -1112,7 +1122,7 @@ dittoHeatmap(cluster_mean,
              assay = "exprs", cluster_cols = TRUE, 
              scale = "none",
              heatmap.colors = viridis(100),
-             annot.by = c("nn_clusters","ncells"))
+             annot.by = c("cluster_celltype","ncells"))
 dev.off()
 ```
 
@@ -1120,43 +1130,23 @@ dev.off()
 
 Perform spatial community analysis. 
 This method groups cells solely based on their location in the tissue by using a previously constructed spatial cell graph. We perform community detection separately for tumor and non-tumor cells. 
-An igraph object is constructed from the colPair slot storing the spatial cell graph constructed by steinbock, and the Louvain algorithm64 is used to detect spatial communities.
 
 ```{r, echo=FALSE}
 start_time <- Sys.time()
 ```
 
 ```{r spatial-community, message=FALSE, fig.height=12, fig.width=12}
-library(igraph)
+# Define if cells are part of the tumor or stroma
+spe$tumor_stroma <- ifelse(spe$celltype == "Tumor", "Tumor", "Stroma")
 
-# Spatial community detection - tumor
-tumor_spe <- spe[,spe$celltype == "Tumor"]
+# Detect spatial communities
+spe <- detectCommunity(spe, 
+                       colPairName = "neighborhood", 
+                       size_threshold = 10,
+                       group_by = "tumor_stroma",
+                       BPPARAM = SerialParam(RNGseed = 220819))
 
-gr <- graph_from_data_frame(as.data.frame(colPair(tumor_spe, "neighborhood")), 
-                            directed = FALSE, 
-                            vertices = data.frame(index = seq_len(ncol(tumor_spe))))
-
-cl_comm <- cluster_louvain(gr)
-comm_tumor <- paste0("Tumor_", membership(cl_comm))
-comm_tumor[membership(cl_comm) %in% which(sizes(cl_comm) < 10)] <- NA
-names(comm_tumor) <- colnames(tumor_spe)
-
-# Spatial community detection - non-tumor
-stroma_spe <- spe[,spe$celltype != "Tumor"]
-
-gr <- graph_from_data_frame(as.data.frame(colPair(stroma_spe, "neighborhood")), 
-                            directed = FALSE, 
-                            vertices = data.frame(index = seq_len(ncol(stroma_spe))))
-
-cl_comm <- cluster_louvain(gr)
-comm_stroma <- paste0("Stroma_", membership(cl_comm))
-comm_stroma[membership(cl_comm) %in% which(sizes(cl_comm) < 10)] <- NA
-names(comm_stroma) <- colnames(stroma_spe)
-
-comm <- c(comm_tumor, comm_stroma)
-
-spe$spatial_community <- comm[colnames(spe)]
-
+# Visualize spatial tumor communities
 plotSpatial(spe[,spe$celltype == "Tumor"], 
             node_color_by = "spatial_community", 
             img_id = "sample_id", 
@@ -1195,34 +1185,33 @@ start_time <- Sys.time()
 ```
 
 ```{r cellular-neighbourhood, fig.height=12, fig.width=12}
+# Construct a 20-nearest neighbor graph
 spe <- buildSpatialGraph(spe, img_id = "sample_id", type = "knn", k = 20)
 
-
+# Compute the fraction of cell phenotypes in each cells neighborhood
 spe <- aggregateNeighbors(spe, colPairName = "knn_interaction_graph", 
                           aggregate_by = "metadata", count_by = "celltype")
 
 set.seed(220705)
 
+# Cluster cells based on cell phenotype fractions
 cn_1 <- kmeans(spe$aggregatedNeighbors, centers = 6)
 spe$cn_celltypes <- as.factor(cn_1$cluster)
 
+# Visualize cellular neighborhoods
 plotSpatial(spe, 
             node_color_by = "cn_celltypes", 
             img_id = "sample_id", 
             node_size_fix = 0.5) +
     scale_color_brewer(palette = "Set3")
 
-mat <- colData(spe) %>% as_tibble() %>%
-    group_by(cn_celltypes, celltype) %>%
-    summarize(count = n()) %>%
-    mutate(freq = count / sum(count)) %>%
-    pivot_wider(id_cols = cn_celltypes, names_from = celltype, 
-                values_from = freq, values_fill = 0) %>%
-    ungroup() %>%
-    select(-cn_celltypes)
+# Compute the fraction of cell phenotypes in each cellular neighborhood
+mat <- prop.table(table(spe$cn_celltypes, spe$celltype), 
+                  margin = 1)
 ```
 
 ```{r}
+# Visualize cell phenotype fractions in each cellular neighborhood
 pheatmap(mat, 
   color = colorRampPalette(c("dark blue", "white", "dark red"))(100), 
   scale = "column")
@@ -1265,22 +1254,26 @@ start_time <- Sys.time()
 ```
 
 ```{r spatial-context, fig.height=12, fig.width=12}
+# Construct a 40-nearest neighbor graph
 spe <- buildSpatialGraph(spe, img_id = "sample_id", 
                          type = "knn", 
                          name = "knn_spatialcontext_graph", 
                          k = 40)
 
+# Compute the fraction of cellular neighborhoods around each cell
 spe <- aggregateNeighbors(spe, 
                           colPairName = "knn_spatialcontext_graph",
                           aggregate_by = "metadata",
                           count_by = "cn_celltypes",
                           name = "aggregatedNeighborhood")
 
+# Detect spatial contexts
 spe <- detectSpatialContext(spe, 
                             entry = "aggregatedNeighborhood",
                             threshold = 0.90,
                             name = "spatial_context")
 
+# Filter out small and infrequent spatial contexts
 spe <- filterSpatialContext(spe, 
                             entry = "spatial_context",
                             group_by = "patient_id", 
@@ -1288,6 +1281,7 @@ spe <- filterSpatialContext(spe,
                             cells_threshold = 100,
                             name = "spatial_context_filtered")
 
+# Visualize cell location colored by their spatial context
 plotSpatial(spe, 
             node_color_by = "spatial_context_filtered", 
             img_id = "sample_id", 
@@ -1296,6 +1290,7 @@ plotSpatial(spe,
 ```
 
 ```{r}
+# Visualize spatial contexts as graph
 plotSpatialContext(spe,
                    entry = "spatial_context_filtered",
                    group_by = "sample_id",
@@ -1392,16 +1387,21 @@ set.seed(220825)
 out <- testInteractions(spe, 
                         group_by = "sample_id",
                         label = "celltype", 
-                        colPairName = "neighborhood")
+                        colPairName = "neighborhood",
+                        BPPARAM = SerialParam(RNGseed = 221029))
 
-out %>% as_tibble() %>%
+# Sum interaction values across all images
+summed_sigvals <- out %>% as_tibble() %>%
     group_by(from_label, to_label) %>%
-    summarize(sum_sigval = sum(sigval, na.rm = TRUE)) %>%
-    ggplot() +
-        geom_tile(aes(from_label, to_label, fill = sum_sigval)) +
-        scale_fill_gradient2(low = muted("blue"), mid = "white", 
-  high = muted("red")) +
-        theme(axis.text.x = element_text(angle = 45, hjust = 1))
+    summarize(sum_sigval = sum(sigval, na.rm = TRUE))
+
+# Visualize summed interaction values in form of a heatmap
+ggplot(summed_sigvals) +
+    geom_tile(aes(from_label, to_label, fill = sum_sigval)) +
+    scale_fill_gradient2(low = muted("blue"), 
+                         mid = "white", 
+                         high = muted("red")) +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
 ```{r, echo=FALSE}
