@@ -66,12 +66,10 @@ BiocManager::install(c("pheatmap", "viridis",
                        "scales", "tiff", "CATALYST", "scuttle", "scater", 
                        "dittoSeq", "tidyverse", "batchelor", 
                        "bluster","scran", "lisaClust", "spicyR",
-                       "iSEE", "harmony"))
+                       "iSEE", "harmony", "imcRtools", "cytomapper"))
 
 # Github dependencies
-devtools::install_github(c("BodenmillerGroup/imcRtools", 
-                           "BodenmillerGroup/cytomapper", 
-                           "i-cyto/Rphenograph"))
+devtools::install_github("i-cyto/Rphenograph")
 ```
 
 ```{r load-libraries, echo = FALSE, message = FALSE}
@@ -102,7 +100,7 @@ Data containers:
 Data analysis:
 
 * [CATALYST](https://bioconductor.org/packages/release/bioc/html/CATALYST.html) version `r packageVersion("CATALYST")`
-* [imcRtools](https://github.com/BodenmillerGroup/imcRtools) version `r packageVersion("imcRtools")` from [Github](https://github.com/BodenmillerGroup/imcRtools)
+* [imcRtools](https://bioconductor.org/packages/release/bioc/html/imcRtools.html) version `r packageVersion("imcRtools")`
 * [scuttle](https://bioconductor.org/packages/release/bioc/html/scuttle.html) version `r packageVersion("scuttle")`
 * [scater](https://bioconductor.org/packages/release/bioc/html/scater.html) version `r packageVersion("scater")`
 * [batchelor](https://www.bioconductor.org/packages/release/bioc/html/batchelor.html) version `r packageVersion("batchelor")`
@@ -115,7 +113,7 @@ Data analysis:
 
 Data visualization:
 
-* [cytomapper](https://github.com/BodenmillerGroup/cytomapper) version `r packageVersion("cytomapper")` from [Github](https://github.com/BodenmillerGroup/cytomapper)
+* [cytomapper](https://bioconductor.org/packages/release/bioc/html/cytomapper.html) version `r packageVersion("cytomapper")`
 * [dittoSeq](https://bioconductor.org/packages/release/bioc/html/dittoSeq.html) version `r packageVersion("dittoSeq")`
 
 Tidy R:
