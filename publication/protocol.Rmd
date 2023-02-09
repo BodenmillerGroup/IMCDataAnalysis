@@ -52,7 +52,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r, message=FALSE}
 options(timeout = 10000)
 dir.create("data/steinbock/raw", recursive = TRUE)
-download.file("https://zenodo.org/record/7412972/files/panel.csv",
+download.file("https://zenodo.org/record/7624451/files/panel.csv",
               "data/steinbock/panel.csv")
 download.file("https://zenodo.org/record/7575859/files/Patient1.zip",
               "data/steinbock/raw/Patient1.zip")

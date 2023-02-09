@@ -423,22 +423,24 @@ expect_equal(colData(spe)[1:5, ], new("DFrame", rownames = c("Patient1_001_1", "
     "001", "001", "001"), indication = c("SCCHN", "SCCHN", "SCCHN", 
     "SCCHN", "SCCHN"))))
 
- expect_equal(names(rowData(spe)), c("channel", "name", "keep", "ilastik", "deepcell", "Tube.Number", 
+ expect_equal(names(rowData(spe)), c("channel", "name", "keep", "ilastik", "deepcell", "cellpose", "Tube.Number", 
  "Target", "Antibody.Clone", "Stock.Concentration", "Final.Concentration...Dilution", 
  "uL.to.add", "use_channel"))
  
  expect_equal(rowData(spe)[1:5,], new("DFrame", rownames = c("MPO", "HistoneH3", "SMA", "CD16", 
- "CD38"), nrows = 5L, listData = list(channel = c("Y89", "In113", 
- "In115", "Pr141", "Nd142"), name = c("MPO", "HistoneH3", "SMA", 
- "CD16", "CD38"), keep = c(1, 1, 1, 1, 1), ilastik = c(NA, 1, 
- NA, NA, NA), deepcell = c(NA, 1, NA, NA, NA), Tube.Number = c(2101, 
- 2113, 1914, 2079, 2095), Target = c("Myeloperoxidase MPO", "Histone H3", 
- "SMA", "CD16", "CD38"), Antibody.Clone = c("Polyclonal MPO", 
- "D1H2", "1A4", "EPR16784", "EPR4106"), Stock.Concentration = c(500, 
- 500, 500, 500, 500), Final.Concentration...Dilution = c("4 ug/mL", 
- "1 ug/mL", "0.25 ug/mL", "5 ug/mL", "2.5 ug/mL"), uL.to.add = c("0.8", 
- "0.2", "0.05", "1", "0.5"), use_channel = c(TRUE, FALSE, TRUE, 
- TRUE, TRUE)), elementType = "ANY", elementMetadata = NULL, metadata = list()))
+"CD38"), nrows = 5L, elementType = "ANY", elementMetadata = NULL, 
+    metadata = list(), listData = list(channel = c("Y89", "In113", 
+    "In115", "Pr141", "Nd142"), name = c("MPO", "HistoneH3", 
+    "SMA", "CD16", "CD38"), keep = c(1, 1, 1, 1, 1), ilastik = c(NA, 
+    1, NA, NA, NA), deepcell = c(NA, 1, NA, NA, NA), cellpose = c(NA, 
+    NA, NA, NA, NA), Tube.Number = c(2101, 2113, 1914, 2079, 
+    2095), Target = c("Myeloperoxidase MPO", "Histone H3", "SMA", 
+    "CD16", "CD38"), Antibody.Clone = c("Polyclonal MPO", "D1H2", 
+    "1A4", "EPR16784", "EPR4106"), Stock.Concentration = c(500, 
+    500, 500, 500, 500), Final.Concentration...Dilution = c("4 ug/mL", 
+    "1 ug/mL", "0.25 ug/mL", "5 ug/mL", "2.5 ug/mL"), uL.to.add = c("0.8", 
+    "0.2", "0.05", "1", "0.5"), use_channel = c(TRUE, FALSE, 
+    TRUE, TRUE, TRUE))))
  
  expect_equal(rownames(spe), c("MPO", "HistoneH3", "SMA", "CD16", "CD38", "HLADR", "CD27", 
  "CD15", "CD45RA", "CD163", "B2M", "CD20", "CD68", "Ido1", "CD3", 
@@ -498,21 +500,21 @@ expect_equal(names(images)[1:5], c("Patient1_001", "Patient1_002", "Patient1_003
 
 expect_s4_class(images, "CytoImageList")
 
-expect_equal(mcols(images), new("DFrame", rownames = c("Patient1_001", "Patient1_002", "Patient1_003",
-"Patient2_001", "Patient2_002", "Patient2_003", "Patient2_004",
-"Patient3_001", "Patient3_002", "Patient3_003", "Patient4_005",
-"Patient4_006", "Patient4_007", "Patient4_008"), nrows = 14L,
-    listData = list(sample_id = c("Patient1_001", "Patient1_002",
-    "Patient1_003", "Patient2_001", "Patient2_002", "Patient2_003",
-    "Patient2_004", "Patient3_001", "Patient3_002", "Patient3_003",
+expect_equal(mcols(images), new("DFrame", rownames = c("Patient1_001", "Patient1_002", "Patient1_003", 
+"Patient2_001", "Patient2_002", "Patient2_003", "Patient2_004", 
+"Patient3_001", "Patient3_002", "Patient3_003", "Patient4_005", 
+"Patient4_006", "Patient4_007", "Patient4_008"), nrows = 14L, 
+    elementType = "ANY", elementMetadata = NULL, metadata = list(), 
+    listData = list(sample_id = c("Patient1_001", "Patient1_002", 
+    "Patient1_003", "Patient2_001", "Patient2_002", "Patient2_003", 
+    "Patient2_004", "Patient3_001", "Patient3_002", "Patient3_003", 
     "Patient4_005", "Patient4_006", "Patient4_007", "Patient4_008"
-    ), patient_id.V1 = c("Patient1", "Patient1", "Patient1",
-    "Patient2", "Patient2", "Patient2", "Patient2", "Patient3",
-    "Patient3", "Patient3", "Patient4", "Patient4", "Patient4",
-    "Patient4"), indication = c("SCCHN", "SCCHN", "SCCHN", "BCC",
-    "BCC", "BCC", "BCC", "NSCLC", "NSCLC", "NSCLC", "CRC", "CRC",
-    "CRC", "CRC")), elementType = "ANY", elementMetadata = NULL,
-    metadata = list()))
+    ), patient_id = c("Patient1", "Patient1", "Patient1", "Patient2", 
+    "Patient2", "Patient2", "Patient2", "Patient3", "Patient3", 
+    "Patient3", "Patient4", "Patient4", "Patient4", "Patient4"
+    ), indication = c("SCCHN", "SCCHN", "SCCHN", "BCC", "BCC", 
+    "BCC", "BCC", "NSCLC", "NSCLC", "NSCLC", "CRC", "CRC", "CRC", 
+    "CRC"))))
 
 expect_equal(as.array(images$Patient1_001)[1:5,1:5,1:2],
              structure(c(0, 0, 0, 0, 1.76359105110168, 0, 0, 0, 1.68342781066895,
@@ -540,7 +542,7 @@ expect_equal(mcols(masks), new("DFrame", rownames = c("Patient1_001", "Patient1_
     "Patient1_003", "Patient2_001", "Patient2_002", "Patient2_003",
     "Patient2_004", "Patient3_001", "Patient3_002", "Patient3_003",
     "Patient4_005", "Patient4_006", "Patient4_007", "Patient4_008"
-    ), patient_id.V1 = c("Patient1", "Patient1", "Patient1",
+    ), patient_id = c("Patient1", "Patient1", "Patient1",
     "Patient2", "Patient2", "Patient2", "Patient2", "Patient3",
     "Patient3", "Patient3", "Patient4", "Patient4", "Patient4",
     "Patient4"), indication = c("SCCHN", "SCCHN", "SCCHN", "BCC",

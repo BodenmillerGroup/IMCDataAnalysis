@@ -6,7 +6,7 @@ cd ${BASEDIR}
 
 # setup steinbock alias
 shopt -s expand_aliases
-alias steinbock="docker run -v ${BASEDIR}/data/steinbock:/data -u $(id -u):$(id -g) ghcr.io/bodenmillergroup/steinbock:0.15.0"
+alias steinbock="docker run -v ${BASEDIR}/data/steinbock:/data -u $(id -u):$(id -g) ghcr.io/bodenmillergroup/steinbock:0.16.0"
 
 # image pre-processing
 { time steinbock preprocess imc images --hpf 50; } 2> steinbock_timing.txt
