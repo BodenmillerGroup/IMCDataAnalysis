@@ -221,13 +221,17 @@ For the current data, we need to link the cancer type (also referred to as "Indi
 to each sample. This metadata is available as external excel file:
 
 ```{r add-indication}
-library(openxlsx)
-library(stringr)
-meta <- read.xlsx("data/sample_metadata.xlsx")
+library(tidyverse)
 
-spe$patient_id <- as.vector(str_extract_all(spe$sample_id, "Patient[1-4]", simplify = TRUE))
-spe$ROI <- as.vector(str_extract_all(spe$sample_id, "00[1-8]", simplify = TRUE))
-spe$indication <- meta$Indication[match(spe$patient_id, meta$Sample.ID)]
+# Read patient metadata
+meta <- read_csv("data/sample_metadata.csv")
+
+# Extract patient id and ROI id from sample name
+spe$patient_id <- str_extract(spe$sample_id, "Patient[1-4]")
+spe$ROI <- str_extract(spe$sample_id, "00[1-8]")
+
+# Store cancer type in SPE object
+spe$indication <- meta$Indication[match(spe$patient_id, meta$`Sample ID`)]
 
 unique(spe$indication)
 ```
@@ -354,9 +358,14 @@ both `CytoImageList` objects is the same.
 
 ```{r add-metadata}
 all.equal(names(images), names(masks))
-patient_id <- str_extract_all(names(images), "Patient[1-4]", simplify = TRUE)
-indication <- meta$Indication[match(patient_id, meta$Sample.ID)] 
 
+# Extract patient id from image name
+patient_id <- str_extract(names(images), "Patient[1-4]")
+
+# Retrieve cancer type per patient from metadata file
+indication <- meta$Indication[match(patient_id, meta$`Sample ID`)] 
+
+# Store patient and image level information in elementMetadata
 mcols(images) <- mcols(masks) <- DataFrame(sample_id = names(images),
                                            patient_id = patient_id,
                                            indication = indication)

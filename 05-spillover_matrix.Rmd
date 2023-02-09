@@ -175,9 +175,13 @@ This information can be visualized in form of a heatmap:
 library(pheatmap)
 cur_table <- table(sce$bc_id, sce$sample_mass)
 
+# Visualize the correctly and incorrectly assigned pixels
 pheatmap(log10(cur_table + 1),
          cluster_rows = FALSE,
          cluster_cols = FALSE)
+
+# Compute the fraction of unassigned pixels per spot
+cur_table["0",] / colSums(cur_table)
 ```
 
 We can see here, that all pixels were assigned to the right mass and that all

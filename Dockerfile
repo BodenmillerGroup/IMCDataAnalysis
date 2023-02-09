@@ -8,7 +8,7 @@ RUN apt-get -y update \
     && rm -rf /var/lib/apt/ilists/*
 
 RUN R -e 'install.packages(c("rmarkdown", "bookdown", "pheatmap", "viridis", "zoo", "BiocManager", "devtools", "testthat", "tiff", \
-                             "distill", "openxlsx", "ggrepel", "patchwork", "mclust", "RColorBrewer", "uwot", "Rtsne", "harmony", \
+                             "distill", "ggrepel", "patchwork", "mclust", "RColorBrewer", "uwot", "Rtsne", "harmony", \
                              "Seurat", "SeuratObject", "cowplot", "kohonen", "caret", "randomForest", "ggridges", "cowplot", \
                              "gridGraphics", "scales", "tiff", "harmony"))'
 RUN R -e 'BiocManager::install(c("CATALYST", "scuttle", "scater", "dittoSeq", "tidyverse", "BiocStyle", "batchelor", "bluster", \

@@ -59,7 +59,7 @@ if (!requireNamespace("BiocManager", quietly = TRUE))
 
 BiocManager::install(c("pheatmap", "viridis",
                        "zoo", "BiocManager", "devtools", "tiff",
-                       "distill", "openxlsx", "ggrepel", "patchwork", "mclust",
+                       "distill", "ggrepel", "patchwork", "mclust",
                        "RColorBrewer", "uwot", "Rtsne", "Seurat", 
                        "SeuratObject", "cowplot", "kohonen", "caret", 
                        "randomForest", "ggridges", "cowplot", "gridGraphics",
@@ -125,7 +125,7 @@ Tidy R:
 The analysis presented here fully relies on packages written in the programming
 language `R` and primarily focuses on analysis approaches downstream of image
 processing. The example data available at
-[https://zenodo.org/record/5949116](https://zenodo.org/record/5949116) were
+[https://zenodo.org/record/7575859](https://zenodo.org/record/7575859) were
 processed (file type conversion, image segmentation, feature extraction as
 explained in Section \@ref(processing)) using the
 [steinbock](https://bodenmillergroup.github.io/steinbock/latest/) framework. The
@@ -135,7 +135,7 @@ exact command line interface calls to process the raw data are shown below:
 if (!dir.exists("data/steinbock")) dir.create("data/steinbock")
 if (!dir.exists("data/ImcSegmentationPipeline")) dir.create("data/ImcSegmentationPipeline")
 # Pre-download steinbock file
-download.file("https://zenodo.org/record/7412972/files/steinbock.sh", 
+download.file("https://zenodo.org/record/7624451/files/steinbock.sh", 
               "data/steinbock/steinbock.sh")
 ```
 
@@ -152,12 +152,12 @@ To highlight the basic steps of IMC data analysis, we provide example data that
 were acquired as part of the **I**ntegrated i**MMU**noprofiling of large adaptive
 **CAN**cer patient cohorts projects ([immucan.eu](https://immucan.eu/)). The
 raw data of 4 patients can be accessed online at 
-[zenodo.org/record/5949116](https://zenodo.org/record/5949116) the
+[zenodo.org/record/7575859](https://zenodo.org/record/7575859) the
 sample/patient metadata information here:
 
 ```{r download-sample-data}
-download.file("https://zenodo.org/record/5949116/files/sample_metadata.xlsx", 
-         destfile = "data/sample_metadata.xlsx")
+download.file("https://zenodo.org/record/7575859/files/sample_metadata.csv", 
+         destfile = "data/sample_metadata.csv")
 ```
 
 ### Processed multiplexed imaging data
@@ -180,14 +180,14 @@ commands which were used to generate this data can be found in
 
 ```{r steinbock-results}
 # download intensities
-url <- "https://zenodo.org/record/7412972/files/intensities.zip"
+url <- "https://zenodo.org/record/7624451/files/intensities.zip"
 destfile <- "data/steinbock/intensities.zip"
 download.file(url, destfile)
 unzip(destfile, exdir="data/steinbock", overwrite=TRUE)
 unlink(destfile)
 
 # download regionprops
-url <- "https://zenodo.org/record/7412972/files/regionprops.zip"
+url <- "https://zenodo.org/record/7624451/files/regionprops.zip"
 destfile <- "data/steinbock/regionprops.zip"
 download.file(url, destfile)
 unzip(destfile, exdir="data/steinbock", overwrite=TRUE)
@@ -195,32 +195,32 @@ unlink(destfile)
 
 
 # download neighbors
-url <- "https://zenodo.org/record/7412972/files/neighbors.zip"
+url <- "https://zenodo.org/record/7624451/files/neighbors.zip"
 destfile <- "data/steinbock/neighbors.zip"
 download.file(url, destfile)
 unzip(destfile, exdir="data/steinbock", overwrite=TRUE)
 unlink(destfile)
 
 # download images
-url <- "https://zenodo.org/record/7412972/files/img.zip"
+url <- "https://zenodo.org/record/7624451/files/img.zip"
 destfile <- "data/steinbock/img.zip"
 download.file(url, destfile)
 unzip(destfile, exdir="data/steinbock", overwrite=TRUE)
 unlink(destfile)
 
 # download masks
-url <- "https://zenodo.org/record/7412972/files/masks_deepcell.zip"
+url <- "https://zenodo.org/record/7624451/files/masks_deepcell.zip"
 destfile <- "data/steinbock/masks_deepcell.zip"
 download.file(url, destfile)
 unzip(destfile, exdir="data/steinbock", overwrite=TRUE)
 unlink(destfile)
 
 # download individual files
-download.file("https://zenodo.org/record/7412972/files/panel.csv", 
+download.file("https://zenodo.org/record/7624451/files/panel.csv", 
               "data/steinbock/panel.csv")
-download.file("https://zenodo.org/record/7412972/files/images.csv", 
+download.file("https://zenodo.org/record/7624451/files/images.csv", 
               "data/steinbock/images.csv")
-download.file("https://zenodo.org/record/7412972/files/steinbock.sh", 
+download.file("https://zenodo.org/record/7624451/files/steinbock.sh", 
               "data/steinbock/steinbock.sh")
 ```
 
@@ -257,7 +257,7 @@ To highlight the estimation and correction of channel-spillover as described by
 [@Chevrier2017], we can access an example spillover-acquisition from:
 
 ```{r download-spillover-data}
-download.file("https://zenodo.org/record/5949116/files/compensation.zip",
+download.file("https://zenodo.org/record/7575859/files/compensation.zip",
               "data/compensation.zip")
 unzip("data/compensation.zip", exdir="data", overwrite=TRUE)
 unlink("data/compensation.zip")
@@ -267,7 +267,7 @@ unlink("data/compensation.zip")
 
 In Section \@ref(classification), we present a cell type classification approach
 that relies on previously gated cells. This ground truth data is available
-online at [zenodo.org/record/6554611](https://zenodo.org/record/6554611) and
+online at [zenodo.org/record/7432486](https://zenodo.org/record/7432486) and
 will be downloaded here for later use:
 
 ```{r download-gated-cells}

@@ -502,7 +502,27 @@ this cluster as B cells. The next chapter \@ref(single-cell-visualization) will
 highlight single-cell visualization methods that can be helpful for manual 
 cluster annotations. 
 
-Full cell labeling can be seen in the following section.
+An example how to label clusters can be seen below:
+
+```{r, message=FALSE}
+cluster_celltype <- recode(spe$nn_clusters,
+                            "1" = "Tumor_proliferating",
+                            "2" = "Myeloid",
+                            "3" = "Tumor",
+                            "4" = "Tumor",
+                            "5" = "Stroma",
+                            "6" = "Myeloid_proliferating",
+                            "7" = "Myeloid",
+                            "8" = "Tumor_proliferating",
+                            "9" = "CD8",
+                            "10" = "CD38",
+                            "11" = "CD4",
+                            "12" = "Bcell",
+                            "13" = "Stroma",
+                            "14" = "unknown")
+
+spe$cluster_celltype <- cluster_celltype
+```
 
 ## Classification approach {#classification}
 
@@ -558,7 +578,7 @@ if (interactive()) {
 ```
 
 The labeled cells for this data set can be accessed at
-[zenodo.org/record/6554611](https://zenodo.org/record/6554611) and were
+[zenodo.org/record/7432486](https://zenodo.org/record/7432486) and were
 downloaded in Section \@ref(prerequisites). Per image, the `cytomapperShiny`
 function allows the export of gated cells in form of a `SingleCellExperiment` or
 `SpatialExperiment` object. The cell label is stored in
@@ -607,31 +627,39 @@ we will identify those cells that were labeled twice AND were labeled as Tumor
 cells. These cells will be assigned their immune cell label. Finally, we will
 save the unique labels within the original `SpatialExperiment` object.
 
-```{r, consolidate-labels}
-cur_tab <- unclass(table(colnames(concat_spe), 
-                         concat_spe$cytomapper_CellLabel))
-cur_labels <- rep("doublets", nrow(cur_tab))
-names(cur_labels) <- rownames(cur_tab)
+For these tasks, we will define a filter function:
 
-# Single assignments
-single_index <- rowSums(cur_tab) == 1
-cur_labels[single_index] <- colnames(cur_tab)[apply(cur_tab[single_index,], 1, 
-                                                    which.max)]
+```{r}
+filter_labels <- function(object, 
+                          label = "cytomapper_CellLabel") {
+    cur_tab <- unclass(table(colnames(object), object[[label]]))
+    
+    cur_labels <- colnames(cur_tab)[apply(cur_tab, 1, which.max)]
+    names(cur_labels) <- rownames(cur_tab)
+    
+    cur_labels <- cur_labels[rowSums(cur_tab) == 1]
+    
+    return(cur_labels)
+}
+```
 
-# Double assignment within the tumor
-double_index <- rowSums(cur_tab) == 2 & cur_tab[,"Tumor"] == 1
-no_tumor <- cur_tab[,colnames(cur_tab) != "Tumor"]
-cur_labels[double_index] <- colnames(no_tumor)[apply(no_tumor[double_index,], 1, 
-                                                    which.max)]
+This function is now applied to all cells and then only non-tumor cells.
 
-# Remove doublets
-cur_labels <- cur_labels[cur_labels != "doublets"]
-table(cur_labels)
+```{r remove-doublets}
+labels <- filter_labels(concat_spe)
+
+cur_spe <- concat_spe[,concat_spe$cytomapper_CellLabel != "Tumor"]
+
+non_tumor_labels <- filter_labels(cur_spe)
+
+additional_cells <- setdiff(names(non_tumor_labels), names(labels))
+
+final_labels <- c(labels, non_tumor_labels[additional_cells])
 
 # Transfer labels to SPE object
 spe_labels <- rep("unlabeled", ncol(spe))
 names(spe_labels) <- colnames(spe)
-spe_labels[names(cur_labels)] <- cur_labels
+spe_labels[names(final_labels)] <- final_labels
 spe$cell_labels <- spe_labels
 
 # Number of cells labeled per patient

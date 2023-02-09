@@ -79,7 +79,7 @@ unlink("data/gated_cells.zip")
 TODO
 
 ```{bash, eval=FALSE}
-alias steinbock="docker run -v /path/to/IMCDataAnalysis/data/steinbock:/data -u $(id -u):$(id -g) ghcr.io/bodenmillergroup/steinbock:0.15.0"
+alias steinbock="docker run -v /path/to/IMCDataAnalysis/data/steinbock:/data -u $(id -u):$(id -g) ghcr.io/bodenmillergroup/steinbock:0.16.0"
 ```
 
 ## Preprocessing
