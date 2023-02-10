@@ -802,7 +802,7 @@ Finally, we save the updated `SpatialExperiment` object.
 saveRDS(spe, "data/spe.rds")
 ```
 
-```{r testing, include=FALSE, eval=FALSE}
+```{r testing, include=FALSE}
 library(testthat)
 
 expect_equal(table(spe$tumor_stroma),
