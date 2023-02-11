@@ -1,0 +1,1431 @@
+---
+title: "An end-to-end workflow for multiplexed image processing and analysis"
+date: "Compiled on `r BiocStyle::doc_date()`"
+author:
+- name: Jonas Windhager
+  affiliation: 
+  - Department of Quantitative Biomedicine, University of Zurich, Zurich, Switzerland
+  - Institute for Molecular Health Sciences, ETH Zurich, Zurich, Switzerland
+  - Life Science Zurich Graduate School, ETH Zurich and University of Zurich, Zurich, Switzerland
+- name: Vito Riccardo Tomaso Zanotelli
+  affiliation: 
+  - Department of Quantitative Biomedicine, University of Zurich, Zurich, Switzerland
+  - Institute for Molecular Health Sciences, ETH Zurich, Zurich, Switzerland
+- name: Daniel Schulz
+  affiliation: 
+  - Department of Quantitative Biomedicine, University of Zurich, Zurich, Switzerland
+  - Institute for Molecular Health Sciences, ETH Zurich, Zurich, Switzerland
+- name: Lasse Meyer
+  affiliation: 
+  - Department of Quantitative Biomedicine, University of Zurich, Zurich, Switzerland
+  - Institute for Molecular Health Sciences, ETH Zurich, Zurich, Switzerland
+- name: Michelle Daniel
+  affiliation: 
+  - Department of Quantitative Biomedicine, University of Zurich, Zurich, Switzerland
+  - Institute for Molecular Health Sciences, ETH Zurich, Zurich, Switzerland
+- name: Bernd Bodenmiller
+  affiliation: 
+  - Department of Quantitative Biomedicine, University of Zurich, Zurich, Switzerland
+  - Institute for Molecular Health Sciences, ETH Zurich, Zurich, Switzerland
+  email: bernd.bodenmiller@uzh.ch
+- name: Nils Eling
+  affiliation: 
+  - Department of Quantitative Biomedicine, University of Zurich, Zurich, Switzerland
+  - Institute for Molecular Health Sciences, ETH Zurich, Zurich, Switzerland
+  email: nils.eling@dqbm.uzh.ch
+output:
+    BiocStyle::html_document:
+        toc_float: yes
+abstract: |
+    Highly multiplexed imaging has enabled the simultaneous spatial profiling of dozens of biological molecules in tissues at single-cell resolution. Extracting biologically relevant information such as the spatial distribution of cell phenotypes from multiplexed tissue imaging data involves a number of computational tasks, including image segmentation, feature extraction, and spatially-resolved single-cell analysis. Here, we present an end-to-end workflow for multiplexed tissue image processing and analysis, integrating a number of previously developed computational tools to enable these tasks in a user-friendly and customizable fashion. For data quality assessment, we highlight the utility of napari-imc for interactively inspecting raw imaging data and the cytomapper R/Bioconductor package for image visualization in R. Raw data preprocessing, image segmentation and feature extraction are performed using the steinbock toolkit. We showcase two alternative approaches for segmenting cells based on supervised pixel classification and pre-trained deep learning models. The extracted single-cell data is then read, processed and analyzed in R. The protocol describes the use of common data containers, facilitating the application of a number of R/Bioconductor packages for dimensionality reduction, single-cell visualization and phenotyping. We provide instructions to perform spatially-resolved single-cell analysis including community analysis, cellular neighborhood detection and cell-cell interaction testing using the imcRtools R/Bioconductor package. Overall, we provide the protocol for researchers with little bioinformatics training, and data analysis can be completed within 5-6 hours, depending on the segmentation approach. An extended version of the workflow can be accessed at [https://bodenmillergroup.github.io/IMCDataAnalysis/](https://bodenmillergroup.github.io/IMCDataAnalysis/). 
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Procedure
+
+### Example data
+
+```{r, message=FALSE}
+options(timeout = 10000)
+dir.create("data/steinbock/raw", recursive = TRUE)
+download.file("https://zenodo.org/record/7624451/files/panel.csv",
+              "data/steinbock/panel.csv")
+download.file("https://zenodo.org/record/7575859/files/Patient1.zip",
+              "data/steinbock/raw/Patient1.zip")
+download.file("https://zenodo.org/record/7575859/files/Patient2.zip",
+              "data/steinbock/raw/Patient2.zip")
+download.file("https://zenodo.org/record/7575859/files/Patient3.zip",
+              "data/steinbock/raw/Patient3.zip")
+download.file("https://zenodo.org/record/7575859/files/Patient4.zip",
+              "data/steinbock/raw/Patient4.zip")
+download.file("https://zenodo.org/record/7575859/files/compensation.zip",
+              "data/compensation.zip")
+unzip("data/compensation.zip", exdir="data", overwrite=TRUE)
+unlink("data/compensation.zip")
+download.file("https://zenodo.org/record/7575859/files/sample_metadata.csv", 
+         destfile = "data/sample_metadata.csv")
+download.file("https://zenodo.org/record/7432486/files/gated_cells.zip",
+              "data/gated_cells.zip")
+unzip("data/gated_cells.zip", exdir="data", overwrite=TRUE)
+unlink("data/gated_cells.zip")
+```
+
+## Setting the steinbock alias 
+
+TODO
+
+```{bash, eval=FALSE}
+alias steinbock="docker run -v /path/to/IMCDataAnalysis/data/steinbock:/data -u $(id -u):$(id -g) ghcr.io/bodenmillergroup/steinbock:0.16.0"
+```
+
+## Preprocessing
+
+In this protocol, data pre-processing refers to the extraction of multi-channel images from raw imaging data, and to preparing them for downstream processing. 
+The required steps are dependent on the imaging technology; here, we showcase the pre-processing of raw IMC data which includes a hot pixel filtering step. 
+
+```{bash preprocess-images, eval = FALSE}
+steinbock preprocess imc images --hpf 50
+```
+
+
+The step took `TODO` minutes.
+
+## Image segmentation
+
+Perform automatic deep learning-enabled single-cell segmentation using the pre-trained Mesmer neural network implemented in DeepCell. 
+In the following command, channels will be min-max-normalized and mean-aggregated according to the deepcell column in the panel file. 
+
+```{bash segment-cells, eval = FALSE}
+steinbock segment deepcell --minmax
+```
+
+The step took `TODO` minutes.
+
+## Single-cell data extraction
+
+For each image, extract the mean pixel intensity per cell and marker. 
+The resulting cell-level intensity values are stored as separate CSV files (one file per image):
+
+```{bash measure-intensities, eval = FALSE}
+steinbock measure intensities
+```
+
+The step took `TODO` minutes.
+
+For each image, extract standard morphological features (e.g., area, eccentricity) per cell. 
+The resulting cell-level features are stored as separate CSV files (one file per image):
+
+```{bash measure-regionprops, eval = FALSE}
+steinbock measure regionprops
+```
+
+The step took `TODO` minutes.
+
+In each image, detect cells in close spatial proximity. 
+The resulting spatial cell graphs are stored as separate directed edge lists in CSV format (one file per image):
+
+```{bash measure-neighbors, eval = FALSE}
+steinbock measure neighbors --type expansion --dmax 4
+```
+
+The step took  `TODO` minutes.
+
+## Reading in data
+
+Read in the spatially-resolved single-cell data into R using the imcRtools package. 
+For the rest of the protocol we will continue with the steinbock generated data.
+
+```{r, echo=FALSE}
+start_time <- Sys.time()
+```
+
+```{r read-steinbock, message=FALSE}
+library(imcRtools)
+spe <- read_steinbock("data/steinbock/")
+```
+
+```{r, echo=FALSE}
+end_time <- Sys.time()
+```
+
+The step took 
+`r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
+
+After reading in the single-cell data, the SpatialExperiment object needs to be further processed. 
+First, the column names are set based on the image name and the cell identifier. 
+The patient identifier and the region of interest (ROI) identifier are saved in the object as well as the cancer type, which can be read in from the provided `data/sample_metadata.xlsx` file. 
+For easy access later on, the channels containing biological variation are selected. 
+Finally, the mean pixel intensities per channel and cell are arsinh-transformed using a cofactor of 1.
+
+```{r, echo=FALSE}
+start_time <- Sys.time()
+```
+
+```{r read-metadata, message=FALSE}
+library(tidyverse)
+colnames(spe) <- paste0(spe$sample_id, "_", spe$ObjectNumber)
+
+# Read patient metadata
+meta <- read_csv("data/sample_metadata.csv")
+
+# Extract patient id and ROI id from sample name
+spe$patient_id <- str_extract(spe$sample_id, "Patient[1-4]")
+spe$ROI <- str_extract(spe$sample_id, "00[1-8]")
+
+# Store cancer type in SPE object
+spe$indication <- meta$Indication[match(spe$patient_id, meta$`Sample ID`)]
+
+# Specify which channels to use for downstream analysis
+rowData(spe)$use_channel <- !grepl("DNA|Histone", rownames(spe))
+
+# Transform the counts
+assay(spe, "exprs") <- asinh(counts(spe)/1)
+```
+
+```{r, echo=FALSE}
+end_time <- Sys.time()
+```
+
+The step took 
+`r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
+
+Read in multi-channel images as a CytoImageList container using the cytomapper package. 
+
+```{r, echo=FALSE}
+start_time <- Sys.time()
+```
+
+```{r read-images, message=FALSE}
+library(cytomapper)
+images <- loadImages("data/steinbock/img/")
+channelNames(images) <- rownames(spe)
+```
+
+```{r, echo=FALSE}
+end_time <- Sys.time()
+```
+
+The step took 
+`r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
+
+Read in segmentation masks as a CytoImageList container.
+
+```{r, echo=FALSE}
+start_time <- Sys.time()
+```
+
+```{r read-masks}
+masks <- loadImages("data/steinbock/masks/", as.is = TRUE)
+```
+
+```{r, echo=FALSE}
+end_time <- Sys.time()
+```
+
+The step took 
+`r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
+
+For downstream visualization and analysis tasks, additional metadata needs to be added to the CytoImageList objects storing the multi-channel images and segmentation masks. 
+Here, individual images, segmentation masks and entries in the SpatialExperiment object are matched via the sample_id entry.
+
+```{r, echo=FALSE}
+start_time <- Sys.time()
+```
+
+```{r set-image-metadata}
+# Extract patient id from image name
+patient_id <- str_extract(names(images), "Patient[1-4]")
+
+# Retrieve cancer type per patient from metadata file
+indication <- meta$Indication[match(patient_id, meta$`Sample ID`)] 
+
+# Store patient and image level information in elementMetadata
+mcols(images) <- mcols(masks) <- DataFrame(sample_id = names(images),
+                                           patient_id = patient_id,
+                                           indication = indication)
+```
+
+```{r, echo=FALSE}
+end_time <- Sys.time()
+```
+
+The step took 
+`r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
+
+## Spillover correction
+
+Low signal spillover between neighbouring channels occurs when using technologies that rely on mass cytometry. 
+Spillover is defined as a small proportion of the signal of a neighbouring channel which can be detected in the primary channel. 
+As spillover is linear to the signal of the neighbouring channel it can be correct for using a previously described compensation approach. 
+This phenomenon is IMC specific and the steps of the following section can be skipped when working with data generated by other multiplexed imaging technologies. 
+
+Read in data from the spillover slide for channel-to-channel spillover correction. The experimental procedure to create and acquire a spillover slide can be seen in Supplementary Note 2. As recommended by the CATALYST R/Bioconductor package, the pixel intensities are arsinh-transformed using a cofactor of 5.
+
+```{r, echo=FALSE}
+start_time <- Sys.time()
+```
+
+```{r read-compensation}
+sce <- readSCEfromTXT("data/compensation/")
+assay(sce, "exprs") <- asinh(counts(sce)/5)
+```
+
+```{r, echo=FALSE}
+end_time <- Sys.time()
+```
+
+The step took 
+`r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
+
+Perform quality assessment of the spillover data by visualizing the median pixel intensity per channel and spotted metal.
+
+```{r, echo=FALSE}
+start_time <- Sys.time()
+```
+
+```{r plotSpotHeatmap, fig.width=7, fig.height=7}
+plotSpotHeatmap(sce)
+```
+
+```{r, echo=FALSE}
+end_time <- Sys.time()
+```
+
+```{r, include=FALSE}
+if (!dir.exists("outputs")) dir.create("outputs", recursive = TRUE)
+pdf("outputs/Fig5_plotSpotHeatmap.pdf", width = 7, height = 6)
+plotSpotHeatmap(sce)
+dev.off()
+```
+
+(optional) Perform pixel binning to increase median pixel intensity. 
+This is only needed if pixel intensities are too low (median below ~200 counts).
+
+```{r, echo=FALSE}
+start_time <- Sys.time()
+```
+
+```{r binAcrossPixels}
+sce2 <- binAcrossPixels(sce, bin_size = 10)
+```
+
+```{r, echo=FALSE}
+end_time <- Sys.time()
+```
+
+The step took 
+`r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
+
+Filter incorrectly assigned pixels. 
+The following step uses functions provided by the CATALYST package to “de-barcode” the pixels. 
+Based on the intensity distribution of all channels, pixels are assigned to their corresponding barcode; here, this is the already known metal spot. 
+This procedure identifies pixels that cannot be robustly assigned to the spotted metal. Pixels of such kind can be regarded as “noisy”, “background”, or “artifacts” that should be removed prior to spillover estimation. 
+The spotted channels (bc_key) need to be specified. The general workflow for pixel de-barcoding is as follows:
+
+* assign a preliminary metal mass to each pixel    
+* for each pixel, estimate a cutoff parameter for the distance between positive and negative pixel sets      
+* apply the estimated cutoffs to identify truly positive pixels    
+
+In cases where incorrect assignments occurred or where few pixels were measured for some spots, the imcRtools package exports a helper function to exclude pixels.
+
+```{r, echo=FALSE}
+start_time <- Sys.time()
+```
+
+```{r CATALYST}
+library(CATALYST)
+
+bc_key <- as.numeric(unique(sce$sample_mass))
+bc_key <- bc_key[order(bc_key)]
+
+sce <- assignPrelim(sce, bc_key = bc_key)
+sce <- estCutoffs(sce)
+sce <- applyCutoffs(sce)
+```
+
+```{r, echo=FALSE}
+end_time <- Sys.time()
+```
+
+The step took 
+`r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
+
+Assess incorretly assigned pixels:
+
+```{r, message=FALSE}
+library(pheatmap)
+cur_table <- table(sce$bc_id, sce$sample_mass)
+
+# Visualize the correctly and incorrectly assigned pixels
+pheatmap(log10(cur_table + 1),
+         cluster_rows = FALSE,
+         cluster_cols = FALSE)
+
+# Compute the fraction of unassigned pixels per spot
+cur_table["0",] / colSums(cur_table)
+
+# Filter pixels that were assigned to a mass other than the spotted mass
+sce <- filterPixels(sce, minevents = 40, correct_pixels = TRUE)
+```
+
+```{r, include=FALSE}
+pdf("outputs/Fig5_filterPixels.pdf", width = 7, height = 6)
+pheatmap(log10(cur_table + 1),
+         cluster_rows = FALSE,
+         cluster_cols = FALSE)
+dev.off()
+```
+
+Compute and store the spillover matrix using the CATALYST package. 
+
+```{r, echo=FALSE}
+start_time <- Sys.time()
+```
+
+```{r compute-spillmat}
+sce <- computeSpillmat(sce)
+sm <- metadata(sce)$spillover_matrix
+```
+
+```{r, echo=FALSE}
+end_time <- Sys.time()
+```
+
+The step took 
+`r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
+
+Perform single-cell data compensation using the CATALYST package. 
+The compCytof function corrects channel-to-channel spillover directly on the single-cell intensities using the previously estimated spillover matrix. 
+The isotope_list variable needs to be extended by isotopes that are not contained in this list provided by the CATALYST package. 
+Visualization of marker intensities of neighboring channels (e.g., Yb173 and Yb174) before and after correction can be used to assess the spillover correction efficacy. 
+
+```{r, echo=FALSE}
+start_time <- Sys.time()
+```
+
+```{r compCytof}
+library(dittoSeq)
+library(patchwork)
+
+# Specify the channel_name entry for use with CATALYST    
+rowData(spe)$channel_name <- paste0(rowData(spe)$channel, "Di")
+
+# Add the missing metal isotope to the isotope_list
+isotope_list <- CATALYST::isotope_list
+isotope_list$Ar <- 80
+
+spe <- compCytof(spe, sm, 
+                 transform = TRUE, cofactor = 1,
+                 isotope_list = isotope_list, 
+                 overwrite = FALSE)
+
+# Visualize biaxial plots before/after compensation
+before <- dittoScatterPlot(spe, x.var = "Ecad", y.var = "CD303",
+                           assay.x = "exprs", assay.y = "exprs") +
+    ggtitle("Before compensation")
+
+after <- dittoScatterPlot(spe, x.var = "Ecad", y.var = "CD303",
+                          assay.x = "compexprs", assay.y = "compexprs") +
+    ggtitle("After compensation")
+
+before + after
+
+# Replace uncompensated assays
+assay(spe, "counts") <- assay(spe, "compcounts") 
+assay(spe, "exprs") <- assay(spe, "compexprs") 
+assay(spe, "compcounts") <- assay(spe, "compexprs") <- NULL
+```
+
+```{r, echo=FALSE}
+end_time <- Sys.time()
+```
+
+The step took 
+`r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
+
+```{r, include=FALSE}
+before_new <- before + theme(axis.title = element_text(size = 18),
+                         plot.title = element_text(size = 18),
+                         axis.text = element_text(size = 12))
+
+after_new <- after + theme(axis.title = element_text(size = 18),
+                         plot.title = element_text(size = 18),
+                         axis.text = element_text(size = 12))
+
+ggsave("outputs/Fig5_before_after_single-cell.pdf", before_new + after_new, width = 8, height = 5)
+```
+
+Perform channel-to-channel spillover correction on multi-channel images. 
+To this end, the previously computed spillover matrix needs to be adjusted to only retain channels that are stored in the multi-channel images. 
+By visualizing neighboring channels, spillover correction efficacy can be assessed.
+
+```{r, echo=FALSE}
+start_time <- Sys.time()
+```
+
+```{r compImage}
+# Use mass tags as channel names
+channelNames(images) <- rowData(spe)$channel_name
+
+# Adapt spillover matrix to retain channels contained in the multi-channel images
+adapted_sm <- adaptSpillmat(sm, channelNames(images), 
+                            isotope_list = isotope_list)
+
+# Perform image compensation
+images_comp <- compImage(images, adapted_sm)
+
+# Visualize neighboring channels before/ after compensation
+plotPixels(images[5], colour_by = "Yb173Di", 
+           image_title = list(text = "Yb173 (Ecad) - before", 
+                       position = "topleft"), 
+           legend = NULL, bcg = list(Yb173Di = c(0, 4, 1)))
+plotPixels(images[5], colour_by = "Yb174Di", 
+           image_title = list(text = "Yb174 (CD303) - before", 
+                              position = "topleft"), 
+           legend = NULL, bcg = list(Yb174Di = c(0, 4, 1)))
+plotPixels(images_comp[5], colour_by = "Yb173Di",
+           image_title = list(text = "Yb173 (Ecad) - after", 
+                              position = "topleft"), 
+           legend = NULL, bcg = list(Yb173Di = c(0, 4, 1)))
+plotPixels(images_comp[5], colour_by = "Yb174Di", 
+           image_title = list(text = "Yb174 (CD303) - after", 
+                              position = "topleft"),
+           legend = NULL, bcg = list(Yb174Di = c(0, 4, 1)))
+
+# Switch back to using target names as channel names
+channelNames(images_comp) <- rownames(spe)
+```
+
+```{r, echo=FALSE}
+end_time <- Sys.time()
+```
+
+The step took 
+`r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
+
+```{r, include=FALSE}
+channelNames(images_comp) <- rowData(spe)$channel_name
+pdf("outputs/Fig5_before_after_images_1.pdf")
+plotPixels(images[5], colour_by = "Yb173Di", 
+           image_title = list(text = "Yb173 (Ecad) - before", 
+                       position = "topleft"), 
+           legend = NULL, bcg = list(Yb173Di = c(0, 4, 1)))
+dev.off()
+pdf("outputs/Fig5_before_after_images_2.pdf")
+plotPixels(images[5], colour_by = "Yb174Di", 
+           image_title = list(text = "Yb174 (CD303) - before", 
+                              position = "topleft"), 
+           legend = NULL, bcg = list(Yb174Di = c(0, 4, 1)))
+dev.off()
+pdf("outputs/Fig5_before_after_images_3.pdf")
+plotPixels(images_comp[5], colour_by = "Yb173Di",
+           image_title = list(text = "Yb173 (Ecad) - after", 
+                              position = "topleft"), 
+           legend = NULL, bcg = list(Yb173Di = c(0, 4, 1)))
+dev.off()
+pdf("outputs/Fig5_before_after_images_4.pdf")
+plotPixels(images_comp[5], colour_by = "Yb174Di", 
+           image_title = list(text = "Yb174 (CD303) - after", 
+                              position = "topleft"),
+           legend = NULL, bcg = list(Yb174Di = c(0, 4, 1)))
+dev.off()
+channelNames(images_comp) <- rownames(spe)
+rm(images)
+```
+
+## Quality control
+
+Outline cells on composite images for visual assessment of segmentation quality. 
+For visualization purposes, we subset 3 images and outline all cells on composite images after channel normalization.
+
+```{r segmentation-quality}
+set.seed(20220118)
+img_ids <- sample(seq_len(length(images_comp)), 3)
+
+cur_images <- images_comp[img_ids]
+
+# Normalize each channel between 0 and 1 
+cur_images <- normalize(cur_images, separateImages = TRUE)
+
+# Clip channel intensities at 0 and 0.2
+cur_images <- normalize(cur_images, inputRange = c(0, 0.2))
+
+plotPixels(cur_images,
+           mask = masks[img_ids],
+           img_id = "sample_id",
+           missing_colour = "white",
+           colour_by = c("CD163", "CD20", "CD3", "Ecad", "DNA1"),
+           colour = list(CD163 = c("black", "yellow"),
+                         CD20 = c("black", "red"),
+                         CD3 = c("black", "green"),
+                         Ecad = c("black", "cyan"),
+                         DNA1 = c("black", "blue")),
+           image_title = NULL,
+           legend = list(colour_by.title.cex = 0.9,
+                         colour_by.labels.cex = 0.9))
+```
+
+```{r, include=FALSE}
+pdf("outputs/Fig6_segmentation-quality.pdf")
+plotPixels(cur_images,
+           mask = masks[img_ids],
+           img_id = "sample_id",
+           missing_colour = "white",
+           colour_by = c("CD163", "CD20", "CD3", "Ecad", "DNA1"),
+           colour = list(CD163 = c("black", "yellow"),
+                         CD20 = c("black", "red"),
+                         CD3 = c("black", "green"),
+                         Ecad = c("black", "cyan"),
+                         DNA1 = c("black", "blue")),
+           image_title = NULL,
+           legend = list(colour_by.title.cex = 1.2,
+                         colour_by.labels.cex = 0.9))
+dev.off()
+```
+
+```{r, include=FALSE}
+p <- dittoPlot(spe, "area", group.by = "sample_id", plots = "boxplot") +
+        ylab("Cell area") + xlab("")
+ggsave("outputs/Fig7_cell-size.pdf", width = 7, height = 5)
+```
+
+Visualize the distribution of the cell area and filter out small cells.
+
+```{r cell-size}
+dittoPlot(spe, var = "area", 
+          group.by = "sample_id", 
+          plots = "boxplot") +
+        ylab("Cell area") + xlab("")
+
+spe <- spe[,spe$area >= 5]
+```
+
+Visualize the cell density per image.
+
+```{r cell-density}
+# Compute the cell density per image
+cell_density <- colData(spe) %>%
+    as.data.frame() %>%
+    group_by(sample_id) %>%
+    # Compute the number of pixels covered by cells and the total number of pixels
+    summarize(cell_area = sum(area),
+           no_pixels = mean(width_px) * mean(height_px)) %>%
+    # Divide the total number of pixels by the number of pixels covered by cells
+    mutate(covered_area = cell_area / no_pixels)
+
+# Visualize the cell density per image
+ggplot(cell_density) +
+        geom_point(aes(sample_id, covered_area)) + 
+        theme_minimal(base_size = 15) +
+        theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 15)) +
+        ylim(c(0, 1)) +
+        ylab("% covered area") + xlab("")
+```
+
+```{r, include=FALSE}
+p <- colData(spe) %>%
+    as.data.frame() %>%
+    group_by(sample_id) %>%
+    summarize(cell_area = sum(area),
+           no_pixels = mean(width_px) * mean(height_px)) %>%
+    mutate(covered_area = cell_area / no_pixels) %>%
+    ggplot() +
+        geom_point(aes(sample_id, covered_area)) + 
+        theme_minimal(base_size = 15) +
+        theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 15)) +
+        ylim(c(0, 1)) +
+        ylab("% covered area") + xlab("")
+ggsave("outputs/Fig8_cell-density.pdf", width = 7, height = 5)
+```
+
+Visualize staining differences between samples for selected markers. 
+Together with the visualization of cells in low dimensions, this figure indicates sample-to-sample differences in marker expression.
+
+```{r marker-distributions, fig.width=7, fig.height=4}
+multi_dittoPlot(spe, vars = c("HLADR", "CD3", "Ecad", "PDGFRb"),
+               group.by = "patient_id", plots = c("ridgeplot"), 
+               assay = "exprs")
+```
+
+```{r, include=FALSE}
+pdf("outputs/Fig9_marker-distribution.pdf", width = 7, height = 5)
+p <- multi_dittoPlot(spe, vars = c("HLADR", "CD3", "Ecad", "PDGFRb"),
+               group.by = "patient_id", plots = c("ridgeplot"), 
+               assay = "exprs") + theme(axis.text.x = element_text(size = 18))
+dev.off()
+```
+
+Visualize low-dimensional embeddings of single cells. 
+Here, we use the scater package to compute a Uniform Manifold Approximation and Projection (UMAP) embedding and visualize cells in low-dimensional space. 
+
+```{r, echo=FALSE}
+start_time <- Sys.time()
+```
+
+```{r umap}
+library(scater)
+
+set.seed(220225)
+spe <- runUMAP(spe, subset_row = rowData(spe)$use_channel, 
+ exprs_values = "exprs") 
+
+# Visualize the UMAP embedding and color cells by patient ID
+dittoDimPlot(spe, var = "patient_id", 
+     reduction.use = "UMAP", size = 0.2)  +
+    ggtitle("Patient ID on UMAP")
+```
+
+```{r, echo=FALSE}
+end_time <- Sys.time()
+```
+
+The step took 
+`r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
+
+```{r, include=FALSE}
+p <- dittoDimPlot(spe, var = "patient_id", 
+     reduction.use = "UMAP", size = 0.2)  +
+    ggtitle("Patient ID on UMAP") +
+    theme(axis.title = element_text(size = 14),
+          plot.title = element_text(size = 18),
+          axis.text = element_text(size = 12),
+          legend.text = element_text(size = 14))
+    
+ggsave("outputs/Fig10_UMAP.pdf", p, width = 6, height = 4)
+```
+
+Perform batch correction to remove sample-to-sample differences. 
+Here, we use the fastMNN method of the batchelor package. 
+
+```{r, echo=FALSE}
+start_time <- Sys.time()
+```
+
+```{r batch-correction, message=FALSE, warning=FALSE}
+library(batchelor)
+
+set.seed(220228)
+# Perform batch correction
+out <- fastMNN(spe, batch = spe$patient_id,
+               auto.merge = TRUE,
+               subset.row = rowData(spe)$use_channel,
+               assay.type = "exprs")
+
+# Store corrected embeddings in SPE object
+reducedDim(spe, "fastMNN") <- reducedDim(out, "corrected")
+
+# Compute UMAP on corrected embeddings
+spe <- runUMAP(spe, dimred= "fastMNN", name = "UMAP_mnnCorrected")
+
+# Visualize corrected UMAP
+dittoDimPlot(spe, var = "patient_id", 
+                   reduction.use = "UMAP_mnnCorrected", size = 0.2) + 
+    ggtitle("Patient ID on UMAP after correction")
+```
+
+```{r, echo=FALSE}
+end_time <- Sys.time()
+```
+
+```{r, include=FALSE}
+p <- dittoDimPlot(spe, var = "patient_id", 
+                   reduction.use = "UMAP_mnnCorrected", size = 0.2) + 
+    ggtitle("Patient ID on UMAP after correction") +
+    theme(axis.title = element_text(size = 14),
+          plot.title = element_text(size = 18),
+          axis.text = element_text(size = 12),
+          legend.text = element_text(size = 14))
+
+ggsave("outputs/Fig10_UMAP_corrected.pdf", p, width = 6, height = 4)
+```
+
+The step took 
+`r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
+
+## Cell phenotyping
+
+Define cellular phenotypes. 
+For this, single cells can be clustered (A) or cells can be labelled via classification (B).
+
+### (A) Cell phenotyping via clustering. 
+
+Graph-based clustering is performed using functions from the bluster and scran R/Bioconductor packages. 
+Alternatively, other approaches such as phenograph or FlowSOM can be used to cluster single cells.
+
+Estimate optimal clustering parameters for graph-based clustering on the integrated cells after batch correction. 
+We perform a sweep across possible combinations of clustering parameters, including the number of nearest neighbors to consider (k) and the edge weighting method (type). 
+We keep the community detection algorithm (cluster.fun) fixed, as the Louvain method is one of the most commonly used algorithms for graph-based clustering. 
+To assess cluster stability, we compute the mean silhouette width across all cells and select the cluster parameter combination with highest mean silhouette width.
+
+```{r, echo=FALSE}
+start_time <- Sys.time()
+```
+
+```{r cluster-sweep}
+library(bluster)
+library(BiocParallel)
+
+# Select the corrected cell embeddings for clustering
+mat <- reducedDim(spe, "fastMNN")
+
+set.seed(220825)
+# Perform the cluster sweep
+combinations <- clusterSweep(mat, BLUSPARAM=SNNGraphParam(),
+                             k=c(10L, 20L), 
+                             type = c("rank", "jaccard"), 
+                             cluster.fun = "louvain")
+
+# Compute the average silhouette width per parameter combination
+sil <- vapply(as.list(combinations$clusters), 
+              function(x) mean(approxSilhouette(mat, x)$width), 0)
+
+# Visualize the average silhouette width per parameter combination
+ggplot(data.frame(method = names(sil),
+                  sil = sil)) +
+    geom_point(aes(method, sil), size = 3) +
+    theme_classic(base_size = 15) +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+    xlab("Cluster parameter combination") +
+    ylab("Average silhouette width")
+```
+
+```{r, echo=FALSE}
+end_time <- Sys.time()
+```
+
+The step took 
+`r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
+
+```{r, include=FALSE}
+p <- ggplot(data.frame(method = names(sil),
+                  sil = sil)) +
+    geom_point(aes(method, sil), size = 3) +
+    theme_classic(base_size = 15) +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+    xlab("Cluster parameter combination") +
+    ylab("Average silhouette width")
+ggsave("outputs/Fig11_clusterSweep.pdf", p, width = 6, height = 5)
+```
+
+Based on the selected parameters, cells are clustered using a graph-based algorithm. 
+As observed above, the parameter setting for k=20 and type=”rank” should result in well-separated clusters. 
+The cluster identifiers are then saved in the SpatialExperiment object.
+
+```{r, echo=FALSE}
+start_time <- Sys.time()
+```
+
+```{r cluster-cells}
+library(scran)
+
+clusters <- clusterCells(spe[rowData(spe)$use_channel,], 
+                         use.dimred = "fastMNN", 
+                         BLUSPARAM = SNNGraphParam(k=20, 
+                                                cluster.fun = "louvain",
+                                                type = "rank"))
+spe$nn_clusters <- clusters
+```
+
+```{r, echo=FALSE}
+end_time <- Sys.time()
+```
+
+The step took 
+`r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
+
+Visualize the marker expression per cluster
+
+```{r message=FALSE}
+library(viridis)
+
+set.seed(220619)
+cur_cells <- sample(seq_len(ncol(spe)), 2000)
+
+dittoHeatmap(spe[,cur_cells], 
+             genes = rownames(spe)[rowData(spe)$use_channel],
+             assay = "exprs", scale = "none",
+             heatmap.colors = viridis(100), 
+             annot.by = c("nn_clusters", "patient_id"))
+```
+
+
+```{r, include=FALSE}
+pdf("outputs/Fig13_cluster-heatmap.pdf")
+dittoHeatmap(spe[,cur_cells], 
+             genes = rownames(spe)[rowData(spe)$use_channel],
+             assay = "exprs", scale = "none",
+             heatmap.colors = viridis(100), 
+             annot.by = c("nn_clusters", "patient_id"))
+dev.off()
+```
+
+Label clusters
+
+```{r, message=FALSE}
+cluster_celltype <- recode(spe$nn_clusters,
+                            "1" = "Tumor_proliferating",
+                            "2" = "Tumor",
+                            "3" = "Tumor",
+                            "4" = "Tumor",
+                            "5" = "Stroma",
+                            "6" = "Tumor_proliferating",
+                            "7" = "Myeloid",
+                            "8" = "CD8",
+                            "9" = "Plasma_cell",
+                            "10" = "CD4",
+                            "11" = "Neutrophil",
+                            "12" = "Bcell",
+                            "13" = "Stroma",
+                            "14" = "unknown")
+
+spe$cluster_celltype <- cluster_celltype
+```
+
+### (B) Classification-based cell phenotyping
+
+Gate individual cell types based on their marker expression. 
+For this, the cytomapper package provides the cytomapperShiny function. 
+Per image, cells are gated based on their marker expression in a hierarchical fashion to define expected cell types. 
+The gated cells are then visualized as outlines on pseudo-coloured composite images. 
+Once the correct cells are labeled, they can be downloaded as a SpatialExperiment object storing only the selected cells. During download, the cell label can be specified, which is stored in the cytomapper_CellLabel entry of the colData slot for later use in training a classifier. 
+
+```{r}
+if (interactive()){
+    cytomapperShiny(object = spe, mask = masks, image = images_comp, 
+                cell_id = "ObjectNumber", img_id = "sample_id")   
+}
+```
+
+Read in files containing the gated cells and concatenate them into a single SpatialExperiment object.
+
+```{r read-gated-files, message=FALSE}
+library(SingleCellExperiment)
+label_files <- list.files("data/gated_cells", 
+                          full.names = TRUE, pattern = ".rds$")
+
+# Read in individual files containing gated cells
+spes <- lapply(label_files, readRDS)
+
+# Concatenate the individual objects into one
+concat_spe <- do.call("cbind", spes)
+```
+
+Remove doublets and reassign tumor cells. 
+As a result of the multi-step labeling approach, some cells may have been labeled multiple times. 
+In cases where one cell was labeled as both tumor and immune cell, we keep the immune cell label, as these cells are most likely immune cells residing within the tumor. 
+All other cells that were labeled multiple times are removed. Finally, the labels are stored in the main SpatialExperiment object.
+
+Define filtering function:
+
+```{r}
+filter_labels <- function(object, 
+                          label = "cytomapper_CellLabel") {
+    cur_tab <- unclass(table(colnames(object), object[[label]]))
+    
+    cur_labels <- colnames(cur_tab)[apply(cur_tab, 1, which.max)]
+    names(cur_labels) <- rownames(cur_tab)
+    
+    cur_labels <- cur_labels[rowSums(cur_tab) == 1]
+    
+    return(cur_labels)
+}
+```
+
+```{r remove-doublets}
+labels <- filter_labels(concat_spe)
+
+cur_spe <- concat_spe[,concat_spe$cytomapper_CellLabel != "Tumor"]
+
+non_tumor_labels <- filter_labels(cur_spe)
+
+additional_cells <- setdiff(names(non_tumor_labels), names(labels))
+
+final_labels <- c(labels, non_tumor_labels[additional_cells])
+
+# Transfer labels to SPE object
+spe_labels <- rep("unlabeled", ncol(spe))
+names(spe_labels) <- colnames(spe)
+spe_labels[names(final_labels)] <- final_labels
+spe$cell_labels <- spe_labels
+```
+
+```{r, echo=FALSE}
+start_time <- Sys.time()
+```
+
+Train a random forest classifier for cell type classification of unlabelled cells. 
+The cells are first split into labelled and unlabelled cells. 
+We then perform a 75/25 split of the labelled cells to select training and testing datasets, respectively. 
+Based on the training dataset, we perform a 5-fold cross validation to tune the random forest model parameter.
+
+```{r train-classifier, message=FALSE}
+library(caret)
+
+# Split between labeled and unlabeled cells
+lab_spe <- spe[,spe$cell_labels != "unlabeled"]
+unlab_spe <- spe[,spe$cell_labels == "unlabeled"]
+
+# Randomly split into train and test data
+set.seed(220925)
+trainIndex <- createDataPartition(factor(lab_spe$cell_labels), p = 0.75)
+train_spe <- lab_spe[,trainIndex$Resample1]
+test_spe <- lab_spe[,-trainIndex$Resample1]
+
+# Define fit parameters for 5-fold cross validation
+fitControl <- trainControl(method = "cv",
+                           number = 5)
+
+# Select the asinh-transformed counts for training
+cur_mat <- t(assay(train_spe, "exprs")[rowData(train_spe)$use_channel,])
+
+# Train a random forest classifier
+rffit <- train(x = cur_mat, 
+               y = factor(train_spe$cell_labels),
+               method = "rf", ntree = 1000,
+               tuneLength = 5,
+               trControl = fitControl)
+```
+
+```{r, echo=FALSE}
+end_time <- Sys.time()
+```
+
+The step took 
+`r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
+
+Assess the classifier performance by computing the confusion matrix of the test dataset. 
+The confusionMatrix function compares the predicted cell labels to the ground truth cell labels and computes a number of performance metrics. 
+A high sensitivity and a high specificity for each cell type label is to be desired.
+
+```{r confusionMatrix}
+# Select the arsinh-transformed counts of the test data
+cur_mat <- t(assay(test_spe, "exprs")[rowData(test_spe)$use_channel,])
+
+# Predict the cell phenotype labels of the test data
+cur_pred <- predict(rffit, 
+                    newdata = cur_mat)
+
+# Compute the confusion matrix between predicted and actual labels
+confusionMatrix(data = cur_pred, 
+                      reference = factor(test_spe$cell_labels), 
+                      mode = "everything")
+```
+
+Predict cell labels of unlabelled cells. Cells for which the highest class probability is below 40% are labeled as “unknown”.
+
+```{r predict-cells}
+# Select the arsinh-transformed counts of the unlabeled data for prediction
+cur_mat <- t(assay(unlab_spe, "exprs")[rowData(unlab_spe)$use_channel,])
+
+# Predict the cell phenotype labels of the unlabeled data
+cell_class <- as.character(predict(rffit,
+                                   newdata = cur_mat,
+                                   type = "raw"))
+names(cell_class) <- rownames(cur_mat)
+
+# Extract prediction probabilities for each cell
+cell_prob <- predict(rffit, 
+                     newdata = cur_mat, 
+                     type = "prob")
+
+# Label cells with a low prediction probability as undefined
+cell_class[rowMax(as.matrix(cell_prob)) < 0.4] <- "undefined"
+
+# Store cell phenotype labels in SPE object
+cell_labels <- spe$cell_labels
+cell_labels[colnames(unlab_spe)] <- cell_class
+spe$celltype <- cell_labels
+```
+
+### Cluster and cell type visualization
+
+Visualize cell type and cluster labels on the UMAP embedding for qualitatively assessing cell phenotyping.
+
+```{r celltype-cluster-UMAP, fig.width=8, fig.height=4}
+p1 <- dittoDimPlot(spe, var = "celltype", 
+             reduction.use = "UMAP_mnnCorrected", size = 0.2,
+             do.label = TRUE) +
+  ggtitle("Cell types on UMAP, integrated cells")
+
+p2 <- dittoDimPlot(spe, var = "cluster_celltype", 
+             reduction.use = "UMAP_mnnCorrected", size = 0.2,
+             do.label = TRUE) +
+  ggtitle("Cluster cell types on UMAP, integrated cells")
+
+p1 + p2
+```
+
+```{r, include=FALSE}
+p1_new <- p1 +
+    theme(axis.title = element_text(size = 14),
+          plot.title = element_text(size = 18),
+          axis.text = element_text(size = 12),
+          legend.text = element_text(size = 14))
+
+p2_new <- p2 +
+    theme(axis.title = element_text(size = 14),
+          plot.title = element_text(size = 18),
+          axis.text = element_text(size = 12),
+          legend.text = element_text(size = 14))
+
+ggsave("outputs/Fig12_celltype-UMAP.pdf", p1_new, width = 8, height = 5)
+ggsave("outputs/Fig12_cluster-UMAP.pdf", p2_new, width = 8, height = 5)
+```
+
+Visualize mean marker expression per cell type and per annotated cluster as heatmaps.
+
+```{r celltype-cluster-heatmap, fig.height=8}
+library(scuttle)
+
+# Calculate the mean of the arsinh-transformed counts per cell phenotype
+celltype_mean <- aggregateAcrossCells(as(spe, "SingleCellExperiment"),  
+                     ids = spe$celltype, 
+                     statistics = "mean",
+                     use.assay.type = "exprs",
+                     subset_row = rowData(spe)$use_channel)
+
+dittoHeatmap(celltype_mean,
+             assay = "exprs", cluster_cols = TRUE, 
+             scale = "none",
+             heatmap.colors = viridis(100),
+             annot.by = c("celltype","ncells"))
+
+# Calculate the mean of the arsinh-transformed counts per annotated cluster
+cluster_mean <- aggregateAcrossCells(as(spe, "SingleCellExperiment"),  
+                     ids = spe$cluster_celltype, 
+                     statistics = "mean",
+                     use.assay.type = "exprs",
+                     subset_row = rowData(spe)$use_channel)
+
+dittoHeatmap(cluster_mean,
+             assay = "exprs", cluster_cols = TRUE, 
+             scale = "none",
+             heatmap.colors = viridis(100),
+             annot.by = c("cluster_celltype","ncells"))
+```
+
+```{r, include=FALSE}
+pdf("outputs/Fig13_celltype-heatmap.pdf")
+dittoHeatmap(celltype_mean,
+             assay = "exprs", cluster_cols = TRUE, 
+             scale = "none",
+             heatmap.colors = viridis(100),
+             annot.by = c("celltype","ncells"))
+dev.off()
+
+pdf("outputs/Fig13_cluster-heatmap.pdf")
+dittoHeatmap(cluster_mean,
+             assay = "exprs", cluster_cols = TRUE, 
+             scale = "none",
+             heatmap.colors = viridis(100),
+             annot.by = c("cluster_celltype","ncells"))
+dev.off()
+```
+
+## Spatial analysis
+
+Perform spatial community analysis. 
+This method groups cells solely based on their location in the tissue by using a previously constructed spatial cell graph. We perform community detection separately for tumor and non-tumor cells. 
+
+```{r, echo=FALSE}
+start_time <- Sys.time()
+```
+
+```{r spatial-community, message=FALSE, fig.height=12, fig.width=12}
+# Define if cells are part of the tumor or stroma
+spe$tumor_stroma <- ifelse(spe$celltype == "Tumor", "Tumor", "Stroma")
+
+# Detect spatial communities
+spe <- detectCommunity(spe, 
+                       colPairName = "neighborhood", 
+                       size_threshold = 10,
+                       group_by = "tumor_stroma",
+                       BPPARAM = SerialParam(RNGseed = 220819))
+
+# Visualize spatial tumor communities
+plotSpatial(spe[,spe$celltype == "Tumor"], 
+            node_color_by = "spatial_community", 
+            img_id = "sample_id", 
+            node_size_fix = 0.5) +
+    theme(legend.position = "none") +
+    scale_color_manual(values = rev(colors()))
+```
+
+```{r, echo=FALSE}
+end_time <- Sys.time()
+```
+
+The step took 
+`r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
+
+```{r, include=FALSE}
+p <- plotSpatial(spe[,spe$celltype == "Tumor"], 
+            node_color_by = "spatial_community", 
+            img_id = "sample_id", 
+            node_size_fix = 0.5) +
+    theme(legend.position = "none", 
+          strip.text.x = element_text(size = 16)) +
+    scale_color_manual(values = rev(colors()))
+ggsave("outputs/Fig14_spatial-communities.pdf", p, width = 12, height = 12)
+```
+
+Perform cellular neighborhood (CN) analysis. 
+CNs are tissue regions with characteristic cell type composition and represent sites of unique local biological processes and interactions. 
+We first construct a spatial 20-nearest neighbor graph based on the cells’ centroids, to include a larger number of neighbors compared to the spatial cell graph constructed earlier using steinbock. 
+The aggregateNeighbors function of the imcRtools package then computes for each cell the cell type fraction among its 20-nearest neighbors. 
+Cells are subsequently clustered using k-means clustering to detect CNs. 
+Finally, these can be spatially visualized and the cell type fraction per CN can be computed.
+
+```{r, echo=FALSE}
+start_time <- Sys.time()
+```
+
+```{r cellular-neighbourhood, fig.height=12, fig.width=12}
+# Construct a 20-nearest neighbor graph
+spe <- buildSpatialGraph(spe, img_id = "sample_id", type = "knn", k = 20)
+
+# Compute the fraction of cell phenotypes in each cells neighborhood
+spe <- aggregateNeighbors(spe, colPairName = "knn_interaction_graph", 
+                          aggregate_by = "metadata", count_by = "celltype")
+
+set.seed(220705)
+
+# Cluster cells based on cell phenotype fractions
+cn_1 <- kmeans(spe$aggregatedNeighbors, centers = 6)
+spe$cn_celltypes <- as.factor(cn_1$cluster)
+
+# Visualize cellular neighborhoods
+plotSpatial(spe, 
+            node_color_by = "cn_celltypes", 
+            img_id = "sample_id", 
+            node_size_fix = 0.5) +
+    scale_color_brewer(palette = "Set3")
+
+# Compute the fraction of cell phenotypes in each cellular neighborhood
+mat <- prop.table(table(spe$cn_celltypes, spe$celltype), 
+                  margin = 1)
+```
+
+```{r}
+# Visualize cell phenotype fractions in each cellular neighborhood
+pheatmap(mat, 
+  color = colorRampPalette(c("dark blue", "white", "dark red"))(100), 
+  scale = "column")
+```
+
+```{r, echo=FALSE}
+end_time <- Sys.time()
+```
+
+The step took 
+`r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
+
+```{r, include=FALSE}
+p <- plotSpatial(spe, 
+            node_color_by = "cn_celltypes", 
+            img_id = "sample_id", 
+            node_size_fix = 0.5) +
+    scale_color_brewer(palette = "Set3") +
+    theme(strip.text.x = element_text(size = 16),
+          legend.text = element_text(size = 18),
+          legend.title = element_text(size = 18))
+ggsave("outputs/Fig15_cellular-neighborhoods.pdf", p, width = 12, height = 12)
+
+pdf("outputs/Fig15_cn-heatmap.pdf", width = 4, height = 4)
+pheatmap(mat, 
+  color = colorRampPalette(c("dark blue", "white", "dark red"))(100), 
+  scale = "column")
+dev.off()
+```
+
+Perform spatial context (SC) analysis. 
+SCs build up on the concept of CNs and are regions in which the local biological processes of CNs interact, and where specialized biological events take place. 
+We construct a second k-nearest neighbor graph with larger k (k=40) to include cells across a length scale on which biological signals could be exchanged. 
+For each cell, the aggregateNeighbours function computes the fraction of CNs among its 40 nearest neighbors. 
+The detectSpatialContext function sorts the CN fractions from high to low, and the SC of each cell is assigned as the minimal combination of CNs that additively surpass a user-defined threshold (here threshold=0.9). 
+After filtering the detected SCs, we can spatially visualize them and represent SC interactions as a graph.
+
+```{r, echo=FALSE}
+start_time <- Sys.time()
+```
+
+```{r spatial-context, fig.height=12, fig.width=12}
+# Construct a 40-nearest neighbor graph
+spe <- buildSpatialGraph(spe, img_id = "sample_id", 
+                         type = "knn", 
+                         name = "knn_spatialcontext_graph", 
+                         k = 40)
+
+# Compute the fraction of cellular neighborhoods around each cell
+spe <- aggregateNeighbors(spe, 
+                          colPairName = "knn_spatialcontext_graph",
+                          aggregate_by = "metadata",
+                          count_by = "cn_celltypes",
+                          name = "aggregatedNeighborhood")
+
+# Detect spatial contexts
+spe <- detectSpatialContext(spe, 
+                            entry = "aggregatedNeighborhood",
+                            threshold = 0.90,
+                            name = "spatial_context")
+
+# Filter out small and infrequent spatial contexts
+spe <- filterSpatialContext(spe, 
+                            entry = "spatial_context",
+                            group_by = "patient_id", 
+                            group_threshold = 3,
+                            cells_threshold = 100,
+                            name = "spatial_context_filtered")
+
+# Visualize cell location colored by their spatial context
+plotSpatial(spe, 
+            node_color_by = "spatial_context_filtered", 
+            img_id = "sample_id", 
+            node_size_fix = 0.5, 
+            colPairName = "knn_spatialcontext_graph")
+```
+
+```{r}
+# Visualize spatial contexts as graph
+plotSpatialContext(spe,
+                   entry = "spatial_context_filtered",
+                   group_by = "sample_id",
+                   node_color_by = "n_cells",
+                   node_size_by = "n_group",
+                   node_label_color_by = "n_cells") +
+    scale_color_viridis()
+```
+
+```{r, echo=FALSE}
+end_time <- Sys.time()
+```
+
+The step took 
+`r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
+
+```{r include=FALSE}
+p <- plotSpatial(spe, 
+            node_color_by = "spatial_context_filtered", 
+            img_id = "sample_id", 
+            node_size_fix = 0.4, 
+            colPairName = "knn_spatialcontext_graph") +
+    theme(strip.text.x = element_text(size = 16),
+          legend.text = element_text(size = 18),
+          legend.title = element_text(size = 18))
+ggsave("outputs/Fig16_spatial-contexts.pdf", p, width = 14, height = 12)
+
+p <- plotSpatialContext(spe,
+                   entry = "spatial_context_filtered",
+                   group_by = "sample_id",
+                   node_color_by = "n_cells",
+                   node_size_by = "n_group",
+                   node_label_color_by = "n_cells") +
+    scale_color_viridis()
+ggsave("outputs/Fig16_spatial-context-graph.pdf", p, width = 7, height = 5)
+```
+
+Perform patch detection analysis. 
+The patchDetection function of the imcRtools package detects fully connected components of cells of interest, constructs a convex hull around each component, and expands this hull to include neighboring cells. 
+Below, we detect connected tumor components made up of at least 10 cells, and we slightly expand the convex hull to include cells within the patch.
+
+```{r, echo=FALSE}
+start_time <- Sys.time()
+```
+
+```{r, fig.height=12, fig.width=12}
+spe <- patchDetection(spe, 
+                      patch_cells = spe$celltype == "Tumor",
+                      img_id = "sample_id",
+                      expand_by = 1,
+                      min_patch_size = 10,
+                      colPairName = "neighborhood")
+
+plotSpatial(spe, 
+            node_color_by = "patch_id", 
+            img_id = "sample_id", 
+            node_size_fix = 0.5) +
+    theme(legend.position = "none") +
+    scale_color_manual(values = rev(colors()))
+```
+
+```{r, echo=FALSE}
+end_time <- Sys.time()
+```
+
+```{r, include=FALSE}
+p <- plotSpatial(spe,
+            node_color_by = "patch_id", 
+            img_id = "sample_id", 
+            node_size_fix = 0.5) +
+    theme(legend.position = "none",
+          strip.text.x = element_text(size = 16)) +
+    scale_color_manual(values = rev(colors()))
+ggsave("outputs/Fig17_patch-detection.pdf", p, width = 12, height = 12)
+```
+
+The step took 
+`r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
+
+Perform interaction analysis. 
+This approach detects cell type pairs that show stronger (“interaction”) or weaker (“avoidance”) co-localization compared to a random distribution of cell types. 
+Using a previously constructed spatial cell graph (here the one produced by steinbock), the testInteraction function of the imcRtools package computes the average interaction count for each cell type pair per image and compares it against an empirical null distribution derived by permuting all cell labels. 
+The returned data frame contains one entry per cell type pair for each image indicating the empirical p-value and statistical significance (interaction: 1, no significance: 0, avoidance: -1). 
+These significance values can be summed across all images and visualized in the form of a heatmap.
+
+```{r, echo=FALSE}
+start_time <- Sys.time()
+```
+
+```{r, message=FALSE}
+library(scales)
+
+set.seed(220825)
+out <- testInteractions(spe, 
+                        group_by = "sample_id",
+                        label = "celltype", 
+                        colPairName = "neighborhood",
+                        BPPARAM = SerialParam(RNGseed = 221029))
+
+# Sum interaction values across all images
+summed_sigvals <- out %>% as_tibble() %>%
+    group_by(from_label, to_label) %>%
+    summarize(sum_sigval = sum(sigval, na.rm = TRUE))
+
+# Visualize summed interaction values in form of a heatmap
+ggplot(summed_sigvals) +
+    geom_tile(aes(from_label, to_label, fill = sum_sigval)) +
+    scale_fill_gradient2(low = muted("blue"), 
+                         mid = "white", 
+                         high = muted("red")) +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+```{r, echo=FALSE}
+end_time <- Sys.time()
+```
+
+```{r, include=FALSE}
+p <- out %>% as_tibble() %>%
+    group_by(from_label, to_label) %>%
+    summarize(sum_sigval = sum(sigval, na.rm = TRUE)) %>%
+    ggplot() +
+        geom_tile(aes(from_label, to_label, fill = sum_sigval)) +
+        scale_fill_gradient2(low = muted("blue"), mid = "white", 
+  high = muted("red")) +
+        theme(axis.text.x = element_text(angle = 45, hjust = 1))
+ggsave("outputs/Fig18_interaction-testing.pdf", p, width = 5, height = 4)
+```
+
+The step took 
+`r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
+
+## Session information
+
+```{r}
+sessionInfo()
+```
+
