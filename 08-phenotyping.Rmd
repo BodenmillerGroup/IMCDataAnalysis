@@ -415,7 +415,7 @@ spe$som_clusters_corrected <- as.factor(som.cluster)
 dittoDimPlot(spe, var = "som_clusters_corrected", 
              reduction.use = "UMAP_mnnCorrected", size = 0.2,
              do.label = TRUE) +
-    ggtitle("Phenograph clusters expression on UMAP, integrated cells")
+    ggtitle("SOM clusters expression on UMAP, integrated cells")
 ```
 
 ```{r, fig.height=8}
@@ -462,8 +462,8 @@ pheatmap(log10(tab3 + 10), color = viridis(100))
 
 We observe that `Rphenograph` and the shared nearest neighbor (SNN) approach by
 `scran` show similar results (first heatmap above). For example, Rphenograph
-cluster 18 (a tumor cluster) is perfectly captured by SNN cluster 13. On the
-other hand, the Neutrophil cluster (SNN cluster 4) is split into Rphenograph
+cluster 18 (a tumor cluster) is perfectly captured by SNN cluster 14. On the
+other hand, the Neutrophil cluster (SNN cluster 6) is split into Rphenograph
 cluster 5 and Rphenograph cluster 9. A common approach
 is to now merge clusters that contain similar cell types and annotate them by
 hand.
@@ -508,14 +508,14 @@ An example how to label clusters can be seen below:
 library(dplyr)
 cluster_celltype <- recode(spe$nn_clusters_corrected,
                             "1" = "Tumor_proliferating",
-                            "2" = "Myeloid",
+                            "2" = "Neutrophil",
                             "3" = "Tumor",
                             "4" = "Tumor",
                             "5" = "Stroma",
-                            "6" = "Myeloid_proliferating",
+                            "6" = "Proliferating",
                             "7" = "Myeloid",
                             "8" = "CD8",
-                            "9" = "CD38",
+                            "9" = "Plasma_cell",
                             "10" = "CD4",
                             "11" = "Bcell",
                             "12" = "Stroma",

@@ -220,7 +220,7 @@ It is also often the case that sample-specific metadata are available externally
 For the current data, we need to link the cancer type (also referred to as "Indication")
 to each sample. This metadata is available as external excel file:
 
-```{r add-indication}
+```{r add-indication, message=FALSE}
 library(tidyverse)
 
 # Read patient metadata
