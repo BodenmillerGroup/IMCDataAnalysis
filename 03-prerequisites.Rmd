@@ -60,7 +60,7 @@ if (!requireNamespace("BiocManager", quietly = TRUE))
 BiocManager::install(c("pheatmap", "viridis",
                        "zoo", "BiocManager", "devtools", "tiff",
                        "distill", "ggrepel", "patchwork", "mclust",
-                       "RColorBrewer", "uwot", "Rtsne", "Seurat", 
+                       "RColorBrewer", "uwot", "Rtsne", "Seurat", "Matrix",
                        "SeuratObject", "cowplot", "kohonen", "caret", 
                        "randomForest", "ggridges", "cowplot", "gridGraphics",
                        "scales", "tiff", "CATALYST", "scuttle", "scater", 
