@@ -45,11 +45,9 @@ abstract: |
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Procedure
+## Example data
 
-### Example data
-
-```{r, message=FALSE}
+```{r, message=FALSE, eval=FALSE}
 options(timeout = 10000)
 dir.create("data/steinbock/raw", recursive = TRUE)
 download.file("https://zenodo.org/record/7624451/files/panel.csv",
@@ -82,7 +80,9 @@ TODO
 alias steinbock="docker run -v /path/to/IMCDataAnalysis/data/steinbock:/data -u $(id -u):$(id -g) ghcr.io/bodenmillergroup/steinbock:0.16.0"
 ```
 
-## Preprocessing
+# Multiplexed tissue image processing
+
+## Data pre-processing (technology-specific)
 
 In this protocol, data pre-processing refers to the extraction of multi-channel images from raw imaging data, and to preparing them for downstream processing. 
 The required steps are dependent on the imaging technology; here, we showcase the pre-processing of raw IMC data which includes a hot pixel filtering step. 
@@ -133,6 +133,8 @@ steinbock measure neighbors --type expansion --dmax 4
 ```
 
 The step took  `TODO` minutes.
+
+# Single-cell and spatial data analysis
 
 ## Reading in data
 
