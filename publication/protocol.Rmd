@@ -778,7 +778,8 @@ mat <- reducedDim(spe, "fastMNN")
 combinations <- clusterSweep(mat, BLUSPARAM=SNNGraphParam(),
                              k=c(10L, 20L), 
                              type = c("rank", "jaccard"), 
-                             cluster.fun = "louvain")
+                             cluster.fun = "louvain",
+                             BPPARAM = SerialParam(RNGseed = 230214))
 
 # Compute the average silhouette width per parameter combination
 sil <- vapply(as.list(combinations$clusters), 
@@ -869,19 +870,18 @@ Label clusters
 ```{r, message=FALSE}
 cluster_celltype <- recode(spe$nn_clusters,
                             "1" = "Tumor_proliferating",
-                            "2" = "Tumor",
+                            "2" = "Myeloid",
                             "3" = "Tumor",
                             "4" = "Tumor",
                             "5" = "Stroma",
-                            "6" = "Tumor_proliferating",
+                            "6" = "Myeloid_proliferating",
                             "7" = "Myeloid",
                             "8" = "CD8",
                             "9" = "Plasma_cell",
                             "10" = "CD4",
-                            "11" = "Neutrophil",
-                            "12" = "Bcell",
-                            "13" = "Stroma",
-                            "14" = "unknown")
+                            "11" = "Bcell",
+                            "12" = "Stroma",
+                            "13" = "unknown")
 
 spe$cluster_celltype <- cluster_celltype
 ```
@@ -1423,6 +1423,12 @@ ggsave("outputs/Fig21_interaction-testing.pdf", p, width = 5, height = 4)
 
 The step took 
 `r round(as.numeric(difftime(end_time, start_time, units = "mins")), digits = 2)` minutes.
+
+We finally save out the `SpatialExperiment` object.
+
+```{r save-object}
+saveRDS(spe, "data/spe.rds")
+```
 
 ## Session information
 
