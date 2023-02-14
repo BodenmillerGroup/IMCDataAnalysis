@@ -89,3 +89,7 @@ which you can site as follows:
 Jonas Windhager, Bernd Bodenmiller, Nils Eling (2020). An end-to-end workflow for multiplexed image processing and analysis. 
     bioRxiv, doi: 10.1101/2021.11.12.468357
 ```
+
+## Funding
+
+The work was funded by the European Union’s Horizon 2020 research and innovation program under Marie Sklodowska-Curie Actions grant agreement No 892225 (N.E) and by the CRUK IMAXT Grand Challenge (J.W.).
