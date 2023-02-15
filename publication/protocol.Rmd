@@ -297,7 +297,8 @@ plotSpotHeatmap(sce)
 end_time <- Sys.time()
 ```
 
-```{r, include=FALSE}
+```{r, include=FALSE, error=FALSE}
+dev.off()
 if (!dir.exists("outputs")) dir.create("outputs", recursive = TRUE)
 pdf("outputs/Fig5_plotSpotHeatmap.pdf", width = 7, height = 6)
 plotSpotHeatmap(sce)
@@ -358,7 +359,7 @@ The step took
 
 Assess incorretly assigned pixels:
 
-```{r, message=FALSE}
+```{r, message=FALSE, fig.width=7, fig.height=7}
 library(pheatmap)
 cur_table <- table(sce$bc_id, sce$sample_mass)
 
@@ -374,7 +375,8 @@ cur_table["0",] / colSums(cur_table)
 sce <- filterPixels(sce, minevents = 40, correct_pixels = TRUE)
 ```
 
-```{r, include=FALSE}
+```{r, include=FALSE, error=FALSE}
+dev.off()
 pdf("outputs/Fig6_filterPixels.pdf", width = 7, height = 6)
 pheatmap(log10(cur_table + 1),
          cluster_rows = FALSE,
@@ -841,7 +843,7 @@ The step took
 
 Visualize the marker expression per cluster
 
-```{r message=FALSE}
+```{r message=FALSE, fig.height=7, fig.width=7}
 library(viridis)
 
 set.seed(220619)
@@ -856,6 +858,7 @@ dittoHeatmap(spe[,cur_cells],
 
 
 ```{r, include=FALSE}
+dev.off()
 pdf("outputs/Fig13_cluster-heatmap.pdf")
 dittoHeatmap(spe[,cur_cells], 
              genes = rownames(spe)[rowData(spe)$use_channel],
@@ -874,14 +877,14 @@ cluster_celltype <- recode(spe$nn_clusters,
                             "3" = "Tumor",
                             "4" = "Tumor",
                             "5" = "Stroma",
-                            "6" = "Myeloid_proliferating",
+                            "6" = "Proliferating",
                             "7" = "Myeloid",
                             "8" = "CD8",
                             "9" = "Plasma_cell",
                             "10" = "CD4",
                             "11" = "Bcell",
                             "12" = "Stroma",
-                            "13" = "unknown")
+                            "13" = "pDC")
 
 spe$cluster_celltype <- cluster_celltype
 ```
@@ -1046,7 +1049,7 @@ spe$celltype <- cell_labels
 
 Visualize cell type and cluster labels on the UMAP embedding for qualitatively assessing cell phenotyping.
 
-```{r celltype-cluster-UMAP, fig.width=8, fig.height=4}
+```{r celltype-cluster-UMAP, fig.width=12, fig.height=4}
 p1 <- dittoDimPlot(spe, var = "celltype", 
              reduction.use = "UMAP_mnnCorrected", size = 0.2,
              do.label = TRUE) +
@@ -1110,6 +1113,7 @@ dittoHeatmap(cluster_mean,
 ```
 
 ```{r, include=FALSE}
+dev.off()
 pdf("outputs/Fig15_celltype-heatmap.pdf")
 dittoHeatmap(celltype_mean,
              assay = "exprs", cluster_cols = TRUE, 
@@ -1236,6 +1240,7 @@ p <- plotSpatial(spe,
           legend.title = element_text(size = 18))
 ggsave("outputs/Fig18_cellular-neighborhoods.pdf", p, width = 12, height = 12)
 
+dev.off()
 pdf("outputs/Fig18_cn-heatmap.pdf", width = 4, height = 4)
 pheatmap(mat, 
   color = colorRampPalette(c("dark blue", "white", "dark red"))(100), 
