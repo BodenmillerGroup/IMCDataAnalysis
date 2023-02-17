@@ -271,7 +271,7 @@ online at [zenodo.org/record/7432486](https://zenodo.org/record/7432486) and
 will be downloaded here for later use:
 
 ```{r download-gated-cells}
-download.file("https://zenodo.org/record/7432486/files/gated_cells.zip",
+download.file("https://zenodo.org/record/7647079/files/gated_cells.zip",
               "data/gated_cells.zip")
 unzip("data/gated_cells.zip", exdir="data", overwrite=TRUE)
 unlink("data/gated_cells.zip")

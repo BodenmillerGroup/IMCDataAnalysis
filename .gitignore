@@ -13,3 +13,6 @@ _bookdown_files/
 *.md
 *.rds
 outputs/*
+
+!README.md
+!publication/README.md
