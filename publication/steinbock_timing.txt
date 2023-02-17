@@ -1,91 +1,91 @@
-2023-02-15 21:34:44,180 INFO steinbock - img/Patient4_005.tiff
-2023-02-15 21:34:45,406 INFO steinbock - img/Patient4_006.tiff
-2023-02-15 21:34:46,840 INFO steinbock - img/Patient4_007.tiff
-2023-02-15 21:34:47,779 INFO steinbock - img/Patient4_008.tiff
-2023-02-15 21:34:54,927 INFO steinbock - img/Patient3_001.tiff
-2023-02-15 21:34:56,117 INFO steinbock - img/Patient3_002.tiff
-2023-02-15 21:34:57,326 INFO steinbock - img/Patient3_003.tiff
-2023-02-15 21:35:02,790 INFO steinbock - img/Patient2_001.tiff
-2023-02-15 21:35:03,884 INFO steinbock - img/Patient2_002.tiff
-2023-02-15 21:35:04,902 INFO steinbock - img/Patient2_003.tiff
-2023-02-15 21:35:06,243 INFO steinbock - img/Patient2_004.tiff
-2023-02-15 21:35:10,163 INFO steinbock - img/Patient1_001.tiff
-2023-02-15 21:35:11,019 INFO steinbock - img/Patient1_002.tiff
-2023-02-15 21:35:11,931 INFO steinbock - img/Patient1_003.tiff
-2023-02-15 21:35:12,089 INFO steinbock - images.csv
+2023-02-17 11:15:11,345 INFO steinbock - img/Patient4_005.tiff
+2023-02-17 11:15:13,111 INFO steinbock - img/Patient4_006.tiff
+2023-02-17 11:15:14,096 INFO steinbock - img/Patient4_007.tiff
+2023-02-17 11:15:14,985 INFO steinbock - img/Patient4_008.tiff
+2023-02-17 11:15:20,542 INFO steinbock - img/Patient3_001.tiff
+2023-02-17 11:15:21,539 INFO steinbock - img/Patient3_002.tiff
+2023-02-17 11:15:22,329 INFO steinbock - img/Patient3_003.tiff
+2023-02-17 11:15:27,254 INFO steinbock - img/Patient2_001.tiff
+2023-02-17 11:15:28,209 INFO steinbock - img/Patient2_002.tiff
+2023-02-17 11:15:29,261 INFO steinbock - img/Patient2_003.tiff
+2023-02-17 11:15:30,135 INFO steinbock - img/Patient2_004.tiff
+2023-02-17 11:15:33,810 INFO steinbock - img/Patient1_001.tiff
+2023-02-17 11:15:34,624 INFO steinbock - img/Patient1_002.tiff
+2023-02-17 11:15:35,437 INFO steinbock - img/Patient1_003.tiff
+2023-02-17 11:15:35,509 INFO steinbock - images.csv
 
-real	0m45.675s
-user	0m0.075s
-sys	0m0.171s
-2023-02-15 21:35:48,686 INFO steinbock - masks/Patient1_001.tiff
-2023-02-15 21:36:04,536 INFO steinbock - masks/Patient1_002.tiff
-2023-02-15 21:36:20,211 INFO steinbock - masks/Patient1_003.tiff
-2023-02-15 21:36:37,165 INFO steinbock - masks/Patient2_001.tiff
-2023-02-15 21:36:53,487 INFO steinbock - masks/Patient2_002.tiff
-2023-02-15 21:37:10,850 INFO steinbock - masks/Patient2_003.tiff
-2023-02-15 21:37:27,411 INFO steinbock - masks/Patient2_004.tiff
-2023-02-15 21:37:45,097 INFO steinbock - masks/Patient3_001.tiff
-2023-02-15 21:38:03,079 INFO steinbock - masks/Patient3_002.tiff
-2023-02-15 21:38:16,954 INFO steinbock - masks/Patient3_003.tiff
-2023-02-15 21:38:30,103 INFO steinbock - masks/Patient4_005.tiff
-2023-02-15 21:38:46,460 INFO steinbock - masks/Patient4_006.tiff
-2023-02-15 21:39:02,808 INFO steinbock - masks/Patient4_007.tiff
-2023-02-15 21:39:17,029 INFO steinbock - masks/Patient4_008.tiff
+real	0m42.327s
+user	0m0.070s
+sys	0m0.186s
+2023-02-17 11:16:09,405 INFO steinbock - masks/Patient1_001.tiff
+2023-02-17 11:16:24,374 INFO steinbock - masks/Patient1_002.tiff
+2023-02-17 11:16:40,902 INFO steinbock - masks/Patient1_003.tiff
+2023-02-17 11:16:54,754 INFO steinbock - masks/Patient2_001.tiff
+2023-02-17 11:17:09,502 INFO steinbock - masks/Patient2_002.tiff
+2023-02-17 11:17:23,543 INFO steinbock - masks/Patient2_003.tiff
+2023-02-17 11:17:37,838 INFO steinbock - masks/Patient2_004.tiff
+2023-02-17 11:17:53,105 INFO steinbock - masks/Patient3_001.tiff
+2023-02-17 11:18:08,164 INFO steinbock - masks/Patient3_002.tiff
+2023-02-17 11:18:21,836 INFO steinbock - masks/Patient3_003.tiff
+2023-02-17 11:18:35,332 INFO steinbock - masks/Patient4_005.tiff
+2023-02-17 11:18:49,279 INFO steinbock - masks/Patient4_006.tiff
+2023-02-17 11:19:02,250 INFO steinbock - masks/Patient4_007.tiff
+2023-02-17 11:19:15,645 INFO steinbock - masks/Patient4_008.tiff
 
-real	4m6.607s
-user	0m0.111s
-sys	0m0.196s
-2023-02-15 21:39:24,112 INFO steinbock - intensities/Patient1_001.csv
-2023-02-15 21:39:25,322 INFO steinbock - intensities/Patient1_002.csv
-2023-02-15 21:39:26,523 INFO steinbock - intensities/Patient1_003.csv
-2023-02-15 21:39:27,683 INFO steinbock - intensities/Patient2_001.csv
-2023-02-15 21:39:28,657 INFO steinbock - intensities/Patient2_002.csv
-2023-02-15 21:39:29,801 INFO steinbock - intensities/Patient2_003.csv
-2023-02-15 21:39:30,968 INFO steinbock - intensities/Patient2_004.csv
-2023-02-15 21:39:32,187 INFO steinbock - intensities/Patient3_001.csv
-2023-02-15 21:39:33,275 INFO steinbock - intensities/Patient3_002.csv
-2023-02-15 21:39:34,794 INFO steinbock - intensities/Patient3_003.csv
-2023-02-15 21:39:35,772 INFO steinbock - intensities/Patient4_005.csv
-2023-02-15 21:39:37,121 INFO steinbock - intensities/Patient4_006.csv
-2023-02-15 21:39:38,335 INFO steinbock - intensities/Patient4_007.csv
-2023-02-15 21:39:39,406 INFO steinbock - intensities/Patient4_008.csv
+real	3m41.504s
+user	0m0.096s
+sys	0m0.107s
+2023-02-17 11:19:21,546 INFO steinbock - intensities/Patient1_001.csv
+2023-02-17 11:19:22,721 INFO steinbock - intensities/Patient1_002.csv
+2023-02-17 11:19:23,829 INFO steinbock - intensities/Patient1_003.csv
+2023-02-17 11:19:24,832 INFO steinbock - intensities/Patient2_001.csv
+2023-02-17 11:19:25,944 INFO steinbock - intensities/Patient2_002.csv
+2023-02-17 11:19:26,801 INFO steinbock - intensities/Patient2_003.csv
+2023-02-17 11:19:27,881 INFO steinbock - intensities/Patient2_004.csv
+2023-02-17 11:19:28,969 INFO steinbock - intensities/Patient3_001.csv
+2023-02-17 11:19:29,984 INFO steinbock - intensities/Patient3_002.csv
+2023-02-17 11:19:31,033 INFO steinbock - intensities/Patient3_003.csv
+2023-02-17 11:19:31,891 INFO steinbock - intensities/Patient4_005.csv
+2023-02-17 11:19:33,005 INFO steinbock - intensities/Patient4_006.csv
+2023-02-17 11:19:34,015 INFO steinbock - intensities/Patient4_007.csv
+2023-02-17 11:19:35,000 INFO steinbock - intensities/Patient4_008.csv
 
-real	0m20.054s
-user	0m0.074s
+real	0m17.812s
+user	0m0.064s
 sys	0m0.079s
-2023-02-15 21:39:44,573 INFO steinbock - regionprops/Patient1_001.csv
-2023-02-15 21:39:46,153 INFO steinbock - regionprops/Patient1_002.csv
-2023-02-15 21:39:47,778 INFO steinbock - regionprops/Patient1_003.csv
-2023-02-15 21:39:49,351 INFO steinbock - regionprops/Patient2_001.csv
-2023-02-15 21:39:50,728 INFO steinbock - regionprops/Patient2_002.csv
-2023-02-15 21:39:52,014 INFO steinbock - regionprops/Patient2_003.csv
-2023-02-15 21:39:53,758 INFO steinbock - regionprops/Patient2_004.csv
-2023-02-15 21:39:55,392 INFO steinbock - regionprops/Patient3_001.csv
-2023-02-15 21:39:56,944 INFO steinbock - regionprops/Patient3_002.csv
-2023-02-15 21:39:58,756 INFO steinbock - regionprops/Patient3_003.csv
-2023-02-15 21:40:00,610 INFO steinbock - regionprops/Patient4_005.csv
-2023-02-15 21:40:02,795 INFO steinbock - regionprops/Patient4_006.csv
-2023-02-15 21:40:04,181 INFO steinbock - regionprops/Patient4_007.csv
-2023-02-15 21:40:05,599 INFO steinbock - regionprops/Patient4_008.csv
+2023-02-17 11:19:39,513 INFO steinbock - regionprops/Patient1_001.csv
+2023-02-17 11:19:41,184 INFO steinbock - regionprops/Patient1_002.csv
+2023-02-17 11:19:42,743 INFO steinbock - regionprops/Patient1_003.csv
+2023-02-17 11:19:43,972 INFO steinbock - regionprops/Patient2_001.csv
+2023-02-17 11:19:45,249 INFO steinbock - regionprops/Patient2_002.csv
+2023-02-17 11:19:46,360 INFO steinbock - regionprops/Patient2_003.csv
+2023-02-17 11:19:47,772 INFO steinbock - regionprops/Patient2_004.csv
+2023-02-17 11:19:49,441 INFO steinbock - regionprops/Patient3_001.csv
+2023-02-17 11:19:50,741 INFO steinbock - regionprops/Patient3_002.csv
+2023-02-17 11:19:52,112 INFO steinbock - regionprops/Patient3_003.csv
+2023-02-17 11:19:53,154 INFO steinbock - regionprops/Patient4_005.csv
+2023-02-17 11:19:54,707 INFO steinbock - regionprops/Patient4_006.csv
+2023-02-17 11:19:55,921 INFO steinbock - regionprops/Patient4_007.csv
+2023-02-17 11:19:57,015 INFO steinbock - regionprops/Patient4_008.csv
 
-real	0m26.245s
-user	0m0.080s
-sys	0m0.086s
-2023-02-15 21:40:13,936 INFO steinbock - neighbors/Patient1_001.csv
-2023-02-15 21:40:17,470 INFO steinbock - neighbors/Patient1_002.csv
-2023-02-15 21:40:21,668 INFO steinbock - neighbors/Patient1_003.csv
-2023-02-15 21:40:25,007 INFO steinbock - neighbors/Patient2_001.csv
-2023-02-15 21:40:28,019 INFO steinbock - neighbors/Patient2_002.csv
-2023-02-15 21:40:30,786 INFO steinbock - neighbors/Patient2_003.csv
-2023-02-15 21:40:34,952 INFO steinbock - neighbors/Patient2_004.csv
-2023-02-15 21:40:39,013 INFO steinbock - neighbors/Patient3_001.csv
-2023-02-15 21:40:42,472 INFO steinbock - neighbors/Patient3_002.csv
-2023-02-15 21:40:46,213 INFO steinbock - neighbors/Patient3_003.csv
-2023-02-15 21:40:49,004 INFO steinbock - neighbors/Patient4_005.csv
-2023-02-15 21:40:53,459 INFO steinbock - neighbors/Patient4_006.csv
-2023-02-15 21:40:56,546 INFO steinbock - neighbors/Patient4_007.csv
-2023-02-15 21:40:59,423 INFO steinbock - neighbors/Patient4_008.csv
+real	0m22.012s
+user	0m0.068s
+sys	0m0.071s
+2023-02-17 11:20:04,083 INFO steinbock - neighbors/Patient1_001.csv
+2023-02-17 11:20:07,222 INFO steinbock - neighbors/Patient1_002.csv
+2023-02-17 11:20:10,812 INFO steinbock - neighbors/Patient1_003.csv
+2023-02-17 11:20:13,747 INFO steinbock - neighbors/Patient2_001.csv
+2023-02-17 11:20:16,573 INFO steinbock - neighbors/Patient2_002.csv
+2023-02-17 11:20:19,097 INFO steinbock - neighbors/Patient2_003.csv
+2023-02-17 11:20:23,208 INFO steinbock - neighbors/Patient2_004.csv
+2023-02-17 11:20:27,917 INFO steinbock - neighbors/Patient3_001.csv
+2023-02-17 11:20:31,678 INFO steinbock - neighbors/Patient3_002.csv
+2023-02-17 11:20:35,359 INFO steinbock - neighbors/Patient3_003.csv
+2023-02-17 11:20:38,021 INFO steinbock - neighbors/Patient4_005.csv
+2023-02-17 11:20:42,735 INFO steinbock - neighbors/Patient4_006.csv
+2023-02-17 11:20:45,714 INFO steinbock - neighbors/Patient4_007.csv
+2023-02-17 11:20:48,389 INFO steinbock - neighbors/Patient4_008.csv
 
-real	0m53.727s
-user	0m0.077s
-sys	0m0.086s
+real	0m51.379s
+user	0m0.064s
+sys	0m0.069s
