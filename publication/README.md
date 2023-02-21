@@ -65,6 +65,8 @@ replaced by the anticipated working directory.
 To obtain more detailed installation instructions, please refer to the 
 [steinbock documentation](https://bodenmillergroup.github.io/steinbock/latest/install-docker/).
 
+A shell script for automatic execution of the commands can be seen at [steinbock.sh](steinbock.sh).
+
 **4. Option A: Install R packages**
 
 The workflow highlights the use of a number of R packages.
