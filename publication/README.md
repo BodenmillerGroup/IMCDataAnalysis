@@ -89,7 +89,7 @@ To install the required software around 1-2 hours need to be taken into account.
 When the workflow was written, we used R v4.2.2 installed and Bioconductor 
 release version 3.16. 
 
-Please see [protocol.html](protocol.html) for the exact versions of the software
+Please see [protocol.md](protocol.md#session-information) for the exact versions of the software
 packages.
 
 **4. Option B: Obtain docker container**
