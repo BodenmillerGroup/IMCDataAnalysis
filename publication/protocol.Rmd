@@ -1614,7 +1614,6 @@ start_time <- Sys.time()
 ```{r, message=FALSE}
 library(scales)
 
-set.seed(220825)
 out <- testInteractions(spe, 
                         group_by = "sample_id",
                         label = "celltype", 

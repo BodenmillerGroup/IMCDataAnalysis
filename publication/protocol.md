@@ -197,7 +197,7 @@ data.
     library(imcRtools)
     spe <- read_steinbock("data/steinbock/")
 
-The step took 0.6 minutes.
+The step took 0.8 minutes.
 
 After reading in the single-cell data, the `SpatialExperiment` object
 needs to be further processed. First, the column names are set based on
@@ -228,7 +228,7 @@ of 1.
     # Transform the counts
     assay(spe, "exprs") <- asinh(counts(spe)/1)
 
-The step took 0.05 minutes.
+The step took 0.04 minutes.
 
 Read in multi-channel images as a `CytoImageList` container using the
 [cytomapper](https://github.com/BodenmillerGroup/cytomapper) package.
@@ -237,7 +237,7 @@ Read in multi-channel images as a `CytoImageList` container using the
     images <- loadImages("data/steinbock/img/")
     channelNames(images) <- rownames(spe)
 
-The step took 0.8 minutes.
+The step took 0.83 minutes.
 
 Read in segmentation masks as a `CytoImageList` container.
 
@@ -295,7 +295,7 @@ intensities are arsinh-transformed using a cofactor of 5.
 
     assay(sce, "exprs") <- asinh(counts(sce)/5)
 
-The step took 0.37 minutes.
+The step took 0.08 minutes.
 
 CRITICAL: The provided data of the spillover slide were specifically
 acquired for this dataset and cannot be applied to other datasets. It is
@@ -315,7 +315,7 @@ counts).
 
     sce2 <- binAcrossPixels(sce, bin_size = 10)
 
-The step took 0.23 minutes.
+The step took 0.29 minutes.
 
 Filter incorrectly assigned pixels. The following step uses functions
 provided by the CATALYST package to “de-barcode” the pixels. Based on
@@ -354,7 +354,7 @@ general workflow for pixel de-barcoding is as follows:
     sce <- estCutoffs(sce)
     sce <- applyCutoffs(sce)
 
-The step took 0.17 minutes.
+The step took 0.15 minutes.
 
 Observe the number of correctly and incorrectly assigned pixels per
 spot. The following heatmap depicts the number of pixels assigned to
@@ -397,7 +397,7 @@ Compute and store the spillover matrix using the CATALYST package.
     sce <- computeSpillmat(sce)
     sm <- metadata(sce)$spillover_matrix
 
-The step took 0.04 minutes.
+The step took 0.03 minutes.
 
 Perform single-cell data compensation using the
 [CATALYST](https://github.com/HelenaLC/CATALYST) package. The
@@ -442,7 +442,7 @@ spillover correction efficacy.
     assay(spe, "exprs") <- assay(spe, "compexprs") 
     assay(spe, "compcounts") <- assay(spe, "compexprs") <- NULL
 
-The step took 0.15 minutes.
+The step took 0.12 minutes.
 
 Perform channel-to-channel spillover correction on multi-channel images.
 To this end, the previously computed spillover matrix needs to be
@@ -500,7 +500,7 @@ efficacy can be assessed.
     # Switch back to using target names as channel names
     channelNames(images_comp) <- rownames(spe)
 
-The step took 11.19 minutes.
+The step took 11.35 minutes.
 
 ### Quality control
 
@@ -624,7 +624,7 @@ package to compute a Uniform Manifold Approximation and Projection
 
 ![](protocol_files/figure-markdown_strict/umap-1.png)
 
-The step took 0.61 minutes.
+The step took 0.7 minutes.
 
 CRITICAL: Differences in marker distributions or non-overlapping samples
 on the UMAP visualization can indicate sample-to-sample differences in
@@ -666,7 +666,7 @@ embedding based on markers that are known to be expressed in certain
 cell phenotypes. These markers should be expressed in cells that cluster
 in the UMAP embedding.
 
-The step took 3.12 minutes.
+The step took 2.68 minutes.
 
 ### Cell phenotyping
 
@@ -721,7 +721,7 @@ combination with highest mean silhouette width.
 
 ![](protocol_files/figure-markdown_strict/cluster-sweep-1.png)
 
-The step took 5.15 minutes.
+The step took 4.95 minutes.
 
 CRITICAL: For each dataset, parameter estimation should be performed
 independently. For large datasets, the function takes a long time to
@@ -742,7 +742,7 @@ cluster identifiers are then saved in the `SpatialExperiment` object.
                                                     type = "rank"))
     spe$nn_clusters <- clusters
 
-The step took 1.35 minutes.
+The step took 1.22 minutes.
 
 To annotate the individual clusters based on cell phenotypes contained
 within, the marker expression per cluster can be visualized in the form
@@ -900,7 +900,7 @@ model parameter.
                    tuneLength = 5,
                    trControl = fitControl)
 
-The step took 11.19 minutes.
+The step took 9.77 minutes.
 
 Assess the classifier performance by computing the confusion matrix of
 the test dataset. The `confusionMatrix` function compares the predicted
@@ -1113,7 +1113,7 @@ detection separately for tumor and non-tumor cells.
 
 ![](protocol_files/figure-markdown_strict/spatial-community-1.png)
 
-The step took 0.06 minutes.
+The step took 0.09 minutes.
 
 After detecting spatial communities, a number of downstream analyses can
 be performed. These include (i) computing the cell phenotype fraction
@@ -1165,7 +1165,7 @@ spatially visualized and the cell type fraction per CN can be computed.
 
 ![](protocol_files/figure-markdown_strict/unnamed-chunk-62-1.png)
 
-The step took 0.2 minutes.
+The step took 0.18 minutes.
 
 CRITICAL: A parameter sweep should be performed to estimate the optimal
 value for `k`. However, with prior knowledge on the expected tissue
@@ -1236,7 +1236,7 @@ graph.
 
 ![](protocol_files/figure-markdown_strict/unnamed-chunk-66-1.png)
 
-The step took 0.36 minutes.
+The step took 0.29 minutes.
 
 Perform patch detection analysis. The `patchDetection` function of the
 `imcRtools` package detects fully connected components of cells of
@@ -1261,7 +1261,7 @@ convex hull to include cells within the patch.
 
 ![](protocol_files/figure-markdown_strict/unnamed-chunk-70-1.png)
 
-The step took 0.51 minutes.
+The step took 0.38 minutes.
 
 Perform interaction analysis as proposed by Schapiro et al. This
 approach detects cell phenotype pairs that show stronger (“interaction”)
@@ -1279,7 +1279,6 @@ visualized in the form of a heatmap.
 
     library(scales)
 
-    set.seed(220825)
     out <- testInteractions(spe, 
                             group_by = "sample_id",
                             label = "celltype", 
@@ -1301,7 +1300,7 @@ visualized in the form of a heatmap.
 
 ![](protocol_files/figure-markdown_strict/unnamed-chunk-74-1.png)
 
-The step took 9 minutes.
+The step took 6.84 minutes.
 
 We finally save out the `SpatialExperiment` object.
 
