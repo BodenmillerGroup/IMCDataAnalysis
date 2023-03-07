@@ -302,14 +302,8 @@ detected cellular neighborhoods (CN).
 
 ```{r, message=FALSE}
 library(tidyverse)
-for_plot <- colData(spe) %>% as_tibble() %>%
-    group_by(cn_celltypes, celltype) %>%
-    summarize(count = n()) %>%
-    mutate(freq = count / sum(count)) %>%
-    pivot_wider(id_cols = cn_celltypes, names_from = celltype, 
-                values_from = freq, values_fill = 0) %>%
-    ungroup() %>%
-    select(-cn_celltypes)
+for_plot <- prop.table(table(spe$cn_celltypes, spe$celltype), 
+                  margin = 1)
 
 pheatmap(for_plot, color = colorRampPalette(c("dark blue", "white", "dark red"))(100), 
          scale = "column")
@@ -343,14 +337,8 @@ Also here, we can visualize the cell type composition of each cellular
 neighborhood.
 
 ```{r, message=FALSE}
-for_plot <- colData(spe) %>% as_tibble() %>%
-    group_by(cn_expression, celltype) %>%
-    summarize(count = n()) %>%
-    mutate(freq = count / sum(count)) %>%
-    pivot_wider(id_cols = cn_expression, names_from = celltype, 
-                values_from = freq, values_fill = 0) %>%
-    ungroup() %>%
-    select(-cn_expression)
+for_plot <- prop.table(table(spe$cn_expression, spe$celltype), 
+                  margin = 1)
 
 pheatmap(for_plot, color = colorRampPalette(c("dark blue", "white", "dark red"))(100), 
          scale = "column")
@@ -425,14 +413,8 @@ Similar to the example above, we can now observe the cell type
 composition per spatial cluster.
 
 ```{r lisaClust-3, message=FALSE}
-for_plot <- colData(spe) %>% as_tibble() %>%
-    group_by(lisa_clusters, celltype) %>%
-    summarize(count = n()) %>%
-    mutate(freq = count / sum(count)) %>%
-    pivot_wider(id_cols = lisa_clusters, names_from = celltype, 
-                values_from = freq, values_fill = 0) %>%
-    ungroup() %>%
-    select(-lisa_clusters)
+for_plot <- prop.table(table(spe$lisa_clusters, spe$celltype), 
+                  margin = 1)
 
 pheatmap(for_plot, color = colorRampPalette(c("dark blue", "white", "dark red"))(100), 
          scale = "column")
@@ -641,7 +623,7 @@ plotSpatial(spe,
             img_id = "sample_id", 
             node_size_fix = 0.5) +
     theme(legend.position = "none") +
-    scale_color_manual(values = colors())
+    scale_color_manual(values = rev(colors()))
 ```
 
 We can now calculate the fraction of T cells within each tumor patch to roughly
@@ -654,6 +636,7 @@ colData(spe) %>% as_tibble() %>%
     summarize(Tcell_count = sum(celltype == "CD8" | celltype == "CD4"),
               patch_size = n(),
               Tcell_freq = Tcell_count / patch_size) %>%
+    filter(!is.na(patch_id)) %>%
     ggplot() +
         geom_point(aes(log10(patch_size), Tcell_freq, color = sample_id)) +
     theme_classic()
@@ -1024,8 +1007,8 @@ expect_equal(spe$aggregatedNeighbors[1000:1100,],
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0))))
 
 expect_equal(table(spe$cn_celltypes),
-             structure(c(`1` = 11968L, `2` = 5268L, `3` = 3361L, `4` = 7820L, 
-`5` = 10047L, `6` = 9330L), dim = 6L, dimnames = structure(list(
+             structure(c(`1` = 11968L, `2` = 5268L, `3` = 3360L, `4` = 7820L, 
+`5` = 10048L, `6` = 9330L), dim = 6L, dimnames = structure(list(
     c("1", "2", "3", "4", "5", "6")), names = ""), class = "table"))
 
 expect_equal(table(spe$cn_expression),
@@ -1034,22 +1017,22 @@ expect_equal(table(spe$cn_expression),
     c("1", "2", "3", "4", "5", "6")), names = ""), class = "table"))
 
 expect_equal(table(spe$lisa_clusters),
-             structure(c(`1` = 11939L, `2` = 4928L, `3` = 2729L, `4` = 4528L, 
-`5` = 16574L, `6` = 7096L), dim = 6L, dimnames = structure(list(
+             structure(c(`1` = 11941L, `2` = 4928L, `3` = 2729L, `4` = 4527L, 
+`5` = 16574L, `6` = 7095L), dim = 6L, dimnames = structure(list(
     c("1", "2", "3", "4", "5", "6")), names = ""), class = "table"))
 
 expect_equal(table(spe$spatial_context),
-             structure(c(`1` = 6009L, `1_2` = 20L, `1_2_3_5` = 1L, `1_2_3_5_6` = 3L, 
+             structure(c(`1` = 6009L, `1_2` = 20L, `1_2_3_5` = 1L, `1_2_3_5_6` = 2L, 
 `1_2_3_6` = 3L, `1_2_4` = 4L, `1_2_4_5` = 3L, `1_2_4_5_6` = 18L, 
 `1_2_4_6` = 199L, `1_2_5` = 26L, `1_2_5_6` = 207L, `1_2_6` = 1514L, 
-`1_3` = 3L, `1_3_4_5_6` = 8L, `1_3_4_6` = 7L, `1_3_5_6` = 71L, 
-`1_3_6` = 328L, `1_4_5` = 5L, `1_4_5_6` = 479L, `1_4_6` = 1121L, 
+`1_3` = 3L, `1_3_4_5_6` = 8L, `1_3_4_6` = 7L, `1_3_5_6` = 72L, 
+`1_3_6` = 329L, `1_4_5` = 5L, `1_4_5_6` = 479L, `1_4_6` = 1121L, 
 `1_5` = 40L, `1_5_6` = 2060L, `1_6` = 7806L, `2` = 1646L, `2_3` = 227L, 
 `2_3_4` = 92L, `2_3_4_5` = 59L, `2_3_5` = 183L, `2_3_5_6` = 38L, 
 `2_3_6` = 11L, `2_4` = 2669L, `2_4_5` = 906L, `2_4_5_6` = 131L, 
-`2_4_6` = 780L, `2_5` = 512L, `2_5_6` = 294L, `2_6` = 761L, `3` = 1587L, 
+`2_4_6` = 780L, `2_5` = 512L, `2_5_6` = 294L, `2_6` = 761L, `3` = 1586L, 
 `3_4` = 193L, `3_4_5` = 556L, `3_4_5_6` = 49L, `3_4_6` = 8L, 
-`3_5` = 1884L, `3_5_6` = 321L, `3_6` = 272L, `4` = 1602L, `4_5` = 4914L, 
+`3_5` = 1885L, `3_5_6` = 321L, `3_6` = 271L, `4` = 1602L, `4_5` = 4914L, 
 `4_5_6` = 1546L, `4_6` = 1484L, `5` = 3013L, `5_6` = 1424L, `6` = 697L
 ), dim = 52L, dimnames = structure(list(c("1", "1_2", "1_2_3_5", 
 "1_2_3_5_6", "1_2_3_6", "1_2_4", "1_2_4_5", "1_2_4_5_6", "1_2_4_6", 
@@ -1065,8 +1048,8 @@ expect_equal(table(spe$spatial_context_filtered),
 `1_2_6` = 1514L, `1_4_5_6` = 479L, `1_4_6` = 1121L, `1_5_6` = 2060L, 
 `1_6` = 7806L, `2` = 1646L, `2_3_5` = 183L, `2_4` = 2669L, `2_4_5` = 906L, 
 `2_4_5_6` = 131L, `2_4_6` = 780L, `2_5` = 512L, `2_5_6` = 294L, 
-`2_6` = 761L, `3` = 1587L, `3_4` = 193L, `3_4_5` = 556L, `3_5` = 1884L, 
-`3_5_6` = 321L, `3_6` = 272L, `4` = 1602L, `4_5` = 4914L, `4_5_6` = 1546L, 
+`2_6` = 761L, `3` = 1586L, `3_4` = 193L, `3_4_5` = 556L, `3_5` = 1885L, 
+`3_5_6` = 321L, `3_6` = 271L, `4` = 1602L, `4_5` = 4914L, `4_5_6` = 1546L, 
 `4_6` = 1484L, `5` = 3013L, `5_6` = 1424L), dim = 29L, dimnames = structure(list(
     c("1", "1_2_4_6", "1_2_5_6", "1_2_6", "1_4_5_6", "1_4_6", 
     "1_5_6", "1_6", "2", "2_3_5", "2_4", "2_4_5", "2_4_5_6", 

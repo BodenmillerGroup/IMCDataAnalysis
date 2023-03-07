@@ -1369,7 +1369,7 @@ Patient1_001_1199 = "unlabeled", Patient1_001_1200 = "unlabeled",
 Patient1_001_1201 = "unlabeled"))
 
 expect_equal(table(spe$celltype), 
-             structure(c(Bcell = 1594L, BnTcell = 2675L, CD4 = 3845L, CD8 = 3504L, 
+             structure(c(Bcell = 1595L, BnTcell = 2674L, CD4 = 3845L, CD8 = 3504L, 
 Myeloid = 8020L, Neutrophil = 681L, Plasma_cell = 3397L, Stroma = 5306L, 
 Treg = 1515L, Tumor = 16625L, undefined = 632L), dim = 11L, dimnames = structure(list(
     c("Bcell", "BnTcell", "CD4", "CD8", "Myeloid", "Neutrophil", 
