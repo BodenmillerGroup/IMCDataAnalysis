@@ -719,10 +719,10 @@ accurately represent the corresponding cell, should therefore be excluded from
 the analysis. The selected threshold is dataset-specific and should be
 fine-tuned by visualizing the distribution of the cell area.
 
-Visualize the cell density per image.
+Visualize the image area covered by cells per image.
 
 ```{r cell-density}
-# Compute the cell density per image
+# Compute the fraction of image area covered by cells
 cell_density <- colData(spe) %>%
     as.data.frame() %>%
     group_by(sample_id) %>%
@@ -732,7 +732,7 @@ cell_density <- colData(spe) %>%
     # Divide the total number of pixels by the number of pixels covered by cells
     mutate(covered_area = cell_area / no_pixels)
 
-# Visualize the cell density per image
+# Visualize the image area covered by cells per image
 ggplot(cell_density) +
         geom_point(aes(sample_id, covered_area)) + 
         theme_minimal(base_size = 15) +
@@ -853,7 +853,7 @@ spe <- runUMAP(spe, dimred= "fastMNN", name = "UMAP_mnnCorrected")
 
 # Visualize corrected UMAP
 dittoDimPlot(spe, var = "patient_id", 
-                   reduction.use = "UMAP_mnnCorrected", size = 0.2) + 
+             reduction.use = "UMAP_mnnCorrected", size = 0.2) + 
     ggtitle("Patient ID on UMAP after correction")
 ```
 
@@ -972,7 +972,7 @@ start_time <- Sys.time()
 ```{r cluster-cells}
 library(scran)
 
-clusters <- clusterCells(spe[rowData(spe)$use_channel,], 
+clusters <- clusterCells(spe, 
                          use.dimred = "fastMNN", 
                          BLUSPARAM = SNNGraphParam(k=20, 
                                                 cluster.fun = "louvain",
@@ -1159,7 +1159,7 @@ test_spe <- lab_spe[,-trainIndex$Resample1]
 fitControl <- trainControl(method = "cv",
                            number = 5)
 
-# Select the asinh-transformed counts for training
+# Select the arsinh-transformed counts for training
 cur_mat <- t(assay(train_spe, "exprs")[rowData(train_spe)$use_channel,])
 
 # Train a random forest classifier
@@ -1506,8 +1506,7 @@ spe <- filterSpatialContext(spe,
 plotSpatial(spe, 
             node_color_by = "spatial_context_filtered", 
             img_id = "sample_id", 
-            node_size_fix = 0.5, 
-            colPairName = "knn_spatialcontext_graph")
+            node_size_fix = 0.5)
 ```
 
 ```{r}
