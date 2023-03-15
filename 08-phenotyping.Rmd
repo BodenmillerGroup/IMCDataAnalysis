@@ -292,7 +292,7 @@ patient-specific. We can now perform clustering of the integrated cells
 by directly specifying which low-dimensional embedding to use:
 
 ```{r snn-2, message=FALSE}
-clusters <- clusterCells(spe[rowData(spe)$use_channel,], 
+clusters <- clusterCells(spe, 
                          use.dimred = "fastMNN", 
                          BLUSPARAM = NNGraphParam(k=20, 
                                                   cluster.fun = "louvain",
