@@ -197,7 +197,7 @@ data.
     library(imcRtools)
     spe <- read_steinbock("data/steinbock/")
 
-The step took 0.8 minutes.
+The step took 0.48 minutes.
 
 After reading in the single-cell data, the `SpatialExperiment` object
 needs to be further processed. First, the column names are set based on
@@ -228,7 +228,7 @@ of 1.
     # Transform the counts
     assay(spe, "exprs") <- asinh(counts(spe)/1)
 
-The step took 0.04 minutes.
+The step took 0.02 minutes.
 
 Read in multi-channel images as a `CytoImageList` container using the
 [cytomapper](https://github.com/BodenmillerGroup/cytomapper) package.
@@ -237,7 +237,7 @@ Read in multi-channel images as a `CytoImageList` container using the
     images <- loadImages("data/steinbock/img/")
     channelNames(images) <- rownames(spe)
 
-The step took 0.83 minutes.
+The step took 0.42 minutes.
 
 Read in segmentation masks as a `CytoImageList` container.
 
@@ -295,7 +295,7 @@ intensities are arsinh-transformed using a cofactor of 5.
 
     assay(sce, "exprs") <- asinh(counts(sce)/5)
 
-The step took 0.08 minutes.
+The step took 0.11 minutes.
 
 CRITICAL: The provided data of the spillover slide were specifically
 acquired for this dataset and cannot be applied to other datasets. It is
@@ -315,7 +315,7 @@ counts).
 
     sce2 <- binAcrossPixels(sce, bin_size = 10)
 
-The step took 0.29 minutes.
+The step took 0.2 minutes.
 
 Filter incorrectly assigned pixels. The following step uses functions
 provided by the CATALYST package to “de-barcode” the pixels. Based on
@@ -442,7 +442,7 @@ spillover correction efficacy.
     assay(spe, "exprs") <- assay(spe, "compexprs") 
     assay(spe, "compcounts") <- assay(spe, "compexprs") <- NULL
 
-The step took 0.12 minutes.
+The step took 0.13 minutes.
 
 Perform channel-to-channel spillover correction on multi-channel images.
 To this end, the previously computed spillover matrix needs to be
@@ -500,7 +500,7 @@ efficacy can be assessed.
     # Switch back to using target names as channel names
     channelNames(images_comp) <- rownames(spe)
 
-The step took 11.35 minutes.
+The step took 9.67 minutes.
 
 ### Quality control
 
@@ -559,9 +559,9 @@ therefore be excluded from the analysis. The selected threshold is
 dataset-specific and should be fine-tuned by visualizing the
 distribution of the cell area.
 
-Visualize the cell density per image.
+Visualize the image area covered by cells per image.
 
-    # Compute the cell density per image
+    # Compute the fraction of image area covered by cells
     cell_density <- colData(spe) %>%
         as.data.frame() %>%
         group_by(sample_id) %>%
@@ -571,7 +571,7 @@ Visualize the cell density per image.
         # Divide the total number of pixels by the number of pixels covered by cells
         mutate(covered_area = cell_area / no_pixels)
 
-    # Visualize the cell density per image
+    # Visualize the image area covered by cells per image
     ggplot(cell_density) +
             geom_point(aes(sample_id, covered_area)) + 
             theme_minimal(base_size = 15) +
@@ -624,7 +624,7 @@ package to compute a Uniform Manifold Approximation and Projection
 
 ![](protocol_files/figure-markdown_strict/umap-1.png)
 
-The step took 0.7 minutes.
+The step took 0.76 minutes.
 
 CRITICAL: Differences in marker distributions or non-overlapping samples
 on the UMAP visualization can indicate sample-to-sample differences in
@@ -654,7 +654,7 @@ package.
 
     # Visualize corrected UMAP
     dittoDimPlot(spe, var = "patient_id", 
-                       reduction.use = "UMAP_mnnCorrected", size = 0.2) + 
+                 reduction.use = "UMAP_mnnCorrected", size = 0.2) + 
         ggtitle("Patient ID on UMAP after correction")
 
 ![](protocol_files/figure-markdown_strict/batch-correction-1.png)
@@ -666,7 +666,7 @@ embedding based on markers that are known to be expressed in certain
 cell phenotypes. These markers should be expressed in cells that cluster
 in the UMAP embedding.
 
-The step took 2.68 minutes.
+The step took 2.46 minutes.
 
 ### Cell phenotyping
 
@@ -721,7 +721,7 @@ combination with highest mean silhouette width.
 
 ![](protocol_files/figure-markdown_strict/cluster-sweep-1.png)
 
-The step took 4.95 minutes.
+The step took 4.94 minutes.
 
 CRITICAL: For each dataset, parameter estimation should be performed
 independently. For large datasets, the function takes a long time to
@@ -735,7 +735,7 @@ cluster identifiers are then saved in the `SpatialExperiment` object.
 
     library(scran)
 
-    clusters <- clusterCells(spe[rowData(spe)$use_channel,], 
+    clusters <- clusterCells(spe, 
                              use.dimred = "fastMNN", 
                              BLUSPARAM = SNNGraphParam(k=20, 
                                                     cluster.fun = "louvain",
@@ -890,7 +890,7 @@ model parameter.
     fitControl <- trainControl(method = "cv",
                                number = 5)
 
-    # Select the asinh-transformed counts for training
+    # Select the arsinh-transformed counts for training
     cur_mat <- t(assay(train_spe, "exprs")[rowData(train_spe)$use_channel,])
 
     # Train a random forest classifier
@@ -900,7 +900,7 @@ model parameter.
                    tuneLength = 5,
                    trControl = fitControl)
 
-The step took 9.77 minutes.
+The step took 9.68 minutes.
 
 Assess the classifier performance by computing the confusion matrix of
 the test dataset. The `confusionMatrix` function compares the predicted
@@ -1165,7 +1165,7 @@ spatially visualized and the cell type fraction per CN can be computed.
 
 ![](protocol_files/figure-markdown_strict/unnamed-chunk-62-1.png)
 
-The step took 0.18 minutes.
+The step took 0.17 minutes.
 
 CRITICAL: A parameter sweep should be performed to estimate the optimal
 value for `k`. However, with prior knowledge on the expected tissue
@@ -1220,8 +1220,7 @@ graph.
     plotSpatial(spe, 
                 node_color_by = "spatial_context_filtered", 
                 img_id = "sample_id", 
-                node_size_fix = 0.5, 
-                colPairName = "knn_spatialcontext_graph")
+                node_size_fix = 0.5)
 
 ![](protocol_files/figure-markdown_strict/spatial-context-1.png)
 
@@ -1236,7 +1235,7 @@ graph.
 
 ![](protocol_files/figure-markdown_strict/unnamed-chunk-66-1.png)
 
-The step took 0.29 minutes.
+The step took 0.31 minutes.
 
 Perform patch detection analysis. The `patchDetection` function of the
 `imcRtools` package detects fully connected components of cells of
@@ -1261,7 +1260,7 @@ convex hull to include cells within the patch.
 
 ![](protocol_files/figure-markdown_strict/unnamed-chunk-70-1.png)
 
-The step took 0.38 minutes.
+The step took 0.39 minutes.
 
 Perform interaction analysis as proposed by Schapiro et al. This
 approach detects cell phenotype pairs that show stronger (“interaction”)
@@ -1300,7 +1299,7 @@ visualized in the form of a heatmap.
 
 ![](protocol_files/figure-markdown_strict/unnamed-chunk-74-1.png)
 
-The step took 6.84 minutes.
+The step took 8.54 minutes.
 
 We finally save out the `SpatialExperiment` object.
 
