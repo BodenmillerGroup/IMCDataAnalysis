@@ -694,6 +694,8 @@ ggplot(as.data.frame(colData(spe))) +
 
 ## Interaction analysis
 
+**Bug notice: we discovered and fixed a bug in the `testInteractions` function in version below 1.5.5 which affected `SingleCellExperiment` or `SpatialExperiment` objects in which cells were not grouped by image. Please install the newest version of `imcRtools` (>=1.5.5) directly from Github as explained [here](https://github.com/BodenmillerGroup/imcRtools).**  
+
 The next section focuses on statistically testing the pairwise interaction
 between all cell types of the dataset. For this, the `imcRtools` package
 provides the 
