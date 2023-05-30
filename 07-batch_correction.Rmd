@@ -382,7 +382,7 @@ The modified `SpatialExperiment` object is saved for further downstream analysis
 saveRDS(spe, "data/spe.rds")
 ```
 
-```{r testing, include=FALSE, eval=FALSE}
+```{r testing, include=FALSE, eval=TRUE}
 library(testthat)
 
 expect_equal(reducedDimNames(spe), c("UMAP", "TSNE", "fastMNN", "UMAP_mnnCorrected", 
