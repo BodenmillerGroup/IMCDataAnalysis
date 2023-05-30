@@ -115,10 +115,10 @@ intensities by a factor of 5.
 
 ```{r default-normalization}
 # 0 - 1 channel scaling across all images
-norm_images <- normalize(cur_images)
+norm_images <- cytomapper::normalize(cur_images)
 
 # Clip channel at 0.2
-norm_images <- normalize(norm_images, inputRange = c(0, 0.2))
+norm_images <- cytomapper::normalize(norm_images, inputRange = c(0, 0.2))
 
 plotPixels(norm_images, 
            colour_by = c("Ecad", "CD3", "CD20", "CD8a", "CD38", "Ki67"))
@@ -131,10 +131,10 @@ between images:
 
 ```{r individual-normalization}
 # 0 - 1 channel scaling per image
-norm_images <- normalize(cur_images, separateImages = TRUE)
+norm_images <- cytomapper::normalize(cur_images, separateImages = TRUE)
 
 # Clip channel at 0.2
-norm_images <- normalize(norm_images, inputRange = c(0, 0.2))
+norm_images <- cytomapper::normalize(norm_images, inputRange = c(0, 0.2))
 
 plotPixels(norm_images, 
            colour_by = c("Ecad", "CD3", "CD20", "CD8a", "CD38", "Ki67"))
@@ -149,7 +149,7 @@ individually:
 
 ```{r setting-inputRange}
 # 0 - 1 channel scaling per image
-norm_images <- normalize(cur_images, 
+norm_images <- cytomapper::normalize(cur_images, 
                          separateImages = TRUE,
                          inputRange = list(Ecad = c(0, 50), 
                                            CD3 = c(0, 30),

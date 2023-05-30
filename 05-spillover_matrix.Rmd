@@ -321,7 +321,7 @@ adapted_sm <- adaptSpillmat(sm, paste0(panel$channel[panel$keep == 1], "Di"),
 
 The adpated spillover matrix now matches the `channelNames` of the
 `CytoImageList` object and can be used to perform pixel-level spillover
-compensation. Here, we parallelise the image compensation on 4 cores. When
+compensation. Here, we parallelise the image compensation on all available minus 2 cores. When
 working on Windows, you will need to use the `SnowParam` function instead of
 `MultiCoreParam`.
 

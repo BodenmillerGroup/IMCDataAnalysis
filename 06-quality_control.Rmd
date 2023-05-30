@@ -462,7 +462,7 @@ expect_equal(head(reducedDim(spe, "UMAP"), n = 10),
 -3.72411928804407), dim = c(10L, 2L), dimnames = list(c("Patient1_001_1",
 "Patient1_001_2", "Patient1_001_3", "Patient1_001_4", "Patient1_001_5",
 "Patient1_001_6", "Patient1_001_7", "Patient1_001_8", "Patient1_001_9",
-"Patient1_001_10"), NULL)), tolerance = 0.01)
+"Patient1_001_10"), c("UMAP1", "UMAP2"))), tolerance = 0.01)
 
 expect_equal(reducedDim(spe, "UMAP")[100:130,],
              structure(c(-3.89626533053039, -7.13317567370056, -6.77943021319031,
@@ -489,7 +489,7 @@ expect_equal(reducedDim(spe, "UMAP")[100:130,],
 "Patient1_001_118", "Patient1_001_119", "Patient1_001_120", "Patient1_001_121",
 "Patient1_001_122", "Patient1_001_123", "Patient1_001_124", "Patient1_001_125",
 "Patient1_001_126", "Patient1_001_127", "Patient1_001_128", "Patient1_001_129",
-"Patient1_001_130"), NULL)), tolerance = 0.01)
+"Patient1_001_130"), c("UMAP1", "UMAP2"))), tolerance = 0.01)
 
 expect_equal(head(reducedDim(spe, "TSNE"), n = 10),
              structure(c(8.5000231819133, 8.69417707607171, 8.66506409812202,
@@ -500,7 +500,7 @@ expect_equal(head(reducedDim(spe, "TSNE"), n = 10),
 -32.2252709733315), dim = c(10L, 2L), dimnames = list(c("Patient1_001_1",
 "Patient1_001_2", "Patient1_001_3", "Patient1_001_4", "Patient1_001_5",
 "Patient1_001_6", "Patient1_001_7", "Patient1_001_8", "Patient1_001_9",
-"Patient1_001_10"), NULL)), tolerance = 0.01)
+"Patient1_001_10"), c("TSNE1", "TSNE2"))), tolerance = 0.01)
 
 expect_equal(reducedDim(spe, "TSNE")[100:130,],
              structure(c(10.6418413622177, -8.19603725541398, -7.57330997290384,
@@ -527,7 +527,7 @@ expect_equal(reducedDim(spe, "TSNE")[100:130,],
 "Patient1_001_118", "Patient1_001_119", "Patient1_001_120", "Patient1_001_121",
 "Patient1_001_122", "Patient1_001_123", "Patient1_001_124", "Patient1_001_125",
 "Patient1_001_126", "Patient1_001_127", "Patient1_001_128", "Patient1_001_129",
-"Patient1_001_130"), NULL)), tolerance = 0.01)
+"Patient1_001_130"), c("TSNE1", "TSNE2"))), tolerance = 0.01)
 ```
 
 ## Session Info

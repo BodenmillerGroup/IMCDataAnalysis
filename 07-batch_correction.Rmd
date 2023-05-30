@@ -755,7 +755,7 @@ expect_equal(head(reducedDim(spe, "UMAP_mnnCorrected"), n = 10),
 -0.815554912957808), dim = c(10L, 2L), dimnames = list(c("Patient1_001_1",
 "Patient1_001_2", "Patient1_001_3", "Patient1_001_4", "Patient1_001_5",
 "Patient1_001_6", "Patient1_001_7", "Patient1_001_8", "Patient1_001_9",
-"Patient1_001_10"), NULL)), tolerance = 0.01)
+"Patient1_001_10"), c("UMAP1", "UMAP2"))), tolerance = 0.01)
 
 expect_equal(reducedDim(spe, "UMAP_mnnCorrected")[100:130,],
              structure(c(-0.647811624401541, -6.67081228195998, -6.47172609268996,
@@ -782,7 +782,7 @@ expect_equal(reducedDim(spe, "UMAP_mnnCorrected")[100:130,],
 "Patient1_001_118", "Patient1_001_119", "Patient1_001_120", "Patient1_001_121",
 "Patient1_001_122", "Patient1_001_123", "Patient1_001_124", "Patient1_001_125",
 "Patient1_001_126", "Patient1_001_127", "Patient1_001_128", "Patient1_001_129",
-"Patient1_001_130"), NULL)), tolerance = 0.01)
+"Patient1_001_130"), c("UMAP1", "UMAP2"))), tolerance = 0.01)
 
 expect_equal(dim(reducedDim(spe, "harmony")), c(47794L, 20L))
 
@@ -855,7 +855,7 @@ expect_equal(head(reducedDim(spe, "UMAP_harmony"), n = 10),
 1.99227516116338), dim = c(10L, 2L), dimnames = list(c("Patient1_001_1",
 "Patient1_001_2", "Patient1_001_3", "Patient1_001_4", "Patient1_001_5",
 "Patient1_001_6", "Patient1_001_7", "Patient1_001_8", "Patient1_001_9",
-"Patient1_001_10"), NULL)), tolerance = 0.01)
+"Patient1_001_10"), c("UMAP1", "UMAP2"))), tolerance = 0.01)
 
 expect_equal(reducedDim(spe, "UMAP_harmony")[100:130,],
              structure(c(3.02137129049965, -9.51233942765525, -8.39272768754295,
@@ -882,7 +882,7 @@ expect_equal(reducedDim(spe, "UMAP_harmony")[100:130,],
 "Patient1_001_118", "Patient1_001_119", "Patient1_001_120", "Patient1_001_121",
 "Patient1_001_122", "Patient1_001_123", "Patient1_001_124", "Patient1_001_125",
 "Patient1_001_126", "Patient1_001_127", "Patient1_001_128", "Patient1_001_129",
-"Patient1_001_130"), NULL)), tolerance = 0.01)
+"Patient1_001_130"), c("UMAP1", "UMAP2"))), tolerance = 0.01)
 
 expect_equal(dim(reducedDim(spe, "seurat")), c(47794L, 30L))
 
@@ -1235,7 +1235,7 @@ expect_equal(head(reducedDim(spe, "UMAP_seurat"), n = 10),
 2.22540372724809), dim = c(10L, 2L), dimnames = list(c("Patient1_001_1",
 "Patient1_001_2", "Patient1_001_3", "Patient1_001_4", "Patient1_001_5",
 "Patient1_001_6", "Patient1_001_7", "Patient1_001_8", "Patient1_001_9",
-"Patient1_001_10"), NULL)), tolerance = 0.01)
+"Patient1_001_10"), c("UMAP1", "UMAP2"))), tolerance = 0.01)
 
 expect_equal(reducedDim(spe, "UMAP_seurat")[100:130,],
              structure(c(4.96633392671255, -4.37532848020883, -4.10224527021738,
@@ -1262,7 +1262,7 @@ expect_equal(reducedDim(spe, "UMAP_seurat")[100:130,],
 "Patient1_001_118", "Patient1_001_119", "Patient1_001_120", "Patient1_001_121",
 "Patient1_001_122", "Patient1_001_123", "Patient1_001_124", "Patient1_001_125",
 "Patient1_001_126", "Patient1_001_127", "Patient1_001_128", "Patient1_001_129",
-"Patient1_001_130"), NULL)), tolerance = 0.01)
+"Patient1_001_130"), c("UMAP1", "UMAP2"))), tolerance = 0.01)
 ```
 
 ## Session Info

@@ -519,7 +519,7 @@ cluster_celltype <- recode(spe$nn_clusters_corrected,
                             "10" = "CD4",
                             "11" = "Bcell",
                             "12" = "Stroma",
-                            "13" = "unknown")
+                            "13" = "pDC")
 
 spe$cluster_celltype <- cluster_celltype
 ```
