@@ -508,7 +508,7 @@ An example how to label clusters can be seen below:
 library(dplyr)
 cluster_celltype <- recode(spe$nn_clusters_corrected,
                             "1" = "Tumor_proliferating",
-                            "2" = "Neutrophil",
+                            "2" = "Myeloid",
                             "3" = "Tumor",
                             "4" = "Tumor",
                             "5" = "Stroma",
