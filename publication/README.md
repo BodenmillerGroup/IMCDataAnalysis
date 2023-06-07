@@ -11,7 +11,7 @@ TODO upon acceptance
 To run the workflow, a computer with a recent version of a Windows, Mac, or Linux operating system (OS) is required. 
 With increasing dataset size, more memory is required and we recommend at least 8 GB RAM to analyse the provided dataset. 
 Alternatively, a high performance computer (e.g. cluster) can be used, provided Docker can be installed (see below). 
-For this manuscript, the workflow was run on MacOS Big Sur (11.7.3), 2.7 GHz Quad-Core Intel Core i7, 16 GB 2133 MHz LPDDR3.
+For this manuscript, the workflow was run on MacOS Big Sur (11.7.4), 2.7 GHz Quad-Core Intel Core i7, 16 GB 2133 MHz LPDDR3.
 
 ### Reproducing the analysis
 
