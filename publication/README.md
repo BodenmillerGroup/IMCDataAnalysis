@@ -11,7 +11,7 @@ TODO upon acceptance
 To run the workflow, a computer with a recent version of a Windows, Mac, or Linux operating system (OS) is required. 
 With increasing dataset size, more memory is required and we recommend at least 8 GB RAM to analyse the provided dataset. 
 Alternatively, a high performance computer (e.g. cluster) can be used, provided Docker can be installed (see below). 
-For this manuscript, the workflow was run on MacOS Big Sur (11.7.3), 2.7 GHz Quad-Core Intel Core i7, 16 GB 2133 MHz LPDDR3.
+For this manuscript, the workflow was run on MacOS Big Sur (11.7.4), 2.7 GHz Quad-Core Intel Core i7, 16 GB 2133 MHz LPDDR3.
 
 ### Reproducing the analysis
 
@@ -86,8 +86,8 @@ BiocManager::install(c("pheatmap", "viridis",
 ```
 
 To install the required software around 1-2 hours need to be taken into account.
-When the workflow was written, we used R v4.2.2 installed and Bioconductor 
-release version 3.16. 
+When the workflow was written, we used R v4.3.0 installed and Bioconductor 
+release version 3.17. 
 
 Please see [protocol.md](protocol.md#session-information) for the exact versions of the software
 packages.
@@ -99,7 +99,7 @@ analysis performed in the protocol. To obtain the Docker container execute the
 following call in the terminal:
 
 ```
-docker pull ghcr.io/bodenmillergroup/imcdataanalysis:2023-02-11
+docker pull ghcr.io/bodenmillergroup/imcdataanalysis:2023-05-01
 ```
 
 After obtaining the Docker container, start it by calling:
@@ -107,7 +107,7 @@ After obtaining the Docker container, start it by calling:
 ```
 docker run -v /path/to/IMCDataAnalysis/publication:/home/rstudio/publication \
 	-e PASSWORD=bioc -p 8787:8787  \
-	ghcr.io/bodenmillergroup/imcdataanalysis:2023-02-11
+	ghcr.io/bodenmillergroup/imcdataanalysis:2023-05-01
 ```
 
 Please make sure to adapt the `/path/to/IMCDataAnalysis/publication` to the correct working directory.
@@ -128,12 +128,12 @@ and a `SpatialExperiment` object storing all analysis results.
 
 * **napari & napari-imc (IMC-specific):** The multi-dimensional image viewer napari  (https://napari.org) together with the napari-imc plugin for loading imaging mass cytometry files (https://github.com/BodenmillerGroup/napari-imc) were used to visualize and inspect raw multiplexed imaging data. Python 3.9.12 (https://www.python.org), napari 0.4.16, and napari-imc 0.6.5 were installed into a fresh conda (https://conda.io) environment; see below for installation instructions.
 * **steinbock Docker container:** The multi-channel image processing toolkit steinbock  (https://bodenmillergroup.github.io/steinbock) was used to pre-process multiplexed imaging data, perform image segmentation, and extract single-cell data. The steinbock Docker container v0.16.0 was pulled from the GitHub container registry using Docker Desktop 4.9.0 for Mac; see below for installation instructions.
-* **Ilastik/CellProfiler-based segmentation pipeline:** Multiplexed image processing using random forest-based pixel classification and watershed-based cell segmentation was performed using the Ilastik/CellProfiler-based segmentation pipeline v3.4 (https://bodenmillergroup.github.io/ImcSegmentationPipeline/); see below for installation instructions.
+* **Ilastik/CellProfiler-based segmentation pipeline:** Multiplexed image processing using random forest-based pixel classification and watershed-based cell segmentation was performed using the Ilastik/CellProfiler-based segmentation pipeline v3.6 (https://bodenmillergroup.github.io/ImcSegmentationPipeline/); see below for installation instructions.
 
 In addition, in order to use the pipeline, the following software need to be installed:
-* **Ilastik:** The Ilastik software is used for pixel-classification prior to cell segmentation and can be installed from https://www.ilastik.org/download.html. The version used for this workflow is v1.3.3post3.
+* **Ilastik:** The Ilastik software is used for pixel-classification prior to cell segmentation and can be installed from https://www.ilastik.org/download.html. The version used for this workflow is v1.4.0.
 * **CellProfiler:** The CellProfiler software is used to segment individual cells. The tool can be installed from https://cellprofiler.org/previous-releases on Windows (64-bit) and MacOS (10.14+). The version used in this workflow is v4.2.1.
-* **R setup:** Downstream analysis after image processing is conducted using the statistical programming language R, which can be installed from https://cran.r-project.org/ following the OS-specific instructions. The version used in this workflow is v4.2.2. 
+* **R setup:** Downstream analysis after image processing is conducted using the statistical programming language R, which can be installed from https://cran.r-project.org/ following the OS-specific instructions. The version used in this workflow is v4.3.0. 
 * The RStudio software offers an easy-to-use GUI for data analysis in R. It can be installed from https://www.rstudio.com/products/rstudio/download/.
 
 ### Installation instructions
@@ -141,7 +141,7 @@ In addition, in order to use the pipeline, the following software need to be ins
 * **napari & napari-imc:** Install the conda package manager according to the instructions at https://docs.conda.io/projects/conda/en/latest/user-guide/install/ 
 Create a new conda environment with Python 3.9:
 ```
-conda create -n napari-imc python=3.9
+conda create -n napari-imc -y python=3.9
 ```
 Activate the conda environment and install napari & napari-imc:
 ```

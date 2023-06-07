@@ -235,7 +235,7 @@ of the pipeline, please refer to the [docs](https://bodenmillergroup.github.io/I
 
 ```{r imcsegpipe-results}
 # download analysis folder
-url <- "https://zenodo.org/record/6449127/files/analysis.zip"
+url <- "https://zenodo.org/record/7997296/files/analysis.zip"
 destfile <- "data/ImcSegmentationPipeline/analysis.zip"
 download.file(url, destfile)
 unzip(destfile, exdir="data/ImcSegmentationPipeline", overwrite=TRUE)
