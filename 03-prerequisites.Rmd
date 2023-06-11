@@ -2,11 +2,11 @@
 
 The analysis presented in this book requires a basic understanding of the 
 `R` programing language. An introduction to `R` can be found [here](https://cran.r-project.org/doc/manuals/r-release/R-intro.pdf) and
-in the book [R for Data Science](https://r4ds.had.co.nz/index.html).
+in the book [R for Data Science](https://r4ds.hadley.nz/).
 
 Furthermore, it is beneficial to be familiar with single-cell data analysis
 using the [Bioconductor](https://www.bioconductor.org/) framework. The 
-[Orchestrating Single-Cell Analysis with Bioconductor](https://bioconductor.org/books/release/OSCA/) 
+[Orchestrating Single-Cell Analysis with Bioconductor](https://bioconductor.org/books/release/OSCA/) book
 gives an excellent overview on data containers and basic analysis that are being
 used here.
 
@@ -14,11 +14,28 @@ An overview on IMC as technology and necessary image processing steps can be
 found on the [IMC workflow website](https://bodenmillergroup.github.io/IMCWorkflow/). 
 
 Before we get started on IMC data analysis, we will need to make sure that
-software dependencies are installed and the needed example data is downloaded.
+software dependencies are installed and the example data is downloaded.
+
+## Obtain the code
+
+This book provides R code to perform single-cell and spatial data analysis.
+You can copy the individual code chunks into your R scripts or you can obtain
+the full code of the book via:
+
+```
+git clone https://github.com/BodenmillerGroup/IMCDataAnalysis.git
+```
 
 ## Software requirements
 
-### Using Docker
+The R packages needed to execute the presented workflow can either be manually
+installed (see section \@ref(manual-install)) or are available within a provided
+Docker container (see section \@ref(docker)). The Docker option is useful if you
+want to exactly reproduce the presented analysis across operating systems;
+however, the manual install gives you more flexibility for exploratory data
+analysis.
+
+### Using Docker {#docker}
 
 For reproducibility purposes, we provide a Docker container [here](https://github.com/BodenmillerGroup/IMCDataAnalysis/pkgs/container/imcdataanalysis).
 
@@ -36,6 +53,9 @@ docker run -v /path/to/IMCDataAnalysis:/home/rstudio/IMCDataAnalysis \
 	ghcr.io/bodenmillergroup/imcdataanalysis:latest
 ```
 
+Here, the `/path/to/` needs to be adjusted to where you keep the code and data
+of the book.
+
 **Of note: it is recommended to use a date-tagged version of the container to ensure reproducibility**. 
 This can be done via:
 
@@ -47,7 +67,7 @@ docker pull ghcr.io/bodenmillergroup/imcdataanalysis:<year-month-date>
 3. Navigate to `IMCDataAnalysis` and open the `IMCDataAnalysis.Rproj` file.  
 4. Code in the individual files can now be executed or the whole workflow can be build by entering `bookdown::render_book()`.
 
-### Manual installation
+### Manual installation {#manual-install}
 
 The following section describes how to manually install all needed R packages
 when not using the provided Docker container.
@@ -57,16 +77,15 @@ To install all R packages needed for the analysis, please run:
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
 
-BiocManager::install(c("pheatmap", "viridis",
-                       "zoo", "BiocManager", "devtools", "tiff",
-                       "distill", "ggrepel", "patchwork", "mclust",
-                       "RColorBrewer", "uwot", "Rtsne", "Seurat", "Matrix",
-                       "SeuratObject", "cowplot", "kohonen", "caret", 
-                       "randomForest", "ggridges", "cowplot", "gridGraphics",
-                       "scales", "tiff", "CATALYST", "scuttle", "scater", 
-                       "dittoSeq", "tidyverse", "batchelor", 
-                       "bluster","scran", "lisaClust", "spicyR",
-                       "iSEE", "harmony", "imcRtools", "cytomapper"))
+BiocManager::install(c("rmarkdown", "bookdown", "pheatmap", "viridis", "zoo", 
+                       "devtools", "testthat", "tiff", "distill", "ggrepel", 
+                       "patchwork", "mclust", "RColorBrewer", "uwot", "Rtsne", 
+                       "harmony", "Seurat", "SeuratObject", "cowplot", "kohonen", 
+                       "caret", "randomForest", "ggridges", "cowplot", 
+                       "gridGraphics", "scales", "tiff", "harmony", "Matrix", 
+                       "CATALYST", "scuttle", "scater", "dittoSeq", 
+                       "tidyverse", "BiocStyle", "batchelor", "bluster", "scran", 
+                       "lisaClust", "spicyR", "iSEE", "imcRtools", "cytomapper"))
 
 # Github dependencies
 devtools::install_github("i-cyto/Rphenograph")
@@ -88,6 +107,8 @@ library(scran)
 library(lisaClust)
 library(caret)
 ```
+
+### Major package versions
 
 Throughout the analysis, we rely on different R software packages.
 This section lists the most commonly used packages in this workflow.
@@ -128,7 +149,7 @@ processing. The example data available at
 [https://zenodo.org/record/7575859](https://zenodo.org/record/7575859) were
 processed (file type conversion, image segmentation, feature extraction as
 explained in Section \@ref(processing)) using the
-[steinbock](https://bodenmillergroup.github.io/steinbock/latest/) framework. The
+[steinbock](https://bodenmillergroup.github.io/steinbock/latest/) toolkit. The
 exact command line interface calls to process the raw data are shown below:
 
 ```{r, echo = FALSE, message = FALSE}
@@ -152,8 +173,8 @@ To highlight the basic steps of IMC data analysis, we provide example data that
 were acquired as part of the **I**ntegrated i**MMU**noprofiling of large adaptive
 **CAN**cer patient cohorts projects ([immucan.eu](https://immucan.eu/)). The
 raw data of 4 patients can be accessed online at 
-[zenodo.org/record/7575859](https://zenodo.org/record/7575859) the
-sample/patient metadata information here:
+[zenodo.org/record/7575859](https://zenodo.org/record/7575859). We will only
+download the sample/patient metadata information here:
 
 ```{r download-sample-data}
 download.file("https://zenodo.org/record/7575859/files/sample_metadata.csv", 
@@ -163,20 +184,21 @@ download.file("https://zenodo.org/record/7575859/files/sample_metadata.csv",
 ### Processed multiplexed imaging data
 
 The IMC raw data was either processed using the 
-[steinbock](https://github.com/BodenmillerGroup/steinbock) framework or the
+[steinbock](https://github.com/BodenmillerGroup/steinbock) toolkit or the
 [IMC Segmentation Pipeline](https://github.com/BodenmillerGroup/ImcSegmentationPipeline).
 Image processing included file type conversion, cell segmentation and feature
 extraction. 
 
 **steinbock output**
 
-The output of the `steinbock` framework required for the analysis presented here includes the single-cell mean
-intensity files, the single-cell morphological features and spatial locations,
-spatial object graphs in form of edge lists indicating cells in close proximity,
-hot pixel filtered multi-channel images, segmentation masks, image metadata and
+This book uses the output of the `steinbock` framework when applied to process
+the example data. The processed data includes the single-cell mean intensity
+files, the single-cell morphological features and spatial locations, spatial
+object graphs in form of edge lists indicating cells in close proximity, hot
+pixel filtered multi-channel images, segmentation masks, image metadata and
 channel metadata. All these files will be downloaded here for later use. The
-commands which were used to generate this data can be found in
-`data/steinbock/steinbock.sh`.
+commands which were used to generate this data can be found in the shell script
+above.
 
 ```{r steinbock-results}
 # download intensities
@@ -192,7 +214,6 @@ destfile <- "data/steinbock/regionprops.zip"
 download.file(url, destfile)
 unzip(destfile, exdir="data/steinbock", overwrite=TRUE)
 unlink(destfile)
-
 
 # download neighbors
 url <- "https://zenodo.org/record/7624451/files/neighbors.zip"
@@ -267,7 +288,7 @@ unlink("data/compensation.zip")
 
 In Section \@ref(classification), we present a cell type classification approach
 that relies on previously gated cells. This ground truth data is available
-online at [zenodo.org/record/7432486](https://zenodo.org/record/7432486) and
+online at [zenodo.org/record/7647079](https://zenodo.org/record/7647079) and
 will be downloaded here for later use:
 
 ```{r download-gated-cells}
