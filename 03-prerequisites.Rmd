@@ -85,7 +85,8 @@ BiocManager::install(c("rmarkdown", "bookdown", "pheatmap", "viridis", "zoo",
                        "gridGraphics", "scales", "tiff", "harmony", "Matrix", 
                        "CATALYST", "scuttle", "scater", "dittoSeq", 
                        "tidyverse", "BiocStyle", "batchelor", "bluster", "scran", 
-                       "lisaClust", "spicyR", "iSEE", "imcRtools", "cytomapper"))
+                       "lisaClust", "spicyR", "iSEE", "imcRtools", "cytomapper",
+                       "imcdatasets", "cytoviewer"))
 
 # Github dependencies
 devtools::install_github("i-cyto/Rphenograph")
