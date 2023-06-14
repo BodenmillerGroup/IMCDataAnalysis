@@ -30,7 +30,7 @@ experiment-wide metadata. For an in-depth introduction to the `SingleCellExperim
 container, please refer to the [SingleCellExperiment class](https://bioconductor.org/books/release/OSCA.intro/the-singlecellexperiment-class.html).
 
 The [SpatialExperiment](https://bioconductor.org/packages/release/bioc/html/SingleCellExperiment.html)
-class [@Righelli2021] is an extension of the `SingleCellExperiment` class. It
+class [@Righelli2022] is an extension of the `SingleCellExperiment` class. It
 was developed to store spatial data in addition to single-cell data and an
 extended introduction is accessible
 [here](https://bioconductor.org/packages/release/bioc/vignettes/SpatialExperiment/inst/doc/SpatialExperiment.html).
