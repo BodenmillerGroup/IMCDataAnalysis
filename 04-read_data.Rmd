@@ -416,6 +416,26 @@ cytomapper_sce <- measureObjects(masks, image = images, img_id = "sample_id")
 cytomapper_sce
 ```
 
+## Accessing publicly available IMC datasets
+
+The [imcdatasets](https://github.com/BodenmillerGroup/imcdatasets)
+R/Bioconductor package provides a number of publicly available IMC datasets. For
+a complete introduction to the package, please refer to the
+[documentation](https://bioconductor.org/packages/release/data/experiment/vignettes/imcdatasets/inst/doc/imcdatasets.html).
+Here, we can read in example data of [@Damond2019] taken from patients diagnosed
+with Type I Diabetes. The example here consists of a `CytoImageList` object of
+100 images, a `CytoImageList` object of 100 segmentation masks and a
+`SingleCellExperiment` object containing 252059 cells. **Of note:** downloading the
+images takes quite some time and uses 8GB of memory.
+
+```{r access-damond-data, message=FALSE, eval=FALSE}
+library(imcdatasets)
+
+pancreasImages <- Damond_2019_Pancreas(data_type = "images")
+pancreasMasks <- Damond_2019_Pancreas(data_type = "masks")
+pancreasSCE <- Damond_2019_Pancreas(data_type = "sce")
+```
+
 ## Save objects
 
 Finally, the generated data objects can be saved for further downstream 
@@ -582,6 +602,85 @@ expect_equal(mcols(masks), new("DFrame", rownames = c("Patient1_001", "Patient1_
 expect_equal(as.array(masks$Patient1_001)[1:5,1:5], structure(c(58L, 58L, 58L, 58L, 58L, 58L, 58L, 58L, 58L, 58L, 
 58L, 58L, 58L, 58L, 58L, 58L, 58L, 58L, 58L, 58L, 58L, 58L, 58L, 
 58L, 58L), dim = c(5L, 5L)))
+```
+
+```{r integration-test-imcsegmentation-pipeline, include = FALSE}
+expect_equal(dim(spe2), c(40L, 43796L))
+
+expect_equal(names(colData(spe2)), c("sample_id", "ObjectNumber", "AreaShape_Area", "Neighbors_NumberOfNeighbors_8", 
+"AreaShape_Eccentricity", "AreaShape_MajorAxisLength", "AreaShape_MinorAxisLength", 
+"AreaShape_MeanRadius", "ImageNumber", "Metadata_acname", "Metadata_acid", 
+"Metadata_description"))
+
+expect_equal(colData(spe2)[1:5, ], new("DFrame", rownames = NULL, nrows = 5L, elementType = "ANY", 
+    elementMetadata = NULL, metadata = list(), listData = list(
+        sample_id = c("1", "1", "1", "1", "1"), ObjectNumber = c(1, 
+        2, 3, 4, 5), AreaShape_Area = c(61, 40, 27, 48, 34), 
+        Neighbors_NumberOfNeighbors_8 = c(6, 8, 7, 7, 7), AreaShape_Eccentricity = c(0.808013494907822, 
+        0.801208429202, 0.52994193892238, 0.839066042071405, 
+        0.774470900280141), AreaShape_MajorAxisLength = c(12.0610890660951, 
+        9.34348318770232, 6.39364541933779, 11.3851699913821, 
+        9.72619134201331), AreaShape_MinorAxisLength = c(7.10595920371522, 
+        5.59100365955202, 5.4220282329127, 6.19386917672975, 
+        6.15288138869827), AreaShape_MeanRadius = c(1.56945391923939, 
+        1.53106601717798, 1.40344156396267, 1.47571815899011, 
+        1.24432752321663), ImageNumber = c(1, 1, 1, 1, 1), Metadata_acname = c("Patient1", 
+        "Patient1", "Patient1", "Patient1", "Patient1"), Metadata_acid = c(1, 
+        1, 1, 1, 1), Metadata_description = c("pos1_1", "pos1_1", 
+        "pos1_1", "pos1_1", "pos1_1"))))
+
+ expect_equal(names(rowData(spe2)), c("Tube.Number", "Metal.Tag", "Target", "Clean_Target", "Antibody.Clone", 
+"Stock.Concentration", "Final.Concentration...Dilution", "uL.to.add", 
+"full", "ilastik", "deepcell"))
+ 
+ expect_equal(rowData(spe2)[1:5,], new("DFrame", rownames = c("MPO", "HistoneH3", "SMA", "CD16", 
+"CD38"), nrows = 5L, elementType = "ANY", elementMetadata = NULL, 
+    metadata = list(), listData = list(Tube.Number = c(2101, 
+    2113, 1914, 2079, 2095), Metal.Tag = c("Y89", "In113", "In115", 
+    "Pr141", "Nd142"), Target = c("Myeloperoxidase MPO", "Histone H3", 
+    "SMA", "CD16", "CD38"), Clean_Target = c("MPO", "HistoneH3", 
+    "SMA", "CD16", "CD38"), Antibody.Clone = c("Polyclonal MPO", 
+    "D1H2", "1A4", "EPR16784", "EPR4106"), Stock.Concentration = c(500, 
+    500, 500, 500, 500), Final.Concentration...Dilution = c("4 ug/mL", 
+    "1 ug/mL", "0.25 ug/mL", "5 ug/mL", "2.5 ug/mL"), uL.to.add = c("0.8", 
+    "0.2", "0.05", "1", "0.5"), full = c(1, 1, 1, 1, 1), ilastik = c(0, 
+    1, 0, 0, 0), deepcell = c(NA, 1, NA, NA, NA))))
+ 
+ expect_equal(rownames(spe2), c("MPO", "HistoneH3", "SMA", "CD16", "CD38", "HLADR", "CD27", 
+ "CD15", "CD45RA", "CD163", "B2M", "CD20", "CD68", "Ido1", "CD3", 
+ "LAG3", "CD11c", "PD1", "PDGFRb", "CD7", "GrzB", "PDL1", 
+ "TCF7", "CD45RO", "FOXP3", "ICOS", "CD8a", "CarbonicAnhydrase", 
+ "CD33", "Ki67", "VISTA", "CD40", "CD4", "CD14", "Ecad", "CD303", 
+ "CD206", "cleavedPARP", "DNA1", "DNA2"))
+
+expect_equal(as.vector(counts(spe2)[1:5, 1:5]), c(0.344262295001812, 4.77049180216797, 0.557377049050553, 0.770491803099294, 
+0.393442622859214, 0.374999999912689, 6.74999999842776, 0.724999999831198, 
+0.224999999947613, 0.899999999790452, 0.185185185142068, 12.8518518488591, 
+1.03703703679558, 0.555555555426205, 0.999999999767169, 0.31249999992724, 
+14.5624999966091, 1.27083333303744, 0.791666666482343, 0.666666666511446, 
+0.323529411689378, 11.8529411737103, 1.08823529386427, 6.8235294101755, 
+0.794117646873929))
+
+expect_equal(colPairNames(spe2), "neighborhood")
+
+expect_equal(colPair(spe2)[1:5,], new("SelfHits", from = c(1L, 1L, 1L, 1L, 1L), to = c(2L, 3L, 
+41L, 51L, 79L), nLnode = 43796L, nRnode = 43796L, elementMetadata = NULL, 
+    metadata = list()))
+
+expect_equal(spatialCoords(spe2)[1:5,], structure(c(10.2295081967213, 18.7, 25.4074074074074, 32.2708333333333, 
+45.0294117647059, 2.62295081967213, 2, 1.81481481481481, 2.22916666666667, 
+1.5), dim = c(5L, 2L), dimnames = list(c("1", "2", "3", "4", 
+"5"), c("Pos_X", "Pos_Y"))))
+```
+
+```{r integration-test-measureObjects, include = FALSE}
+expect_equal(counts(spe), counts(cytomapper_sce), check.attributes = FALSE)
+
+expect_equal(spe$area, cytomapper_sce$s.area)
+expect_equal(spe$axis_major_length, cytomapper_sce$m.majoraxis)
+expect_equal(spe$eccentricity, cytomapper_sce$m.eccentricity)
+expect_equal(as.vector(spatialCoords(spe)[,1]), cytomapper_sce$m.cx - 1)
+expect_equal(as.vector(spatialCoords(spe)[,2]), cytomapper_sce$m.cy - 1)
 ```
 
 ## Session Info
