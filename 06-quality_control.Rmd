@@ -30,12 +30,12 @@ normalization (channels are first min-max normalized and scaled to a range of
 ```{r overlay-masks, message=FALSE}
 library(cytomapper)
 set.seed(20220118)
-img_ids <- sample(seq_len(length(images)), 3)
+img_ids <- sample(seq_along(images), 3)
 
 # Normalize and clip images
 cur_images <- images[img_ids]
-cur_images <- normalize(cur_images, separateImages = TRUE)
-cur_images <- normalize(cur_images, inputRange = c(0, 0.2))
+cur_images <- cytomapper::normalize(cur_images, separateImages = TRUE)
+cur_images <- cytomapper::normalize(cur_images, inputRange = c(0, 0.2))
 
 plotPixels(cur_images,
            mask = masks[img_ids],
@@ -54,10 +54,29 @@ plotPixels(cur_images,
 
 We can see that nuclei are centered within the segmentation masks and all cell
 types are correctly segmented (note: to zoom into the image you can right click
-and select `Open Image in New Tab`). A common challenge here is to segment large (e.g.
-epithelial cells - in cyan) _versus_ small (e.g. B cells - in red). However, the
+and select `Open Image in New Tab`). A common challenge here is to segment large (e.g.,
+epithelial cells - in cyan) _versus_ small (e.g., B cells - in red). However, the
 segmentation approach here appears to correctly segment cells across different
 sizes.
+
+An easier and interactive way of observing segmentation quality is to use the
+interactive image viewer provided by the
+[cytoviewer](https://github.com/BodenmillerGroup/cytoviewer) R/Bioconductor
+package [@Meyer2023]. Under "Image-level" > "Basic controls", up to six markers
+can be selected for visualization. The contrast of each marker can be adjusted.
+Under "Image-level" > "Advanced controls", click the "Show cell outlines" box
+to outline segmented cells on the images.
+
+```{r, message = FALSE}
+library(cytoviewer)
+
+if (interactive()) {
+    cytoviewer(image = images, 
+               mask = masks, 
+               cell_id = "ObjectNumber", 
+               img_id = "sample_id")
+}
+```
 
 An additional approach to observe cell segmentation quality and potentially also
 antibody specificity issues is to visualize single-cell expression in form of a
@@ -69,22 +88,28 @@ library(dittoSeq)
 library(viridis)
 cur_cells <- sample(seq_len(ncol(spe)), 2000)
 
-dittoHeatmap(spe[,cur_cells], genes = rownames(spe)[rowData(spe)$use_channel],
-             assay = "exprs", cluster_cols = TRUE, scale = "none",
-             heatmap.colors = viridis(100), annot.by = "indication",
+dittoHeatmap(spe[,cur_cells], 
+             genes = rownames(spe)[rowData(spe)$use_channel],
+             assay = "exprs", 
+             cluster_cols = TRUE, 
+             scale = "none",
+             heatmap.colors = viridis(100), 
+             annot.by = "indication",
              annotation_colors = list(indication = metadata(spe)$color_vectors$indication))
 ```
 
-We can differentiate between epithelial cells (Ecad+) and immune cells (CD45RO).
-Some of the markers are specifically detected (e.g., Ki67, CD20, Ecad) and
-others are more broadly detected (e.g. HLADR, B2M, CD4).
+We can differentiate between epithelial cells (Ecad+) and immune cells
+(CD45RO+). Some of the markers are detected in specific cells (e.g., Ki67, CD20,
+Ecad) while others are more broadly expressed across cells (e.g., HLADR, B2M,
+CD4).
 
 ## Image-level quality control {#image-quality}
 
 Image-level quality control is often performed using tools that offer a
-graphical user interface such as [QuPath](https://qupath.github.io/) and
-[FIJI](https://imagej.net/software/fiji/). Viewers that were specifically
-developed for IMC data can be seen
+graphical user interface such as [QuPath](https://qupath.github.io/),
+[FIJI](https://imagej.net/software/fiji/) and the previously mentioned
+[cytoviewer](https://github.com/BodenmillerGroup/cytoviewer) package. Viewers
+that were specifically developed for IMC data can be seen
 [here](https://bodenmillergroup.github.io/IMCWorkflow/viewers.html). In this
 section, we will specifically focus on quantitative metrics to assess image
 quality.
@@ -96,23 +121,26 @@ $$SNR = I_s/I_n$$
 
 where $I_s$ is the intensity of the signal (mean intensity of pixels with true
 signal) and $I_n$ is the intensity of the noise (mean intensity of pixels
-containing noise). Finding a threshold that separates pixels containing signal
-and pixels containing noise is not trivial and different approaches can be
-chosen. Here, we use the `otsu` thresholding approach to find pixels of the
+containing noise). This definition of the SNR is just one of many and other
+measures can be applied.  Finding a threshold that separates pixels containing
+signal and pixels containing noise is not trivial and different approaches can
+be chosen. Here, we use the `otsu` thresholding approach to find pixels of the
 "foreground" (i.e., signal) and "background" (i.e., noise). The SNR is then
 defined as the mean intensity of foreground pixels divided by the mean intensity
-of background pixels. We compute this measure as well as the mean signal intensity
-per image. The plot below shows the  
-average SNR _versus_ the average signal intensity across all images. 
+of background pixels. We compute this measure as well as the mean signal
+intensity per image. The plot below shows the average SNR _versus_ the average
+signal intensity across all images.
 
-```{r image-snr, message=FALSE, warning=FALSE}
+```{r image-snr, message=FALSE}
 library(tidyverse)
 library(ggrepel)
 library(EBImage)
-cur_snr <- lapply(images, function(img){
+
+cur_snr <- lapply(names(images), function(x){
+    img <- images[[x]]
     mat <- apply(img, 3, function(ch){
         # Otsu threshold
-        thres <- otsu(ch, range = c(min(ch), max(ch)))
+        thres <- otsu(ch, range = c(min(ch), max(ch)), levels = 65536)
         # Signal-to-noise ratio
         snr <- mean(ch[ch > thres]) / mean(ch[ch <= thres])
         # Signal intensity
@@ -121,7 +149,8 @@ cur_snr <- lapply(images, function(img){
         return(c(snr = snr, ps = ps))
     })
     t(mat) %>% as.data.frame() %>% 
-        mutate(marker = colnames(mat)) %>% 
+        mutate(image = x,
+               marker = colnames(mat)) %>% 
         pivot_longer(cols = c(snr, ps))
 })
 
@@ -129,12 +158,11 @@ cur_snr <- do.call(rbind, cur_snr)
 
 cur_snr %>% 
     group_by(marker, name) %>%
-    summarize(mean = mean(value),
-              ci = qnorm(0.975)*sd(value)/sqrt(n())) %>%
-    pivot_wider(names_from = name, values_from = c(mean, ci)) %>%
+    summarize(log_mean = log2(mean(value))) %>%
+    pivot_wider(names_from = name, values_from = log_mean) %>%
     ggplot() +
-    geom_point(aes(log2(mean_ps), log2(mean_snr))) +
-    geom_label_repel(aes(log2(mean_ps), log2(mean_snr), label = marker)) +
+    geom_point(aes(ps, snr)) +
+    geom_label_repel(aes(ps, snr, label = marker)) +
     theme_minimal(base_size = 15) + ylab("Signal-to-noise ratio [log2]") +
     xlab("Signal intensity [log2]")
 ```
@@ -146,6 +174,30 @@ but low SNR. This might be due to staining differences between individual nuclei
 where some nuclei are considered as background. We do however observe high
 SNR and sufficient signal intensity for the majority of markers.
 
+Otsu thesholding and SNR calculation does not perform well if the markers are
+lowly abundant. In the next code chunk, we will remove markers that have 
+a positive signal of below 2 per image.  
+
+```{r, snr-adjusted}
+cur_snr <- cur_snr %>% 
+    pivot_wider(names_from = name, values_from = value) %>%
+    filter(ps > 2) %>%
+    pivot_longer(cols = c(snr, ps))
+
+cur_snr %>% 
+    group_by(marker, name) %>%
+    summarize(log_mean = log2(mean(value))) %>%
+    pivot_wider(names_from = name, values_from = log_mean) %>%
+    ggplot() +
+    geom_point(aes(ps, snr)) +
+    geom_label_repel(aes(ps, snr, label = marker)) +
+    theme_minimal(base_size = 15) + ylab("Signal-to-noise ratio [log2]") +
+    xlab("Signal intensity [log2]")
+```
+
+This visualization shows a reduces SNR for PD1, LAG3 and cleaved PARP which was
+previously inflated due to low signal.
+
 Another quality indicator is the image area covered by cells (or biological
 tissue). This metric identifies ROIs where little cells are present, possibly
 hinting at incorrect selection of the ROI. We can compute the percentage of
@@ -153,17 +205,23 @@ covered image area using the metadata contained in the `SpatialExperiment`
 object:
 
 ```{r cell-density}
-colData(spe) %>%
+cell_density <- colData(spe) %>%
     as.data.frame() %>%
     group_by(sample_id) %>%
+    # Compute the number of pixels covered by cells and 
+    # the total number of pixels
     summarize(cell_area = sum(area),
-           no_pixels = mean(width_px) * mean(height_px)) %>%
-    mutate(covered_area = cell_area / no_pixels) %>%
-    ggplot() +
+              no_pixels = mean(width_px) * mean(height_px)) %>%
+    # Divide the total number of pixels 
+    # by the number of pixels covered by cells
+    mutate(covered_area = cell_area / no_pixels)
+
+# Visualize the image area covered by cells per image
+ggplot(cell_density) +
         geom_point(aes(reorder(sample_id,covered_area), covered_area)) + 
         theme_minimal(base_size = 15) +
-        ylim(c(0, 1)) + 
-        theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 8)) +
+        theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 15)) +
+        ylim(c(0, 1)) +
         ylab("% covered area") + xlab("")
 ```
 
@@ -173,8 +231,8 @@ two images can now be visualized using `cytomapper`.
 ```{r low-density-images, message=FALSE}
 # Normalize and clip images
 cur_images <- images[c("Patient4_005", "Patient4_007")]
-cur_images <- normalize(cur_images, separateImages = TRUE)
-cur_images <- normalize(cur_images, inputRange = c(0, 0.2))
+cur_images <- cytomapper::normalize(cur_images, separateImages = TRUE)
+cur_images <- cytomapper::normalize(cur_images, inputRange = c(0, 0.2))
 
 plotPixels(cur_images,
            mask = masks[c("Patient4_005", "Patient4_007")],
@@ -191,7 +249,7 @@ plotPixels(cur_images,
 ```
 
 These two images display less dense tissue structure but overall the images are
-intact and seem segemented correctly.
+intact and appear to be segmented correctly.
 
 Finally, it can be beneficial to visualize the mean marker expression per image
 to identify images with outlying marker expression. This check does not
