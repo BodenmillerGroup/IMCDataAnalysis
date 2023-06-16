@@ -278,10 +278,10 @@ dittoHeatmap(image_mean, genes = rownames(spe)[rowData(spe)$use_channel],
              show_colnames = TRUE)
 ```
 
-We observe extensive biological variation across the 14 images. Some images show
-high expression of the macrophage marker CD206, the B cell marker CD20, the
-neutrophil marker CD15, and the proliferation marker Ki67. These differences will
-be further studied in the following chapters.
+We observe extensive biological variation across the 14 images specifically for
+some of the cell phenotype markers including the macrophage marker CD206, the B
+cell marker CD20, the neutrophil marker CD15, and the proliferation marker Ki67.
+These differences will be further studied in the following chapters.
 
 ## Cell-level quality control {#cell-quality}
 
@@ -296,20 +296,26 @@ with positive and negative expression. The SNR is defined as:
 
 $$SNR = I_s/I_n$$
 
-where $I_s$ is the intensity of the signal (mean intensity of cells with positive
-signal) and $I_n$ is the intensity of the noise (mean intensity of cells
-lacking expression). We calculate the SNR and signal intensity by fitting the
-mixture model across the transformed counts of all cells contained in the
-`SpatialExperiment` object.
+where $I_s$ is the intensity of the signal (mean intensity of cells with
+positive signal) and $I_n$ is the intensity of the noise (mean intensity of
+cells lacking expression). To define cells with positive and negative marker
+expression, we fit the mixture model across the transformed counts of all cells
+contained in the `SpatialExperiment` object. Next, for each marker we calculate
+the mean of the non-transformed counts for the positive and the negative cells.
+The SNR is then the ratio between the mean of the positive signal and the mean
+of the negative signal.
 
 ```{r cell-snr, message=FALSE, warning=FALSE, results="hide", fig.keep="all"}
 library(mclust)
 
 set.seed(220224)
-mat <- apply(assay(spe, "exprs"), 1, function(x){
-    cur_model <- Mclust(x, G = 2)
-    mean1 <- mean(x[cur_model$classification == 1])
-    mean2 <- mean(x[cur_model$classification == 2])
+mat <- sapply(seq_len(nrow(spe)), function(x){
+    cur_exprs <- assay(spe, "exprs")[x,]
+    cur_counts <- assay(spe, "counts")[x,]
+    
+    cur_model <- Mclust(cur_exprs, G = 2)
+    mean1 <- mean(cur_counts[cur_model$classification == 1])
+    mean2 <- mean(cur_counts[cur_model$classification == 2])
     
     signal <- ifelse(mean1 > mean2, mean1, mean2)
     noise <- ifelse(mean1 > mean2, mean2, mean1)
@@ -318,7 +324,7 @@ mat <- apply(assay(spe, "exprs"), 1, function(x){
 })
     
 cur_snr <- t(mat) %>% as.data.frame() %>% 
-        mutate(marker = colnames(mat))
+        mutate(marker = rownames(spe))
 
 cur_snr %>% ggplot() +
     geom_point(aes(log2(ps), log2(snr))) +
@@ -333,13 +339,9 @@ differences in cell density or can indicate biological differences due to cell
 type compositions (tumor cells tend to be larger than immune cells). 
 
 ```{r cell-size, message=FALSE}
-colData(spe) %>%
-    as.data.frame() %>%
-    group_by(sample_id) %>%
-    ggplot() +
-        geom_boxplot(aes(sample_id, area)) +
-        theme_minimal(base_size = 15) + 
-        theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 8)) +
+dittoPlot(spe, var = "area", 
+          group.by = "sample_id", 
+          plots = "boxplot") +
         ylab("Cell area") + xlab("")
 
 summary(spe$area)
@@ -365,17 +367,18 @@ Another quality indicator can be an absolute measure of cell density often
 reported in cells per mm$^2$.
 
 ```{r no-cells-per-image, message=FALSE}
-colData(spe) %>%
+cell_density <- colData(spe) %>%
     as.data.frame() %>%
     group_by(sample_id) %>%
     summarize(cell_count = n(),
            no_pixels = mean(width_px) * mean(height_px)) %>%
-    mutate(cells_per_mm2 = cell_count/(no_pixels/1000000)) %>%
-    ggplot() +
-        geom_point(aes(sample_id, cells_per_mm2)) + 
-        theme_minimal(base_size = 15)  + 
-        theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 8)) +
-        ylab("Cells per mm2") + xlab("")
+    mutate(cells_per_mm2 = cell_count/(no_pixels/1000000))
+
+ggplot(cell_density) +
+    geom_point(aes(reorder(sample_id,cells_per_mm2), cells_per_mm2)) + 
+    theme_minimal(base_size = 15) + 
+    theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 8)) +
+    ylab("Cells per mm2") + xlab("")
 ```
 
 The number of cells per mm$^2$ varies across images which also depends on the
@@ -384,7 +387,7 @@ immune cells appear in cell dense regions while other stromal regions are less
 dense.
 
 The data presented here originate from samples from different locations with
-potential differences in pre-processing and each sample stained individually.
+potential differences in pre-processing and each sample was stained individually.
 These (and other) technical aspects can induce staining differences between
 samples or batches of samples. Observing potential staining differences can be
 crucial to assess data quality. We will use ridgeline visualizations to check
@@ -392,28 +395,29 @@ differences in staining patterns:
 
 ```{r ridges, message=FALSE, fig.width=7, fig.height=25}
 multi_dittoPlot(spe, vars = rownames(spe)[rowData(spe)$use_channel],
-               group.by = "patient_id", plots = c("ridgeplot"), 
+               group.by = "patient_id", plots = "ridgeplot", 
                assay = "exprs", 
                color.panel = metadata(spe)$color_vectors$patient_id)
 ```
 
 We observe variations in the distributions of marker expression across patients.
 These variations may arise partly from different abundances of cells in
-different images (e.g. Patient3 may have higher numbers of CD11c+ and PD1+
+different images (e.g., Patient3 may have higher numbers of CD11c+ and PD1+
 cells) as well as staining differences between samples. While most of the
 selected markers are specifically expressed in immune cell subtypes, we can see
-that E-Cadherin (a marker for epithelial (tumor) cells) shows similar expression across all
-patients.
+that E-Cadherin (a marker for epithelial (tumor) cells) shows a similar
+expression range across all patients.
 
 Finally, we will use non-linear dimensionality reduction methods to project
 cells from a high-dimensional (40) down to a low-dimensional (2) space. For this
-the `r BiocStyle::Biocpkg("scater")` package provides the `runUMAP` and `runTSNE`
-function. To ensure reproducibility, we will need to set a seed; 
-however different seeds and different parameter settings (e.g. the `perplexity`)
-parameter in the `runTSNE` function need to be tested to avoid interpreting
-visualization artefacts. For dimensionality reduction, we will use all channels
-that show biological variation across the dataset. However, marker selection 
-can be performed with different biological questions in mind.
+the `r BiocStyle::Biocpkg("scater")` package provides the `runUMAP` and
+`runTSNE` function. To ensure reproducibility, we will need to set a seed;
+however different seeds and different parameter settings (e.g., the `perplexity`
+parameter in the `runTSNE` function) need to be tested to avoid
+over-interpretation of visualization artefacts. For dimensionality reduction, we
+will use all channels that show biological variation across the dataset.
+However, marker selection can be performed with different biological questions
+in mind.
 
 ```{r dimred, message=FALSE}
 library(scater)
@@ -436,7 +440,7 @@ potential "batch effects". The `dittoDimPlot`
 function allows flexible visualization. It returns `ggplot` objects which
 can be further modified.
 
-```{r visualizing-dimred-1, message=FALSE, fig.height=12}
+```{r visualizing-dimred-1, message=FALSE, fig.height=8}
 library(patchwork)
 
 # visualize patient id 
