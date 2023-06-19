@@ -2,9 +2,9 @@
 
 A common step during single-cell data analysis is the annotation of cells based
 on their phenotype. Defining cell phenotypes is often subjective and relies
-on previous biological knowledge. The [Orchestrating Single Cell Analysis with Bioconductor](https://bioconductor.org/books/3.14/OSCA.basic/cell-type-annotation.html) book
+on previous biological knowledge. The [Orchestrating Single Cell Analysis with Bioconductor](https://bioconductor.org/books/release/OSCA.basic/cell-type-annotation.html) book
 presents a number of approaches to phenotype cells detected by single-cell RNA
-sequencing based on reference datasets or prior knowledge of geneset importance.
+sequencing based on reference datasets or gene set analysis.
 
 In highly-multiplexed imaging, target proteins or molecules are manually
 selected based on the biological question at hand. It narrows down the feature
@@ -21,7 +21,7 @@ data. Tools have been developed to correct lateral spillover between cells
 [@Bai2021] but the approach requires careful selection of the markers to
 correct. In Section \@ref(classification) we will train and apply a random
 forest classifier to classify cell phenotypes in the dataset as alternative
-approach for clustering-based cell phenotyping. This approach has been previously used to
+approach to clustering-based cell phenotyping. This approach has been previously used to
 identify major cell phenotypes in metastatic melanoma and avoids clustering of
 cells [@Hoch2022].
 
@@ -41,14 +41,14 @@ cur_cells <- sample(seq_len(ncol(spe)), 2000)
 
 ## Clustering approaches {#clustering}
 
-In the first section to identify cellular phenotypes in the dataset, we will
-present clustering approaches that group cells based on their similarity in
-marker expression. A number of approaches have been developed to cluster data
-derived from single-cell RNA sequencing technologies [@Yu2022] or CyTOF
-[@Weber2016]. For demonstration purposes, we will highlight common clustering
-approaches that are available in R and have been used for clustering cells
-obtained from IMC. Two approaches rely on graph-based clustering and one
-approach uses self organizing maps (SOM).
+In the first section, we will present clustering approaches to identify cellular
+phenotypes in the dataset. These methods group cells based on their similarity
+in marker expression or by their proximity in low dimensional space. A number of
+approaches have been developed to cluster data derived from single-cell RNA
+sequencing technologies [@Yu2022] or CyTOF [@Weber2016]. For demonstration
+purposes, we will highlight common clustering approaches that are available in R
+and have been used for clustering cells obtained from IMC. Two approaches rely
+on graph-based clustering and one approach uses self organizing maps (SOM).
 
 ### Rphenograph
 
@@ -96,6 +96,7 @@ library(viridis)
 
 mat <- t(assay(spe, "exprs")[rowData(spe)$use_channel,])
 
+set.seed(230619)
 out <- Rphenograph(mat, k = 45)
 
 clusters <- factor(membership(out[[2]]))
@@ -105,7 +106,7 @@ spe$pg_clusters <- clusters
 dittoDimPlot(spe, var = "pg_clusters", 
              reduction.use = "UMAP", size = 0.2,
              do.label = TRUE) +
-    ggtitle("Phenograph clusters expression on UMAP")
+    ggtitle("Phenograph clusters on UMAP")
 ```
 
 ```{r, fig.height=8}
@@ -134,6 +135,7 @@ be directly accessed from the `reducedDim` slot.
 ```{r rphenograph-2, message=FALSE}
 mat <- reducedDim(spe, "fastMNN")
 
+set.seed(230619)
 out <- Rphenograph(mat, k = 45)
 
 clusters <- factor(membership(out[[2]]))
@@ -143,7 +145,7 @@ spe$pg_clusters_corrected <- clusters
 dittoDimPlot(spe, var = "pg_clusters_corrected", 
              reduction.use = "UMAP_mnnCorrected", size = 0.2,
              do.label = TRUE) +
-    ggtitle("Phenograph clusters expression on UMAP, integrated cells")
+    ggtitle("Phenograph clusters on UMAP, integrated cells")
 ```
 
 ```{r, fig.height=8}
@@ -151,9 +153,8 @@ dittoHeatmap(spe[,cur_cells],
              genes = rownames(spe)[rowData(spe)$use_channel],
              assay = "exprs", scale = "none",
              heatmap.colors = viridis(100), 
-             annot.by = c("pg_clusters_corrected", "pg_clusters","patient_id"),
+             annot.by = c("pg_clusters_corrected","patient_id"),
              annot.colors = c(dittoColors(1)[1:length(unique(spe$pg_clusters_corrected))],
-                              dittoColors(1)[1:length(unique(spe$pg_clusters))],
                               metadata(spe)$color_vectors$patient_id))
 ```
 
@@ -170,8 +171,8 @@ package provides a simple interface to cluster cells using a number of different
 
 For simplicity, we will focus on graph based clustering as this is the most
 popular and a fast method for single-cell clustering. The `bluster` package
-provides functionalities to build k-nearest neighbour (KNN) and it's weighted
-version (shared nearest neighbor; SNN) graphs where nodes represent cells.
+provides functionalities to build k-nearest neighbor (KNN) graphs and its weighted
+version, shared nearest neighbor (SNN) graphs where nodes represent cells.
 The user can chose the number of neighbors to consider (parameter `k`), 
 the edge weighting method (parameter `type`) and the community detection
 function to use (parameter `cluster.fun`). As all parameters affect the clustering
@@ -182,13 +183,8 @@ of interest. The resulting matrix is transposed to fit to the requirements of
 the bluster package (cells in rows).
 
 We test two different settings for `k`, two for `type` and fix the `cluster.fun`
-to `louvain` as this is the most common approach for community detection.
-This function call is parallelized by setting the `BPPARAM` parameter. We use
-the `approxSilhouette` function to compute the silhouette width for each cell
-and compute the average across all cells per parameter setting. 
-Please see `?silhouette` for more information on how the silhouette 
-width id computed for each cell. A large average silhouette width indicates 
-cells that are well clustered.
+to `louvain` as this is one of the most common approaches for community detection.
+This function call is parallelized by setting the `BPPARAM` parameter. 
 
 ```{r, echo=FALSE}
 start_time <- Sys.time()
@@ -207,18 +203,46 @@ combinations <- clusterSweep(mat,
                              type = c("rank", "jaccard"), 
                              cluster.fun = "louvain",
                              BPPARAM = MulticoreParam(RNGseed = 220427))
+```
 
+We next calculate two metrics to estimate cluster stability: the average
+silhouette width and the neighborhood purity.
+
+We use the `approxSilhouette` function to compute the silhouette width for each
+cell and compute the average across all cells per parameter setting. Please see
+`?silhouette` for more information on how the silhouette width is computed for
+each cell. A large average silhouette width indicates a cluster parameter
+setting for which cells that are well clustered.
+
+The `neighborPurity` function computes the fraction of cells around each cell
+with the same cluster ID. Per parameter setting, we compute the average
+neighborhood purity across all cells. A large average neighborhood purity
+indicates a cluster parameter setting for which cells that are well clustered.
+
+```{r cluster-diagnostics, fig.height=7}
 sil <- vapply(as.list(combinations$clusters), 
               function(x) mean(approxSilhouette(mat, x)$width), 
               0)
 
 ggplot(data.frame(method = names(sil),
                   sil = sil)) +
-    geom_point(aes(reorder(method, sil), sil)) +
+    geom_point(aes(method, sil)) +
     theme_classic(base_size = 15) +
     theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
     xlab("Cluster parameter combination") +
     ylab("Average silhouette width")
+
+pur <- vapply(as.list(combinations$clusters), 
+              function(x) mean(neighborPurity(mat, x)$purity), 
+              0)
+
+ggplot(data.frame(method = names(pur),
+                  pur = pur)) +
+    geom_point(aes(method, pur)) +
+    theme_classic(base_size = 15) +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+    xlab("Cluster parameter combination") +
+    ylab("Average neighborhood purity")
 ```
 
 ```{r, echo=FALSE}
@@ -230,7 +254,7 @@ The cluster parameter sweep took
 
 Performing a cluster sweep takes some time as multiple function calls are run in parallel.
 We do however recommend testing a number of different parameter settings to
-access clustering performance.
+assess clustering performance.
 
 Once parameter settings are known, we can either use the `clusterRows` function
 of the `bluster` package to cluster cells or its convenient wrapper function
