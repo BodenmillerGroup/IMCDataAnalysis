@@ -266,8 +266,9 @@ function detects the 10 nearest neighbours for each cell, performs rank-based
 weighting of edges (see `?makeSNNGraph` for more information) and uses the
 `cluster_walktrap` function to detect communities in the graph.
 
-As we can see above, the clustering approach in this dataset with `k` being 
-20 and rank-based edge weighting leads to the highest silouhette width.
+As we can see above, the clustering approach in this dataset with `k` being 20
+and rank-based edge weighting leads to the highest silhouette width and highest
+neighborhood purity.
 
 ```{r, echo=FALSE}
 start_time <- Sys.time()
@@ -276,19 +277,19 @@ start_time <- Sys.time()
 ```{r snn-1, message=FALSE}
 library(scran)
 
+set.seed(220620)
 clusters <- clusterCells(spe[rowData(spe)$use_channel,], 
                          assay.type = "exprs", 
                          BLUSPARAM = SNNGraphParam(k=20, 
                                                   cluster.fun = "louvain",
-                                                  type = "rank",
-                                                  BPPARAM = MulticoreParam(RNGseed = 220427)))
+                                                  type = "rank"))
 
 spe$nn_clusters <- clusters
 
 dittoDimPlot(spe, var = "nn_clusters", 
              reduction.use = "UMAP", size = 0.2,
              do.label = TRUE) +
-    ggtitle("SNN clusters expression on UMAP")
+    ggtitle("SNN clusters on UMAP")
 ```
 
 ```{r, fig.height=8}
@@ -316,19 +317,19 @@ patient-specific. We can now perform clustering of the integrated cells
 by directly specifying which low-dimensional embedding to use:
 
 ```{r snn-2, message=FALSE}
+set.seed(220621)
 clusters <- clusterCells(spe, 
                          use.dimred = "fastMNN", 
-                         BLUSPARAM = NNGraphParam(k=20, 
-                                                  cluster.fun = "louvain",
-                                                  type = "rank",
-                                                  BPPARAM = bpparam()))
+                         BLUSPARAM = SNNGraphParam(k = 20, 
+                                        cluster.fun = "louvain",
+                                        type = "rank"))
 
 spe$nn_clusters_corrected <- clusters
 
 dittoDimPlot(spe, var = "nn_clusters_corrected", 
              reduction.use = "UMAP_mnnCorrected", size = 0.2,
              do.label = TRUE) +
-    ggtitle("SNN clusters expression on UMAP, integrated cells")
+    ggtitle("SNN clusters on UMAP, integrated cells")
 ```
 
 ```{r, fig.height=8}
@@ -336,9 +337,8 @@ dittoHeatmap(spe[,cur_cells],
              genes = rownames(spe)[rowData(spe)$use_channel],
              assay = "exprs", scale = "none",
              heatmap.colors = viridis(100), 
-             annot.by = c("nn_clusters_corrected", "nn_clusters","patient_id"),
+             annot.by = c("nn_clusters_corrected","patient_id"),
              annot.colors = c(dittoColors(1)[1:length(unique(spe$nn_clusters_corrected))],
-                              dittoColors(1)[1:length(unique(spe$nn_clusters))],
                               metadata(spe)$color_vectors$patient_id))
 ```
 
@@ -378,7 +378,7 @@ spe$som_clusters <- cluster_ids(spe, "meta13")
 dittoDimPlot(spe, var = "som_clusters", 
              reduction.use = "UMAP", size = 0.2,
              do.label = TRUE) +
-    ggtitle("SOM clusters expression on UMAP")
+    ggtitle("SOM clusters on UMAP")
 ```
 
 ```{r, fig.height=8}
@@ -439,7 +439,7 @@ spe$som_clusters_corrected <- as.factor(som.cluster)
 dittoDimPlot(spe, var = "som_clusters_corrected", 
              reduction.use = "UMAP_mnnCorrected", size = 0.2,
              do.label = TRUE) +
-    ggtitle("SOM clusters expression on UMAP, integrated cells")
+    ggtitle("SOM clusters on UMAP, integrated cells")
 ```
 
 ```{r, fig.height=8}
@@ -538,12 +538,12 @@ cluster_celltype <- recode(spe$nn_clusters_corrected,
                             "5" = "Stroma",
                             "6" = "Proliferating",
                             "7" = "Myeloid",
-                            "8" = "CD8",
-                            "9" = "Plasma_cell",
+                            "8" = "Plasma_cell",
+                            "9" = "CD8",
                             "10" = "CD4",
-                            "11" = "Bcell",
-                            "12" = "Stroma",
-                            "13" = "pDC")
+                            "11" = "Neutrophil",
+                            "12" = "Bcell",
+                            "13" = "Stroma")
 
 spe$cluster_celltype <- cluster_celltype
 ```
