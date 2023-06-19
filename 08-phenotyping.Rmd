@@ -352,10 +352,10 @@ package to group cells into 100 (default) clusters based on self organizing maps
 (SOM). In the next step, the
 [ConsensusClusterPlus](https://bioconductor.org/packages/release/bioc/html/ConsensusClusterPlus.html)
 package is used to perform hierarchical consensus clustering of the previously
-detected 100 SOM nodes into 1 to `maxK` clusters. Cluster stability for each `k`
+detected 100 SOM nodes into 2 to `maxK` clusters. Cluster stability for each `k`
 can be assessed by plotting the `delta_area(spe)`. The optimal number
 of clusters can be found by selecting the `k` at which a plateau is reached.
-In the example below, the optimal `k` lies somewhere around 13.
+In the example below, an optimal `k` lies somewhere around 13.
 
 ```{r, echo=FALSE}
 start_time <- Sys.time()
@@ -365,10 +365,10 @@ start_time <- Sys.time()
 library(CATALYST)
 
 # Run FlowSOM and ConsensusClusterPlus clustering
+set.seed(220410)
 spe <- cluster(spe, 
                features = rownames(spe)[rowData(spe)$use_channel],
-               maxK = 30,
-               seed = 220410)
+               maxK = 30)
 
 # Assess cluster stability
 delta_area(spe)
@@ -417,6 +417,7 @@ library(ConsensusClusterPlus)
 mat <- reducedDim(spe, "fastMNN")
 
 # Perform SOM clustering
+set.seed(220410)
 som.out <- clusterRows(mat, SomParam(100), full = TRUE)
 
 # Cluster the 100 SOM codes into larger clusters
@@ -447,9 +448,8 @@ dittoHeatmap(spe[,cur_cells],
              genes = rownames(spe)[rowData(spe)$use_channel],
              assay = "exprs", scale = "none",
              heatmap.colors = viridis(100), 
-             annot.by = c("som_clusters_corrected", "som_clusters","patient_id"),
+             annot.by = c("som_clusters_corrected","patient_id"),
              annot.colors = c(dittoColors(1)[1:length(unique(spe$som_clusters_corrected))],
-                              dittoColors(1)[1:length(unique(spe$som_clusters))],
                               metadata(spe)$color_vectors$patient_id))
 ```
 
