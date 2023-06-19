@@ -1126,17 +1126,7 @@ expect_equal(table(spe$pg_clusters_corrected),
 )), names = ""), class = "table"))
 
 expect_equal(spe$pg_clusters_corrected[1000:1200],
-             structure(c(`1` = 3400L, `2` = 2052L, `3` = 3015L, `4` = 2152L, 
-`5` = 3311L, `6` = 1069L, `7` = 4694L, `8` = 402L, `9` = 3518L, 
-`10` = 741L, `11` = 1674L, `12` = 3650L, `13` = 1453L, `14` = 1760L, 
-`15` = 804L, `16` = 3643L, `17` = 748L, `18` = 1419L, `19` = 1226L, 
-`20` = 3596L, `21` = 895L, `22` = 789L, `23` = 1184L, `24` = 283L, 
-`25` = 316L), dim = 25L, dimnames = structure(list(c("1", "2", 
-"3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", 
-"15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25"
-)), names = ""), class = "table")
-> dput(spe$pg_clusters_corrected[1000:1200])
-structure(c(`1000` = 1L, `1001` = 9L, `1002` = 1L, `1003` = 1L, 
+             structure(c(`1000` = 1L, `1001` = 9L, `1002` = 1L, `1003` = 1L, 
 `1004` = 1L, `1005` = 1L, `1006` = 1L, `1007` = 1L, `1008` = 1L, 
 `1009` = 5L, `1010` = 15L, `1011` = 1L, `1012` = 2L, `1013` = 1L, 
 `1014` = 1L, `1015` = 15L, `1016` = 1L, `1017` = 1L, `1018` = 2L, 
@@ -1261,7 +1251,7 @@ expect_equal(table(spe$som_clusters_corrected),
     "12", "13", "14", "15", "16")), names = ""), class = "table"))
 
 expect_equal(spe$som_clusters_corrected[1000:1200],
-            structure(c(V30 = 4L, V71 = 9L, V20 = 4L, V39 = 4L, V30 = 4L, 
+             structure(c(V30 = 4L, V71 = 9L, V20 = 4L, V39 = 4L, V30 = 4L, 
 V39 = 4L, V20 = 4L, V30 = 4L, V20 = 4L, V9 = 3L, V10 = 4L, V39 = 4L, 
 V16 = 2L, V20 = 4L, V39 = 4L, V10 = 4L, V30 = 4L, V30 = 4L, V16 = 2L, 
 V39 = 4L, V38 = 8L, V10 = 4L, V10 = 4L, V98 = 14L, V20 = 4L, 
