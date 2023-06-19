@@ -486,11 +486,11 @@ pheatmap(log10(tab3 + 10), color = viridis(100))
 
 We observe that `Rphenograph` and the shared nearest neighbor (SNN) approach by
 `scran` show similar results (first heatmap above). For example, Rphenograph
-cluster 18 (a tumor cluster) is perfectly captured by SNN cluster 14. On the
+cluster 20 (a tumor cluster) is perfectly captured by SNN cluster 12. On the
 other hand, the Neutrophil cluster (SNN cluster 6) is split into Rphenograph
-cluster 5 and Rphenograph cluster 9. A common approach
+cluster 2 and Rphenograph cluster 6. A common approach
 is to now merge clusters that contain similar cell types and annotate them by
-hand.
+hand (see below).
 
 Below, a comparison between the clustering results of the integrated cells 
 is shown.
@@ -516,11 +516,12 @@ clusters and therefore matches better with the SOM clustering approach.
 
 The `bluster` package provides a number of metrics to assess cluster stability
 [here](https://www.bioconductor.org/packages/release/bioc/vignettes/bluster/inst/doc/diagnostics.html).
-For brevity we only highlighted the use of the silhouette width but different
-metrics should be tested to assess cluster stability.
+For brevity we only highlighted the use of the silhouette width and the
+neighborhood purity but different metrics should be tested to assess cluster
+stability.
 
 To assign cell types to clusters, we manually annotate clusters based on their
-marker expression. For example, SNN cluster 11 (clustering of the integrated
+marker expression. For example, SNN cluster 12 (clustering of the integrated
 cells) shows high, homogeneous expression of CD20 and we might therefore label
 this cluster as B cells. The next chapter \@ref(single-cell-visualization) will 
 highlight single-cell visualization methods that can be helpful for manual 
