@@ -70,11 +70,14 @@ to outline segmented cells on the images.
 ```{r, message = FALSE}
 library(cytoviewer)
 
+app <- cytoviewer(image = images, 
+                  mask = masks, 
+                  cell_id = "ObjectNumber", 
+                  img_id = "sample_id")
+
+
 if (interactive()) {
-    cytoviewer(image = images, 
-               mask = masks, 
-               cell_id = "ObjectNumber", 
-               img_id = "sample_id")
+    shiny::runApp(app, launch.browser = TRUE)
 }
 ```
 
