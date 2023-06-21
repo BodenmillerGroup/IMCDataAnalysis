@@ -1041,14 +1041,15 @@ expect_equal(table(spe$cn_celltypes),
     c("1", "2", "3", "4", "5", "6")), names = ""), class = "table"))
 
 expect_equal(table(spe$cn_expression),
-             structure(c(`1` = 5156L, `2` = 7430L, `3` = 11031L, `4` = 9328L, 
-`5` = 4862L, `6` = 9987L), dim = 6L, dimnames = structure(list(
+             structure(c(`1` = 5969L, `2` = 8768L, `3` = 5944L, `4` = 9638L, 
+`5` = 12886L, `6` = 4589L), dim = 6L, dimnames = structure(list(
     c("1", "2", "3", "4", "5", "6")), names = ""), class = "table"))
 
-expect_equal(table(spe$lisa_clusters),
-             structure(c(`1` = 11941L, `2` = 4928L, `3` = 2729L, `4` = 4527L, 
-`5` = 16574L, `6` = 7095L), dim = 6L, dimnames = structure(list(
-    c("1", "2", "3", "4", "5", "6")), names = ""), class = "table"))
+expect_equal(table(spe$region),
+             structure(c(region_1 = 4928L, region_2 = 7094L, region_3 = 2729L, 
+region_4 = 16574L, region_5 = 4529L, region_6 = 11940L), dim = 6L, dimnames = structure(list(
+    c("region_1", "region_2", "region_3", "region_4", "region_5", 
+    "region_6")), names = ""), class = "table"))
 
 expect_equal(table(spe$spatial_context),
              structure(c(`1` = 6009L, `1_2` = 20L, `1_2_3_5` = 1L, `1_2_3_5_6` = 2L, 
