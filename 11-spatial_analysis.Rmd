@@ -1,17 +1,18 @@
 # Performing spatial analysis
 
-Highly multiplexed imaging technologies acquire the spatial distributions 
-of molecule abundances across tissue sections. As such, analyzing single cells
-in their spatial tissue context is a key strength of these technologies.
+Highly multiplexed imaging technologies measure the spatial distributions of
+molecule abundances across tissue sections. As such, having the option to
+analyze single cells in their spatial tissue context is a key strength of these
+technologies.
 
 A number of software packages such as
 [squidpy](https://squidpy.readthedocs.io/en/stable/),
-[giotto](https://rubd.github.io/Giotto_site/) and
+[giotto](https://giottosuite.readthedocs.io/en/master/) and
 [Seurat](https://satijalab.org/seurat/articles/spatial_vignette_2.html) have
 been developed to analyse and visualize cells in their spatial context. The
 following chapter will highlight the use of
 [imcRtools](https://bioconductor.org/packages/release/bioc/html/imcRtools.html)
-and other Bioconductor tools tools to visualize and analyse single-cell data
+and other Bioconductor packages to visualize and analyse single-cell data
 obtained from highly multiplexed imaging technologies.
 
 We will first read in the spatially-annotated single-cell data processed in the 
@@ -49,11 +50,11 @@ needs to be provided. For graphs constructed via Delaunay triangulation,
 the `max_dist` parameter can be set to avoid unusually large connections at the
 edge of the image.
 
-```{r build-spatial-graphs, message=FALSE}
+```{r build-spatial-graphs}
 library(imcRtools)
 spe <- buildSpatialGraph(spe, img_id = "sample_id", type = "knn", k = 20)
 spe <- buildSpatialGraph(spe, img_id = "sample_id", type = "expansion", threshold = 20)
-spe <- buildSpatialGraph(spe, img_id = "sample_id", type = "delaunay", max_dist = 50)
+spe <- buildSpatialGraph(spe, img_id = "sample_id", type = "delaunay", max_dist = 20)
 ```
 
 The spatial graphs are stored in `colPair(spe, name)` slots. These slots store
@@ -119,8 +120,7 @@ plotSpatial(spe[,spe$sample_id == "Patient3_001"],
             img_id = "sample_id", 
             draw_edges = TRUE, 
             colPairName = "expansion_interaction_graph", 
-            nodes_first = FALSE, 
-            directed = FALSE,
+            nodes_first = FALSE,
             edge_color_fix = "grey") + 
     scale_color_manual(values = metadata(spe)$color_vectors$celltype) +
     ggtitle("expansion interaction graph")
