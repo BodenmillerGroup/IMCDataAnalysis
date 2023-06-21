@@ -172,26 +172,52 @@ For a full documentation on the `plotSpatial` function, please refer to
 
 ## Spatial community analysis
 
-The detection of spatial communities was proposed by [@Jackson2020]. Here,
-cells are clustered solely based on their interactions as defined by the
-spatial object graph. In the following example, we perform spatial community 
-detection separately for tumor and stromal cells.
+The detection of spatial communities was proposed by [@Jackson2020]. Here, cells
+are clustered solely based on their interactions as defined by the spatial
+object graph. We can perform spatial community detection across all cells as
+displayed in the next code chunk. Communities with less than 10 cells are
+excluded. **Of note:** we set the seed outside of the function call for
+reproducibility porposes as internally the `louvain` modularity optimization
+function is used which gives different results over different runs.
+
+```{r, spatial-community-1, fig.height=12, fig.width=12}
+set.seed(230621)
+spe <- detectCommunity(spe, 
+                       colPairName = "neighborhood", 
+                       size_threshold = 10)
+
+plotSpatial(spe, 
+            node_color_by = "spatial_community", 
+            img_id = "sample_id", 
+            node_size_fix = 0.5) +
+    theme(legend.position = "none") +
+    ggtitle("Spatial tumor communities") +
+    scale_color_manual(values = rev(colors()))
+```
+
+The example shown above might not be of interest if different tissue structures
+exist within which spatial communities should be computed. In the following
+example, we perform spatial community detection separately for tumor and stromal
+cells.
 
 The general procedure is as follows:    
+
 1. create a `colData(spe)` entry that specifies if a cell is part of the tumor
 or stroma compartment. 
+
 2. use the `detectCommunity` function of the `imcRtools`
-package to cluster cells within the tumor or stoma compartment solely based on
+package to cluster cells within the tumor or stroma compartment solely based on
 their spatial interaction graph as constructed by the `steinbock` package.  
 
 Both tumor and stromal spatial communities are stored in the `colData` of
 the `SpatialExperiment` object under the `spatial_community` identifier.
 
-We set the seed argument within the `SerialParam` function for reproducibility
-purposes. This is important as the global seed is not recognized by functions
-provided by the `BiocParallel` package.
+**Of note:** Here, and in contrast to the function call above, we set the seed 
+argument within the `SerialParam` function for reproducibility
+purposes. We need this here due to the way the `detectCommunity` function 
+is implemented when setting the `group_by` parameter.
 
-```{r spatial-community, message=FALSE}
+```{r spatial-community-2}
 spe$tumor_stroma <- ifelse(spe$celltype == "Tumor", "Tumor", "Stroma")
 
 library(BiocParallel)
@@ -233,10 +259,16 @@ spatial stromal community is displayed.
 library(pheatmap)
 library(viridis)
 
-for_plot <- prop.table(table(spe[,spe$celltype != "Tumor"]$spatial_community, 
-                             spe[,spe$celltype != "Tumor"]$celltype), margin = 1)
+cur_spe <- spe[,spe$celltype != "Tumor"]
 
-pheatmap(for_plot, color = viridis(100), show_rownames = FALSE)
+for_plot <- prop.table(table(cur_spe$spatial_community, 
+                             cur_spe$celltype), 
+                       margin = 1)
+
+pheatmap(for_plot, 
+         color = colorRampPalette(c("dark blue", "white", "dark red"))(100), 
+         show_rownames = FALSE, 
+         scale = "column")
 ```
 
 We observe that many spatial stromal communities are made up of myeloid cells or
