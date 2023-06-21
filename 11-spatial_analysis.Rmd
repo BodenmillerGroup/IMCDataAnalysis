@@ -334,7 +334,7 @@ plotSpatial(spe,
 The next code chunk visualizes the cell type compositions of the
 detected cellular neighborhoods (CN).
 
-```{r, message=FALSE}
+```{r}
 for_plot <- prop.table(table(spe$cn_celltypes, spe$celltype), 
                        margin = 1)
 
@@ -375,7 +375,7 @@ plotSpatial(spe,
 Also here, we can visualize the cell type composition of each cellular
 neighborhood.
 
-```{r, message=FALSE}
+```{r}
 for_plot <- prop.table(table(spe$cn_expression, spe$celltype), 
                   margin = 1)
 
@@ -411,7 +411,9 @@ In the following example, we calculate the LISA curves within a 10µm, 20µm and
 and smoother spatial clusters. However, a number of parameter settings should be
 tested to estimate the robustness of the results.
 
-```{r lisaClust, fig.height=12, fig.width=12}
+```{r lisaClust, fig.height=12, fig.width=12, message=FALSE}
+library(lisaClust)
+
 set.seed(220705)
 spe <- lisaClust(spe, 
                  k = 6,
@@ -430,7 +432,7 @@ plotSpatial(spe,
 Similar to the example above, we can now observe the cell type
 composition per spatial cluster.
 
-```{r lisaClust-3, message=FALSE}
+```{r lisaClust-3}
 for_plot <- prop.table(table(spe$region, spe$celltype), 
                   margin = 1)
 
@@ -455,7 +457,7 @@ regionMap(spe,
 ## Spatial context analysis
 
 Downstream of CN assignments, we will analyze the spatial context (SC)
-of each cell using three functions from `imcRtools`.
+of each cell using three functions from the `imcRtools` package.
 
 While CNs can represent sites of unique local processes, the term SC was
 coined by Bhate and colleagues [@Bhate2022] and describes tissue regions
@@ -490,13 +492,14 @@ For more details and biological validation, please refer to
 library(circlize)
 library(RColorBrewer)
 
-# Generate k-nearest neighbor graph for SC detection (k=40) 
-spe <- buildSpatialGraph(spe, img_id = "sample_id", 
+# Construct a 40-nearest neighbor graph
+spe <- buildSpatialGraph(spe, 
+                         img_id = "sample_id", 
                          type = "knn", 
                          name = "knn_spatialcontext_graph", 
                          k = 40)
 
-# Aggregate based on clustered_neighbors
+# Compute the fraction of cellular neighborhoods around each cell
 spe <- aggregateNeighbors(spe, 
                           colPairName = "knn_spatialcontext_graph",
                           aggregate_by = "metadata",
@@ -510,15 +513,15 @@ spe <- detectSpatialContext(spe,
                             name = "spatial_context")
 
 # Define SC color scheme
-col_SC <- setNames(colorRampPalette(brewer.pal(9, "Paired"))(length(unique(spe$spatial_context))), 
+n_SCs <- length(unique(spe$spatial_context))
+col_SC <- setNames(colorRampPalette(brewer.pal(9, "Paired"))(n_SCs), 
                    sort(unique(spe$spatial_context)))
 
 # Visualize spatial contexts on images
 plotSpatial(spe, 
             node_color_by = "spatial_context", 
             img_id = "sample_id", 
-            node_size_fix = 0.5, 
-            colPairName = "knn_spatialcontext_graph") +
+            node_size_fix = 0.5) +
     scale_color_manual(values = col_SC)
 ```
 
@@ -535,15 +538,13 @@ library(patchwork)
 p1 <- plotSpatial(spe[,spe$sample_id == "Patient3_001"], 
             node_color_by = "cn_celltypes", 
             img_id = "sample_id", 
-            node_size_fix = 0.5, 
-            colPairName = "knn_interaction_graph") +
+            node_size_fix = 0.5) +
     scale_color_brewer(palette = "Set3")
 
 p2 <- plotSpatial(spe[,spe$sample_id == "Patient3_001"], 
             node_color_by = "spatial_context", 
             img_id = "sample_id", 
-            node_size_fix = 0.5, 
-            colPairName = "knn_spatialcontext_graph") +
+            node_size_fix = 0.5) +
     scale_color_manual(values = col_SC, limits = force)
 
 p1 + p2
@@ -553,12 +554,12 @@ As expected, we can observe that interfaces between different CNs make
 up distinct SCs. For instance, interface between CN 3 (TLS region
 consisting of B and BnT cells) and CN 5 (Plasma- and T-cell dominated)
 turns to SC 3_5. On the other hand, the core of CN 3 becomes SC 3, since
-for the neighborhood for these cells is just the cellular neighborhood
+the most abundant CN of the neighborhood for these cells is just the CN
 itself.
 
 Next, we filter the SCs based on user-defined thresholds for number of
 group entries (here at least 3 patients) and/or total number of cells
-(here minimum of 100 cells) per SC with `filterSpatialContext`.
+(here minimum of 100 cells) per SC using the `filterSpatialContext` function.
 
 ```{r filterSpatialContext, fig.height=12, fig.width=13}
 ## Filter spatial contexts
@@ -566,27 +567,27 @@ group entries (here at least 3 patients) and/or total number of cells
 spe <- filterSpatialContext(spe, 
                             entry = "spatial_context",
                             group_by = "patient_id", 
-                            group_threshold = 3)
+                            group_threshold = 3,
+                            name = "spatial_context_filtered")
 
 plotSpatial(spe, 
             node_color_by = "spatial_context_filtered", 
             img_id = "sample_id", 
-            node_size_fix = 0.5, 
-            colPairName = "knn_spatialcontext_graph") +
+            node_size_fix = 0.5) +
     scale_color_manual(values = col_SC, limits = force)
 
-# By number of group entries and total number of cells
+# Filter out small and infrequent spatial contexts
 spe <- filterSpatialContext(spe, 
                             entry = "spatial_context",
                             group_by = "patient_id", 
                             group_threshold = 3,
-                            cells_threshold = 100)
+                            cells_threshold = 100,
+                            name = "spatial_context_filtered")
 
 plotSpatial(spe, 
             node_color_by = "spatial_context_filtered", 
             img_id = "sample_id", 
-            node_size_fix = 0.5, 
-            colPairName = "knn_spatialcontext_graph") +
+            node_size_fix = 0.5) +
     scale_color_manual(values = col_SC, limits = force)
 ```
 
@@ -598,7 +599,7 @@ create a SC graph for the filtered SCs here.
 ```{r plotSpatialContext}
 ## Plot spatial context graph 
 
-# Colored by name and size by n_cells
+# Colored by name, size by n_cells
 plotSpatialContext(spe, 
                    entry = "spatial_context_filtered",
                    group_by = "sample_id",
@@ -606,7 +607,7 @@ plotSpatialContext(spe,
                    node_size_by = "n_cells",
                    node_label_color_by = "name")
 
-# Colored by n_cells and size by n_group                   
+# Colored by n_cells, size by n_group                   
 plotSpatialContext(spe, 
                    entry = "spatial_context_filtered",
                    group_by = "sample_id",
@@ -621,7 +622,7 @@ SC 1 (Tumor-dominated), SC 1_6 (Tumor and Tumor-Stroma interface) and SC
 frequent SCs in this dataset. Moreover, we may compare the degree of the
 different nodes in the SC graph. For example, we can observe that SC 1
 has only one degree (directed to SC 1_6), while SC 5 (T cells and plasma cells) has
-a much higher degree (n = 4) and potentially more interaction.
+a much higher degree (n = 4) and potentially more CN interactions.
 
 ## Patch detection
 
@@ -631,7 +632,7 @@ detecting spatial compartments in a supervised fashion. The
 [patchDetection](https://bodenmillergroup.github.io/imcRtools/reference/patchDetection.html)
 function allows the detection of connected sets of similar cells as proposed by
 [@Hoch2022]. In the following example, we will use the `patchDetection` function
-to detect function to detect tumor patches in three steps:
+to detect tumor patches in three steps:
 
 1. Find connected sets of tumor cells (using the `steinbock` graph).  
 2. Components which contain less than 10 cells are excluded.  
@@ -644,7 +645,8 @@ spe <- patchDetection(spe,
                       img_id = "sample_id",
                       expand_by = 1,
                       min_patch_size = 10,
-                      colPairName = "neighborhood")
+                      colPairName = "neighborhood",
+                      BPPARAM = MulticoreParam())
 
 plotSpatial(spe, 
             node_color_by = "patch_id", 
@@ -669,10 +671,6 @@ colData(spe) %>% as_tibble() %>%
         geom_point(aes(log10(patch_size), Tcell_freq, color = sample_id)) +
     theme_classic()
 ```
-
-An increase of T cell infiltration with tumor patch size can be observed. This
-effect is most likely caused by sparse but fully connected tumor cell regions
-which contain many stromal cells.
 
 We can now measure the size of each patch using the
 [patchSize](https://bodenmillergroup.github.io/imcRtools/reference/patchSize.html)
@@ -709,11 +707,12 @@ plotSpatial(spe,
     scale_color_gradient2(low = "dark blue", mid = "white", high = "dark red")
 ```
 
-Finally, we can  observe the minimum distances to tumor patches in a cell type specific
-manner.
+Finally, we can  observe the minimum distances to tumor patches in a cell type
+specific manner.
 
 ```{r celltype-distance, message=FALSE}
 library(ggridges)
+
 ggplot(as.data.frame(colData(spe))) + 
     geom_density_ridges(aes(distToCells, celltype, fill = celltype)) +
     geom_vline(xintercept = 0, color = "dark red", linewidth = 2) +
@@ -722,7 +721,7 @@ ggplot(as.data.frame(colData(spe))) +
 
 ## Interaction analysis
 
-**Bug notice: we discovered and fixed a bug in the `testInteractions` function in version below 1.5.5 which affected `SingleCellExperiment` or `SpatialExperiment` objects in which cells were not grouped by image. Please install the newest version of `imcRtools` (>=1.5.5) directly from Github as explained [here](https://github.com/BodenmillerGroup/imcRtools).**  
+**Bug notice: we discovered and fixed a bug in the `testInteractions` function in version below 1.5.5 which affected `SingleCellExperiment` or `SpatialExperiment` objects in which cells were not grouped by image. Please make sure you have the newest version (>= 1.6.0) installed.**  
 
 The next section focuses on statistically testing the pairwise interaction
 between all cell types of the dataset. For this, the `imcRtools` package
@@ -732,7 +731,7 @@ function which implements the interaction testing strategy proposed by
 [@Shapiro2017]. 
 
 Per grouping level (e.g., image), the `testInteractions` function computes the 
-averaged cell type/cell type interaction count and computes this count against
+averaged cell type/cell type interaction count and compares this count against
 an empirical null distribution which is generated by permuting all cell labels (while maintaining the tissue structure).
 
 In the following example, we use the `steinbock` generated spatial interaction
@@ -755,7 +754,7 @@ the image ID, `group_by`), "from" cell type (`from_label`) and "to" cell type
 (`to_label`). The `sigval` entry indicates if a pair of cell types is
 significantly interacting (`sigval = 1`), if a pair of cell types is
 significantly avoiding (`sigval = -1`) or if no significant interaction or
-avoidance was detected.
+avoidance was detected (`sigval = 0`).
 
 These results can be visualized by computing the sum of the `sigval` entries
 across all images:
