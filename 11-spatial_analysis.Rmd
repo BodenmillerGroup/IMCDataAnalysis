@@ -314,8 +314,10 @@ with more neighbors usually results in larger CNs.
 
 ```{r cn-analysis, fig.height=12, fig.width=12}
 # By celltypes
-spe <- aggregateNeighbors(spe, colPairName = "knn_interaction_graph", 
-                          aggregate_by = "metadata", count_by = "celltype")
+spe <- aggregateNeighbors(spe, 
+                          colPairName = "knn_interaction_graph", 
+                          aggregate_by = "metadata", 
+                          count_by = "celltype")
 
 set.seed(220705)
 
@@ -333,11 +335,11 @@ The next code chunk visualizes the cell type compositions of the
 detected cellular neighborhoods (CN).
 
 ```{r, message=FALSE}
-library(tidyverse)
 for_plot <- prop.table(table(spe$cn_celltypes, spe$celltype), 
-                  margin = 1)
+                       margin = 1)
 
-pheatmap(for_plot, color = colorRampPalette(c("dark blue", "white", "dark red"))(100), 
+pheatmap(for_plot, 
+         color = colorRampPalette(c("dark blue", "white", "dark red"))(100), 
          scale = "column")
 ```
 
@@ -352,9 +354,14 @@ expression across the 20-nearest neighbor prior to kmeans clustering
 
 ```{r, fig.height=12, fig.width=12}
 # By expression
-spe <- aggregateNeighbors(spe, colPairName = "knn_interaction_graph", 
-                          aggregate_by = "expression", assay_type = "exprs",
+spe <- aggregateNeighbors(spe, 
+                          colPairName = "knn_interaction_graph", 
+                          aggregate_by = "expression", 
+                          assay_type = "exprs",
                           subset_row = rowData(spe)$use_channel)
+
+set.seed(220705)
+
 cn_2 <- kmeans(spe$mean_aggregatedExpression, centers = 6)
 spe$cn_expression <- as.factor(cn_2$cluster)
 
@@ -372,16 +379,17 @@ neighborhood.
 for_plot <- prop.table(table(spe$cn_expression, spe$celltype), 
                   margin = 1)
 
-pheatmap(for_plot, color = colorRampPalette(c("dark blue", "white", "dark red"))(100), 
+pheatmap(for_plot, 
+         color = colorRampPalette(c("dark blue", "white", "dark red"))(100), 
          scale = "column")
 ```
 
 When clustering cells based on the mean expression within the direct
-neighborhood, tumor patches are split across CN 4 and CN 6 without
+neighborhood, tumor cells are split across CN 6, CN 1 and CN 4 without
 forming a clear tumor/stroma interface. This result reflects
 patient-to-patient differences in the expression of tumor markers.
 
-CN 5 again contains B cells and BnT cells but also CD8 and undefined
+CN 3 again contains B cells and BnT cells but also CD8 and undefined
 cells, therefore it is less representative of TLS compared to CN 3 in
 previous CN approach. CN detection based on mean marker expression is
 therefore sensitive to staining/expression differences between samples
@@ -394,48 +402,26 @@ Bioconductor package [@Patrick2021]. In contrast to `imcRtools`, the
 (LISA) functions and clusters cells based on those. More precise, the
 package summarizes L-functions from a Poisson point process model to
 derive numeric vectors for each cell which can then again be clustered
-using kmeans.
+using kmeans. All steps are supported by the `lisaClust` function which
+can be applied to a `SingleCellExperiment` and `SpatialExperiment` object.
 
-The `lisa` function requires a `SegmentedCells` object which can be
-generated using the
-[spicyR](https://www.bioconductor.org/packages/release/bioc/html/spicyR.html)
-package.
 
-```{r lisaClust-1, message=FALSE}
-library(lisaClust)
-library(spicyR)
+In the following example, we calculate the LISA curves within a 10µm, 20µm and
+50µm neighborhood around each cell. Increasing these radii will lead to broader
+and smoother spatial clusters. However, a number of parameter settings should be
+tested to estimate the robustness of the results.
 
-cells <- data.frame(row.names = colnames(spe))
-cells$ObjectNumber <- spe$ObjectNumber
-cells$ImageNumber <- spe$sample_id
-cells$AreaShape_Center_X <- spatialCoords(spe)[,"Pos_X"]
-cells$AreaShape_Center_Y <- spatialCoords(spe)[,"Pos_Y"]
-cells$cellType <- spe$celltype
-
-lisa_sc <- SegmentedCells(cells, cellProfiler = TRUE)
-
-lisa_sc
-```
-
-After creating the `SegmentedCells` object, the `lisa` function computes
-LISA curves across a given set of distances. In the following example,
-we calculate the LISA curves within a 10µm, 20µm and 50µm neighborhood
-around each cell. Increasing these radii will lead to broader and
-smoother spatial clusters. However, a number of parameter settings
-should be tested to estimate the robustness of the results.
-
-```{r lisaClust-2, message=FALSE, fig.height=12, fig.width=12}
-lisaCurves <- lisa(lisa_sc, Rs = c(10, 20, 50))
-
-# Set NA to 0
-lisaCurves[is.na(lisaCurves)] <- 0
-
-lisa_clusters <- kmeans(lisaCurves, centers = 6)$cluster
-
-spe$lisa_clusters <- as.factor(lisa_clusters)
+```{r lisaClust, fig.height=12, fig.width=12}
+set.seed(220705)
+spe <- lisaClust(spe, 
+                 k = 6,
+                 Rs = c(10, 20, 50),
+                 spatialCoords = c("Pos_X", "Pos_Y"),
+                 cellType = "celltype",
+                 imageID = "sample_id")
 
 plotSpatial(spe, 
-            node_color_by = "lisa_clusters", 
+            node_color_by = "region", 
             img_id = "sample_id", 
             node_size_fix = 0.5) +
     scale_color_brewer(palette = "Set3")
@@ -445,16 +431,26 @@ Similar to the example above, we can now observe the cell type
 composition per spatial cluster.
 
 ```{r lisaClust-3, message=FALSE}
-for_plot <- prop.table(table(spe$lisa_clusters, spe$celltype), 
+for_plot <- prop.table(table(spe$region, spe$celltype), 
                   margin = 1)
 
-pheatmap(for_plot, color = colorRampPalette(c("dark blue", "white", "dark red"))(100), 
+pheatmap(for_plot, 
+         color = colorRampPalette(c("dark blue", "white", "dark red"))(100), 
          scale = "column")
 ```
 
-In this case, CN 2 and 5 contain tumor cells but no CN is forming the
-tumor/stroma interface. CN 3 represents TLS. CN 6 indicates T cell
-subtypes and plasma cells are aggregated to CN 4.
+In this case, CN 1 and 4 contain tumor cells but no CN is forming the
+tumor/stroma interface. CN 3 represents TLS. CN 2 indicates T cell
+subtypes and plasma cells are aggregated to CN 5.
+
+As an alternative way of visualizing the enrichment of cell types within the 
+detected CNs, the `lisaClust` package provides the `regionMap` function.
+
+```{r}
+regionMap(spe, 
+          cellType = "celltype",
+          region = "region")
+```
 
 ## Spatial context analysis
 
