@@ -397,7 +397,7 @@ as well as lateral spillover due to imperfect segmentation.
 
 An alternative to the `aggregateNeighbors` function is provided by the
 [lisaClust](https://bioconductor.org/packages/release/bioc/html/lisaClust.html)
-Bioconductor package [@Patrick2021]. In contrast to `imcRtools`, the
+Bioconductor package [@Patrick2023]. In contrast to `imcRtools`, the
 `lisaClust` package computes local indicators of spatial associations
 (LISA) functions and clusters cells based on those. More precise, the
 package summarizes L-functions from a Poisson point process model to
