@@ -846,10 +846,12 @@ UMAP visualization can indicate sample-to-sample differences in staining or
 biological differences. Staining differences can arise when samples were
 processed differently or stained with different batches of an antibody cocktail.
 
-Perform batch correction to remove sample-to-sample differences. 
-Here, we use the `fastMNN` method of the 
-[batchelor](https://bioconductor.org/packages/release/bioc/html/batchelor.html) 
-package. 
+Perform batch correction to remove sample-to-sample differences. Here, we use
+the `fastMNN` method of the
+[batchelor](https://bioconductor.org/packages/release/bioc/html/batchelor.html)
+package. In the following code chunk, the `fastMNN` and the `runUMAP` functions,
+which are both not deterministic, are executed subsequently after setting a seed
+for reproducibility reasons.
 
 ```{r, echo=FALSE}
 start_time <- Sys.time()
@@ -994,6 +996,7 @@ start_time <- Sys.time()
 ```{r cluster-cells}
 library(scran)
 
+set.seed(220621)
 clusters <- clusterCells(spe, 
                          use.dimred = "fastMNN", 
                          BLUSPARAM = SNNGraphParam(k = 20, 
@@ -1051,12 +1054,12 @@ cluster_celltype <- recode(spe$nn_clusters,
                             "5" = "Stroma",
                             "6" = "Proliferating",
                             "7" = "Myeloid",
-                            "8" = "CD8",
-                            "9" = "Plasma_cell",
+                            "8" = "Plasma_cell",
+                            "9" = "CD8",
                             "10" = "CD4",
-                            "11" = "Bcell",
-                            "12" = "Stroma",
-                            "13" = "pDC")
+                            "11" = "Neutrophil",
+                            "12" = "Bcell",
+                            "13" = "Stroma")
 
 spe$cluster_celltype <- cluster_celltype
 ```
@@ -1162,7 +1165,10 @@ Train a random forest classifier for cell type classification of unlabelled
 cells. The cells are first split into labelled and unlabelled cells. We then
 perform a 75/25 split of the labelled cells to select training and testing
 datasets, respectively. Based on the training dataset, we perform a 5-fold cross
-validation to tune the random forest model parameter.
+validation to tune the random forest model parameter. In the following code
+chunk, the `createDataPartition` and the `train` functions, which are both not
+deterministic, are executed subsequently after setting a seed for
+reproducibility reasons.
 
 ```{r train-classifier, message=FALSE}
 library(caret)
