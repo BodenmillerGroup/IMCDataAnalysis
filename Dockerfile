@@ -12,6 +12,6 @@ RUN R -e 'install.packages(c("rmarkdown", "bookdown", "pheatmap", "viridis", "zo
                              "Seurat", "SeuratObject", "cowplot", "kohonen", "caret", "randomForest", "ggridges", "cowplot", \
                              "gridGraphics", "scales", "tiff", "harmony", "Matrix"))'
 RUN R -e 'BiocManager::install(c("CATALYST", "scuttle", "scater", "dittoSeq", "tidyverse", "BiocStyle", "batchelor", "bluster", \
-                                 "scran", "lisaClust", "spicyR", "iSEE", "imcRtools", "cytomapper", "imcdatasets", "cytoviewer"")'
+                                 "scran", "lisaClust", "spicyR", "iSEE", "imcRtools", "cytomapper", "imcdatasets", "cytoviewer")'
 RUN R -e 'devtools::install_github(c("i-cyto/Rphenograph"))'
 
