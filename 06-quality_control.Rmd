@@ -75,7 +75,6 @@ app <- cytoviewer(image = images,
                   cell_id = "ObjectNumber", 
                   img_id = "sample_id")
 
-
 if (interactive()) {
     shiny::runApp(app, launch.browser = TRUE)
 }
@@ -420,7 +419,9 @@ parameter in the `runTSNE` function) need to be tested to avoid
 over-interpretation of visualization artefacts. For dimensionality reduction, we
 will use all channels that show biological variation across the dataset.
 However, marker selection can be performed with different biological questions
-in mind.
+in mind. Here, both the `runUMAP` and `runTSNE` function are not deterministic, 
+meaning they produce different results across different runs. We therefore
+set a `seed` in this chunk for reproducibility purposes.
 
 ```{r dimred, message=FALSE}
 library(scater)

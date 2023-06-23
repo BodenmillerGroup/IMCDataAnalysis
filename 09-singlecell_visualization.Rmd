@@ -97,6 +97,7 @@ library(viridis)
 p1 <- dittoDimPlot(spe, 
                    var = "celltype", 
                    reduction.use = "UMAP_mnnCorrected", 
+                   size = 0.2,
                    do.label = TRUE) +
   scale_color_manual(values = metadata(spe)$color_vectors$celltype) +
   theme(legend.title = element_blank()) +

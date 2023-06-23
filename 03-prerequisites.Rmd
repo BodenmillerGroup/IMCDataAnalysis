@@ -136,6 +136,7 @@ Data analysis:
 Data visualization:
 
 * [cytomapper](https://bioconductor.org/packages/release/bioc/html/cytomapper.html) version `r packageVersion("cytomapper")`
+* [cytoviewer](https://bioconductor.org/packages/release/bioc/html/cytoviewer.html) version `r packageVersion("cytoviewer")`
 * [dittoSeq](https://bioconductor.org/packages/release/bioc/html/dittoSeq.html) version `r packageVersion("dittoSeq")`
 
 Tidy R:

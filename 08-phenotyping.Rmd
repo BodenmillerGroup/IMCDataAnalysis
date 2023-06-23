@@ -719,7 +719,10 @@ parameters. In the case of the chosen random forest model (`method = "rf"`), we
 only need to estimate a single parameters (`mtry`) which corresponds to the
 number of variables randomly sampled as candidates at each split. To estimate
 the best parameter, we will perform a 5-fold cross validation (set within
-`trainControl`) over a tune length of 5 entries to `mtry`.
+`trainControl`) over a tune length of 5 entries to `mtry`. In the following
+code chunk, the `createDataPartition` and the `train` function are not deterministic,
+meaning they return different results across different runs. We therefore set
+a `seed` here for both functions.
 
 ```{r, echo=FALSE}
 start_time <- Sys.time()
