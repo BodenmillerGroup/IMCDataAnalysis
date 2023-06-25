@@ -107,6 +107,7 @@ library(bluster)
 library(scran)
 library(lisaClust)
 library(caret)
+library(cytoviewer)
 ```
 
 ### Major package versions
