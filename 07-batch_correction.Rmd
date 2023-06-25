@@ -777,22 +777,7 @@ test_that("fastMNN is reproducible", {
 "Patient1_001_125", "Patient1_001_126", "Patient1_001_127", "Patient1_001_128", 
 "Patient1_001_129", "Patient1_001_130"), NULL)))
     
-    
-})
-
-```
-
-```{r testing-2, include=FALSE}
-library(testthat)
-
-expect_equal(reducedDimNames(spe), c("UMAP", "TSNE", "fastMNN", "UMAP_mnnCorrected", "PCA", "harmony", 
-"UMAP_harmony", "seurat", "UMAP_seurat"))
-
-expect_equal(dim(reducedDim(spe, "fastMNN")), c(47794L, 36L))
-
-expect_equal(dim(reducedDim(spe, "UMAP_mnnCorrected")), c(47794L, 2L))
-
-expect_equal(head(reducedDim(spe, "UMAP_mnnCorrected"), n = 10),
+    expect_equal(head(reducedDim(spe, "UMAP_mnnCorrected"), n = 10),
              structure(c(-5.68709674774978, -4.08356181084487, -3.9715031713185,
 0.406542685634164, -6.86016717850539, -3.45563093125197, -2.17657152115676,
 1.60496243537095, -8.83462444245193, -5.39916101395461, 0.205106232490877,
@@ -829,6 +814,21 @@ expect_equal(reducedDim(spe, "UMAP_mnnCorrected")[100:130,],
 "Patient1_001_122", "Patient1_001_123", "Patient1_001_124", "Patient1_001_125",
 "Patient1_001_126", "Patient1_001_127", "Patient1_001_128", "Patient1_001_129",
 "Patient1_001_130"), c("UMAP1", "UMAP2"))))
+    
+    
+})
+
+```
+
+```{r testing-2, include=FALSE}
+library(testthat)
+
+expect_equal(reducedDimNames(spe), c("UMAP", "TSNE", "fastMNN", "UMAP_mnnCorrected", "PCA", "harmony", 
+"UMAP_harmony", "seurat", "UMAP_seurat"))
+
+expect_equal(dim(reducedDim(spe, "fastMNN")), c(47794L, 36L))
+
+expect_equal(dim(reducedDim(spe, "UMAP_mnnCorrected")), c(47794L, 2L))
 
 expect_equal(dim(reducedDim(spe, "harmony")), c(47794L, 30L))
 
