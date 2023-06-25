@@ -814,14 +814,6 @@ expect_equal(reducedDim(spe, "UMAP_mnnCorrected")[100:130,],
 "Patient1_001_122", "Patient1_001_123", "Patient1_001_124", "Patient1_001_125",
 "Patient1_001_126", "Patient1_001_127", "Patient1_001_128", "Patient1_001_129",
 "Patient1_001_130"), c("UMAP1", "UMAP2"))))
-    
-    
-})
-
-```
-
-```{r testing-2, include=FALSE}
-library(testthat)
 
 expect_equal(reducedDimNames(spe), c("UMAP", "TSNE", "fastMNN", "UMAP_mnnCorrected", "PCA", "harmony", 
 "UMAP_harmony", "seurat", "UMAP_seurat"))
@@ -1339,6 +1331,10 @@ expect_equal(reducedDim(spe, "UMAP_seurat")[100:130,],
 "Patient1_001_122", "Patient1_001_123", "Patient1_001_124", "Patient1_001_125",
 "Patient1_001_126", "Patient1_001_127", "Patient1_001_128", "Patient1_001_129",
 "Patient1_001_130"), c("UMAP1", "UMAP2"))))
+    
+    
+})
+
 ```
 
 ## Session Info
