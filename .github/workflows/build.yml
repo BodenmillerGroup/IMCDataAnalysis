@@ -55,7 +55,7 @@ jobs:
           ghcr.io/bodenmillergroup/imcdataanalysis:latest
 
   bookdown:
-    runs-on: ubuntu-latest
+    runs-on: macos-11
     if: ${{ always() }}
     needs: docker-build-push
     container: ghcr.io/bodenmillergroup/imcdataanalysis:latest
@@ -76,7 +76,7 @@ jobs:
           path: docs/
   
   checkout-and-deploy:
-    runs-on: ubuntu-latest
+    runs-on: macos-11
     needs: bookdown
     steps:
       - name: Checkout
