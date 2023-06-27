@@ -69,10 +69,12 @@ jobs:
         timeout-minutes: 12
 
       - name: Render Book
-        run: |
-          docker pull ghcr.io/bodenmillergroup/imcdataanalysis:latest
-          docker run -v .:/home/rstudio/IMCDataAnalysis ghcr.io/bodenmillergroup/imcdataanalysis:latest
-          docker exec imcdataanalysis:latest Rscript -e 'bookdown::render_book("index.Rmd", new_session = TRUE)'
+        uses: addnab/docker-run-action@v3
+        with:
+          image: ghcr.io/bodenmillergroup/imcdataanalysis:latest
+          options: -v ${{ github.workspace }}:/home/rstudio/IMCDataAnalysis
+          run: |
+            Rscript -e 'bookdown::render_book("/home/rstudio/IMCDataAnalysis", new_session = TRUE)'
         
       - name: Upload artifact    
         uses: actions/upload-artifact@v2
