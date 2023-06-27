@@ -58,19 +58,21 @@ jobs:
     runs-on: macos-11
     if: ${{ always() }}
     needs: docker-build-push
-    container: ghcr.io/bodenmillergroup/imcdataanalysis:latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     
     steps:
-      - uses: docker-practice/actions-setup-docker@master
-        timeout-minutes: 12
-    
       - name: Checkout
         uses: actions/checkout@v2
 
+      - uses: docker-practice/actions-setup-docker@master
+        timeout-minutes: 12
+
       - name: Render Book
-        run: Rscript -e 'bookdown::render_book("index.Rmd", new_session = TRUE)'
+        run: |
+          docker pull ghcr.io/bodenmillergroup/imcdataanalysis:latest
+          docker run -v .:/home/rstudio/IMCDataAnalysis ghcr.io/bodenmillergroup/imcdataanalysis:latest
+          docker exec imcdataanalysis:latest Rscript -e 'bookdown::render_book("index.Rmd", new_session = TRUE)'
         
       - name: Upload artifact    
         uses: actions/upload-artifact@v2
