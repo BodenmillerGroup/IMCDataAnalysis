@@ -65,12 +65,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-        
-      - name: Setup Docker on macOS
-        uses: douglascamata/setup-docker-macos-action@v1-alpha
 
       - name: Render Book
-        run: Rscript -e 'bookdown::render_book("index.Rmd", new_session = TRUE)'
+        run: |
+          brew install docker
+          colima start
+          Rscript -e 'bookdown::render_book("index.Rmd", new_session = TRUE)'
         
       - name: Upload artifact    
         uses: actions/upload-artifact@v2
