@@ -63,14 +63,14 @@ jobs:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     
     steps:
+      - uses: docker-practice/actions-setup-docker@master
+        timeout-minutes: 12
+    
       - name: Checkout
         uses: actions/checkout@v2
 
       - name: Render Book
-        run: |
-          brew install docker
-          colima start
-          Rscript -e 'bookdown::render_book("index.Rmd", new_session = TRUE)'
+        run: Rscript -e 'bookdown::render_book("index.Rmd", new_session = TRUE)'
         
       - name: Upload artifact    
         uses: actions/upload-artifact@v2
