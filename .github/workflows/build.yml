@@ -66,12 +66,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
         
-      - name: Install Colima
-        run: brew install docker colima
-    
-      - name: Start Colima
-        run: colima start
-      
+      - name: Setup Docker on macOS
+        uses: douglascamata/setup-docker-macos-action@v1-alpha
+
       - name: Render Book
         run: Rscript -e 'bookdown::render_book("index.Rmd", new_session = TRUE)'
         
@@ -80,9 +77,6 @@ jobs:
         with:
           name: docs
           path: docs/
-    
-      - name: Stop Colima
-        run: colima stop
   
   checkout-and-deploy:
     runs-on: ubuntu-latest
