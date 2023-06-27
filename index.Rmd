@@ -14,15 +14,14 @@ description: "This bookdown project highlights possible down-stream analyses per
 # IMC Data Analysis Workflow {#preamble}
 
 This workflow highlights the use of common R/Bioconductor packages
-to analyze single-cell data obtained from segmented imaging mass cytometry (IMC)
-images. We will not perform multi-channel image processing and segmentation in R
+to analyze single-cell data obtained from segmented multi-channel images. We will not perform multi-channel image processing and segmentation in R
 but rather link to available approaches in Section \@ref(processing). While we
-use IMC data as an example, the concepts presented here can be applied to images
+use imaging mass zytometry (IMC) data as an example, the concepts presented here can be applied to images
 obtained by other highly-multiplexed imaging technologies (e.g. CODEX, MIBI,
 mIF, etc.).
 
 We will give an introduction to IMC in Section \@ref(intro) and highlight
-strategies to extract single-cell data from IMC images in Section
+strategies to extract single-cell data from multi-channel images in Section
 \@ref(processing).
 
 Reproducible code written in R is available from Section \@ref(prerequisites)
@@ -32,10 +31,24 @@ onwards and the workflow can be largely divided into the following parts:
 2. Image- and cell-level quality control, low-dimensional visualization
 3. Sample/batch effect correction
 4. Cell phenotyping via clustering or classification
-5. Image visualization
+5. Single-cell and image visualization
 6. Spatial analyses
 
+## Disclaimer
+
+Multi-channel image and spatial, single-cell analysis is complex and we
+highlight an example workflow here. However, this workflow is not complete and
+does not cover all possible aspects of exploratory data analysis. Instead, we
+demonstrate this workflow as a solid basis that supports other aspects of data
+analysis. It offers interoperability with other packages for single-cell and
+spatial analysis and the user will need to become familiar with the general
+framework to efficiently analyse data obtained from multiplexed imaging
+technologies.
+
 ## Feedback and contributing
+
+We provide the workflow as an open-source resource. It does not mean that
+this workflow is tested on all possible datasets or biological questions.
 
 If you notice an issue or missing information, please report an issue
 [here](https://github.com/BodenmillerGroup/IMCDataAnalysis/issues). We also

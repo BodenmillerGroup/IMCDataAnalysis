@@ -4,7 +4,7 @@
 
 This section highlights how to generate a spillover matrix from individually
 acquired single metal spots on an agarose slide. Each spot needs to be imaged as
-its own acquisition/ROI and individual .txt files containing the pixel
+its own acquisition/ROI and individual TXT files containing the pixel
 intensities per spot need to be available. For complete details on the spillover
 correction approach, please refer to [the original
 publication](https://www.cell.com/cell-systems/fulltext/S2405-4712(18)30063-2) [@Chevrier2017].
@@ -16,24 +16,24 @@ publication](https://www.cell.com/cell-systems/fulltext/S2405-4712(18)30063-2) [
 * Remove the slide and prop it up against a support to allow the excess agarose to run off onto paper towels.  
 * Allow the slide to dry completely (at least 30 minutes).  
 * Retrieve all the antibody conjugates used in the panel for which the spillover matrix is to be generated and place them on ice. 
-* Arrange them in a known order (e.g. mass of the conjugated metal).  
+* Arrange them in a known order (e.g., mass of the conjugated metal).  
 * Pipette 0.3 µl spots of 0.4% trypan blue dye into an array on the slide. Prepare one spot per antibody, and make sure the spots are well separated. 
 * Pipette 0.3 µl of each antibody conjugate (usually at 0.5 mg/ml) onto a unique blue spot, taking care to avoid different antibodies bleeding into each other. Note the exact location of each conjugate on the slide. 
 * Let the spots dry completely, at least 1 hour. 
 
 **Spillover slide acquisition:**  
 
-* Create a .jpeg or .png image of the slide using a mobile phone camera or flat-bed scanner.  
+* Create a JPEG or PNG image of the slide using a mobile phone camera or flat-bed scanner.  
 * In the CyTOF software, create a new file and import the slide image into it. 
 * Create a panorama across all the spots to visualize their locations.  
 * Within each spot, create a region of interest (ROI) with a width of 200 pixels and a height of 10 pixels.  
-* Name each ROI with the mass and name of the metal conjugate contained in the spot, e.g "Ir193" or "Ho165". This will be how each .txt file is named. 
+* Name each ROI with the mass and name of the metal conjugate contained in the spot, e.g "Ir193" or "Ho165". This will be how each TXT file is named. 
 * Set the profiling type of each ROI to "Local".  
 * Apply the antibody panel to all the ROIs. This panel should contain all (or more) of the isotopes in the panel, with the correct metal specified. For example: if the metal used is Barium 138, make sure this, rather than Lanthanum 138, is selected. 
 * Save the file, make sure "Generate Text File" is selected, and start the acquisition. 
 
 This procedure will generate an MCD file similar to the one available on zenodo:
-[https://zenodo.org/record/5949116/files/compensation.zip](https://zenodo.org/record/5949116/files/compensation.zip)
+[10.5281/zenodo.5949115](https://doi.org/10.5281/zenodo.5949115)
 
 The original code of the spillover correction manuscript is available on Github
 [here](https://github.com/BodenmillerGroup/cyTOFcompensation); however, due to
@@ -41,9 +41,9 @@ changes in the
 [CATALYST](https://bioconductor.org/packages/release/bioc/html/CATALYST.html)
 package, users were not able to reproduce the analysis using the newest software
 versions. The following workflow uses the newest package versions to generate a
-spillover matrix.
+spillover matrix and perform spillover correction.
 
-In brief, the highlighted workflow comprises 5 steps:
+In brief, the highlighted workflow comprises 9 steps:
 
 1. Reading in the data
 2. Quality control 
@@ -62,23 +62,25 @@ spots and save it for later use.
 
 ### Read in the data
 
-Here, we will read in the individual .txt files into a `SingleCellExperiment`
+Here, we will read in the individual TXT files into a `SingleCellExperiment`
 object. This object can be used directly by the `CATALYST` package to estimate
 the spillover.
 
-For this to work, the .txt file names need to contain the spotted metal isotope
+For this to work, the TXT file names need to contain the spotted metal isotope
 name. By default, the first occurrence of the isotope in the format `(mt)(mass)`
 (e.g. `Sm152` for Samarium isotope with the atomic mass 152) will be used as
 spot identifier. Alternatively, a named list of already read-in pixel intensities
-can be provided. For more inforation, please refer to the man page `?readSCEfromTXT`.
+can be provided. For more information, please refer to the man page `?readSCEfromTXT`.
 
 For further downstream analysis, we will asinh-transform the data using a
 cofactor of 5; a common transformation for CyTOF data [@Bendall2011].
+As the pixel intensities are larger than the cell intensities, the cofactor
+here is larger than the cofactor when transforming the mean cell intensities.
 
 ```{r read-txts, message=FALSE}
 library(imcRtools)
 
-# Create SingleCellExperiment from .txt files
+# Create SingleCellExperiment from TXT files
 sce <- readSCEfromTXT("data/compensation/") 
 assay(sce, "exprs") <- asinh(counts(sce)/5)
 ```
@@ -95,7 +97,7 @@ summed (see [Optional pixel binning](#pixel_binning)).
 
 2. Each spotted metal (row) should show the highest median pixel intensity in its
 corresponding channel (column). If this is not the case, either the naming of the
-.txt files was incorrect or the incorrect metal was spotted.
+TXT files was incorrect or the incorrect metal was spotted.
 
 ```{r QC-heatmap, message = FALSE, fig.width=7, fig.height=7}
 # Log10 median pixel counts per spot and channel
@@ -105,8 +107,8 @@ plotSpotHeatmap(sce)
 plotSpotHeatmap(sce, log = FALSE, threshold = 200)
 ```
 
-As we can see, all median pixel intensities are > 200 counts for each spot.
-We also observe acquired channels for which no spot was placed (Xe134, Ir191, Ir193). 
+As we can see, nearly all median pixel intensities are > 200 counts for each spot.
+We also observe acquired channels for which no spot was placed (e.g., Xe134, Ir191, Ir193). 
 
 ### Optional pixel binning {#pixel_binning}
 
@@ -185,7 +187,7 @@ cur_table["0",] / colSums(cur_table)
 ```
 
 We can see here, that all pixels were assigned to the right mass and that all
-pixel sets are made up of > 1000 pixels.
+pixel sets are made up of > 800 pixels.
 
 However, in cases where incorrect assignment occurred or where few pixels were
 measured for some spots, the `imcRtools` package exports a simple helper
@@ -194,6 +196,14 @@ function to exclude pixels based on these criteria:
 ```{r pixel-filtering}
 sce <- filterPixels(sce, minevents = 40, correct_pixels = TRUE)
 ```
+
+In the `filterPixels` function, the `minevents` parameter specifies the threshold
+under which correctly assigned pixel sets are excluded from spillover
+estimation. The `correct_pixels` parameter indicates whether pixels that were
+assigned to masses other than the spotted mass should be excluded from spillover
+estimation. The default values often result in sufficient pixel filtering;
+however, if very few pixels (~100) are measured per spot, the `minevents`
+parameter value needs to be lowered.
 
 ### Compute spillover matrix
 
@@ -213,7 +223,7 @@ isotope_list$Ar <- 80
 
 plotSpillmat(sce, isotope_list = isotope_list)
 
-# Save spillover matrix in new object
+# Save spillover matrix in variable
 sm <- metadata(sce)$spillover_matrix
 ```
 
@@ -256,7 +266,7 @@ spe <- compCytof(spe, sm,
 ```
 
 To check the effect of channel spillover compensation, the expression of markers
-that are affected by spillover (e.g., E cadherin in channel Yb173 and CD303 in
+that are affected by spillover (e.g., E-cadherin in channel Yb173 and CD303 in
 channel Yb174) can be visualized in form of scatter plots before and after
 compensation.
 
@@ -309,17 +319,15 @@ metals. Please refer to `?compCytof` for more information how metals in the
 spillover matrix are matched to acquired channels in the `SingleCellExperiment`
 object.
 
-The spillover matrix can now be adapted to exclude channels that are not part of
-the measurement (`keep == 0`).
+The spillover matrix can now be adapted to exclude channels that were not kept
+for downstream analysis.
 
 ```{r}
-library(tiff)
-panel <- read.csv("data/steinbock/panel.csv")
-adapted_sm <- adaptSpillmat(sm, paste0(panel$channel[panel$keep == 1], "Di"), 
+adapted_sm <- adaptSpillmat(sm, channelNames(images), 
                             isotope_list = isotope_list)
 ```
 
-The adpated spillover matrix now matches the `channelNames` of the
+The adapted spillover matrix now matches the `channelNames` of the
 `CytoImageList` object and can be used to perform pixel-level spillover
 compensation. Here, we parallelise the image compensation on all available minus 2 cores. When
 working on Windows, you will need to use the `SnowParam` function instead of
@@ -327,7 +335,6 @@ working on Windows, you will need to use the `SnowParam` function instead of
 
 ```{r image-compensation, message = FALSE}
 library(BiocParallel)
-library(parallel)
 
 images_comp <- compImage(images, adapted_sm, 
                          BPPARAM = MulticoreParam())
@@ -357,6 +364,10 @@ For convenience, we will re-set the `channelNames` to their biological targtes:
 
 ```{r re-set-channels}
 channelNames(images_comp) <- rownames(spe)
+```
+
+```{r, include=FALSE}
+rm(images)
 ```
 
 ## Write out compensated images

@@ -55,7 +55,7 @@ jobs:
           ghcr.io/bodenmillergroup/imcdataanalysis:latest
 
   bookdown:
-    runs-on: ubuntu-latest
+    runs-on: macos-11
     if: ${{ always() }}
     needs: docker-build-push
     container: ghcr.io/bodenmillergroup/imcdataanalysis:latest
@@ -65,6 +65,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+        
+      - name: Install Colima
+        run: brew install docker colima
+    
+      - name: Start Colima
+        run: colima start
       
       - name: Render Book
         run: Rscript -e 'bookdown::render_book("index.Rmd", new_session = TRUE)'
@@ -74,6 +80,9 @@ jobs:
         with:
           name: docs
           path: docs/
+    
+      - name: Stop Colima
+        run: colima stop
   
   checkout-and-deploy:
     runs-on: ubuntu-latest
