@@ -55,7 +55,7 @@ jobs:
           ghcr.io/bodenmillergroup/imcdataanalysis:latest
 
   bookdown:
-    runs-on: macos-11
+    runs-on: macos-latest
     if: ${{ always() }}
     needs: docker-build-push
     env:

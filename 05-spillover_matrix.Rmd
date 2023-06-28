@@ -337,7 +337,7 @@ working on Windows, you will need to use the `SnowParam` function instead of
 library(BiocParallel)
 
 images_comp <- compImage(images, adapted_sm, 
-                         BPPARAM = SerialParam())
+                         BPPARAM = MulticoreParam())
 ```
 
 As a sanity check, we will visualize the image before and after compensation:
