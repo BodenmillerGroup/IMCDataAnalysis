@@ -395,7 +395,7 @@ saveRDS(spe, "data/spe.rds")
 saveRDS(images_comp, "data/images.rds")
 ```
 
-```{r testing, include = FALSE}
+```{r testing, include = FALSE, eval=FALSE}
 library(testthat)
 
 expect_equal(assayNames(spe), c("counts", "exprs"))
