@@ -55,22 +55,19 @@ jobs:
           ghcr.io/bodenmillergroup/imcdataanalysis:latest
 
   bookdown:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     if: ${{ always() }}
     needs: docker-build-push
+    container: ghcr.io/bodenmillergroup/imcdataanalysis:latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-
+      
       - name: Render Book
-        run: |
-          brew install docker
-          colima start
-          docker pull ghcr.io/bodenmillergroup/imcdataanalysis:latest
-          docker run -v ${{ github.workspace }}:/home/rstudio/IMCDataAnalysis ghcr.io/bodenmillergroup/imcdataanalysis:latest Rscript -e 'bookdown::render_book("/home/rstudio/IMCDataAnalysis", new_session = TRUE)'
+        run: Rscript -e 'bookdown::render_book("index.Rmd", new_session = TRUE)'
         
       - name: Upload artifact    
         uses: actions/upload-artifact@v2
