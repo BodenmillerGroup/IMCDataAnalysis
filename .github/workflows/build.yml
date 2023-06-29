@@ -65,11 +65,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - uses: docker-practice/actions-setup-docker@master
-        timeout-minutes: 12
-
       - name: Render Book
         run: |
+          brew install docker
+          colima start
           docker pull ghcr.io/bodenmillergroup/imcdataanalysis:latest
           docker run -v ${{ github.workspace }}:/home/rstudio/IMCDataAnalysis ghcr.io/bodenmillergroup/imcdataanalysis:latest Rscript -e 'bookdown::render_book("/home/rstudio/IMCDataAnalysis", new_session = TRUE)'
         
