@@ -133,7 +133,7 @@ of background pixels. We compute this measure as well as the mean signal
 intensity per image. The plot below shows the average SNR _versus_ the average
 signal intensity across all images.
 
-```{r image-snr, message=FALSE}
+```{r image-snr, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(ggrepel)
 library(EBImage)
@@ -180,7 +180,7 @@ Otsu thesholding and SNR calculation does not perform well if the markers are
 lowly abundant. In the next code chunk, we will remove markers that have 
 a positive signal of below 2 per image.  
 
-```{r, snr-adjusted}
+```{r, snr-adjusted, message=FALSE, warning=FALSE}
 cur_snr <- cur_snr %>% 
     pivot_wider(names_from = name, values_from = value) %>%
     filter(ps > 2) %>%
