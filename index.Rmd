@@ -69,6 +69,12 @@ Jonas Windhager, Bernd Bodenmiller, Nils Eling (2020). An end-to-end workflow fo
     bioRxiv, doi: 10.1101/2021.11.12.468357
 ```
 
+## Changelog
+
+```{r echo=FALSE}
+htmltools::includeMarkdown('CHANGELOG.md')
+```
+
 ---
 
 <a name="email"><sup>*</sup></a> nils.eling@uzh.ch  

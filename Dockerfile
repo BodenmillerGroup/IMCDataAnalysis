@@ -7,7 +7,7 @@ RUN apt-get -y update \
     && apt-get clean \
     && rm -rf /var/lib/apt/ilists/*
 
-RUN R -e 'install.packages(c("rmarkdown", "bookdown", "pheatmap", "viridis", "zoo", "BiocManager", "devtools", "testthat", "tiff", \
+RUN R -e 'install.packages(c("rmarkdown", "markdown", "bookdown", "pheatmap", "viridis", "zoo", "BiocManager", "devtools", "testthat", "tiff", \
                              "distill", "ggrepel", "patchwork", "mclust", "RColorBrewer", "uwot", "Rtsne", "harmony", \
                              "Seurat", "SeuratObject", "cowplot", "kohonen", "caret", "randomForest", "ggridges", "cowplot", \
                              "gridGraphics", "scales", "tiff", "harmony", "Matrix"))'

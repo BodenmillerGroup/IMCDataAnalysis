@@ -50,8 +50,11 @@ needs to be provided. For graphs constructed via Delaunay triangulation,
 the `max_dist` parameter can be set to avoid unusually large connections at the
 edge of the image.
 
-```{r build-spatial-graphs}
+```{r load-libraries, message=FALSE, warning=FALSE}
 library(imcRtools)
+```
+
+```{r build-spatial-graphs}
 spe <- buildSpatialGraph(spe, img_id = "sample_id", type = "knn", k = 20)
 spe <- buildSpatialGraph(spe, img_id = "sample_id", type = "expansion", threshold = 20)
 spe <- buildSpatialGraph(spe, img_id = "sample_id", type = "delaunay", max_dist = 20)
