@@ -1,6 +1,6 @@
 # Multi-channel image processing {#processing}
 
-This book focueses on common analysis steps of spatially-resolved single-cell data
+This book focuses on common analysis steps of spatially-resolved single-cell data
 **after** image segmentation and feature extraction. In this chapter, the sections
 describe the processing of multiplexed imaging data, including file type
 conversion, image segmentation, feature extraction and data export. To obtain

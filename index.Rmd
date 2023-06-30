@@ -71,7 +71,9 @@ Jonas Windhager, Bernd Bodenmiller, Nils Eling (2020). An end-to-end workflow fo
 
 ## Changelog
 
-@@include[CHANGELOG.md](CHANGELOG.md)
+```{r echo=FALSE}
+htmltools::includeMarkdown('CHANGELOG.md')
+```
 
 ---
 
