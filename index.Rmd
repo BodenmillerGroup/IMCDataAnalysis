@@ -16,7 +16,7 @@ description: "This bookdown project highlights possible down-stream analyses per
 This workflow highlights the use of common R/Bioconductor packages
 to analyze single-cell data obtained from segmented multi-channel images. We will not perform multi-channel image processing and segmentation in R
 but rather link to available approaches in Section \@ref(processing). While we
-use imaging mass zytometry (IMC) data as an example, the concepts presented here can be applied to images
+use imaging mass cytometry (IMC) data as an example, the concepts presented here can be applied to images
 obtained by other highly-multiplexed imaging technologies (e.g. CODEX, MIBI,
 mIF, etc.).
 
