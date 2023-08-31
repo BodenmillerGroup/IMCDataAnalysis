@@ -1,4 +1,4 @@
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6806449.svg)](https://doi.org/10.5281/zenodo.6806449)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.8100220.svg)](https://doi.org/10.5281/zenodo.6806448)
 
 # R based analysis workflow for multiplexed imaging data
 
