@@ -208,7 +208,7 @@ library(imcRtools)
 spe <- read_steinbock("data/steinbock/")
 ```
 
-The step took 0.46 minutes.
+The step took 0.47 minutes.
 
 After reading in the single-cell data, the `SpatialExperiment` object
 needs to be further processed. First, the column names are set based on
@@ -260,7 +260,7 @@ images <- loadImages("data/steinbock/img/")
 channelNames(images) <- rownames(spe)
 ```
 
-The step took 0.92 minutes.
+The step took 0.48 minutes.
 
 Read in segmentation masks as a `CytoImageList` container.
 
@@ -270,7 +270,7 @@ masks <- loadImages("data/steinbock/masks/", as.is = TRUE)
 
     ## All files in the provided location will be read in.
 
-The step took 0.02 minutes.
+The step took 0.01 minutes.
 
 For downstream visualization and analysis tasks, additional metadata
 needs to be added to the `CytoImageList` objects storing the
@@ -326,7 +326,7 @@ sce <- readSCEfromTXT("data/compensation/")
 assay(sce, "exprs") <- asinh(counts(sce)/5)
 ```
 
-The step took 0.12 minutes.
+The step took 0.06 minutes.
 
 CRITICAL: The provided data of the spillover slide were specifically
 acquired for this dataset and cannot be applied to other datasets. It is
@@ -350,7 +350,7 @@ counts).
 sce2 <- binAcrossPixels(sce, bin_size = 10)
 ```
 
-The step took 0.26 minutes.
+The step took 0.21 minutes.
 
 Filter incorrectly assigned pixels. The following step uses functions
 provided by the CATALYST package to “de-barcode” the pixels. Based on
@@ -391,7 +391,7 @@ sce <- estCutoffs(sce)
 sce <- applyCutoffs(sce)
 ```
 
-The step took 0.15 minutes.
+The step took 0.14 minutes.
 
 Observe the number of correctly and incorrectly assigned pixels per
 spot. The heatmap depicts the number of pixels assigned to each spot on
@@ -498,7 +498,7 @@ assay(spe, "exprs") <- assay(spe, "compexprs")
 assay(spe, "compcounts") <- assay(spe, "compexprs") <- NULL
 ```
 
-The step took 0.16 minutes.
+The step took 0.12 minutes.
 
 Perform channel-to-channel spillover correction on multi-channel images.
 To this end, the previously computed spillover matrix needs to be
@@ -568,7 +568,7 @@ plotPixels(images_comp[5], colour_by = "Yb174Di",
 channelNames(images_comp) <- rownames(spe)
 ```
 
-The step took 10.36 minutes.
+The step took 9.22 minutes.
 
 ## Quality control
 
@@ -708,7 +708,7 @@ dittoDimPlot(spe, var = "patient_id",
 
 ![](protocol_files/figure-markdown_github/umap-1.png)
 
-The step took 0.67 minutes.
+The step took 0.57 minutes.
 
 CRITICAL: Differences in marker distributions or non-overlapping samples
 on the UMAP visualization can indicate sample-to-sample differences in
@@ -764,7 +764,7 @@ phenotypes. These markers should be expressed in cells that cluster in
 the UMAP embedding. Other batch effect correction approaches such as
 `Seurat` and `harmony` can be used to improve data integration.
 
-The step took 3.54 minutes.
+The step took 2.77 minutes.
 
 ## Cell phenotyping
 
@@ -821,7 +821,7 @@ ggplot(data.frame(method = names(sil),
 
 ![](protocol_files/figure-markdown_github/cluster-sweep-1.png)
 
-The step took 7.11 minutes.
+The step took 5.68 minutes.
 
 CRITICAL: For each dataset, parameter estimation should be performed
 independently. For large datasets, the function takes a long time to
@@ -845,7 +845,7 @@ clusters <- clusterCells(spe,
 spe$nn_clusters <- clusters
 ```
 
-The step took 1.86 minutes.
+The step took 1.6 minutes.
 
 To annotate the individual clusters based on cell phenotypes contained
 within, the marker expression per cluster can be visualized in the form
@@ -1023,7 +1023,7 @@ rffit <- train(x = cur_mat,
                trControl = fitControl)
 ```
 
-The step took 15.89 minutes.
+The step took 9.92 minutes.
 
 Assess the classifier performance by computing the confusion matrix of
 the test dataset. The `confusionMatrix` function compares the predicted
@@ -1247,7 +1247,7 @@ plotSpatial(spe[,spe$celltype == "Tumor"],
 
 ![](protocol_files/figure-markdown_github/spatial-community-1.png)
 
-The step took 0.12 minutes.
+The step took 0.07 minutes.
 
 After detecting spatial communities, a number of downstream analyses can
 be performed. These include (i) computing the cell phenotype fraction
@@ -1311,7 +1311,7 @@ pheatmap(mat,
 
 ![](protocol_files/figure-markdown_github/unnamed-chunk-63-1.png)
 
-The step took 0.35 minutes.
+The step took 0.17 minutes.
 
 CRITICAL: A parameter sweep should be performed to estimate the optimal
 value for `k`. However, with prior knowledge on the expected tissue
@@ -1391,14 +1391,14 @@ plotSpatialContext(spe,
 
 ![](protocol_files/figure-markdown_github/unnamed-chunk-67-1.png)
 
-The step took 0.48 minutes.
+The step took 0.29 minutes.
 
 Perform patch detection analysis. The `patchDetection` function of the
 `imcRtools` package detects fully connected components of cells of
-interest, constructs a convex hull around each component, and expands
+interest, constructs a concave hull around each component, and expands
 this hull to include neighboring cells. Below, we detect connected tumor
 components made up of at least 10 cells, and we slightly expand the
-convex hull to include cells within the patch.
+concave hull to include cells within the patch.
 
 ``` r
 spe <- patchDetection(spe, 
@@ -1422,7 +1422,7 @@ plotSpatial(spe,
 
 ![](protocol_files/figure-markdown_github/unnamed-chunk-71-1.png)
 
-The step took 0.48 minutes.
+The step took 0.36 minutes.
 
 Perform interaction analysis as proposed by Schapiro et al. This
 approach detects cell phenotype pairs that show stronger (“interaction”)
@@ -1465,7 +1465,7 @@ ggplot(summed_sigvals) +
 
 ![](protocol_files/figure-markdown_github/unnamed-chunk-75-1.png)
 
-The step took 10.67 minutes.
+The step took 7.39 minutes.
 
 We finally save out the `SpatialExperiment` object.
 
