@@ -1580,9 +1580,9 @@ ggsave("outputs/Fig19_spatial-context-graph.pdf", p, width = 7, height = 5)
 
 Perform patch detection analysis. The `patchDetection` function of the
 `imcRtools` package detects fully connected components of cells of interest,
-constructs a convex hull around each component, and expands this hull to include
+constructs a concave hull around each component, and expands this hull to include
 neighboring cells. Below, we detect connected tumor components made up of at
-least 10 cells, and we slightly expand the convex hull to include cells within
+least 10 cells, and we slightly expand the concave hull to include cells within
 the patch.
 
 ```{r, echo=FALSE}
