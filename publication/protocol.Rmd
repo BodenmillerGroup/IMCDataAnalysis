@@ -35,8 +35,9 @@ author:
   - Institute for Molecular Health Sciences, ETH Zurich, Zurich, Switzerland
   email: nils.eling@dqbm.uzh.ch
 output:
-    BiocStyle::html_document:
-        toc_float: yes
+  md_document:
+    variant: markdown_github
+    toc: true
 abstract: |
     Multiplexed imaging enables the simultaneous spatial profiling of dozens of biological molecules in tissues at single-cell resolution. Extracting biologically relevant information such as the spatial distribution of cell phenotypes from multiplexed tissue imaging data involves a number of computational tasks, including image segmentation, feature extraction, and spatially resolved single-cell analysis. Here, we present an end-to-end workflow for multiplexed tissue image processing and analysis, that integrates a number of previously developed computational tools to enable these tasks in a user-friendly and customizable fashion. For data quality assessment, we highlight the utility of napari-imc for interactively inspecting raw imaging data and the cytomapper R/Bioconductor package for image visualization in R. Raw data preprocessing, image segmentation and feature extraction are performed using the steinbock toolkit. We showcase two alternative approaches for segmenting cells based on supervised pixel classification and pre-trained deep learning models. The extracted single-cell data is then read, processed and analyzed in R. The protocol describes the use of community-established data containers, facilitating the application of  R/Bioconductor packages for dimensionality reduction, single-cell visualization and phenotyping. We provide instructions to perform spatially resolved single-cell analysis, including community analysis, cellular neighborhood detection and cell-cell interaction testing using the imcRtools R/Bioconductor package. The workflow has been previously applied to imaging mass cytometry data, but can be easily adapted to other highly multiplexed imaging technologies. This protocol can be implemented by researchers with basic bioinformatics training, and analysis of the provided dataset can be completed within 5 to 6 hours. An extended version of the workflow can be accessed at [https://bodenmillergroup.github.io/IMCDataAnalysis/](https://bodenmillergroup.github.io/IMCDataAnalysis/). 
 
@@ -1042,7 +1043,7 @@ dev.off()
 ```
 
 After observing cluster-specific expression patterns, the individual clusters
-can be annotated. For example, cluster 11 shows high expression of the B cell
+can be annotated. For example, cluster 12 shows high expression of the B cell
 marker CD20 and can therefore be labeled as “Bcell”.
 
 ```{r, message=TRUE}

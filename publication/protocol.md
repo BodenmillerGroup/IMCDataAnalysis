@@ -208,7 +208,7 @@ library(imcRtools)
 spe <- read_steinbock("data/steinbock/")
 ```
 
-The step took 0.47 minutes.
+The step took 0.42 minutes.
 
 After reading in the single-cell data, the `SpatialExperiment` object
 needs to be further processed. First, the column names are set based on
@@ -260,7 +260,7 @@ images <- loadImages("data/steinbock/img/")
 channelNames(images) <- rownames(spe)
 ```
 
-The step took 0.48 minutes.
+The step took 0.59 minutes.
 
 Read in segmentation masks as a `CytoImageList` container.
 
@@ -326,7 +326,7 @@ sce <- readSCEfromTXT("data/compensation/")
 assay(sce, "exprs") <- asinh(counts(sce)/5)
 ```
 
-The step took 0.06 minutes.
+The step took 0.05 minutes.
 
 CRITICAL: The provided data of the spillover slide were specifically
 acquired for this dataset and cannot be applied to other datasets. It is
@@ -449,7 +449,7 @@ sce <- computeSpillmat(sce)
 sm <- metadata(sce)$spillover_matrix
 ```
 
-The step took 0.05 minutes.
+The step took 0.04 minutes.
 
 Perform single-cell data compensation using the
 [CATALYST](https://github.com/HelenaLC/CATALYST) package. The
@@ -568,7 +568,7 @@ plotPixels(images_comp[5], colour_by = "Yb174Di",
 channelNames(images_comp) <- rownames(spe)
 ```
 
-The step took 9.22 minutes.
+The step took 9.93 minutes.
 
 ## Quality control
 
@@ -708,7 +708,7 @@ dittoDimPlot(spe, var = "patient_id",
 
 ![](protocol_files/figure-markdown_github/umap-1.png)
 
-The step took 0.57 minutes.
+The step took 0.63 minutes.
 
 CRITICAL: Differences in marker distributions or non-overlapping samples
 on the UMAP visualization can indicate sample-to-sample differences in
@@ -764,7 +764,7 @@ phenotypes. These markers should be expressed in cells that cluster in
 the UMAP embedding. Other batch effect correction approaches such as
 `Seurat` and `harmony` can be used to improve data integration.
 
-The step took 2.77 minutes.
+The step took 2.83 minutes.
 
 ## Cell phenotyping
 
@@ -821,7 +821,7 @@ ggplot(data.frame(method = names(sil),
 
 ![](protocol_files/figure-markdown_github/cluster-sweep-1.png)
 
-The step took 5.68 minutes.
+The step took 5.08 minutes.
 
 CRITICAL: For each dataset, parameter estimation should be performed
 independently. For large datasets, the function takes a long time to
@@ -845,7 +845,7 @@ clusters <- clusterCells(spe,
 spe$nn_clusters <- clusters
 ```
 
-The step took 1.6 minutes.
+The step took 1.45 minutes.
 
 To annotate the individual clusters based on cell phenotypes contained
 within, the marker expression per cluster can be visualized in the form
@@ -868,7 +868,7 @@ dittoHeatmap(spe[,cur_cells],
 ![](protocol_files/figure-markdown_github/unnamed-chunk-48-1.png)
 
 After observing cluster-specific expression patterns, the individual
-clusters can be annotated. For example, cluster 11 shows high expression
+clusters can be annotated. For example, cluster 12 shows high expression
 of the B cell marker CD20 and can therefore be labeled as “Bcell”.
 
 ``` r
@@ -1023,7 +1023,7 @@ rffit <- train(x = cur_mat,
                trControl = fitControl)
 ```
 
-The step took 9.92 minutes.
+The step took 9.46 minutes.
 
 Assess the classifier performance by computing the confusion matrix of
 the test dataset. The `confusionMatrix` function compares the predicted
@@ -1247,7 +1247,7 @@ plotSpatial(spe[,spe$celltype == "Tumor"],
 
 ![](protocol_files/figure-markdown_github/spatial-community-1.png)
 
-The step took 0.07 minutes.
+The step took 0.05 minutes.
 
 After detecting spatial communities, a number of downstream analyses can
 be performed. These include (i) computing the cell phenotype fraction
@@ -1311,7 +1311,7 @@ pheatmap(mat,
 
 ![](protocol_files/figure-markdown_github/unnamed-chunk-63-1.png)
 
-The step took 0.17 minutes.
+The step took 0.14 minutes.
 
 CRITICAL: A parameter sweep should be performed to estimate the optimal
 value for `k`. However, with prior knowledge on the expected tissue
@@ -1391,7 +1391,7 @@ plotSpatialContext(spe,
 
 ![](protocol_files/figure-markdown_github/unnamed-chunk-67-1.png)
 
-The step took 0.29 minutes.
+The step took 0.28 minutes.
 
 Perform patch detection analysis. The `patchDetection` function of the
 `imcRtools` package detects fully connected components of cells of
@@ -1422,7 +1422,7 @@ plotSpatial(spe,
 
 ![](protocol_files/figure-markdown_github/unnamed-chunk-71-1.png)
 
-The step took 0.36 minutes.
+The step took 0.38 minutes.
 
 Perform interaction analysis as proposed by Schapiro et al. This
 approach detects cell phenotype pairs that show stronger (“interaction”)
@@ -1465,7 +1465,7 @@ ggplot(summed_sigvals) +
 
 ![](protocol_files/figure-markdown_github/unnamed-chunk-75-1.png)
 
-The step took 7.39 minutes.
+The step took 6.64 minutes.
 
 We finally save out the `SpatialExperiment` object.
 
