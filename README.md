@@ -80,14 +80,13 @@ To add new libraries to the container please add them to the [Dockerfile](Docker
 
 ## Citation
 
-The workflow is currently under development for final publication.
-In the meantime please refer to the 
-[preprint](https://www.biorxiv.org/content/10.1101/2021.11.12.468357v1) 
+The workflow has been published in  
+[Nature Protocols](https://www.nature.com/articles/s41596-023-00881-0) 
 which you can site as follows:
 
 ```
-Jonas Windhager, Bernd Bodenmiller, Nils Eling (2020). An end-to-end workflow for multiplexed image processing and analysis. 
-    bioRxiv, doi: 10.1101/2021.11.12.468357
+Windhager, J., Zanotelli, V.R.T., Schulz, D. et al. An end-to-end workflow for multiplexed image processing and analysis.
+    Nat Protoc (2023). 
 ```
 
 ## Funding

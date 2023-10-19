@@ -3,8 +3,11 @@
 This folder of the repository contains the code to reproduce the analysis presented in the following paper:
 
 ```
-TODO upon acceptance
+Windhager, J., Zanotelli, V.R.T., Schulz, D. et al. An end-to-end workflow for multiplexed image processing and analysis.
+    Nat Protoc (2023). 
 ```
+
+It is accessible at [https://www.nature.com/articles/s41596-023-00881-0](https://www.nature.com/articles/s41596-023-00881-0)
 
 ### System requirements
 
