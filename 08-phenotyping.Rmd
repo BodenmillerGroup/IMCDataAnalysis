@@ -805,6 +805,7 @@ the classifier, we will now predict cell phenotypes in the test data.
 cur_mat <- t(assay(test_spe, "exprs")[rowData(test_spe)$use_channel,])
 
 # Predict the cell phenotype labels of the test data
+set.seed(231019)
 cur_pred <- predict(rffit, newdata = cur_mat)
 ```
 
@@ -853,6 +854,7 @@ Finally, to observe which cell phenotypes were wrongly classified, we can visual
 the distribution of classification probabilities per cell phenotype class:
 
 ```{r prediciton-probability, fig.height=15}
+set.seed(231019)
 cur_pred <- predict(rffit, 
                     newdata = cur_mat, 
                     type = "prob")
@@ -885,6 +887,7 @@ probabilities.
 cur_mat <- t(assay(unlab_spe, "exprs")[rowData(unlab_spe)$use_channel,])
 
 # Predict the cell phenotype labels of the unlabeled data
+set.seed(231014)
 cell_class <- as.character(predict(rffit, 
                                    newdata = cur_mat, 
                                    type = "raw"))
@@ -893,6 +896,7 @@ names(cell_class) <- rownames(cur_mat)
 table(cell_class)
 
 # Extract prediction probabilities for each cell
+set.seed(231014)
 cell_prob <- predict(rffit, 
                      newdata = cur_mat, 
                      type = "prob")
