@@ -60,8 +60,8 @@ issues. Have a look at the source code at:
 ## Citation
 
 The workflow has been published in  
-[Nature Protocols](https://www.nature.com/articles/s41596-023-00881-0) 
-which you can site as follows:
+[https://www.nature.com/articles/s41596-023-00881-0](https://www.nature.com/articles/s41596-023-00881-0) 
+which you can cite as follows:
 
 ```
 Windhager, J., Zanotelli, V.R.T., Schulz, D. et al. An end-to-end workflow for multiplexed image processing and analysis.
