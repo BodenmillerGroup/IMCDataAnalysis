@@ -539,8 +539,7 @@ expect_equal(colPair(spe)[1:5,], new("SelfHits", from = c(1L, 1L, 2L, 2L, 2L), t
 
 expect_equal(spatialCoords(spe)[1:5,], structure(c(468.583333333333, 515.833333333333, 587.235294117647, 
 192.25, 231.772727272727, 0.416666666666667, 0.416666666666667, 
-0.470588235294118, 1.25, 0.909090909090909), dim = c(5L, 2L), dimnames = list(
-    c("1", "2", "3", "4", "5"), c("Pos_X", "Pos_Y"))))
+0.470588235294118, 1.25, 0.909090909090909), dim = c(5L, 2L), dimnames = list(NULL, c("Pos_X", "Pos_Y"))))
 ```
 
 ```{r integration-test-read-images, include = FALSE}
@@ -669,8 +668,7 @@ expect_equal(colPair(spe2)[1:5,], new("SelfHits", from = c(1L, 1L, 1L, 1L, 1L), 
 
 expect_equal(spatialCoords(spe2)[1:5,], structure(c(10.2295081967213, 18.7, 25.4074074074074, 32.2708333333333, 
 45.0294117647059, 2.62295081967213, 2, 1.81481481481481, 2.22916666666667, 
-1.5), dim = c(5L, 2L), dimnames = list(c("1", "2", "3", "4", 
-"5"), c("Pos_X", "Pos_Y"))))
+1.5), dim = c(5L, 2L), dimnames = list(NULL, c("Pos_X", "Pos_Y"))))
 ```
 
 ```{r integration-test-measureObjects, include = FALSE}
