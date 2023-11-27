@@ -5,3 +5,8 @@
 **Version 1.0.1** [2023-10-19]
 
 - Added seed before `predict` call after training a classifier
+
+**Version 1.0.2** [2023-11-27]
+
+- Added developers documentation
+- Added more ways to visualize cell type composition per CN
