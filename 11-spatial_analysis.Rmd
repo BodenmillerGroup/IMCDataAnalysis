@@ -334,20 +334,60 @@ plotSpatial(spe,
     scale_color_brewer(palette = "Set3")
 ```
 
-The next code chunk visualizes the cell type compositions of the
-detected cellular neighborhoods (CN).
+There are now different visualizations to examine the cell type composition 
+of the detected cellular neighborhoods (CN). First we can look at the total 
+number of cells per cell type and CN.
 
 ```{r}
-for_plot <- prop.table(table(spe$cn_celltypes, spe$celltype), 
-                       margin = 1)
+for_plot <- table(spe$cn_celltypes, spe$celltype)
 
+pheatmap(for_plot, 
+         color = viridis(100), display_numbers = TRUE, 
+         number_color = "white", number_format = "%.0f")
+```
+
+Next, we can observe per cell type the fraction of CN that they are distributed
+across.
+
+```{r}
+for_plot <- prop.table(table(spe$cn_celltypes, spe$celltype), margin = 2)
+
+pheatmap(for_plot, 
+         color = viridis(100), display_numbers = TRUE, 
+         number_color = "white", number_format = "%.2f")
+```
+
+Similarly, we can visualize the fraction of each CN made up of each cell type.
+
+```{r}
+for_plot <- prop.table(table(spe$cn_celltypes, spe$celltype), margin = 1)
+
+pheatmap(for_plot, 
+         color = viridis(100), display_numbers = TRUE, 
+         number_color = "white", number_format = "%.2f")
+```
+
+This visualization can also be scaled by column to account for the relative 
+cell type abundance.
+
+```{r}
 pheatmap(for_plot, 
          color = colorRampPalette(c("dark blue", "white", "dark red"))(100), 
          scale = "column")
 ```
 
-CN 1 and CN 6 are mainly composed of tumor cells with CN 6 forming the
-tumor/stroma border. CN 3 is mainly composed of B and BnT cells
+Lastly, we can visualize the enrichment of cell types within cellular neighborhoods
+using the `regionMap` function of the `lisaClust` package.
+
+```{r}
+library(lisaClust)
+regionMap(spe, 
+          cellType = "celltype",
+          region = "cn_celltypes")
+```
+
+CN 1 and CN 6 are mainly enriched for tumor cells with CN 6 forming the
+tumor/stroma border. CN 3 is mainly enriched for B and BnT cells
 indicating TLS. CN 5 is composed of aggregated plasma cells and most T
 cells.
 
@@ -408,15 +448,12 @@ derive numeric vectors for each cell which can then again be clustered
 using kmeans. All steps are supported by the `lisaClust` function which
 can be applied to a `SingleCellExperiment` and `SpatialExperiment` object.
 
-
 In the following example, we calculate the LISA curves within a 10µm, 20µm and
 50µm neighborhood around each cell. Increasing these radii will lead to broader
 and smoother spatial clusters. However, a number of parameter settings should be
 tested to estimate the robustness of the results.
 
 ```{r lisaClust, fig.height=12, fig.width=12, message=FALSE}
-library(lisaClust)
-
 set.seed(220705)
 spe <- lisaClust(spe, 
                  k = 6,
@@ -447,15 +484,6 @@ pheatmap(for_plot,
 In this case, CN 1 and 4 contain tumor cells but no CN is forming the
 tumor/stroma interface. CN 3 represents TLS. CN 2 indicates T cell
 subtypes and plasma cells are aggregated to CN 5.
-
-As an alternative way of visualizing the enrichment of cell types within the 
-detected CNs, the `lisaClust` package provides the `regionMap` function.
-
-```{r}
-regionMap(spe, 
-          cellType = "celltype",
-          region = "region")
-```
 
 ## Spatial context analysis
 

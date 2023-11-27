@@ -122,6 +122,11 @@ and are hosted on Zenodo.
 
 * Continue going through the book
 
+### Execute the book
+
+* When you are done working through the book, within the Docker container open the RProject file and execute `bookdown::render_book()` to make sure that it can be executed from beginning to end.
+* Under `data/CellTypeValidation` have a look at the PNGs to check if celltypes were correctly detected.
+
 ### Add changes to CHANGELOG.md
 
 Finally, add all the recent changes to the CHANGELOG, create and merge a PR and create a new release (see above).
