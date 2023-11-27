@@ -45,10 +45,19 @@ spatial analysis and the user will need to become familiar with the general
 framework to efficiently analyse data obtained from multiplexed imaging
 technologies.
 
+## Update freeze
+
+This workflow has been actively developed until December 2023. At that time
+we used the most recent (`v.0.16.0`) version of `steinbock` to process the 
+example data. If you are having issues when using newer versions of `steinbock`
+please open an issue [here](https://github.com/BodenmillerGroup/IMCDataAnalysis/issues).
+
 ## Feedback and contributing
 
 We provide the workflow as an open-source resource. It does not mean that
-this workflow is tested on all possible datasets or biological questions.
+this workflow is tested on all possible datasets or biological questions and 
+there exist multiple ways of analysing data. It is therefore recommended to
+check the results and question their biological interpretation.
 
 If you notice an issue or missing information, please report an issue
 [here](https://github.com/BodenmillerGroup/IMCDataAnalysis/issues). We also
@@ -56,6 +65,19 @@ welcome contributions in form of pull requests or feature requests in form of
 issues. Have a look at the source code at:
 
 [https://github.com/BodenmillerGroup/IMCDataAnalysis](https://github.com/BodenmillerGroup/IMCDataAnalysis)
+
+## Maintainer
+
+[Daniel Schulz](https://github.com/SchulzDan)  
+
+## Contributors
+
+[Nils Eling](https://github.com/nilseling)
+[Vito Zanotelli](https://github.com/votti)  
+[Daniel Schulz](https://github.com/SchulzDan)  
+[Jonas Windhager](https://github.com/jwindhager)   
+[Michelle Daniel](https://github.com/michdaniel)  
+[Lasse Meyer](https://github.com/lassedochreden)
 
 ## Citation
 
