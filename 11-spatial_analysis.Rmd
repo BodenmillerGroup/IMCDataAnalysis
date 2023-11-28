@@ -398,7 +398,7 @@ cur_sce$x <- spatialCoords(cur_spe)[,1]
 cur_sce$y <- spatialCoords(cur_spe)[,2]
 cur_sce$region <- as.character(cur_sce$cn_celltypes)
 
-hatchingPlot(cur_sce, region = "cn_celltypes", cellType = "celltype") +
+hatchingPlot(cur_sce, region = "region", cellType = "celltype") +
     scale_color_manual(values = metadata(spe)$color_vectors$celltype)
 ```
 
