@@ -339,7 +339,7 @@ of the detected cellular neighborhoods (CN). First we can look at the total
 number of cells per cell type and CN.
 
 ```{r}
-for_plot <- table(spe$cn_celltypes, spe$celltype)
+for_plot <- table(as.character(spe$cn_celltypes), spe$celltype)
 
 pheatmap(for_plot, 
          color = viridis(100), display_numbers = TRUE, 
@@ -350,7 +350,7 @@ Next, we can observe per cell type the fraction of CN that they are distributed
 across.
 
 ```{r}
-for_plot <- prop.table(table(spe$cn_celltypes, spe$celltype), margin = 2)
+for_plot <- prop.table(table(as.character(spe$cn_celltypes), spe$celltype), margin = 2)
 
 pheatmap(for_plot, 
          color = viridis(100), display_numbers = TRUE, 
@@ -360,7 +360,7 @@ pheatmap(for_plot,
 Similarly, we can visualize the fraction of each CN made up of each cell type.
 
 ```{r}
-for_plot <- prop.table(table(spe$cn_celltypes, spe$celltype), margin = 1)
+for_plot <- prop.table(table(as.character(spe$cn_celltypes), spe$celltype), margin = 1)
 
 pheatmap(for_plot, 
          color = viridis(100), display_numbers = TRUE, 
@@ -384,6 +384,29 @@ library(lisaClust)
 regionMap(spe, 
           cellType = "celltype",
           region = "cn_celltypes")
+```
+
+It is also recommended to visualize some images to confirm the interpretation of
+cellular neighborhoods. For this we can either use the `lisClust::hatchingPlot` or
+the `imcRtools::plotSpatial` functions:
+
+```{r}
+# hatchingPlot
+cur_spe <- spe[,spe$sample_id == "Patient1_003"]
+cur_sce <- as(cur_spe, "SingleCellExperiment")
+cur_sce$x <- spatialCoords(cur_spe)[,1]
+cur_sce$y <- spatialCoords(cur_spe)[,2]
+cur_sce$region <- as.character(cur_sce$cn_celltypes)
+
+hatchingPlot(cur_sce, region = "cn_celltypes", cellType = "celltype") +
+    scale_color_manual(values = metadata(spe)$color_vectors$celltype)
+```
+
+```{r, fig.height=8, fig.width=10}
+# plotSpatial
+plotSpatial(spe[,spe$sample_id == "Patient1_003"],
+            img_id = "cn_celltypes", node_color_by = "celltype", node_size_fix = 0.7) +
+    scale_color_manual(values = metadata(spe)$color_vectors$celltype)
 ```
 
 CN 1 and CN 6 are mainly enriched for tumor cells with CN 6 forming the
