@@ -10,7 +10,6 @@ R workflow highlighting analyses approaches for multiplexed imaging data.
 
 ## Scope
 
-
 This workflow explains the use of common R/Bioconductor packages to pre-process and analyse single-cell data obtained from segmented multichannel images.
 While we use imaging mass cytometry (IMC) data as an example, the concepts presented here can be applied to images obtained by other technologies (e.g. CODEX, MIBI, mIF, CyCIF, etc.).
 The workflow can be largely divided into the following parts:
@@ -22,6 +21,13 @@ The workflow can be largely divided into the following parts:
 5. Single-cell visualization
 6. Image visualization
 7. Spatial analyses
+
+## Update freeze
+
+This workflow has been actively developed until December 2023. At that time
+we used the most recent (`v.0.16.0`) version of `steinbock` to process the 
+example data. If you are having issues when using newer versions of `steinbock`
+please open an issue [here](https://github.com/BodenmillerGroup/IMCDataAnalysis/issues).
 
 ## Usage
 
@@ -58,6 +64,20 @@ docker pull ghcr.io/bodenmillergroup/imcdataanalysis:<year-month-date>
 3. Navigate to `IMCDataAnalysis` and open the `IMCDataAnalysis.Rproj` file.  
 4. Code in the individual files can now be executed or the whole workflow can be build by entering `bookdown::render_book()`.
 
+## Feedback
+
+We provide the workflow as an open-source resource. It does not mean that
+this workflow is tested on all possible datasets or biological questions and 
+there exist multiple ways of analysing data. It is therefore recommended to
+check the results and question their biological interpretation.
+
+If you notice an issue or missing information, please report an issue
+[here](https://github.com/BodenmillerGroup/IMCDataAnalysis/issues). We also
+welcome contributions in form of pull requests or feature requests in form of
+issues. Have a look at the source code at:
+
+[https://github.com/BodenmillerGroup/IMCDataAnalysis](https://github.com/BodenmillerGroup/IMCDataAnalysis)
+
 ## Contributing guidelines
 
 For feature requests and bug reports, please raise an issue [here](https://github.com/BodenmillerGroup/IMCDataAnalysis/issues).
@@ -68,10 +88,11 @@ To add new libraries to the container please add them to the [Dockerfile](Docker
 
 ## Maintainer
 
-[Nils Eling](https://github.com/nilseling)
+[Daniel Schulz](https://github.com/SchulzDan)  
 
 ## Contributors
 
+[Nils Eling](https://github.com/nilseling)
 [Vito Zanotelli](https://github.com/votti)  
 [Daniel Schulz](https://github.com/SchulzDan)  
 [Jonas Windhager](https://github.com/jwindhager)   
