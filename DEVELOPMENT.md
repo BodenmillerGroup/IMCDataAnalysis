@@ -103,7 +103,7 @@ and are hosted on Zenodo.
 
 ### Upload data to zenodo
 
-* On [zenodo](https://zenodo.org/records/7624451), click on `New version` and replace all files with the newer version. No need to upload the raw data to zenodo as they are hosted in a different repository
+* On [zenodo](https://zenodo.org/records/7624451), click on `New version` and replace all files with the newer version. No need to upload the raw data to zenodo as they are hosted in a different repository. Make sure to change the date and update the version number.
 
 ### Adjust the book
 
