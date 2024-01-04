@@ -6,7 +6,10 @@ The following section describes how to visualize the abundance of biomolecules
 including the generation of pseudo-color composite images. Section
 \@ref(mask-visualization) highlights the visualization of cell metadata (e.g.,
 cell phenotype) as well as summarized pixel intensities on cell segmentation
-masks.
+masks. Section \@ref(interactive-visualization) showcases interactive pixel- and
+cell-level visualization with the
+[cytoviewer](https://bioconductor.org/packages/release/bioc/html/cytoviewer.html) 
+R/Bioconductor package [@Meyer2024]. 
 
 The
 [cytomapper](https://www.bioconductor.org/packages/release/bioc/html/cytomapper.html)
@@ -475,14 +478,17 @@ p2 <- ggdraw(out2$plot, clip = "on")
 plot_grid(p1, p2)
 ```
 
-## Interactive image visualization
+## Interactive image visualization {#interactive-visualization}
 
 The
-[cytoviewer](https://bioconductor.org/packages/release/bioc/html/cytoviewer.html)
-package allows the interactive visualization of multi-channel images and
-segmentation masks. It also allows to map cellular metadata onto segmentation
-masks and outlining of cells on composite images. For a full introduction to the
-package, please refer to [the vignette](https://bioconductor.org/packages/release/bioc/vignettes/cytoviewer/inst/doc/cytoviewer.html).
+[cytoviewer](https://bioconductor.org/packages/release/bioc/html/cytoviewer.html) 
+R/Bioconductor package [@Meyer2024] extends the static visualization abilities 
+from `cytomapper` via an interactive and user-friendly `shiny` application.   
+
+It supports flexible generation of image composites, allows side-by-side 
+visualization of single channels, and facilitates the spatial visualization of 
+single-cell data in the form of segmentation masks. For a full introduction to 
+the package, please refer to [the vignette](https://bioconductor.org/packages/release/bioc/vignettes/cytoviewer/inst/doc/cytoviewer.html).
 
 ```{r cytoviewer-interactive, message = FALSE}
 library(cytoviewer)
@@ -494,7 +500,7 @@ app <- cytoviewer(image = images,
                   img_id = "sample_id")
 
 if (interactive()) {
-    shiny::runApp(app, launch.browser = TRUE)
+    shiny::runApp(app)
 }
 ```
 
