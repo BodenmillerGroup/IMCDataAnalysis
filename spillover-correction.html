@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>6 Spillover correction | Analysis workflow for IMC data</title>
+  <meta name="description" content="This bookdown project highlights possible down-stream analyses performed on imaging mass cytometry data." />
+  <meta name="generator" content="bookdown 0.37 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="6 Spillover correction | Analysis workflow for IMC data" />
+  <meta property="og:type" content="book" />
+  
+  <meta property="og:description" content="This bookdown project highlights possible down-stream analyses performed on imaging mass cytometry data." />
+  <meta name="github-repo" content="BodenmillerGroup/IMCDataAnalysis" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="6 Spillover correction | Analysis workflow for IMC data" />
+  
+  <meta name="twitter:description" content="This bookdown project highlights possible down-stream analyses performed on imaging mass cytometry data." />
+  
+
+<meta name="author" content="Authors: Nils Eling 1,2,*, Vito Zanotelli 1,2, Michelle Daniel 1,2, Daniel Schulz 1,2, Jonas Windhager 1,2, Lasse Meyer 1,2" />
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="read-data.html"/>
+<link rel="next" href="image-and-cell-level-quality-control.html"/>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+<style type="text/css">
+/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Multiplexed imaging data analysis</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> IMC Data Analysis Workflow</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="index.html"><a href="index.html#disclaimer"><i class="fa fa-check"></i><b>1.1</b> Disclaimer</a></li>
+<li class="chapter" data-level="1.2" data-path="index.html"><a href="index.html#update-freeze"><i class="fa fa-check"></i><b>1.2</b> Update freeze</a></li>
+<li class="chapter" data-level="1.3" data-path="index.html"><a href="index.html#feedback-and-contributing"><i class="fa fa-check"></i><b>1.3</b> Feedback and contributing</a></li>
+<li class="chapter" data-level="1.4" data-path="index.html"><a href="index.html#maintainer"><i class="fa fa-check"></i><b>1.4</b> Maintainer</a></li>
+<li class="chapter" data-level="1.5" data-path="index.html"><a href="index.html#contributors"><i class="fa fa-check"></i><b>1.5</b> Contributors</a></li>
+<li class="chapter" data-level="1.6" data-path="index.html"><a href="index.html#citation"><i class="fa fa-check"></i><b>1.6</b> Citation</a></li>
+<li class="chapter" data-level="1.7" data-path="index.html"><a href="index.html#changelog"><i class="fa fa-check"></i><b>1.7</b> Changelog</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="intro.html"><a href="intro.html"><i class="fa fa-check"></i><b>2</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="intro.html"><a href="intro.html#technical-details-of-imc"><i class="fa fa-check"></i><b>2.1</b> Technical details of IMC</a>
+<ul>
+<li class="chapter" data-level="2.1.1" data-path="intro.html"><a href="intro.html#metal-conjugated-antobodies-and-staining"><i class="fa fa-check"></i><b>2.1.1</b> Metal-conjugated antobodies and staining</a></li>
+<li class="chapter" data-level="2.1.2" data-path="intro.html"><a href="intro.html#data-acquisition"><i class="fa fa-check"></i><b>2.1.2</b> Data acquisition</a></li>
+</ul></li>
+<li class="chapter" data-level="2.2" data-path="intro.html"><a href="intro.html#data-format"><i class="fa fa-check"></i><b>2.2</b> IMC data format</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="processing.html"><a href="processing.html"><i class="fa fa-check"></i><b>3</b> Multi-channel image processing</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="processing.html"><a href="processing.html#image-pre-processing-imc-specific"><i class="fa fa-check"></i><b>3.1</b> Image pre-processing (IMC specific)</a></li>
+<li class="chapter" data-level="3.2" data-path="processing.html"><a href="processing.html#image-segmentation"><i class="fa fa-check"></i><b>3.2</b> Image segmentation</a></li>
+<li class="chapter" data-level="3.3" data-path="processing.html"><a href="processing.html#feature-extraction"><i class="fa fa-check"></i><b>3.3</b> Feature extraction</a></li>
+<li class="chapter" data-level="3.4" data-path="processing.html"><a href="processing.html#data-export"><i class="fa fa-check"></i><b>3.4</b> Data export</a></li>
+<li class="chapter" data-level="3.5" data-path="processing.html"><a href="processing.html#data-import-into-r"><i class="fa fa-check"></i><b>3.5</b> Data import into R</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="prerequisites.html"><a href="prerequisites.html"><i class="fa fa-check"></i><b>4</b> Prerequisites</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="prerequisites.html"><a href="prerequisites.html#obtain-the-code"><i class="fa fa-check"></i><b>4.1</b> Obtain the code</a></li>
+<li class="chapter" data-level="4.2" data-path="prerequisites.html"><a href="prerequisites.html#software-requirements"><i class="fa fa-check"></i><b>4.2</b> Software requirements</a>
+<ul>
+<li class="chapter" data-level="4.2.1" data-path="prerequisites.html"><a href="prerequisites.html#docker"><i class="fa fa-check"></i><b>4.2.1</b> Using Docker</a></li>
+<li class="chapter" data-level="4.2.2" data-path="prerequisites.html"><a href="prerequisites.html#manual-install"><i class="fa fa-check"></i><b>4.2.2</b> Manual installation</a></li>
+<li class="chapter" data-level="4.2.3" data-path="prerequisites.html"><a href="prerequisites.html#major-package-versions"><i class="fa fa-check"></i><b>4.2.3</b> Major package versions</a></li>
+</ul></li>
+<li class="chapter" data-level="4.3" data-path="prerequisites.html"><a href="prerequisites.html#image-processing"><i class="fa fa-check"></i><b>4.3</b> Image processing</a></li>
+<li class="chapter" data-level="4.4" data-path="prerequisites.html"><a href="prerequisites.html#download-data"><i class="fa fa-check"></i><b>4.4</b> Download example data</a>
+<ul>
+<li class="chapter" data-level="4.4.1" data-path="prerequisites.html"><a href="prerequisites.html#processed-multiplexed-imaging-data"><i class="fa fa-check"></i><b>4.4.1</b> Processed multiplexed imaging data</a></li>
+<li class="chapter" data-level="4.4.2" data-path="prerequisites.html"><a href="prerequisites.html#files-for-spillover-matrix-estimation"><i class="fa fa-check"></i><b>4.4.2</b> Files for spillover matrix estimation</a></li>
+<li class="chapter" data-level="4.4.3" data-path="prerequisites.html"><a href="prerequisites.html#gated-cells"><i class="fa fa-check"></i><b>4.4.3</b> Gated cells</a></li>
+</ul></li>
+<li class="chapter" data-level="4.5" data-path="prerequisites.html"><a href="prerequisites.html#sessionInfo"><i class="fa fa-check"></i><b>4.5</b> Software versions</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="read-data.html"><a href="read-data.html"><i class="fa fa-check"></i><b>5</b> Read in the data</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="read-data.html"><a href="read-data.html#read-in-single-cell-information"><i class="fa fa-check"></i><b>5.1</b> Read in single-cell information</a>
+<ul>
+<li class="chapter" data-level="5.1.1" data-path="read-data.html"><a href="read-data.html#steinbock-generated-data"><i class="fa fa-check"></i><b>5.1.1</b> steinbock generated data</a></li>
+<li class="chapter" data-level="5.1.2" data-path="read-data.html"><a href="read-data.html#imc-segmentation-pipeline-generated-data"><i class="fa fa-check"></i><b>5.1.2</b> IMC Segmentation Pipeline generated data</a></li>
+<li class="chapter" data-level="5.1.3" data-path="read-data.html"><a href="read-data.html#reading-custom-files"><i class="fa fa-check"></i><b>5.1.3</b> Reading custom files</a></li>
+</ul></li>
+<li class="chapter" data-level="5.2" data-path="read-data.html"><a href="read-data.html#cell-processing"><i class="fa fa-check"></i><b>5.2</b> Single-cell processing</a></li>
+<li class="chapter" data-level="5.3" data-path="read-data.html"><a href="read-data.html#read-images"><i class="fa fa-check"></i><b>5.3</b> Read in images</a></li>
+<li class="chapter" data-level="5.4" data-path="read-data.html"><a href="read-data.html#generate-single-cell-data-from-images"><i class="fa fa-check"></i><b>5.4</b> Generate single-cell data from images</a></li>
+<li class="chapter" data-level="5.5" data-path="read-data.html"><a href="read-data.html#accessing-publicly-available-imc-datasets"><i class="fa fa-check"></i><b>5.5</b> Accessing publicly available IMC datasets</a></li>
+<li class="chapter" data-level="5.6" data-path="read-data.html"><a href="read-data.html#save-objects"><i class="fa fa-check"></i><b>5.6</b> Save objects</a></li>
+<li class="chapter" data-level="5.7" data-path="read-data.html"><a href="read-data.html#session-info"><i class="fa fa-check"></i><b>5.7</b> Session Info</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="spillover-correction.html"><a href="spillover-correction.html"><i class="fa fa-check"></i><b>6</b> Spillover correction</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="spillover-correction.html"><a href="spillover-correction.html#generate-the-spillover-matrix"><i class="fa fa-check"></i><b>6.1</b> Generate the spillover matrix</a>
+<ul>
+<li class="chapter" data-level="6.1.1" data-path="spillover-correction.html"><a href="spillover-correction.html#read-in-the-data"><i class="fa fa-check"></i><b>6.1.1</b> Read in the data</a></li>
+<li class="chapter" data-level="6.1.2" data-path="spillover-correction.html"><a href="spillover-correction.html#quality-control"><i class="fa fa-check"></i><b>6.1.2</b> Quality control</a></li>
+<li class="chapter" data-level="6.1.3" data-path="spillover-correction.html"><a href="spillover-correction.html#pixel_binning"><i class="fa fa-check"></i><b>6.1.3</b> Optional pixel binning</a></li>
+<li class="chapter" data-level="6.1.4" data-path="spillover-correction.html"><a href="spillover-correction.html#filtering-incorrectly-assigned-pixels"><i class="fa fa-check"></i><b>6.1.4</b> Filtering incorrectly assigned pixels</a></li>
+<li class="chapter" data-level="6.1.5" data-path="spillover-correction.html"><a href="spillover-correction.html#compute-spillover-matrix"><i class="fa fa-check"></i><b>6.1.5</b> Compute spillover matrix</a></li>
+</ul></li>
+<li class="chapter" data-level="6.2" data-path="spillover-correction.html"><a href="spillover-correction.html#single-cell-data-compensation"><i class="fa fa-check"></i><b>6.2</b> Single-cell data compensation</a></li>
+<li class="chapter" data-level="6.3" data-path="spillover-correction.html"><a href="spillover-correction.html#image-compensation"><i class="fa fa-check"></i><b>6.3</b> Image compensation</a></li>
+<li class="chapter" data-level="6.4" data-path="spillover-correction.html"><a href="spillover-correction.html#write-out-compensated-images"><i class="fa fa-check"></i><b>6.4</b> Write out compensated images</a></li>
+<li class="chapter" data-level="6.5" data-path="spillover-correction.html"><a href="spillover-correction.html#save-objects-1"><i class="fa fa-check"></i><b>6.5</b> Save objects</a></li>
+<li class="chapter" data-level="6.6" data-path="spillover-correction.html"><a href="spillover-correction.html#session-info-1"><i class="fa fa-check"></i><b>6.6</b> Session Info</a></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="image-and-cell-level-quality-control.html"><a href="image-and-cell-level-quality-control.html"><i class="fa fa-check"></i><b>7</b> Image and cell-level quality control</a>
+<ul>
+<li class="chapter" data-level="7.1" data-path="image-and-cell-level-quality-control.html"><a href="image-and-cell-level-quality-control.html#read-in-the-data-1"><i class="fa fa-check"></i><b>7.1</b> Read in the data</a></li>
+<li class="chapter" data-level="7.2" data-path="image-and-cell-level-quality-control.html"><a href="image-and-cell-level-quality-control.html#seg-quality"><i class="fa fa-check"></i><b>7.2</b> Segmentation quality control</a></li>
+<li class="chapter" data-level="7.3" data-path="image-and-cell-level-quality-control.html"><a href="image-and-cell-level-quality-control.html#image-quality"><i class="fa fa-check"></i><b>7.3</b> Image-level quality control</a></li>
+<li class="chapter" data-level="7.4" data-path="image-and-cell-level-quality-control.html"><a href="image-and-cell-level-quality-control.html#cell-quality"><i class="fa fa-check"></i><b>7.4</b> Cell-level quality control</a></li>
+<li class="chapter" data-level="7.5" data-path="image-and-cell-level-quality-control.html"><a href="image-and-cell-level-quality-control.html#save-objects-2"><i class="fa fa-check"></i><b>7.5</b> Save objects</a></li>
+<li class="chapter" data-level="7.6" data-path="image-and-cell-level-quality-control.html"><a href="image-and-cell-level-quality-control.html#session-info-2"><i class="fa fa-check"></i><b>7.6</b> Session Info</a></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="batch-effects.html"><a href="batch-effects.html"><i class="fa fa-check"></i><b>8</b> Batch effect correction</a>
+<ul>
+<li class="chapter" data-level="8.1" data-path="batch-effects.html"><a href="batch-effects.html#fastmnn-correction"><i class="fa fa-check"></i><b>8.1</b> fastMNN correction</a>
+<ul>
+<li class="chapter" data-level="8.1.1" data-path="batch-effects.html"><a href="batch-effects.html#perform-sample-correction"><i class="fa fa-check"></i><b>8.1.1</b> Perform sample correction</a></li>
+<li class="chapter" data-level="8.1.2" data-path="batch-effects.html"><a href="batch-effects.html#quality-control-of-correction-results"><i class="fa fa-check"></i><b>8.1.2</b> Quality control of correction results</a></li>
+<li class="chapter" data-level="8.1.3" data-path="batch-effects.html"><a href="batch-effects.html#visualization"><i class="fa fa-check"></i><b>8.1.3</b> Visualization</a></li>
+</ul></li>
+<li class="chapter" data-level="8.2" data-path="batch-effects.html"><a href="batch-effects.html#harmony-correction"><i class="fa fa-check"></i><b>8.2</b> harmony correction</a>
+<ul>
+<li class="chapter" data-level="8.2.1" data-path="batch-effects.html"><a href="batch-effects.html#visualization-1"><i class="fa fa-check"></i><b>8.2.1</b> Visualization</a></li>
+</ul></li>
+<li class="chapter" data-level="8.3" data-path="batch-effects.html"><a href="batch-effects.html#seurat-correction"><i class="fa fa-check"></i><b>8.3</b> Seurat correction</a>
+<ul>
+<li class="chapter" data-level="8.3.1" data-path="batch-effects.html"><a href="batch-effects.html#visualization-2"><i class="fa fa-check"></i><b>8.3.1</b> Visualization</a></li>
+</ul></li>
+<li class="chapter" data-level="8.4" data-path="batch-effects.html"><a href="batch-effects.html#save-objects-3"><i class="fa fa-check"></i><b>8.4</b> Save objects</a></li>
+<li class="chapter" data-level="8.5" data-path="batch-effects.html"><a href="batch-effects.html#session-info-3"><i class="fa fa-check"></i><b>8.5</b> Session Info</a></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html"><i class="fa fa-check"></i><b>9</b> Cell phenotyping</a>
+<ul>
+<li class="chapter" data-level="9.1" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#load-data"><i class="fa fa-check"></i><b>9.1</b> Load data</a></li>
+<li class="chapter" data-level="9.2" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#clustering"><i class="fa fa-check"></i><b>9.2</b> Clustering approaches</a>
+<ul>
+<li class="chapter" data-level="9.2.1" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#rphenograph"><i class="fa fa-check"></i><b>9.2.1</b> Rphenograph</a></li>
+<li class="chapter" data-level="9.2.2" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#snn-graph"><i class="fa fa-check"></i><b>9.2.2</b> Shared nearest neighbour graph</a></li>
+<li class="chapter" data-level="9.2.3" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#self-organizing-maps"><i class="fa fa-check"></i><b>9.2.3</b> Self organizing maps</a></li>
+<li class="chapter" data-level="9.2.4" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#compare-between-clustering-approaches"><i class="fa fa-check"></i><b>9.2.4</b> Compare between clustering approaches</a></li>
+<li class="chapter" data-level="9.2.5" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#clustering-notes"><i class="fa fa-check"></i><b>9.2.5</b> Further clustering notes</a></li>
+</ul></li>
+<li class="chapter" data-level="9.3" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#classification"><i class="fa fa-check"></i><b>9.3</b> Classification approach</a>
+<ul>
+<li class="chapter" data-level="9.3.1" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#manual-labeling-of-cells"><i class="fa fa-check"></i><b>9.3.1</b> Manual labeling of cells</a></li>
+<li class="chapter" data-level="9.3.2" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#define-color-vectors"><i class="fa fa-check"></i><b>9.3.2</b> Define color vectors</a></li>
+<li class="chapter" data-level="9.3.3" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#read-in-and-consolidate-labeled-data"><i class="fa fa-check"></i><b>9.3.3</b> Read in and consolidate labeled data</a></li>
+<li class="chapter" data-level="9.3.4" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#train-classifier"><i class="fa fa-check"></i><b>9.3.4</b> Train classifier</a></li>
+<li class="chapter" data-level="9.3.5" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#classifier-performance"><i class="fa fa-check"></i><b>9.3.5</b> Classifier performance</a></li>
+<li class="chapter" data-level="9.3.6" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#classification-of-new-data"><i class="fa fa-check"></i><b>9.3.6</b> Classification of new data</a></li>
+</ul></li>
+<li class="chapter" data-level="9.4" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#session-info-4"><i class="fa fa-check"></i><b>9.4</b> Session Info</a></li>
+</ul></li>
+<li class="chapter" data-level="10" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html"><i class="fa fa-check"></i><b>10</b> Single cell visualization</a>
+<ul>
+<li class="chapter" data-level="10.1" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#load-data-1"><i class="fa fa-check"></i><b>10.1</b> Load data</a></li>
+<li class="chapter" data-level="10.2" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#cell-type-level"><i class="fa fa-check"></i><b>10.2</b> Cell-type level</a>
+<ul>
+<li class="chapter" data-level="10.2.1" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#dimensionality-reduction-visualization"><i class="fa fa-check"></i><b>10.2.1</b> Dimensionality reduction visualization</a></li>
+<li class="chapter" data-level="10.2.2" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#heatmap-visualization"><i class="fa fa-check"></i><b>10.2.2</b> Heatmap visualization</a></li>
+<li class="chapter" data-level="10.2.3" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#violin-plot-visualization"><i class="fa fa-check"></i><b>10.2.3</b> Violin plot visualization</a></li>
+<li class="chapter" data-level="10.2.4" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#scatter-plot-visualization"><i class="fa fa-check"></i><b>10.2.4</b> Scatter plot visualization</a></li>
+<li class="chapter" data-level="10.2.5" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#barplot-visualization"><i class="fa fa-check"></i><b>10.2.5</b> Barplot visualization</a></li>
+<li class="chapter" data-level="10.2.6" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#catalyst-based-visualization"><i class="fa fa-check"></i><b>10.2.6</b> CATALYST-based visualization</a></li>
+</ul></li>
+<li class="chapter" data-level="10.3" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#sample-level"><i class="fa fa-check"></i><b>10.3</b> Sample-level</a>
+<ul>
+<li class="chapter" data-level="10.3.1" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#dimensionality-reduction-visualization-1"><i class="fa fa-check"></i><b>10.3.1</b> Dimensionality reduction visualization</a></li>
+<li class="chapter" data-level="10.3.2" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#heatmap-visualization-1"><i class="fa fa-check"></i><b>10.3.2</b> Heatmap visualization</a></li>
+<li class="chapter" data-level="10.3.3" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#barplot-visualization-1"><i class="fa fa-check"></i><b>10.3.3</b> Barplot visualization</a></li>
+<li class="chapter" data-level="10.3.4" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#catalyst-based-visualization-1"><i class="fa fa-check"></i><b>10.3.4</b> CATALYST-based visualization</a></li>
+</ul></li>
+<li class="chapter" data-level="10.4" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#rich-example"><i class="fa fa-check"></i><b>10.4</b> Further examples</a>
+<ul>
+<li class="chapter" data-level="10.4.1" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#publication-ready-complexheatmap"><i class="fa fa-check"></i><b>10.4.1</b> Publication-ready ComplexHeatmap</a></li>
+<li class="chapter" data-level="10.4.2" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#interactive-visualization"><i class="fa fa-check"></i><b>10.4.2</b> Interactive visualization</a></li>
+</ul></li>
+<li class="chapter" data-level="10.5" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#session-info-5"><i class="fa fa-check"></i><b>10.5</b> Session Info</a></li>
+</ul></li>
+<li class="chapter" data-level="11" data-path="image-visualization.html"><a href="image-visualization.html"><i class="fa fa-check"></i><b>11</b> Image visualization</a>
+<ul>
+<li class="chapter" data-level="11.1" data-path="image-visualization.html"><a href="image-visualization.html#pixel-visualization"><i class="fa fa-check"></i><b>11.1</b> Pixel visualization</a>
+<ul>
+<li class="chapter" data-level="11.1.1" data-path="image-visualization.html"><a href="image-visualization.html#adjusting-colors"><i class="fa fa-check"></i><b>11.1.1</b> Adjusting colors</a></li>
+<li class="chapter" data-level="11.1.2" data-path="image-visualization.html"><a href="image-visualization.html#image-normalization"><i class="fa fa-check"></i><b>11.1.2</b> Image normalization</a></li>
+</ul></li>
+<li class="chapter" data-level="11.2" data-path="image-visualization.html"><a href="image-visualization.html#mask-visualization"><i class="fa fa-check"></i><b>11.2</b> Cell visualization</a>
+<ul>
+<li class="chapter" data-level="11.2.1" data-path="image-visualization.html"><a href="image-visualization.html#visualzing-metadata"><i class="fa fa-check"></i><b>11.2.1</b> Visualzing metadata</a></li>
+<li class="chapter" data-level="11.2.2" data-path="image-visualization.html"><a href="image-visualization.html#visualizating-expression"><i class="fa fa-check"></i><b>11.2.2</b> Visualizating expression</a></li>
+<li class="chapter" data-level="11.2.3" data-path="image-visualization.html"><a href="image-visualization.html#outline-cells"><i class="fa fa-check"></i><b>11.2.3</b> Outlining cells on images</a></li>
+</ul></li>
+<li class="chapter" data-level="11.3" data-path="image-visualization.html"><a href="image-visualization.html#adjusting-plot-annotations"><i class="fa fa-check"></i><b>11.3</b> Adjusting plot annotations</a></li>
+<li class="chapter" data-level="11.4" data-path="image-visualization.html"><a href="image-visualization.html#displaying-individual-images"><i class="fa fa-check"></i><b>11.4</b> Displaying individual images</a></li>
+<li class="chapter" data-level="11.5" data-path="image-visualization.html"><a href="image-visualization.html#saving-and-returning-images"><i class="fa fa-check"></i><b>11.5</b> Saving and returning images</a></li>
+<li class="chapter" data-level="11.6" data-path="image-visualization.html"><a href="image-visualization.html#cytoviewer"><i class="fa fa-check"></i><b>11.6</b> Interactive image visualization</a></li>
+<li class="chapter" data-level="11.7" data-path="image-visualization.html"><a href="image-visualization.html#session-info-6"><i class="fa fa-check"></i><b>11.7</b> Session Info</a></li>
+</ul></li>
+<li class="chapter" data-level="12" data-path="performing-spatial-analysis.html"><a href="performing-spatial-analysis.html"><i class="fa fa-check"></i><b>12</b> Performing spatial analysis</a>
+<ul>
+<li class="chapter" data-level="12.1" data-path="performing-spatial-analysis.html"><a href="performing-spatial-analysis.html#spatial-interaction-graphs"><i class="fa fa-check"></i><b>12.1</b> Spatial interaction graphs</a></li>
+<li class="chapter" data-level="12.2" data-path="performing-spatial-analysis.html"><a href="performing-spatial-analysis.html#spatial-viz"><i class="fa fa-check"></i><b>12.2</b> Spatial visualization</a></li>
+<li class="chapter" data-level="12.3" data-path="performing-spatial-analysis.html"><a href="performing-spatial-analysis.html#spatial-community-analysis"><i class="fa fa-check"></i><b>12.3</b> Spatial community analysis</a></li>
+<li class="chapter" data-level="12.4" data-path="performing-spatial-analysis.html"><a href="performing-spatial-analysis.html#cellular-neighborhood-analysis"><i class="fa fa-check"></i><b>12.4</b> Cellular neighborhood analysis</a></li>
+<li class="chapter" data-level="12.5" data-path="performing-spatial-analysis.html"><a href="performing-spatial-analysis.html#spatial-context-analysis"><i class="fa fa-check"></i><b>12.5</b> Spatial context analysis</a></li>
+<li class="chapter" data-level="12.6" data-path="performing-spatial-analysis.html"><a href="performing-spatial-analysis.html#patch-detection"><i class="fa fa-check"></i><b>12.6</b> Patch detection</a></li>
+<li class="chapter" data-level="12.7" data-path="performing-spatial-analysis.html"><a href="performing-spatial-analysis.html#interaction-analysis"><i class="fa fa-check"></i><b>12.7</b> Interaction analysis</a></li>
+<li class="chapter" data-level="12.8" data-path="performing-spatial-analysis.html"><a href="performing-spatial-analysis.html#session-info-7"><i class="fa fa-check"></i><b>12.8</b> Session Info</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
+<li class="divider"></li>
+<li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Analysis workflow for IMC data</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="spillover-correction" class="section level1 hasAnchor" number="6">
+<h1><span class="header-section-number">6</span> Spillover correction<a href="spillover-correction.html#spillover-correction" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p><strong>Original scripts:</strong> <em>Vito Zanotelli</em>, <strong>adapted/maintained by:</strong> <em>Nils Eling</em></p>
+<p>This section highlights how to generate a spillover matrix from individually
+acquired single metal spots on an agarose slide. Each spot needs to be imaged as
+its own acquisition/ROI and individual TXT files containing the pixel
+intensities per spot need to be available. For complete details on the spillover
+correction approach, please refer to <a href="https://www.cell.com/cell-systems/fulltext/S2405-4712(18)30063-2">the original
+publication</a> <span class="citation">(<a href="#ref-Chevrier2017">Chevrier et al. 2017</a>)</span>.</p>
+<p><strong>Spillover slide preparation:</strong></p>
+<ul>
+<li>Prepare 2% agarose in double distilled H<span class="math inline">\(_2\)</span>O in a beaker and melt it in a microwave until well dissolved.</li>
+<li>Dip a blank superfrost plus glass microscope slide into the agarose and submerge it until the label.</li>
+<li>Remove the slide and prop it up against a support to allow the excess agarose to run off onto paper towels.<br />
+</li>
+<li>Allow the slide to dry completely (at least 30 minutes).<br />
+</li>
+<li>Retrieve all the antibody conjugates used in the panel for which the spillover matrix is to be generated and place them on ice.</li>
+<li>Arrange them in a known order (e.g., mass of the conjugated metal).<br />
+</li>
+<li>Pipette 0.3 µl spots of 0.4% trypan blue dye into an array on the slide. Prepare one spot per antibody, and make sure the spots are well separated.</li>
+<li>Pipette 0.3 µl of each antibody conjugate (usually at 0.5 mg/ml) onto a unique blue spot, taking care to avoid different antibodies bleeding into each other. Note the exact location of each conjugate on the slide.</li>
+<li>Let the spots dry completely, at least 1 hour.</li>
+</ul>
+<p><strong>Spillover slide acquisition:</strong></p>
+<ul>
+<li>Create a JPEG or PNG image of the slide using a mobile phone camera or flat-bed scanner.<br />
+</li>
+<li>In the CyTOF software, create a new file and import the slide image into it.</li>
+<li>Create a panorama across all the spots to visualize their locations.<br />
+</li>
+<li>Within each spot, create a region of interest (ROI) with a width of 200 pixels and a height of 10 pixels.<br />
+</li>
+<li>Name each ROI with the mass and name of the metal conjugate contained in the spot, e.g “Ir193” or “Ho165”. This will be how each TXT file is named.</li>
+<li>Set the profiling type of each ROI to “Local”.<br />
+</li>
+<li>Apply the antibody panel to all the ROIs. This panel should contain all (or more) of the isotopes in the panel, with the correct metal specified. For example: if the metal used is Barium 138, make sure this, rather than Lanthanum 138, is selected.</li>
+<li>Save the file, make sure “Generate Text File” is selected, and start the acquisition.</li>
+</ul>
+<p>This procedure will generate an MCD file similar to the one available on zenodo:
+<a href="https://doi.org/10.5281/zenodo.5949115">10.5281/zenodo.5949115</a></p>
+<p>The original code of the spillover correction manuscript is available on Github
+<a href="https://github.com/BodenmillerGroup/cyTOFcompensation">here</a>; however, due to
+changes in the
+<a href="https://bioconductor.org/packages/release/bioc/html/CATALYST.html">CATALYST</a>
+package, users were not able to reproduce the analysis using the newest software
+versions. The following workflow uses the newest package versions to generate a
+spillover matrix and perform spillover correction.</p>
+<p>In brief, the highlighted workflow comprises 9 steps:</p>
+<ol style="list-style-type: decimal">
+<li>Reading in the data</li>
+<li>Quality control</li>
+<li>(Optional) pixel binning</li>
+<li>“Debarcoding” for pixel assignment</li>
+<li>Pixel selection for spillover matrix estimation</li>
+<li>Spillover matrix generation</li>
+<li>Saving the results</li>
+<li>Single-cell compensation</li>
+<li>Image compensation</li>
+</ol>
+<div id="generate-the-spillover-matrix" class="section level2 hasAnchor" number="6.1">
+<h2><span class="header-section-number">6.1</span> Generate the spillover matrix<a href="spillover-correction.html#generate-the-spillover-matrix" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>In the first step, we will generate a spillover matrix based on the single-metal
+spots and save it for later use.</p>
+<div id="read-in-the-data" class="section level3 hasAnchor" number="6.1.1">
+<h3><span class="header-section-number">6.1.1</span> Read in the data<a href="spillover-correction.html#read-in-the-data" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Here, we will read in the individual TXT files into a <code>SingleCellExperiment</code>
+object. This object can be used directly by the <code>CATALYST</code> package to estimate
+the spillover.</p>
+<p>For this to work, the TXT file names need to contain the spotted metal isotope
+name. By default, the first occurrence of the isotope in the format <code>(mt)(mass)</code>
+(e.g. <code>Sm152</code> for Samarium isotope with the atomic mass 152) will be used as
+spot identifier. Alternatively, a named list of already read-in pixel intensities
+can be provided. For more information, please refer to the man page <code>?readSCEfromTXT</code>.</p>
+<p>For further downstream analysis, we will asinh-transform the data using a
+cofactor of 5; a common transformation for CyTOF data <span class="citation">(<a href="#ref-Bendall2011">Bendall et al. 2011</a>)</span>.
+As the pixel intensities are larger than the cell intensities, the cofactor
+here is larger than the cofactor when transforming the mean cell intensities.</p>
+<div class="sourceCode" id="cb66"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb66-1"><a href="spillover-correction.html#cb66-1" tabindex="-1"></a><span class="fu">library</span>(imcRtools)</span>
+<span id="cb66-2"><a href="spillover-correction.html#cb66-2" tabindex="-1"></a></span>
+<span id="cb66-3"><a href="spillover-correction.html#cb66-3" tabindex="-1"></a><span class="co"># Create SingleCellExperiment from TXT files</span></span>
+<span id="cb66-4"><a href="spillover-correction.html#cb66-4" tabindex="-1"></a>sce <span class="ot">&lt;-</span> <span class="fu">readSCEfromTXT</span>(<span class="st">&quot;data/compensation/&quot;</span>) </span></code></pre></div>
+<pre><code>## Spotted channels:  Y89, In113, In115, Pr141, Nd142, Nd143, Nd144, Nd145, Nd146, Sm147, Nd148, Sm149, Nd150, Eu151, Sm152, Eu153, Sm154, Gd155, Gd156, Gd158, Tb159, Gd160, Dy161, Dy162, Dy163, Dy164, Ho165, Er166, Er167, Er168, Tm169, Er170, Yb171, Yb172, Yb173, Yb174, Lu175, Yb176
+## Acquired channels:  Ar80, Y89, In113, In115, Xe131, Xe134, Ba136, La138, Pr141, Nd142, Nd143, Nd144, Nd145, Nd146, Sm147, Nd148, Sm149, Nd150, Eu151, Sm152, Eu153, Sm154, Gd155, Gd156, Gd158, Tb159, Gd160, Dy161, Dy162, Dy163, Dy164, Ho165, Er166, Er167, Er168, Tm169, Er170, Yb171, Yb172, Yb173, Yb174, Lu175, Yb176, Ir191, Ir193, Pt196, Pb206
+## Channels spotted but not acquired:  
+## Channels acquired but not spotted:  Ar80, Xe131, Xe134, Ba136, La138, Ir191, Ir193, Pt196, Pb206</code></pre>
+<div class="sourceCode" id="cb68"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb68-1"><a href="spillover-correction.html#cb68-1" tabindex="-1"></a><span class="fu">assay</span>(sce, <span class="st">&quot;exprs&quot;</span>) <span class="ot">&lt;-</span> <span class="fu">asinh</span>(<span class="fu">counts</span>(sce)<span class="sc">/</span><span class="dv">5</span>)</span></code></pre></div>
+</div>
+<div id="quality-control" class="section level3 hasAnchor" number="6.1.2">
+<h3><span class="header-section-number">6.1.2</span> Quality control<a href="spillover-correction.html#quality-control" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>In the next step, we will observe the median pixel intensities per spot and
+threshold on medians &lt; 200 counts.
+These types of visualization serve two purposes:</p>
+<ol style="list-style-type: decimal">
+<li><p>Small median pixel intensities (&lt; 200 counts) might hinder the robust
+estimation of the channel spillover. In that case, consecutive pixels can be
+summed (see <a href="spillover-correction.html#pixel_binning">Optional pixel binning</a>).</p></li>
+<li><p>Each spotted metal (row) should show the highest median pixel intensity in its
+corresponding channel (column). If this is not the case, either the naming of the
+TXT files was incorrect or the incorrect metal was spotted.</p></li>
+</ol>
+<div class="sourceCode" id="cb69"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb69-1"><a href="spillover-correction.html#cb69-1" tabindex="-1"></a><span class="co"># Log10 median pixel counts per spot and channel</span></span>
+<span id="cb69-2"><a href="spillover-correction.html#cb69-2" tabindex="-1"></a><span class="fu">plotSpotHeatmap</span>(sce)</span></code></pre></div>
+<p><img src="05-spillover_matrix_files/figure-html/QC-heatmap-1.png" width="672" /></p>
+<div class="sourceCode" id="cb70"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb70-1"><a href="spillover-correction.html#cb70-1" tabindex="-1"></a><span class="co"># Thresholded on 200 pixel counts</span></span>
+<span id="cb70-2"><a href="spillover-correction.html#cb70-2" tabindex="-1"></a><span class="fu">plotSpotHeatmap</span>(sce, <span class="at">log =</span> <span class="cn">FALSE</span>, <span class="at">threshold =</span> <span class="dv">200</span>)</span></code></pre></div>
+<p><img src="05-spillover_matrix_files/figure-html/QC-heatmap-2.png" width="672" /></p>
+<p>As we can see, nearly all median pixel intensities are &gt; 200 counts for each spot.
+We also observe acquired channels for which no spot was placed (e.g., Xe134, Ir191, Ir193).</p>
+</div>
+<div id="pixel_binning" class="section level3 hasAnchor" number="6.1.3">
+<h3><span class="header-section-number">6.1.3</span> Optional pixel binning<a href="spillover-correction.html#pixel_binning" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>In cases where median pixel intensities are low (&lt; 200 counts), consecutive
+pixels can be summed to increase the robustness of the spillover estimation.
+The <code>imcRtools</code> package provides the <code>binAcrossPixels</code> function,
+which performs aggregation for each channel across <code>bin_size</code> consecutive pixels
+per spotted metal.</p>
+<div class="sourceCode" id="cb71"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb71-1"><a href="spillover-correction.html#cb71-1" tabindex="-1"></a><span class="co"># Define grouping</span></span>
+<span id="cb71-2"><a href="spillover-correction.html#cb71-2" tabindex="-1"></a>bin_size <span class="ot">=</span> <span class="dv">10</span></span>
+<span id="cb71-3"><a href="spillover-correction.html#cb71-3" tabindex="-1"></a></span>
+<span id="cb71-4"><a href="spillover-correction.html#cb71-4" tabindex="-1"></a>sce2 <span class="ot">&lt;-</span> <span class="fu">binAcrossPixels</span>(sce, <span class="at">bin_size =</span> bin_size)</span>
+<span id="cb71-5"><a href="spillover-correction.html#cb71-5" tabindex="-1"></a></span>
+<span id="cb71-6"><a href="spillover-correction.html#cb71-6" tabindex="-1"></a><span class="co"># Log10 median pixel counts per spot and channel</span></span>
+<span id="cb71-7"><a href="spillover-correction.html#cb71-7" tabindex="-1"></a><span class="fu">plotSpotHeatmap</span>(sce2)</span></code></pre></div>
+<p><img src="05-spillover_matrix_files/figure-html/binning-1.png" width="672" /></p>
+<div class="sourceCode" id="cb72"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb72-1"><a href="spillover-correction.html#cb72-1" tabindex="-1"></a><span class="co"># Thresholded on 200 pixel counts</span></span>
+<span id="cb72-2"><a href="spillover-correction.html#cb72-2" tabindex="-1"></a><span class="fu">plotSpotHeatmap</span>(sce2, <span class="at">log =</span> <span class="cn">FALSE</span>, <span class="at">threshold =</span> <span class="dv">200</span>)</span></code></pre></div>
+<p><img src="05-spillover_matrix_files/figure-html/binning-2.png" width="672" /></p>
+<p>Here, we can see an increase in the median pixel intensities and accumulation of
+off-diagonal signal. Due to already high original pixel intensities, we will
+refrain from aggregating across consecutive pixels for this demonstration.</p>
+</div>
+<div id="filtering-incorrectly-assigned-pixels" class="section level3 hasAnchor" number="6.1.4">
+<h3><span class="header-section-number">6.1.4</span> Filtering incorrectly assigned pixels<a href="spillover-correction.html#filtering-incorrectly-assigned-pixels" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>The following step uses functions provided by the <code>CATALYST</code> package to
+“debarcode” the pixels. Based on the intensity distribution of all channels,
+pixels are assigned to their corresponding barcode; here this is the already
+known metal spot. This procedure serves the purpose to identify pixels that
+cannot be robustly assigned to the spotted metal. Pixels of such kind can be
+regarded as “noisy”, “background” or “artefacts” that should be removed prior to
+spillover estimation.</p>
+<p>We will also need to specify which channels were spotted (argument <code>bc_key</code>).
+This information is directly contained in the <code>colData(sce)</code> slot.
+To facilitate visualization, we will order the <code>bc_key</code> by mass.</p>
+<p>The general workflow for pixel debarcoding is as follows:</p>
+<ol style="list-style-type: decimal">
+<li>assign a preliminary metal mass to each pixel</li>
+<li>for each pixel, estimate a cutoff parameter for the distance between
+positive and negative pixel sets</li>
+<li>apply the estimated cutoffs to identify truly positive pixels</li>
+</ol>
+<div class="sourceCode" id="cb73"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb73-1"><a href="spillover-correction.html#cb73-1" tabindex="-1"></a><span class="fu">library</span>(CATALYST)</span>
+<span id="cb73-2"><a href="spillover-correction.html#cb73-2" tabindex="-1"></a></span>
+<span id="cb73-3"><a href="spillover-correction.html#cb73-3" tabindex="-1"></a>bc_key <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">unique</span>(sce<span class="sc">$</span>sample_mass))</span>
+<span id="cb73-4"><a href="spillover-correction.html#cb73-4" tabindex="-1"></a>bc_key <span class="ot">&lt;-</span> bc_key[<span class="fu">order</span>(bc_key)]</span>
+<span id="cb73-5"><a href="spillover-correction.html#cb73-5" tabindex="-1"></a></span>
+<span id="cb73-6"><a href="spillover-correction.html#cb73-6" tabindex="-1"></a>sce <span class="ot">&lt;-</span> <span class="fu">assignPrelim</span>(sce, <span class="at">bc_key =</span> bc_key)</span>
+<span id="cb73-7"><a href="spillover-correction.html#cb73-7" tabindex="-1"></a>sce <span class="ot">&lt;-</span> <span class="fu">estCutoffs</span>(sce)</span>
+<span id="cb73-8"><a href="spillover-correction.html#cb73-8" tabindex="-1"></a>sce <span class="ot">&lt;-</span> <span class="fu">applyCutoffs</span>(sce)</span></code></pre></div>
+<p>The obtained <code>SingleCellExperiment</code> now contains the additional <code>bc_id</code> entry.
+For each pixel, this vector indicates the assigned mass (e.g. <code>161</code>) or
+<code>0</code>, meaning unassigned.</p>
+<p>This information can be visualized in form of a heatmap:</p>
+<div class="sourceCode" id="cb74"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb74-1"><a href="spillover-correction.html#cb74-1" tabindex="-1"></a><span class="fu">library</span>(pheatmap)</span>
+<span id="cb74-2"><a href="spillover-correction.html#cb74-2" tabindex="-1"></a>cur_table <span class="ot">&lt;-</span> <span class="fu">table</span>(sce<span class="sc">$</span>bc_id, sce<span class="sc">$</span>sample_mass)</span>
+<span id="cb74-3"><a href="spillover-correction.html#cb74-3" tabindex="-1"></a></span>
+<span id="cb74-4"><a href="spillover-correction.html#cb74-4" tabindex="-1"></a><span class="co"># Visualize the correctly and incorrectly assigned pixels</span></span>
+<span id="cb74-5"><a href="spillover-correction.html#cb74-5" tabindex="-1"></a><span class="fu">pheatmap</span>(<span class="fu">log10</span>(cur_table <span class="sc">+</span> <span class="dv">1</span>),</span>
+<span id="cb74-6"><a href="spillover-correction.html#cb74-6" tabindex="-1"></a>         <span class="at">cluster_rows =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb74-7"><a href="spillover-correction.html#cb74-7" tabindex="-1"></a>         <span class="at">cluster_cols =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
+<p><img src="05-spillover_matrix_files/figure-html/assignment-heatmap-1.png" width="672" /></p>
+<div class="sourceCode" id="cb75"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb75-1"><a href="spillover-correction.html#cb75-1" tabindex="-1"></a><span class="co"># Compute the fraction of unassigned pixels per spot</span></span>
+<span id="cb75-2"><a href="spillover-correction.html#cb75-2" tabindex="-1"></a>cur_table[<span class="st">&quot;0&quot;</span>,] <span class="sc">/</span> <span class="fu">colSums</span>(cur_table)</span></code></pre></div>
+<pre><code>##    113    115    141    142    143    144    145    146    147    148    149 
+## 0.1985 0.1060 0.2575 0.3195 0.3190 0.3825 0.3545 0.4280 0.3570 0.4770 0.4200 
+##    150    151    152    153    154    155    156    158    159    160    161 
+## 0.4120 0.4025 0.4050 0.4630 0.4190 0.4610 0.3525 0.4020 0.4655 0.4250 0.5595 
+##    162    163    164    165    166    167    168    169    170    171    172 
+## 0.4340 0.4230 0.4390 0.4055 0.5210 0.3900 0.3285 0.3680 0.5015 0.4900 0.5650 
+##    173    174    175    176     89 
+## 0.3125 0.4605 0.4710 0.2845 0.3015</code></pre>
+<p>We can see here, that all pixels were assigned to the right mass and that all
+pixel sets are made up of &gt; 800 pixels.</p>
+<p>However, in cases where incorrect assignment occurred or where few pixels were
+measured for some spots, the <code>imcRtools</code> package exports a simple helper
+function to exclude pixels based on these criteria:</p>
+<div class="sourceCode" id="cb77"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb77-1"><a href="spillover-correction.html#cb77-1" tabindex="-1"></a>sce <span class="ot">&lt;-</span> <span class="fu">filterPixels</span>(sce, <span class="at">minevents =</span> <span class="dv">40</span>, <span class="at">correct_pixels =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<p>In the <code>filterPixels</code> function, the <code>minevents</code> parameter specifies the threshold
+under which correctly assigned pixel sets are excluded from spillover
+estimation. The <code>correct_pixels</code> parameter indicates whether pixels that were
+assigned to masses other than the spotted mass should be excluded from spillover
+estimation. The default values often result in sufficient pixel filtering;
+however, if very few pixels (~100) are measured per spot, the <code>minevents</code>
+parameter value needs to be lowered.</p>
+</div>
+<div id="compute-spillover-matrix" class="section level3 hasAnchor" number="6.1.5">
+<h3><span class="header-section-number">6.1.5</span> Compute spillover matrix<a href="spillover-correction.html#compute-spillover-matrix" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Based on the single-positive pixels, we use the <code>CATALYST::computeSpillmat()</code>
+function to compute the spillover matrix and <code>CATALYST::plotSpillmat()</code> to
+visualize it. The <code>plotSpillmat</code> function checks the spotted and acquired
+metal isotopes against a pre-defined <code>CATALYST::isotope_list()</code>. In this data,
+the <code>Ar80</code> channel was additionally acquired to check for deviations in signal
+intensity. <code>Ar80</code> needs to be added to a custom <code>isotope_list</code> object for
+visualization.</p>
+<div class="sourceCode" id="cb78"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb78-1"><a href="spillover-correction.html#cb78-1" tabindex="-1"></a>sce <span class="ot">&lt;-</span> <span class="fu">computeSpillmat</span>(sce)</span>
+<span id="cb78-2"><a href="spillover-correction.html#cb78-2" tabindex="-1"></a></span>
+<span id="cb78-3"><a href="spillover-correction.html#cb78-3" tabindex="-1"></a>isotope_list <span class="ot">&lt;-</span> CATALYST<span class="sc">::</span>isotope_list</span>
+<span id="cb78-4"><a href="spillover-correction.html#cb78-4" tabindex="-1"></a>isotope_list<span class="sc">$</span>Ar <span class="ot">&lt;-</span> <span class="dv">80</span></span>
+<span id="cb78-5"><a href="spillover-correction.html#cb78-5" tabindex="-1"></a></span>
+<span id="cb78-6"><a href="spillover-correction.html#cb78-6" tabindex="-1"></a><span class="fu">plotSpillmat</span>(sce, <span class="at">isotope_list =</span> isotope_list)</span></code></pre></div>
+<pre><code>## Warning: The `guide` argument in `scale_*()` cannot be `FALSE`. This was deprecated in
+## ggplot2 3.3.4.
+## ℹ Please use &quot;none&quot; instead.
+## ℹ The deprecated feature was likely used in the CATALYST package.
+##   Please report the issue at &lt;https://github.com/HelenaLC/CATALYST/issues&gt;.
+## This warning is displayed once every 8 hours.
+## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
+## generated.</code></pre>
+<p><img src="05-spillover_matrix_files/figure-html/compute-spillover-1.png" width="672" /></p>
+<div class="sourceCode" id="cb80"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb80-1"><a href="spillover-correction.html#cb80-1" tabindex="-1"></a><span class="co"># Save spillover matrix in variable</span></span>
+<span id="cb80-2"><a href="spillover-correction.html#cb80-2" tabindex="-1"></a>sm <span class="ot">&lt;-</span> <span class="fu">metadata</span>(sce)<span class="sc">$</span>spillover_matrix</span></code></pre></div>
+<p><strong>Of note: the visualization of the spillover matrix using CATALYST does currently
+not visualize spillover between the larger channels.</strong> In this case, the
+spillover matrix is clipped at Yb171.</p>
+<p>As we can see, the largest spillover appears in <code>In113 --&gt; In115</code> and we also
+observe the <code>+16</code> oxide impurities for e.g. <code>Nd148 --&gt; Dy164</code>.</p>
+<p>We can save the spillover matrix for external use.</p>
+<div class="sourceCode" id="cb81"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb81-1"><a href="spillover-correction.html#cb81-1" tabindex="-1"></a><span class="fu">write.csv</span>(sm, <span class="st">&quot;data/sm.csv&quot;</span>)</span></code></pre></div>
+</div>
+</div>
+<div id="single-cell-data-compensation" class="section level2 hasAnchor" number="6.2">
+<h2><span class="header-section-number">6.2</span> Single-cell data compensation<a href="spillover-correction.html#single-cell-data-compensation" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The <code>CATALYST</code> package can be used to perform spillover compensation on the
+<strong>single-cell mean intensities</strong>. Here, the <code>SpatialExperiment</code> object generated
+in Section <a href="read-data.html#read-data">5</a> is read in. The <code>CATALYST</code> package requires an entry
+to <code>rowData(spe)$channel_name</code> for the <code>compCytof</code> function to run. This entry
+should contain the metal isotopes in the form (mt)(mass)Di (e.g., <code>Sm152Di</code> for
+Samarium isotope with the atomic mass 152).</p>
+<p>The <code>compCytof</code> function performs channel spillover compensation on the mean
+pixel intensities per channel and cell. Here, we will not overwrite the assays
+in the <code>SpatialExperiment</code> object to later highlight the effect of compensation.
+As shown in Section <a href="read-data.html#read-data">5</a>, also the compensated counts are
+asinh-transformed using a cofactor of 1.</p>
+<div class="sourceCode" id="cb82"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb82-1"><a href="spillover-correction.html#cb82-1" tabindex="-1"></a>spe <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">&quot;data/spe.rds&quot;</span>)</span>
+<span id="cb82-2"><a href="spillover-correction.html#cb82-2" tabindex="-1"></a><span class="fu">rowData</span>(spe)<span class="sc">$</span>channel_name <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="fu">rowData</span>(spe)<span class="sc">$</span>channel, <span class="st">&quot;Di&quot;</span>)</span>
+<span id="cb82-3"><a href="spillover-correction.html#cb82-3" tabindex="-1"></a></span>
+<span id="cb82-4"><a href="spillover-correction.html#cb82-4" tabindex="-1"></a>spe <span class="ot">&lt;-</span> <span class="fu">compCytof</span>(spe, sm, </span>
+<span id="cb82-5"><a href="spillover-correction.html#cb82-5" tabindex="-1"></a>                 <span class="at">transform =</span> <span class="cn">TRUE</span>, <span class="at">cofactor =</span> <span class="dv">1</span>,</span>
+<span id="cb82-6"><a href="spillover-correction.html#cb82-6" tabindex="-1"></a>                 <span class="at">isotope_list =</span> isotope_list, </span>
+<span id="cb82-7"><a href="spillover-correction.html#cb82-7" tabindex="-1"></a>                 <span class="at">overwrite =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
+<p>To check the effect of channel spillover compensation, the expression of markers
+that are affected by spillover (e.g., E-cadherin in channel Yb173 and CD303 in
+channel Yb174) can be visualized in form of scatter plots before and after
+compensation.</p>
+<div class="sourceCode" id="cb83"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb83-1"><a href="spillover-correction.html#cb83-1" tabindex="-1"></a><span class="fu">library</span>(dittoSeq)</span>
+<span id="cb83-2"><a href="spillover-correction.html#cb83-2" tabindex="-1"></a><span class="fu">library</span>(patchwork)</span>
+<span id="cb83-3"><a href="spillover-correction.html#cb83-3" tabindex="-1"></a>before <span class="ot">&lt;-</span> <span class="fu">dittoScatterPlot</span>(spe, <span class="at">x.var =</span> <span class="st">&quot;Ecad&quot;</span>, <span class="at">y.var =</span> <span class="st">&quot;CD303&quot;</span>,</span>
+<span id="cb83-4"><a href="spillover-correction.html#cb83-4" tabindex="-1"></a>                           <span class="at">assay.x =</span> <span class="st">&quot;exprs&quot;</span>, <span class="at">assay.y =</span> <span class="st">&quot;exprs&quot;</span>) <span class="sc">+</span></span>
+<span id="cb83-5"><a href="spillover-correction.html#cb83-5" tabindex="-1"></a>    <span class="fu">ggtitle</span>(<span class="st">&quot;Before compensation&quot;</span>)</span>
+<span id="cb83-6"><a href="spillover-correction.html#cb83-6" tabindex="-1"></a></span>
+<span id="cb83-7"><a href="spillover-correction.html#cb83-7" tabindex="-1"></a>after <span class="ot">&lt;-</span> <span class="fu">dittoScatterPlot</span>(spe, <span class="at">x.var =</span> <span class="st">&quot;Ecad&quot;</span>, <span class="at">y.var =</span> <span class="st">&quot;CD303&quot;</span>,</span>
+<span id="cb83-8"><a href="spillover-correction.html#cb83-8" tabindex="-1"></a>                          <span class="at">assay.x =</span> <span class="st">&quot;compexprs&quot;</span>, <span class="at">assay.y =</span> <span class="st">&quot;compexprs&quot;</span>) <span class="sc">+</span></span>
+<span id="cb83-9"><a href="spillover-correction.html#cb83-9" tabindex="-1"></a>    <span class="fu">ggtitle</span>(<span class="st">&quot;After compensation&quot;</span>)</span>
+<span id="cb83-10"><a href="spillover-correction.html#cb83-10" tabindex="-1"></a>before <span class="sc">+</span> after</span></code></pre></div>
+<p><img src="05-spillover_matrix_files/figure-html/visualize-single-cell-spillover-1.png" width="672" /></p>
+<p>We observe that the spillover Yb173 –&gt; Yb174 was successfully corrected.
+To facilitate further downstream analysis, the non-compensated assays can now be
+replaced by their compensated counterparts:</p>
+<div class="sourceCode" id="cb84"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb84-1"><a href="spillover-correction.html#cb84-1" tabindex="-1"></a><span class="fu">assay</span>(spe, <span class="st">&quot;counts&quot;</span>) <span class="ot">&lt;-</span> <span class="fu">assay</span>(spe, <span class="st">&quot;compcounts&quot;</span>) </span>
+<span id="cb84-2"><a href="spillover-correction.html#cb84-2" tabindex="-1"></a><span class="fu">assay</span>(spe, <span class="st">&quot;exprs&quot;</span>) <span class="ot">&lt;-</span> <span class="fu">assay</span>(spe, <span class="st">&quot;compexprs&quot;</span>) </span>
+<span id="cb84-3"><a href="spillover-correction.html#cb84-3" tabindex="-1"></a><span class="fu">assay</span>(spe, <span class="st">&quot;compcounts&quot;</span>) <span class="ot">&lt;-</span> <span class="fu">assay</span>(spe, <span class="st">&quot;compexprs&quot;</span>) <span class="ot">&lt;-</span> <span class="cn">NULL</span></span></code></pre></div>
+</div>
+<div id="image-compensation" class="section level2 hasAnchor" number="6.3">
+<h2><span class="header-section-number">6.3</span> Image compensation<a href="spillover-correction.html#image-compensation" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The <a href="https://github.com/BodenmillerGroup/cytomapper">cytomapper</a> package allows channel
+spillover compensation directly on <strong>multi-channel images</strong>.
+The <code>compImage</code> function takes a <code>CytoImageList</code> object and the estimated
+spillover matrix as input. More info on how to work with <code>CytoImageList</code>
+objects can be seen in Section <a href="image-visualization.html#image-visualization">11</a>.</p>
+<p>At this point, we can read in the <code>CytoImageList</code> object containing multi-channel
+images as generated in Section <a href="read-data.html#read-data">5</a>.
+The <code>channelNames</code> need to be set according to their metal isotope in the form
+(mt)(mass)Di and therefore match <code>colnames(sm)</code>.</p>
+<div class="sourceCode" id="cb85"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb85-1"><a href="spillover-correction.html#cb85-1" tabindex="-1"></a><span class="fu">library</span>(cytomapper)</span>
+<span id="cb85-2"><a href="spillover-correction.html#cb85-2" tabindex="-1"></a></span>
+<span id="cb85-3"><a href="spillover-correction.html#cb85-3" tabindex="-1"></a>images <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">&quot;data/images.rds&quot;</span>)</span>
+<span id="cb85-4"><a href="spillover-correction.html#cb85-4" tabindex="-1"></a><span class="fu">channelNames</span>(images) <span class="ot">&lt;-</span> <span class="fu">rowData</span>(spe)<span class="sc">$</span>channel_name</span></code></pre></div>
+<p>The CATALYST package provides the <code>adaptSpillmat</code> function that corrects the
+spillover matrix in a way that rows and columns match a predefined set of
+metals. Please refer to <code>?compCytof</code> for more information how metals in the
+spillover matrix are matched to acquired channels in the <code>SingleCellExperiment</code>
+object.</p>
+<p>The spillover matrix can now be adapted to exclude channels that were not kept
+for downstream analysis.</p>
+<div class="sourceCode" id="cb86"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb86-1"><a href="spillover-correction.html#cb86-1" tabindex="-1"></a>adapted_sm <span class="ot">&lt;-</span> <span class="fu">adaptSpillmat</span>(sm, <span class="fu">channelNames</span>(images), </span>
+<span id="cb86-2"><a href="spillover-correction.html#cb86-2" tabindex="-1"></a>                            <span class="at">isotope_list =</span> isotope_list)</span></code></pre></div>
+<pre><code>## Compensation is likely to be inaccurate.
+## Spill values for the following interactions
+## have not been estimated:</code></pre>
+<pre><code>## Ir191Di -&gt; Ir193Di</code></pre>
+<pre><code>## Ir193Di -&gt; Ir191Di</code></pre>
+<p>The adapted spillover matrix now matches the <code>channelNames</code> of the
+<code>CytoImageList</code> object and can be used to perform pixel-level spillover
+compensation. Here, we parallelise the image compensation on all available minus 2 cores. When
+working on Windows, you will need to use the <code>SnowParam</code> function instead of
+<code>MultiCoreParam</code>.</p>
+<div class="sourceCode" id="cb90"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb90-1"><a href="spillover-correction.html#cb90-1" tabindex="-1"></a><span class="fu">library</span>(BiocParallel)</span>
+<span id="cb90-2"><a href="spillover-correction.html#cb90-2" tabindex="-1"></a></span>
+<span id="cb90-3"><a href="spillover-correction.html#cb90-3" tabindex="-1"></a>images_comp <span class="ot">&lt;-</span> <span class="fu">compImage</span>(images, adapted_sm, </span>
+<span id="cb90-4"><a href="spillover-correction.html#cb90-4" tabindex="-1"></a>                         <span class="at">BPPARAM =</span> <span class="fu">MulticoreParam</span>())</span></code></pre></div>
+<p>As a sanity check, we will visualize the image before and after compensation:</p>
+<div class="sourceCode" id="cb91"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb91-1"><a href="spillover-correction.html#cb91-1" tabindex="-1"></a><span class="co"># Before compensation</span></span>
+<span id="cb91-2"><a href="spillover-correction.html#cb91-2" tabindex="-1"></a><span class="fu">plotPixels</span>(images[<span class="dv">5</span>], <span class="at">colour_by =</span> <span class="st">&quot;Yb173Di&quot;</span>, </span>
+<span id="cb91-3"><a href="spillover-correction.html#cb91-3" tabindex="-1"></a>           <span class="at">image_title =</span> <span class="fu">list</span>(<span class="at">text =</span> <span class="st">&quot;Yb173 (Ecad) - before&quot;</span>, <span class="at">position =</span> <span class="st">&quot;topleft&quot;</span>), </span>
+<span id="cb91-4"><a href="spillover-correction.html#cb91-4" tabindex="-1"></a>           <span class="at">legend =</span> <span class="cn">NULL</span>, <span class="at">bcg =</span> <span class="fu">list</span>(<span class="at">Yb173Di =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">4</span>, <span class="dv">1</span>)))</span></code></pre></div>
+<p><img src="05-spillover_matrix_files/figure-html/image-visualization-1.png" width="672" /></p>
+<div class="sourceCode" id="cb92"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb92-1"><a href="spillover-correction.html#cb92-1" tabindex="-1"></a><span class="fu">plotPixels</span>(images[<span class="dv">5</span>], <span class="at">colour_by =</span> <span class="st">&quot;Yb174Di&quot;</span>, </span>
+<span id="cb92-2"><a href="spillover-correction.html#cb92-2" tabindex="-1"></a>           <span class="at">image_title =</span> <span class="fu">list</span>(<span class="at">text =</span> <span class="st">&quot;Yb174 (CD303) - before&quot;</span>, <span class="at">position =</span> <span class="st">&quot;topleft&quot;</span>), </span>
+<span id="cb92-3"><a href="spillover-correction.html#cb92-3" tabindex="-1"></a>           <span class="at">legend =</span> <span class="cn">NULL</span>, <span class="at">bcg =</span> <span class="fu">list</span>(<span class="at">Yb174Di =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">4</span>, <span class="dv">1</span>)))</span></code></pre></div>
+<p><img src="05-spillover_matrix_files/figure-html/image-visualization-2.png" width="672" /></p>
+<div class="sourceCode" id="cb93"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb93-1"><a href="spillover-correction.html#cb93-1" tabindex="-1"></a><span class="co"># After compensation</span></span>
+<span id="cb93-2"><a href="spillover-correction.html#cb93-2" tabindex="-1"></a><span class="fu">plotPixels</span>(images_comp[<span class="dv">5</span>], <span class="at">colour_by =</span> <span class="st">&quot;Yb173Di&quot;</span>,</span>
+<span id="cb93-3"><a href="spillover-correction.html#cb93-3" tabindex="-1"></a>           <span class="at">image_title =</span> <span class="fu">list</span>(<span class="at">text =</span> <span class="st">&quot;Yb173 (Ecad) - after&quot;</span>, <span class="at">position =</span> <span class="st">&quot;topleft&quot;</span>), </span>
+<span id="cb93-4"><a href="spillover-correction.html#cb93-4" tabindex="-1"></a>           <span class="at">legend =</span> <span class="cn">NULL</span>, <span class="at">bcg =</span> <span class="fu">list</span>(<span class="at">Yb173Di =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">4</span>, <span class="dv">1</span>)))</span></code></pre></div>
+<p><img src="05-spillover_matrix_files/figure-html/image-visualization-3.png" width="672" /></p>
+<div class="sourceCode" id="cb94"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb94-1"><a href="spillover-correction.html#cb94-1" tabindex="-1"></a><span class="fu">plotPixels</span>(images_comp[<span class="dv">5</span>], <span class="at">colour_by =</span> <span class="st">&quot;Yb174Di&quot;</span>, </span>
+<span id="cb94-2"><a href="spillover-correction.html#cb94-2" tabindex="-1"></a>           <span class="at">image_title =</span> <span class="fu">list</span>(<span class="at">text =</span> <span class="st">&quot;Yb174 (CD303) - after&quot;</span>, <span class="at">position =</span> <span class="st">&quot;topleft&quot;</span>),</span>
+<span id="cb94-3"><a href="spillover-correction.html#cb94-3" tabindex="-1"></a>           <span class="at">legend =</span> <span class="cn">NULL</span>, <span class="at">bcg =</span> <span class="fu">list</span>(<span class="at">Yb174Di =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">4</span>, <span class="dv">1</span>)))</span></code></pre></div>
+<p><img src="05-spillover_matrix_files/figure-html/image-visualization-4.png" width="672" /></p>
+<p>For convenience, we will re-set the <code>channelNames</code> to their biological targtes:</p>
+<div class="sourceCode" id="cb95"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb95-1"><a href="spillover-correction.html#cb95-1" tabindex="-1"></a><span class="fu">channelNames</span>(images_comp) <span class="ot">&lt;-</span> <span class="fu">rownames</span>(spe)</span></code></pre></div>
+</div>
+<div id="write-out-compensated-images" class="section level2 hasAnchor" number="6.4">
+<h2><span class="header-section-number">6.4</span> Write out compensated images<a href="spillover-correction.html#write-out-compensated-images" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>In the final step, the compensated images are written out as 16-bit TIFF
+files:</p>
+<div class="sourceCode" id="cb96"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb96-1"><a href="spillover-correction.html#cb96-1" tabindex="-1"></a><span class="fu">library</span>(tiff)</span>
+<span id="cb96-2"><a href="spillover-correction.html#cb96-2" tabindex="-1"></a><span class="fu">dir.create</span>(<span class="st">&quot;data/comp_img&quot;</span>)</span>
+<span id="cb96-3"><a href="spillover-correction.html#cb96-3" tabindex="-1"></a><span class="fu">lapply</span>(<span class="fu">names</span>(images_comp), <span class="cf">function</span>(x){</span>
+<span id="cb96-4"><a href="spillover-correction.html#cb96-4" tabindex="-1"></a>  <span class="fu">writeImage</span>(<span class="fu">as.array</span>(images_comp[[x]])<span class="sc">/</span>(<span class="dv">2</span><span class="sc">^</span><span class="dv">16</span> <span class="sc">-</span> <span class="dv">1</span>), </span>
+<span id="cb96-5"><a href="spillover-correction.html#cb96-5" tabindex="-1"></a>             <span class="fu">paste0</span>(<span class="st">&quot;data/comp_img/&quot;</span>, x, <span class="st">&quot;.tiff&quot;</span>),</span>
+<span id="cb96-6"><a href="spillover-correction.html#cb96-6" tabindex="-1"></a>             <span class="at">bits.per.sample =</span> <span class="dv">16</span>)</span>
+<span id="cb96-7"><a href="spillover-correction.html#cb96-7" tabindex="-1"></a>})</span></code></pre></div>
+</div>
+<div id="save-objects-1" class="section level2 hasAnchor" number="6.5">
+<h2><span class="header-section-number">6.5</span> Save objects<a href="spillover-correction.html#save-objects-1" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>For further downstream analysis, the compensated <code>SpatialExperiment</code> and
+<code>CytoImageList</code> objects are saved replacing the former objects:</p>
+<div class="sourceCode" id="cb97"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb97-1"><a href="spillover-correction.html#cb97-1" tabindex="-1"></a><span class="fu">saveRDS</span>(spe, <span class="st">&quot;data/spe.rds&quot;</span>)</span>
+<span id="cb97-2"><a href="spillover-correction.html#cb97-2" tabindex="-1"></a><span class="fu">saveRDS</span>(images_comp, <span class="st">&quot;data/images.rds&quot;</span>)</span></code></pre></div>
+</div>
+<div id="session-info-1" class="section level2 hasAnchor" number="6.6">
+<h2><span class="header-section-number">6.6</span> Session Info<a href="spillover-correction.html#session-info-1" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<details>
+<summary>
+SessionInfo
+</summary>
+<pre><code>## R version 4.3.2 (2023-10-31)
+## Platform: x86_64-pc-linux-gnu (64-bit)
+## Running under: Ubuntu 22.04.3 LTS
+## 
+## Matrix products: default
+## BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
+## LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.20.so;  LAPACK version 3.10.0
+## 
+## locale:
+##  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+##  [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+##  [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+##  [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+##  [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+## [11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+## 
+## time zone: Etc/UTC
+## tzcode source: system (glibc)
+## 
+## attached base packages:
+## [1] stats4    stats     graphics  grDevices utils     datasets  methods  
+## [8] base     
+## 
+## other attached packages:
+##  [1] testthat_3.2.1              tiff_0.1-12                
+##  [3] BiocParallel_1.36.0         cytomapper_1.14.0          
+##  [5] EBImage_4.44.0              patchwork_1.1.3            
+##  [7] dittoSeq_1.14.0             ggplot2_3.4.4              
+##  [9] pheatmap_1.0.12             CATALYST_1.26.0            
+## [11] imcRtools_1.8.0             SpatialExperiment_1.12.0   
+## [13] SingleCellExperiment_1.24.0 SummarizedExperiment_1.32.0
+## [15] Biobase_2.62.0              GenomicRanges_1.54.1       
+## [17] GenomeInfoDb_1.38.5         IRanges_2.36.0             
+## [19] S4Vectors_0.40.2            BiocGenerics_0.48.1        
+## [21] MatrixGenerics_1.14.0       matrixStats_1.2.0          
+## 
+## loaded via a namespace (and not attached):
+##   [1] bitops_1.0-7                sf_1.0-15                  
+##   [3] RColorBrewer_1.1-3          doParallel_1.0.17          
+##   [5] tools_4.3.2                 backports_1.4.1            
+##   [7] utf8_1.2.4                  R6_2.5.1                   
+##   [9] DT_0.31                     HDF5Array_1.30.0           
+##  [11] rhdf5filters_1.14.1         GetoptLong_1.0.5           
+##  [13] withr_2.5.2                 sp_2.1-2                   
+##  [15] gridExtra_2.3               cli_3.6.2                  
+##  [17] archive_1.1.7               sandwich_3.1-0             
+##  [19] labeling_0.4.3              sass_0.4.8                 
+##  [21] nnls_1.5                    mvtnorm_1.2-4              
+##  [23] readr_2.1.4                 proxy_0.4-27               
+##  [25] ggridges_0.5.5              systemfonts_1.0.5          
+##  [27] colorRamps_2.3.1            svglite_2.1.3              
+##  [29] scater_1.30.1               plotrix_3.8-4              
+##  [31] flowCore_2.14.0             generics_0.1.3             
+##  [33] shape_1.4.6                 gtools_3.9.5               
+##  [35] vroom_1.6.5                 car_3.1-2                  
+##  [37] dplyr_1.1.4                 Matrix_1.6-4               
+##  [39] RProtoBufLib_2.14.0         ggbeeswarm_0.7.2           
+##  [41] fansi_1.0.6                 abind_1.4-5                
+##  [43] terra_1.7-65                lifecycle_1.0.4            
+##  [45] multcomp_1.4-25             yaml_2.3.8                 
+##  [47] carData_3.0-5               rhdf5_2.46.1               
+##  [49] SparseArray_1.2.3           Rtsne_0.17                 
+##  [51] grid_4.3.2                  promises_1.2.1             
+##  [53] crayon_1.5.2                shinydashboard_0.7.2       
+##  [55] lattice_0.21-9              beachmat_2.18.0            
+##  [57] cowplot_1.1.2               magick_2.8.2               
+##  [59] pillar_1.9.0                knitr_1.45                 
+##  [61] ComplexHeatmap_2.18.0       RTriangle_1.6-0.12         
+##  [63] rjson_0.2.21                codetools_0.2-19           
+##  [65] glue_1.6.2                  data.table_1.14.10         
+##  [67] vctrs_0.6.5                 png_0.1-8                  
+##  [69] gtable_0.3.4                cachem_1.0.8               
+##  [71] xfun_0.41                   S4Arrays_1.2.0             
+##  [73] mime_0.12                   tidygraph_1.3.0            
+##  [75] ConsensusClusterPlus_1.66.0 survival_3.5-7             
+##  [77] iterators_1.0.14            cytolib_2.14.0             
+##  [79] units_0.8-5                 ellipsis_0.3.2             
+##  [81] TH.data_1.1-2               bit64_4.0.5                
+##  [83] rprojroot_2.0.4             bslib_0.6.1                
+##  [85] irlba_2.3.5.1               svgPanZoom_0.3.4           
+##  [87] vipor_0.4.7                 KernSmooth_2.23-22         
+##  [89] colorspace_2.1-0            DBI_1.2.0                  
+##  [91] raster_3.6-26               tidyselect_1.2.0           
+##  [93] bit_4.0.5                   compiler_4.3.2             
+##  [95] BiocNeighbors_1.20.1        desc_1.4.3                 
+##  [97] DelayedArray_0.28.0         bookdown_0.37              
+##  [99] scales_1.3.0                classInt_0.4-10            
+## [101] distances_0.1.10            stringr_1.5.1              
+## [103] digest_0.6.33               fftwtools_0.9-11           
+## [105] rmarkdown_2.25              XVector_0.42.0             
+## [107] htmltools_0.5.7             pkgconfig_2.0.3            
+## [109] jpeg_0.1-10                 sparseMatrixStats_1.14.0   
+## [111] highr_0.10                  fastmap_1.1.1              
+## [113] rlang_1.1.2                 GlobalOptions_0.1.2        
+## [115] htmlwidgets_1.6.4           shiny_1.8.0                
+## [117] DelayedMatrixStats_1.24.0   farver_2.1.1               
+## [119] jquerylib_0.1.4             zoo_1.8-12                 
+## [121] jsonlite_1.8.8              BiocSingular_1.18.0        
+## [123] RCurl_1.98-1.13             magrittr_2.0.3             
+## [125] scuttle_1.12.0              GenomeInfoDbData_1.2.11    
+## [127] Rhdf5lib_1.24.1             munsell_0.5.0              
+## [129] Rcpp_1.0.11                 ggnewscale_0.4.9           
+## [131] viridis_0.6.4               stringi_1.8.3              
+## [133] ggraph_2.1.0                brio_1.1.4                 
+## [135] zlibbioc_1.48.0             MASS_7.3-60                
+## [137] plyr_1.8.9                  parallel_4.3.2             
+## [139] ggrepel_0.9.4               graphlayouts_1.0.2         
+## [141] splines_4.3.2               hms_1.1.3                  
+## [143] circlize_0.4.15             locfit_1.5-9.8             
+## [145] igraph_1.6.0                ggpubr_0.6.0               
+## [147] ggsignif_0.6.4              pkgload_1.3.3              
+## [149] reshape2_1.4.4              ScaledMatrix_1.10.0        
+## [151] XML_3.99-0.16               drc_3.0-1                  
+## [153] evaluate_0.23               tzdb_0.4.0                 
+## [155] foreach_1.5.2               tweenr_2.0.2               
+## [157] httpuv_1.6.13               tidyr_1.3.0                
+## [159] purrr_1.0.2                 polyclip_1.10-6            
+## [161] clue_0.3-65                 ggforce_0.4.1              
+## [163] rsvd_1.0.5                  broom_1.0.5                
+## [165] xtable_1.8-4                e1071_1.7-14               
+## [167] rstatix_0.7.2               later_1.3.2                
+## [169] viridisLite_0.4.2           class_7.3-22               
+## [171] tibble_3.2.1                FlowSOM_2.10.0             
+## [173] beeswarm_0.4.0              cluster_2.1.4              
+## [175] concaveman_1.1.0</code></pre>
+</details>
+
+</div>
+</div>
+<h3>References<a href="references.html#references" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-Bendall2011" class="csl-entry">
+Bendall, Sean C., Erin F. Simonds, Peng Qiu, El Ad D. Amir, Peter O. Krutzik, Rachel Finck, Robert V. Bruggner, et al. 2011. <span>“Single-Cell Mass Cytometry of Differential Immune and Drug Responses Across a Human Hematopoietic Continuum.”</span> <em>Science</em> 332: 687–96.
+</div>
+<div id="ref-Chevrier2017" class="csl-entry">
+Chevrier, Stéphane, Helena L. Crowell, Vito R. T. Zanotelli, Stefanie Engler, Mark D. Robinson, and Bernd Bodenmiller. 2017. <span>“Compensation of Signal Spillover in Suspension and Imaging Mass Cytometry.”</span> <em>Cell Systems</em> 6: 612–20.
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="read-data.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="image-and-cell-level-quality-control.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": true,
+"facebook": false,
+"twitter": true,
+"linkedin": true,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": "https://github.com/BodenmillerGroup/IMCDataAnalysis/blob/master/05-spillover_matrix.Rmd",
+"text": null
+},
+"download": null,
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "section"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

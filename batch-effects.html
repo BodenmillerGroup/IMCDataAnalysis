@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>8 Batch effect correction | Analysis workflow for IMC data</title>
+  <meta name="description" content="This bookdown project highlights possible down-stream analyses performed on imaging mass cytometry data." />
+  <meta name="generator" content="bookdown 0.37 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="8 Batch effect correction | Analysis workflow for IMC data" />
+  <meta property="og:type" content="book" />
+  
+  <meta property="og:description" content="This bookdown project highlights possible down-stream analyses performed on imaging mass cytometry data." />
+  <meta name="github-repo" content="BodenmillerGroup/IMCDataAnalysis" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="8 Batch effect correction | Analysis workflow for IMC data" />
+  
+  <meta name="twitter:description" content="This bookdown project highlights possible down-stream analyses performed on imaging mass cytometry data." />
+  
+
+<meta name="author" content="Authors: Nils Eling 1,2,*, Vito Zanotelli 1,2, Michelle Daniel 1,2, Daniel Schulz 1,2, Jonas Windhager 1,2, Lasse Meyer 1,2" />
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="image-and-cell-level-quality-control.html"/>
+<link rel="next" href="cell-phenotyping.html"/>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+<style type="text/css">
+/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Multiplexed imaging data analysis</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> IMC Data Analysis Workflow</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="index.html"><a href="index.html#disclaimer"><i class="fa fa-check"></i><b>1.1</b> Disclaimer</a></li>
+<li class="chapter" data-level="1.2" data-path="index.html"><a href="index.html#update-freeze"><i class="fa fa-check"></i><b>1.2</b> Update freeze</a></li>
+<li class="chapter" data-level="1.3" data-path="index.html"><a href="index.html#feedback-and-contributing"><i class="fa fa-check"></i><b>1.3</b> Feedback and contributing</a></li>
+<li class="chapter" data-level="1.4" data-path="index.html"><a href="index.html#maintainer"><i class="fa fa-check"></i><b>1.4</b> Maintainer</a></li>
+<li class="chapter" data-level="1.5" data-path="index.html"><a href="index.html#contributors"><i class="fa fa-check"></i><b>1.5</b> Contributors</a></li>
+<li class="chapter" data-level="1.6" data-path="index.html"><a href="index.html#citation"><i class="fa fa-check"></i><b>1.6</b> Citation</a></li>
+<li class="chapter" data-level="1.7" data-path="index.html"><a href="index.html#changelog"><i class="fa fa-check"></i><b>1.7</b> Changelog</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="intro.html"><a href="intro.html"><i class="fa fa-check"></i><b>2</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="intro.html"><a href="intro.html#technical-details-of-imc"><i class="fa fa-check"></i><b>2.1</b> Technical details of IMC</a>
+<ul>
+<li class="chapter" data-level="2.1.1" data-path="intro.html"><a href="intro.html#metal-conjugated-antobodies-and-staining"><i class="fa fa-check"></i><b>2.1.1</b> Metal-conjugated antobodies and staining</a></li>
+<li class="chapter" data-level="2.1.2" data-path="intro.html"><a href="intro.html#data-acquisition"><i class="fa fa-check"></i><b>2.1.2</b> Data acquisition</a></li>
+</ul></li>
+<li class="chapter" data-level="2.2" data-path="intro.html"><a href="intro.html#data-format"><i class="fa fa-check"></i><b>2.2</b> IMC data format</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="processing.html"><a href="processing.html"><i class="fa fa-check"></i><b>3</b> Multi-channel image processing</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="processing.html"><a href="processing.html#image-pre-processing-imc-specific"><i class="fa fa-check"></i><b>3.1</b> Image pre-processing (IMC specific)</a></li>
+<li class="chapter" data-level="3.2" data-path="processing.html"><a href="processing.html#image-segmentation"><i class="fa fa-check"></i><b>3.2</b> Image segmentation</a></li>
+<li class="chapter" data-level="3.3" data-path="processing.html"><a href="processing.html#feature-extraction"><i class="fa fa-check"></i><b>3.3</b> Feature extraction</a></li>
+<li class="chapter" data-level="3.4" data-path="processing.html"><a href="processing.html#data-export"><i class="fa fa-check"></i><b>3.4</b> Data export</a></li>
+<li class="chapter" data-level="3.5" data-path="processing.html"><a href="processing.html#data-import-into-r"><i class="fa fa-check"></i><b>3.5</b> Data import into R</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="prerequisites.html"><a href="prerequisites.html"><i class="fa fa-check"></i><b>4</b> Prerequisites</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="prerequisites.html"><a href="prerequisites.html#obtain-the-code"><i class="fa fa-check"></i><b>4.1</b> Obtain the code</a></li>
+<li class="chapter" data-level="4.2" data-path="prerequisites.html"><a href="prerequisites.html#software-requirements"><i class="fa fa-check"></i><b>4.2</b> Software requirements</a>
+<ul>
+<li class="chapter" data-level="4.2.1" data-path="prerequisites.html"><a href="prerequisites.html#docker"><i class="fa fa-check"></i><b>4.2.1</b> Using Docker</a></li>
+<li class="chapter" data-level="4.2.2" data-path="prerequisites.html"><a href="prerequisites.html#manual-install"><i class="fa fa-check"></i><b>4.2.2</b> Manual installation</a></li>
+<li class="chapter" data-level="4.2.3" data-path="prerequisites.html"><a href="prerequisites.html#major-package-versions"><i class="fa fa-check"></i><b>4.2.3</b> Major package versions</a></li>
+</ul></li>
+<li class="chapter" data-level="4.3" data-path="prerequisites.html"><a href="prerequisites.html#image-processing"><i class="fa fa-check"></i><b>4.3</b> Image processing</a></li>
+<li class="chapter" data-level="4.4" data-path="prerequisites.html"><a href="prerequisites.html#download-data"><i class="fa fa-check"></i><b>4.4</b> Download example data</a>
+<ul>
+<li class="chapter" data-level="4.4.1" data-path="prerequisites.html"><a href="prerequisites.html#processed-multiplexed-imaging-data"><i class="fa fa-check"></i><b>4.4.1</b> Processed multiplexed imaging data</a></li>
+<li class="chapter" data-level="4.4.2" data-path="prerequisites.html"><a href="prerequisites.html#files-for-spillover-matrix-estimation"><i class="fa fa-check"></i><b>4.4.2</b> Files for spillover matrix estimation</a></li>
+<li class="chapter" data-level="4.4.3" data-path="prerequisites.html"><a href="prerequisites.html#gated-cells"><i class="fa fa-check"></i><b>4.4.3</b> Gated cells</a></li>
+</ul></li>
+<li class="chapter" data-level="4.5" data-path="prerequisites.html"><a href="prerequisites.html#sessionInfo"><i class="fa fa-check"></i><b>4.5</b> Software versions</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="read-data.html"><a href="read-data.html"><i class="fa fa-check"></i><b>5</b> Read in the data</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="read-data.html"><a href="read-data.html#read-in-single-cell-information"><i class="fa fa-check"></i><b>5.1</b> Read in single-cell information</a>
+<ul>
+<li class="chapter" data-level="5.1.1" data-path="read-data.html"><a href="read-data.html#steinbock-generated-data"><i class="fa fa-check"></i><b>5.1.1</b> steinbock generated data</a></li>
+<li class="chapter" data-level="5.1.2" data-path="read-data.html"><a href="read-data.html#imc-segmentation-pipeline-generated-data"><i class="fa fa-check"></i><b>5.1.2</b> IMC Segmentation Pipeline generated data</a></li>
+<li class="chapter" data-level="5.1.3" data-path="read-data.html"><a href="read-data.html#reading-custom-files"><i class="fa fa-check"></i><b>5.1.3</b> Reading custom files</a></li>
+</ul></li>
+<li class="chapter" data-level="5.2" data-path="read-data.html"><a href="read-data.html#cell-processing"><i class="fa fa-check"></i><b>5.2</b> Single-cell processing</a></li>
+<li class="chapter" data-level="5.3" data-path="read-data.html"><a href="read-data.html#read-images"><i class="fa fa-check"></i><b>5.3</b> Read in images</a></li>
+<li class="chapter" data-level="5.4" data-path="read-data.html"><a href="read-data.html#generate-single-cell-data-from-images"><i class="fa fa-check"></i><b>5.4</b> Generate single-cell data from images</a></li>
+<li class="chapter" data-level="5.5" data-path="read-data.html"><a href="read-data.html#accessing-publicly-available-imc-datasets"><i class="fa fa-check"></i><b>5.5</b> Accessing publicly available IMC datasets</a></li>
+<li class="chapter" data-level="5.6" data-path="read-data.html"><a href="read-data.html#save-objects"><i class="fa fa-check"></i><b>5.6</b> Save objects</a></li>
+<li class="chapter" data-level="5.7" data-path="read-data.html"><a href="read-data.html#session-info"><i class="fa fa-check"></i><b>5.7</b> Session Info</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="spillover-correction.html"><a href="spillover-correction.html"><i class="fa fa-check"></i><b>6</b> Spillover correction</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="spillover-correction.html"><a href="spillover-correction.html#generate-the-spillover-matrix"><i class="fa fa-check"></i><b>6.1</b> Generate the spillover matrix</a>
+<ul>
+<li class="chapter" data-level="6.1.1" data-path="spillover-correction.html"><a href="spillover-correction.html#read-in-the-data"><i class="fa fa-check"></i><b>6.1.1</b> Read in the data</a></li>
+<li class="chapter" data-level="6.1.2" data-path="spillover-correction.html"><a href="spillover-correction.html#quality-control"><i class="fa fa-check"></i><b>6.1.2</b> Quality control</a></li>
+<li class="chapter" data-level="6.1.3" data-path="spillover-correction.html"><a href="spillover-correction.html#pixel_binning"><i class="fa fa-check"></i><b>6.1.3</b> Optional pixel binning</a></li>
+<li class="chapter" data-level="6.1.4" data-path="spillover-correction.html"><a href="spillover-correction.html#filtering-incorrectly-assigned-pixels"><i class="fa fa-check"></i><b>6.1.4</b> Filtering incorrectly assigned pixels</a></li>
+<li class="chapter" data-level="6.1.5" data-path="spillover-correction.html"><a href="spillover-correction.html#compute-spillover-matrix"><i class="fa fa-check"></i><b>6.1.5</b> Compute spillover matrix</a></li>
+</ul></li>
+<li class="chapter" data-level="6.2" data-path="spillover-correction.html"><a href="spillover-correction.html#single-cell-data-compensation"><i class="fa fa-check"></i><b>6.2</b> Single-cell data compensation</a></li>
+<li class="chapter" data-level="6.3" data-path="spillover-correction.html"><a href="spillover-correction.html#image-compensation"><i class="fa fa-check"></i><b>6.3</b> Image compensation</a></li>
+<li class="chapter" data-level="6.4" data-path="spillover-correction.html"><a href="spillover-correction.html#write-out-compensated-images"><i class="fa fa-check"></i><b>6.4</b> Write out compensated images</a></li>
+<li class="chapter" data-level="6.5" data-path="spillover-correction.html"><a href="spillover-correction.html#save-objects-1"><i class="fa fa-check"></i><b>6.5</b> Save objects</a></li>
+<li class="chapter" data-level="6.6" data-path="spillover-correction.html"><a href="spillover-correction.html#session-info-1"><i class="fa fa-check"></i><b>6.6</b> Session Info</a></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="image-and-cell-level-quality-control.html"><a href="image-and-cell-level-quality-control.html"><i class="fa fa-check"></i><b>7</b> Image and cell-level quality control</a>
+<ul>
+<li class="chapter" data-level="7.1" data-path="image-and-cell-level-quality-control.html"><a href="image-and-cell-level-quality-control.html#read-in-the-data-1"><i class="fa fa-check"></i><b>7.1</b> Read in the data</a></li>
+<li class="chapter" data-level="7.2" data-path="image-and-cell-level-quality-control.html"><a href="image-and-cell-level-quality-control.html#seg-quality"><i class="fa fa-check"></i><b>7.2</b> Segmentation quality control</a></li>
+<li class="chapter" data-level="7.3" data-path="image-and-cell-level-quality-control.html"><a href="image-and-cell-level-quality-control.html#image-quality"><i class="fa fa-check"></i><b>7.3</b> Image-level quality control</a></li>
+<li class="chapter" data-level="7.4" data-path="image-and-cell-level-quality-control.html"><a href="image-and-cell-level-quality-control.html#cell-quality"><i class="fa fa-check"></i><b>7.4</b> Cell-level quality control</a></li>
+<li class="chapter" data-level="7.5" data-path="image-and-cell-level-quality-control.html"><a href="image-and-cell-level-quality-control.html#save-objects-2"><i class="fa fa-check"></i><b>7.5</b> Save objects</a></li>
+<li class="chapter" data-level="7.6" data-path="image-and-cell-level-quality-control.html"><a href="image-and-cell-level-quality-control.html#session-info-2"><i class="fa fa-check"></i><b>7.6</b> Session Info</a></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="batch-effects.html"><a href="batch-effects.html"><i class="fa fa-check"></i><b>8</b> Batch effect correction</a>
+<ul>
+<li class="chapter" data-level="8.1" data-path="batch-effects.html"><a href="batch-effects.html#fastmnn-correction"><i class="fa fa-check"></i><b>8.1</b> fastMNN correction</a>
+<ul>
+<li class="chapter" data-level="8.1.1" data-path="batch-effects.html"><a href="batch-effects.html#perform-sample-correction"><i class="fa fa-check"></i><b>8.1.1</b> Perform sample correction</a></li>
+<li class="chapter" data-level="8.1.2" data-path="batch-effects.html"><a href="batch-effects.html#quality-control-of-correction-results"><i class="fa fa-check"></i><b>8.1.2</b> Quality control of correction results</a></li>
+<li class="chapter" data-level="8.1.3" data-path="batch-effects.html"><a href="batch-effects.html#visualization"><i class="fa fa-check"></i><b>8.1.3</b> Visualization</a></li>
+</ul></li>
+<li class="chapter" data-level="8.2" data-path="batch-effects.html"><a href="batch-effects.html#harmony-correction"><i class="fa fa-check"></i><b>8.2</b> harmony correction</a>
+<ul>
+<li class="chapter" data-level="8.2.1" data-path="batch-effects.html"><a href="batch-effects.html#visualization-1"><i class="fa fa-check"></i><b>8.2.1</b> Visualization</a></li>
+</ul></li>
+<li class="chapter" data-level="8.3" data-path="batch-effects.html"><a href="batch-effects.html#seurat-correction"><i class="fa fa-check"></i><b>8.3</b> Seurat correction</a>
+<ul>
+<li class="chapter" data-level="8.3.1" data-path="batch-effects.html"><a href="batch-effects.html#visualization-2"><i class="fa fa-check"></i><b>8.3.1</b> Visualization</a></li>
+</ul></li>
+<li class="chapter" data-level="8.4" data-path="batch-effects.html"><a href="batch-effects.html#save-objects-3"><i class="fa fa-check"></i><b>8.4</b> Save objects</a></li>
+<li class="chapter" data-level="8.5" data-path="batch-effects.html"><a href="batch-effects.html#session-info-3"><i class="fa fa-check"></i><b>8.5</b> Session Info</a></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html"><i class="fa fa-check"></i><b>9</b> Cell phenotyping</a>
+<ul>
+<li class="chapter" data-level="9.1" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#load-data"><i class="fa fa-check"></i><b>9.1</b> Load data</a></li>
+<li class="chapter" data-level="9.2" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#clustering"><i class="fa fa-check"></i><b>9.2</b> Clustering approaches</a>
+<ul>
+<li class="chapter" data-level="9.2.1" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#rphenograph"><i class="fa fa-check"></i><b>9.2.1</b> Rphenograph</a></li>
+<li class="chapter" data-level="9.2.2" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#snn-graph"><i class="fa fa-check"></i><b>9.2.2</b> Shared nearest neighbour graph</a></li>
+<li class="chapter" data-level="9.2.3" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#self-organizing-maps"><i class="fa fa-check"></i><b>9.2.3</b> Self organizing maps</a></li>
+<li class="chapter" data-level="9.2.4" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#compare-between-clustering-approaches"><i class="fa fa-check"></i><b>9.2.4</b> Compare between clustering approaches</a></li>
+<li class="chapter" data-level="9.2.5" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#clustering-notes"><i class="fa fa-check"></i><b>9.2.5</b> Further clustering notes</a></li>
+</ul></li>
+<li class="chapter" data-level="9.3" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#classification"><i class="fa fa-check"></i><b>9.3</b> Classification approach</a>
+<ul>
+<li class="chapter" data-level="9.3.1" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#manual-labeling-of-cells"><i class="fa fa-check"></i><b>9.3.1</b> Manual labeling of cells</a></li>
+<li class="chapter" data-level="9.3.2" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#define-color-vectors"><i class="fa fa-check"></i><b>9.3.2</b> Define color vectors</a></li>
+<li class="chapter" data-level="9.3.3" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#read-in-and-consolidate-labeled-data"><i class="fa fa-check"></i><b>9.3.3</b> Read in and consolidate labeled data</a></li>
+<li class="chapter" data-level="9.3.4" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#train-classifier"><i class="fa fa-check"></i><b>9.3.4</b> Train classifier</a></li>
+<li class="chapter" data-level="9.3.5" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#classifier-performance"><i class="fa fa-check"></i><b>9.3.5</b> Classifier performance</a></li>
+<li class="chapter" data-level="9.3.6" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#classification-of-new-data"><i class="fa fa-check"></i><b>9.3.6</b> Classification of new data</a></li>
+</ul></li>
+<li class="chapter" data-level="9.4" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#session-info-4"><i class="fa fa-check"></i><b>9.4</b> Session Info</a></li>
+</ul></li>
+<li class="chapter" data-level="10" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html"><i class="fa fa-check"></i><b>10</b> Single cell visualization</a>
+<ul>
+<li class="chapter" data-level="10.1" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#load-data-1"><i class="fa fa-check"></i><b>10.1</b> Load data</a></li>
+<li class="chapter" data-level="10.2" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#cell-type-level"><i class="fa fa-check"></i><b>10.2</b> Cell-type level</a>
+<ul>
+<li class="chapter" data-level="10.2.1" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#dimensionality-reduction-visualization"><i class="fa fa-check"></i><b>10.2.1</b> Dimensionality reduction visualization</a></li>
+<li class="chapter" data-level="10.2.2" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#heatmap-visualization"><i class="fa fa-check"></i><b>10.2.2</b> Heatmap visualization</a></li>
+<li class="chapter" data-level="10.2.3" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#violin-plot-visualization"><i class="fa fa-check"></i><b>10.2.3</b> Violin plot visualization</a></li>
+<li class="chapter" data-level="10.2.4" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#scatter-plot-visualization"><i class="fa fa-check"></i><b>10.2.4</b> Scatter plot visualization</a></li>
+<li class="chapter" data-level="10.2.5" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#barplot-visualization"><i class="fa fa-check"></i><b>10.2.5</b> Barplot visualization</a></li>
+<li class="chapter" data-level="10.2.6" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#catalyst-based-visualization"><i class="fa fa-check"></i><b>10.2.6</b> CATALYST-based visualization</a></li>
+</ul></li>
+<li class="chapter" data-level="10.3" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#sample-level"><i class="fa fa-check"></i><b>10.3</b> Sample-level</a>
+<ul>
+<li class="chapter" data-level="10.3.1" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#dimensionality-reduction-visualization-1"><i class="fa fa-check"></i><b>10.3.1</b> Dimensionality reduction visualization</a></li>
+<li class="chapter" data-level="10.3.2" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#heatmap-visualization-1"><i class="fa fa-check"></i><b>10.3.2</b> Heatmap visualization</a></li>
+<li class="chapter" data-level="10.3.3" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#barplot-visualization-1"><i class="fa fa-check"></i><b>10.3.3</b> Barplot visualization</a></li>
+<li class="chapter" data-level="10.3.4" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#catalyst-based-visualization-1"><i class="fa fa-check"></i><b>10.3.4</b> CATALYST-based visualization</a></li>
+</ul></li>
+<li class="chapter" data-level="10.4" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#rich-example"><i class="fa fa-check"></i><b>10.4</b> Further examples</a>
+<ul>
+<li class="chapter" data-level="10.4.1" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#publication-ready-complexheatmap"><i class="fa fa-check"></i><b>10.4.1</b> Publication-ready ComplexHeatmap</a></li>
+<li class="chapter" data-level="10.4.2" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#interactive-visualization"><i class="fa fa-check"></i><b>10.4.2</b> Interactive visualization</a></li>
+</ul></li>
+<li class="chapter" data-level="10.5" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#session-info-5"><i class="fa fa-check"></i><b>10.5</b> Session Info</a></li>
+</ul></li>
+<li class="chapter" data-level="11" data-path="image-visualization.html"><a href="image-visualization.html"><i class="fa fa-check"></i><b>11</b> Image visualization</a>
+<ul>
+<li class="chapter" data-level="11.1" data-path="image-visualization.html"><a href="image-visualization.html#pixel-visualization"><i class="fa fa-check"></i><b>11.1</b> Pixel visualization</a>
+<ul>
+<li class="chapter" data-level="11.1.1" data-path="image-visualization.html"><a href="image-visualization.html#adjusting-colors"><i class="fa fa-check"></i><b>11.1.1</b> Adjusting colors</a></li>
+<li class="chapter" data-level="11.1.2" data-path="image-visualization.html"><a href="image-visualization.html#image-normalization"><i class="fa fa-check"></i><b>11.1.2</b> Image normalization</a></li>
+</ul></li>
+<li class="chapter" data-level="11.2" data-path="image-visualization.html"><a href="image-visualization.html#mask-visualization"><i class="fa fa-check"></i><b>11.2</b> Cell visualization</a>
+<ul>
+<li class="chapter" data-level="11.2.1" data-path="image-visualization.html"><a href="image-visualization.html#visualzing-metadata"><i class="fa fa-check"></i><b>11.2.1</b> Visualzing metadata</a></li>
+<li class="chapter" data-level="11.2.2" data-path="image-visualization.html"><a href="image-visualization.html#visualizating-expression"><i class="fa fa-check"></i><b>11.2.2</b> Visualizating expression</a></li>
+<li class="chapter" data-level="11.2.3" data-path="image-visualization.html"><a href="image-visualization.html#outline-cells"><i class="fa fa-check"></i><b>11.2.3</b> Outlining cells on images</a></li>
+</ul></li>
+<li class="chapter" data-level="11.3" data-path="image-visualization.html"><a href="image-visualization.html#adjusting-plot-annotations"><i class="fa fa-check"></i><b>11.3</b> Adjusting plot annotations</a></li>
+<li class="chapter" data-level="11.4" data-path="image-visualization.html"><a href="image-visualization.html#displaying-individual-images"><i class="fa fa-check"></i><b>11.4</b> Displaying individual images</a></li>
+<li class="chapter" data-level="11.5" data-path="image-visualization.html"><a href="image-visualization.html#saving-and-returning-images"><i class="fa fa-check"></i><b>11.5</b> Saving and returning images</a></li>
+<li class="chapter" data-level="11.6" data-path="image-visualization.html"><a href="image-visualization.html#cytoviewer"><i class="fa fa-check"></i><b>11.6</b> Interactive image visualization</a></li>
+<li class="chapter" data-level="11.7" data-path="image-visualization.html"><a href="image-visualization.html#session-info-6"><i class="fa fa-check"></i><b>11.7</b> Session Info</a></li>
+</ul></li>
+<li class="chapter" data-level="12" data-path="performing-spatial-analysis.html"><a href="performing-spatial-analysis.html"><i class="fa fa-check"></i><b>12</b> Performing spatial analysis</a>
+<ul>
+<li class="chapter" data-level="12.1" data-path="performing-spatial-analysis.html"><a href="performing-spatial-analysis.html#spatial-interaction-graphs"><i class="fa fa-check"></i><b>12.1</b> Spatial interaction graphs</a></li>
+<li class="chapter" data-level="12.2" data-path="performing-spatial-analysis.html"><a href="performing-spatial-analysis.html#spatial-viz"><i class="fa fa-check"></i><b>12.2</b> Spatial visualization</a></li>
+<li class="chapter" data-level="12.3" data-path="performing-spatial-analysis.html"><a href="performing-spatial-analysis.html#spatial-community-analysis"><i class="fa fa-check"></i><b>12.3</b> Spatial community analysis</a></li>
+<li class="chapter" data-level="12.4" data-path="performing-spatial-analysis.html"><a href="performing-spatial-analysis.html#cellular-neighborhood-analysis"><i class="fa fa-check"></i><b>12.4</b> Cellular neighborhood analysis</a></li>
+<li class="chapter" data-level="12.5" data-path="performing-spatial-analysis.html"><a href="performing-spatial-analysis.html#spatial-context-analysis"><i class="fa fa-check"></i><b>12.5</b> Spatial context analysis</a></li>
+<li class="chapter" data-level="12.6" data-path="performing-spatial-analysis.html"><a href="performing-spatial-analysis.html#patch-detection"><i class="fa fa-check"></i><b>12.6</b> Patch detection</a></li>
+<li class="chapter" data-level="12.7" data-path="performing-spatial-analysis.html"><a href="performing-spatial-analysis.html#interaction-analysis"><i class="fa fa-check"></i><b>12.7</b> Interaction analysis</a></li>
+<li class="chapter" data-level="12.8" data-path="performing-spatial-analysis.html"><a href="performing-spatial-analysis.html#session-info-7"><i class="fa fa-check"></i><b>12.8</b> Session Info</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
+<li class="divider"></li>
+<li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Analysis workflow for IMC data</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="batch-effects" class="section level1 hasAnchor" number="8">
+<h1><span class="header-section-number">8</span> Batch effect correction<a href="batch-effects.html#batch-effects" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p>In Section <a href="image-and-cell-level-quality-control.html#cell-quality">7.4</a> we observed staining/expression differences
+between the individual samples. This can arise due to technical (e.g.,
+differences in sample processing) as well as biological (e.g., differential
+expression between patients/indications) effects. However, the combination of these effects
+hinders cell phenotyping via clustering as highlighted in Section <a href="cell-phenotyping.html#clustering">9.2</a>.</p>
+<p>To integrate cells across samples, we can use computational
+strategies developed for correcting batch effects in single-cell RNA sequencing
+data. In the following sections, we will use functions of the
+<a href="https://www.bioconductor.org/packages/release/bioc/html/batchelor.html">batchelor</a>,
+<a href="https://github.com/immunogenomics/harmony">harmony</a> and
+<a href="https://satijalab.org/seurat/articles/integration_introduction.html">Seurat</a>
+packages to correct for such batch effects.</p>
+<p>Of note: the correction approaches presented here aim at removing any
+differences between samples. This will also remove biological differences
+between the patients/indications. Nevertheless, integrating cells across samples
+can facilitate the detection of cell phenotypes via clustering.</p>
+<p>First, we will read in the <code>SpatialExperiment</code> object containing the single-cell
+data.</p>
+<div class="sourceCode" id="cb126"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb126-1"><a href="batch-effects.html#cb126-1" tabindex="-1"></a>spe <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">&quot;data/spe.rds&quot;</span>)</span></code></pre></div>
+<div id="fastmnn-correction" class="section level2 hasAnchor" number="8.1">
+<h2><span class="header-section-number">8.1</span> fastMNN correction<a href="batch-effects.html#fastmnn-correction" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The <code>batchelor</code> package provides the <code>mnnCorrect</code> and <code>fastMNN</code> functions to
+correct for differences between samples/batches. Both functions build up on
+finding mutual nearest neighbors (MNN) among the cells of different samples and
+correct expression differences between the batches <span class="citation">(<a href="#ref-Haghverdi2018">Haghverdi et al. 2018</a>)</span>. The <code>mnnCorrect</code> function
+returns corrected expression counts while the <code>fastMNN</code> functions performs the
+correction in reduced dimension space. As such, <code>fastMNN</code> returns integrated
+cells in form of a low dimensional embedding.</p>
+<p>Paper: <a href="https://www.nature.com/articles/nbt.4091">Batch effects in single-cell RNA-sequencing data are corrected by matching mutual nearest neighbors</a><br />
+Documentation: <a href="https://www.bioconductor.org/packages/release/bioc/vignettes/batchelor/inst/doc/correction.html">batchelor</a></p>
+<div id="perform-sample-correction" class="section level3 hasAnchor" number="8.1.1">
+<h3><span class="header-section-number">8.1.1</span> Perform sample correction<a href="batch-effects.html#perform-sample-correction" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Here, we apply the <code>fastMNN</code> function to integrate cells between
+patients. By setting <code>auto.merge = TRUE</code> the function estimates the best
+batch merging order by maximizing the number of MNN pairs at each merging step.
+This is more time consuming than merging sequentially based on how batches appear in the
+dataset (default). We again select the markers defined in Section <a href="read-data.html#cell-processing">5.2</a>
+for sample correction.</p>
+<p>The function returns a <code>SingleCellExperiment</code> object which contains corrected
+low-dimensional coordinates for each cell in the <code>reducedDim(out, "corrected")</code>
+slot. This low-dimensional embedding can be further used for clustering and
+non-linear dimensionality reduction. We check that the order of cells is the
+same between the input and output object and then transfer the corrected
+coordinates to the main <code>SpatialExperiment</code> object.</p>
+<div class="sourceCode" id="cb127"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb127-1"><a href="batch-effects.html#cb127-1" tabindex="-1"></a><span class="fu">library</span>(batchelor)</span>
+<span id="cb127-2"><a href="batch-effects.html#cb127-2" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">220228</span>)</span>
+<span id="cb127-3"><a href="batch-effects.html#cb127-3" tabindex="-1"></a>out <span class="ot">&lt;-</span> <span class="fu">fastMNN</span>(spe, <span class="at">batch =</span> spe<span class="sc">$</span>patient_id,</span>
+<span id="cb127-4"><a href="batch-effects.html#cb127-4" tabindex="-1"></a>               <span class="at">auto.merge =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb127-5"><a href="batch-effects.html#cb127-5" tabindex="-1"></a>               <span class="at">subset.row =</span> <span class="fu">rowData</span>(spe)<span class="sc">$</span>use_channel,</span>
+<span id="cb127-6"><a href="batch-effects.html#cb127-6" tabindex="-1"></a>               <span class="at">assay.type =</span> <span class="st">&quot;exprs&quot;</span>)</span>
+<span id="cb127-7"><a href="batch-effects.html#cb127-7" tabindex="-1"></a></span>
+<span id="cb127-8"><a href="batch-effects.html#cb127-8" tabindex="-1"></a><span class="co"># Check that order of cells is the same</span></span>
+<span id="cb127-9"><a href="batch-effects.html#cb127-9" tabindex="-1"></a><span class="fu">stopifnot</span>(<span class="fu">all.equal</span>(<span class="fu">colnames</span>(spe), <span class="fu">colnames</span>(out)))</span>
+<span id="cb127-10"><a href="batch-effects.html#cb127-10" tabindex="-1"></a></span>
+<span id="cb127-11"><a href="batch-effects.html#cb127-11" tabindex="-1"></a><span class="co"># Transfer the correction results to the main spe object</span></span>
+<span id="cb127-12"><a href="batch-effects.html#cb127-12" tabindex="-1"></a><span class="fu">reducedDim</span>(spe, <span class="st">&quot;fastMNN&quot;</span>) <span class="ot">&lt;-</span> <span class="fu">reducedDim</span>(out, <span class="st">&quot;corrected&quot;</span>)</span></code></pre></div>
+<p>The computational time of the <code>fastMNN</code> function call is
+1.49 minutes.</p>
+<p>Of note, the warnings that the <code>fastMNN</code> function produces can be avoided as follows:</p>
+<ol style="list-style-type: decimal">
+<li>The following warning can be avoided by setting <code>BSPARAM = BiocSingular::ExactParam()</code></li>
+</ol>
+<pre><code>Warning in (function (A, nv = 5, nu = nv, maxit = 1000, work = nv + 7, reorth = TRUE,  :
+  You&#39;re computing too large a percentage of total singular values, use a standard svd instead.</code></pre>
+<ol start="2" style="list-style-type: decimal">
+<li>The following warning can be avoided by requesting fewer singular values by setting <code>d = 30</code></li>
+</ol>
+<pre><code>In check_numbers(k = k, nu = nu, nv = nv, limit = min(dim(x)) -  :
+  more singular values/vectors requested than available</code></pre>
+</div>
+<div id="quality-control-of-correction-results" class="section level3 hasAnchor" number="8.1.2">
+<h3><span class="header-section-number">8.1.2</span> Quality control of correction results<a href="batch-effects.html#quality-control-of-correction-results" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>The <code>fastMNN</code> function further returns outputs that can be used to assess the
+quality of the batch correction. The <code>metadata(out)$merge.info</code> entry collects
+diagnostics for each individual merging step. Here, the <code>batch.size</code> and
+<code>lost.var</code> entries are important. The <code>batch.size</code> entry reports the relative
+magnitude of the batch effect and the <code>lost.var</code> entry represents the percentage
+of lost variance per merging step. A large <code>batch.size</code> and low <code>lost.var</code>
+indicate sufficient batch correction.</p>
+<div class="sourceCode" id="cb130"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb130-1"><a href="batch-effects.html#cb130-1" tabindex="-1"></a>merge_info <span class="ot">&lt;-</span> <span class="fu">metadata</span>(out)<span class="sc">$</span>merge.info </span>
+<span id="cb130-2"><a href="batch-effects.html#cb130-2" tabindex="-1"></a></span>
+<span id="cb130-3"><a href="batch-effects.html#cb130-3" tabindex="-1"></a>merge_info[,<span class="fu">c</span>(<span class="st">&quot;left&quot;</span>, <span class="st">&quot;right&quot;</span>, <span class="st">&quot;batch.size&quot;</span>)]</span></code></pre></div>
+<pre><code>## DataFrame with 3 rows and 3 columns
+##                         left    right batch.size
+##                       &lt;List&gt;   &lt;List&gt;  &lt;numeric&gt;
+## 1                   Patient4 Patient2   0.381635
+## 2          Patient4,Patient2 Patient1   0.581013
+## 3 Patient4,Patient2,Patient1 Patient3   0.767376</code></pre>
+<div class="sourceCode" id="cb132"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb132-1"><a href="batch-effects.html#cb132-1" tabindex="-1"></a>merge_info<span class="sc">$</span>lost.var</span></code></pre></div>
+<pre><code>##         Patient1    Patient2   Patient3    Patient4
+## [1,] 0.000000000 0.031154864 0.00000000 0.046198914
+## [2,] 0.043363546 0.009772150 0.00000000 0.011931892
+## [3,] 0.005394755 0.003023119 0.07219394 0.005366304</code></pre>
+<p>We observe that Patient4 and Patient2 are most similar with a low batch effect.
+Merging cells of Patient3 into the combined batch of Patient1,
+Patient2 and Patient4 resulted in the highest percentage of lost variance and
+the detection of the largest batch effect. In the next paragraph we can
+visualize the correction results.</p>
+</div>
+<div id="visualization" class="section level3 hasAnchor" number="8.1.3">
+<h3><span class="header-section-number">8.1.3</span> Visualization<a href="batch-effects.html#visualization" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>The simplest option to check if the sample effects were corrected is by using
+non-linear dimensionality reduction techniques and observe mixing of cells across
+samples. We will recompute the UMAP embedding using the corrected
+low-dimensional coordinates for each cell.</p>
+<div class="sourceCode" id="cb134"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb134-1"><a href="batch-effects.html#cb134-1" tabindex="-1"></a><span class="fu">library</span>(scater)</span>
+<span id="cb134-2"><a href="batch-effects.html#cb134-2" tabindex="-1"></a></span>
+<span id="cb134-3"><a href="batch-effects.html#cb134-3" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">220228</span>)</span>
+<span id="cb134-4"><a href="batch-effects.html#cb134-4" tabindex="-1"></a>spe <span class="ot">&lt;-</span> <span class="fu">runUMAP</span>(spe, <span class="at">dimred=</span> <span class="st">&quot;fastMNN&quot;</span>, <span class="at">name =</span> <span class="st">&quot;UMAP_mnnCorrected&quot;</span>) </span></code></pre></div>
+<p>Next, we visualize the corrected UMAP while overlaying patient IDs.</p>
+<div class="sourceCode" id="cb135"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb135-1"><a href="batch-effects.html#cb135-1" tabindex="-1"></a><span class="fu">library</span>(cowplot)</span>
+<span id="cb135-2"><a href="batch-effects.html#cb135-2" tabindex="-1"></a><span class="fu">library</span>(dittoSeq)</span>
+<span id="cb135-3"><a href="batch-effects.html#cb135-3" tabindex="-1"></a><span class="fu">library</span>(viridis)</span>
+<span id="cb135-4"><a href="batch-effects.html#cb135-4" tabindex="-1"></a></span>
+<span id="cb135-5"><a href="batch-effects.html#cb135-5" tabindex="-1"></a><span class="co"># visualize patient id </span></span>
+<span id="cb135-6"><a href="batch-effects.html#cb135-6" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> <span class="fu">dittoDimPlot</span>(spe, <span class="at">var =</span> <span class="st">&quot;patient_id&quot;</span>, </span>
+<span id="cb135-7"><a href="batch-effects.html#cb135-7" tabindex="-1"></a>                   <span class="at">reduction.use =</span> <span class="st">&quot;UMAP&quot;</span>, <span class="at">size =</span> <span class="fl">0.2</span>) <span class="sc">+</span> </span>
+<span id="cb135-8"><a href="batch-effects.html#cb135-8" tabindex="-1"></a>    <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">metadata</span>(spe)<span class="sc">$</span>color_vectors<span class="sc">$</span>patient_id) <span class="sc">+</span></span>
+<span id="cb135-9"><a href="batch-effects.html#cb135-9" tabindex="-1"></a>    <span class="fu">ggtitle</span>(<span class="st">&quot;Patient ID on UMAP before correction&quot;</span>)</span>
+<span id="cb135-10"><a href="batch-effects.html#cb135-10" tabindex="-1"></a>p2 <span class="ot">&lt;-</span> <span class="fu">dittoDimPlot</span>(spe, <span class="at">var =</span> <span class="st">&quot;patient_id&quot;</span>, </span>
+<span id="cb135-11"><a href="batch-effects.html#cb135-11" tabindex="-1"></a>                   <span class="at">reduction.use =</span> <span class="st">&quot;UMAP_mnnCorrected&quot;</span>, <span class="at">size =</span> <span class="fl">0.2</span>) <span class="sc">+</span> </span>
+<span id="cb135-12"><a href="batch-effects.html#cb135-12" tabindex="-1"></a>    <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">metadata</span>(spe)<span class="sc">$</span>color_vectors<span class="sc">$</span>patient_id) <span class="sc">+</span></span>
+<span id="cb135-13"><a href="batch-effects.html#cb135-13" tabindex="-1"></a>    <span class="fu">ggtitle</span>(<span class="st">&quot;Patient ID on UMAP after correction&quot;</span>)</span>
+<span id="cb135-14"><a href="batch-effects.html#cb135-14" tabindex="-1"></a></span>
+<span id="cb135-15"><a href="batch-effects.html#cb135-15" tabindex="-1"></a><span class="fu">plot_grid</span>(p1, p2)</span></code></pre></div>
+<p><img src="07-batch_correction_files/figure-html/visualizing-batch-correction-fastMNN-1-1.png" width="672" /></p>
+<p>We observe an imperfect merging of Patient3 into all other samples. This
+was already seen when displaying the merging information above.
+We now also visualize the expression of selected markers across all cells
+before and after batch correction.</p>
+<div class="sourceCode" id="cb136"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb136-1"><a href="batch-effects.html#cb136-1" tabindex="-1"></a>markers <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Ecad&quot;</span>, <span class="st">&quot;CD45RO&quot;</span>, <span class="st">&quot;CD20&quot;</span>, <span class="st">&quot;CD3&quot;</span>, <span class="st">&quot;FOXP3&quot;</span>, <span class="st">&quot;CD206&quot;</span>, <span class="st">&quot;MPO&quot;</span>, <span class="st">&quot;SMA&quot;</span>, <span class="st">&quot;Ki67&quot;</span>)</span>
+<span id="cb136-2"><a href="batch-effects.html#cb136-2" tabindex="-1"></a></span>
+<span id="cb136-3"><a href="batch-effects.html#cb136-3" tabindex="-1"></a><span class="co"># Before correction</span></span>
+<span id="cb136-4"><a href="batch-effects.html#cb136-4" tabindex="-1"></a>plot_list <span class="ot">&lt;-</span> <span class="fu">multi_dittoDimPlot</span>(spe, <span class="at">var =</span> markers, <span class="at">reduction.use =</span> <span class="st">&quot;UMAP&quot;</span>, </span>
+<span id="cb136-5"><a href="batch-effects.html#cb136-5" tabindex="-1"></a>                   <span class="at">assay =</span> <span class="st">&quot;exprs&quot;</span>, <span class="at">size =</span> <span class="fl">0.2</span>, <span class="at">list.out =</span> <span class="cn">TRUE</span>) </span>
+<span id="cb136-6"><a href="batch-effects.html#cb136-6" tabindex="-1"></a>plot_list <span class="ot">&lt;-</span> <span class="fu">lapply</span>(plot_list, <span class="cf">function</span>(x) x <span class="sc">+</span> <span class="fu">scale_color_viridis</span>())</span>
+<span id="cb136-7"><a href="batch-effects.html#cb136-7" tabindex="-1"></a><span class="fu">plot_grid</span>(<span class="at">plotlist =</span> plot_list) </span></code></pre></div>
+<p><img src="07-batch_correction_files/figure-html/visualizing-batch-correction-fastMNN-2-1.png" width="672" /></p>
+<div class="sourceCode" id="cb137"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb137-1"><a href="batch-effects.html#cb137-1" tabindex="-1"></a><span class="co"># After correction</span></span>
+<span id="cb137-2"><a href="batch-effects.html#cb137-2" tabindex="-1"></a>plot_list <span class="ot">&lt;-</span> <span class="fu">multi_dittoDimPlot</span>(spe, <span class="at">var =</span> markers, <span class="at">reduction.use =</span> <span class="st">&quot;UMAP_mnnCorrected&quot;</span>, </span>
+<span id="cb137-3"><a href="batch-effects.html#cb137-3" tabindex="-1"></a>                   <span class="at">assay =</span> <span class="st">&quot;exprs&quot;</span>, <span class="at">size =</span> <span class="fl">0.2</span>, <span class="at">list.out =</span> <span class="cn">TRUE</span>) </span>
+<span id="cb137-4"><a href="batch-effects.html#cb137-4" tabindex="-1"></a>plot_list <span class="ot">&lt;-</span> <span class="fu">lapply</span>(plot_list, <span class="cf">function</span>(x) x <span class="sc">+</span> <span class="fu">scale_color_viridis</span>())</span>
+<span id="cb137-5"><a href="batch-effects.html#cb137-5" tabindex="-1"></a><span class="fu">plot_grid</span>(<span class="at">plotlist =</span> plot_list) </span></code></pre></div>
+<p><img src="07-batch_correction_files/figure-html/visualizing-batch-correction-fastMNN-2-2.png" width="672" /></p>
+<p>We observe that immune cells across patients are merged after batch correction
+using <code>fastMNN</code>. However, the tumor cells of different patients still cluster
+separately.</p>
+</div>
+</div>
+<div id="harmony-correction" class="section level2 hasAnchor" number="8.2">
+<h2><span class="header-section-number">8.2</span> harmony correction<a href="batch-effects.html#harmony-correction" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The <code>harmony</code> algorithm performs batch correction by iteratively clustering and
+correcting the positions of cells in PCA space <span class="citation">(<a href="#ref-Korsunsky2019">Korsunsky et al. 2019</a>)</span>. We will first
+perform PCA on the asinh-transformed counts and then call the <code>RunHarmony</code>
+function to perform data integration.</p>
+<p>Paper: <a href="https://www.nature.com/articles/s41592-019-0619-0">Fast, sensitive and accurate integration of single-cell data with Harmony</a><br />
+Documentation: <a href="https://portals.broadinstitute.org/harmony/index.html">harmony</a></p>
+<p>Similar to the <code>fastMNN</code> function, <code>harmony</code> returns the corrected
+low-dimensional coordinates for each cell. These can be transfered to the
+<code>reducedDim</code> slot of the original <code>SpatialExperiment</code> object.</p>
+<div class="sourceCode" id="cb138"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb138-1"><a href="batch-effects.html#cb138-1" tabindex="-1"></a><span class="fu">library</span>(harmony)</span>
+<span id="cb138-2"><a href="batch-effects.html#cb138-2" tabindex="-1"></a><span class="fu">library</span>(BiocSingular)</span>
+<span id="cb138-3"><a href="batch-effects.html#cb138-3" tabindex="-1"></a></span>
+<span id="cb138-4"><a href="batch-effects.html#cb138-4" tabindex="-1"></a>spe <span class="ot">&lt;-</span> <span class="fu">runPCA</span>(spe, </span>
+<span id="cb138-5"><a href="batch-effects.html#cb138-5" tabindex="-1"></a>              <span class="at">subset_row =</span> <span class="fu">rowData</span>(spe)<span class="sc">$</span>use_channel, </span>
+<span id="cb138-6"><a href="batch-effects.html#cb138-6" tabindex="-1"></a>              <span class="at">exprs_values =</span> <span class="st">&quot;exprs&quot;</span>, </span>
+<span id="cb138-7"><a href="batch-effects.html#cb138-7" tabindex="-1"></a>              <span class="at">ncomponents =</span> <span class="dv">30</span>,</span>
+<span id="cb138-8"><a href="batch-effects.html#cb138-8" tabindex="-1"></a>              <span class="at">BSPARAM =</span> <span class="fu">ExactParam</span>())</span>
+<span id="cb138-9"><a href="batch-effects.html#cb138-9" tabindex="-1"></a></span>
+<span id="cb138-10"><a href="batch-effects.html#cb138-10" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">230616</span>)</span>
+<span id="cb138-11"><a href="batch-effects.html#cb138-11" tabindex="-1"></a>out <span class="ot">&lt;-</span> <span class="fu">RunHarmony</span>(spe, <span class="at">group.by.vars =</span> <span class="st">&quot;patient_id&quot;</span>)</span>
+<span id="cb138-12"><a href="batch-effects.html#cb138-12" tabindex="-1"></a></span>
+<span id="cb138-13"><a href="batch-effects.html#cb138-13" tabindex="-1"></a><span class="co"># Check that order of cells is the same</span></span>
+<span id="cb138-14"><a href="batch-effects.html#cb138-14" tabindex="-1"></a><span class="fu">stopifnot</span>(<span class="fu">all.equal</span>(<span class="fu">colnames</span>(spe), <span class="fu">colnames</span>(out)))</span>
+<span id="cb138-15"><a href="batch-effects.html#cb138-15" tabindex="-1"></a></span>
+<span id="cb138-16"><a href="batch-effects.html#cb138-16" tabindex="-1"></a><span class="fu">reducedDim</span>(spe, <span class="st">&quot;harmony&quot;</span>) <span class="ot">&lt;-</span> <span class="fu">reducedDim</span>(out, <span class="st">&quot;HARMONY&quot;</span>)</span></code></pre></div>
+<p>The computational time of the <code>HarmonyMatrix</code> function call is
+0.48 minutes.</p>
+<div id="visualization-1" class="section level3 hasAnchor" number="8.2.1">
+<h3><span class="header-section-number">8.2.1</span> Visualization<a href="batch-effects.html#visualization-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>We will now again visualize the cells in low dimensions after UMAP embedding.</p>
+<div class="sourceCode" id="cb139"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb139-1"><a href="batch-effects.html#cb139-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">220228</span>)</span>
+<span id="cb139-2"><a href="batch-effects.html#cb139-2" tabindex="-1"></a>spe <span class="ot">&lt;-</span> <span class="fu">runUMAP</span>(spe, <span class="at">dimred =</span> <span class="st">&quot;harmony&quot;</span>, <span class="at">name =</span> <span class="st">&quot;UMAP_harmony&quot;</span>) </span></code></pre></div>
+<div class="sourceCode" id="cb140"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb140-1"><a href="batch-effects.html#cb140-1" tabindex="-1"></a><span class="co"># visualize patient id </span></span>
+<span id="cb140-2"><a href="batch-effects.html#cb140-2" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> <span class="fu">dittoDimPlot</span>(spe, <span class="at">var =</span> <span class="st">&quot;patient_id&quot;</span>, </span>
+<span id="cb140-3"><a href="batch-effects.html#cb140-3" tabindex="-1"></a>                   <span class="at">reduction.use =</span> <span class="st">&quot;UMAP&quot;</span>, <span class="at">size =</span> <span class="fl">0.2</span>) <span class="sc">+</span> </span>
+<span id="cb140-4"><a href="batch-effects.html#cb140-4" tabindex="-1"></a>    <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">metadata</span>(spe)<span class="sc">$</span>color_vectors<span class="sc">$</span>patient_id) <span class="sc">+</span></span>
+<span id="cb140-5"><a href="batch-effects.html#cb140-5" tabindex="-1"></a>    <span class="fu">ggtitle</span>(<span class="st">&quot;Patient ID on UMAP before correction&quot;</span>)</span>
+<span id="cb140-6"><a href="batch-effects.html#cb140-6" tabindex="-1"></a>p2 <span class="ot">&lt;-</span> <span class="fu">dittoDimPlot</span>(spe, <span class="at">var =</span> <span class="st">&quot;patient_id&quot;</span>, </span>
+<span id="cb140-7"><a href="batch-effects.html#cb140-7" tabindex="-1"></a>                   <span class="at">reduction.use =</span> <span class="st">&quot;UMAP_harmony&quot;</span>, <span class="at">size =</span> <span class="fl">0.2</span>) <span class="sc">+</span> </span>
+<span id="cb140-8"><a href="batch-effects.html#cb140-8" tabindex="-1"></a>    <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">metadata</span>(spe)<span class="sc">$</span>color_vectors<span class="sc">$</span>patient_id) <span class="sc">+</span></span>
+<span id="cb140-9"><a href="batch-effects.html#cb140-9" tabindex="-1"></a>    <span class="fu">ggtitle</span>(<span class="st">&quot;Patient ID on UMAP after correction&quot;</span>)</span>
+<span id="cb140-10"><a href="batch-effects.html#cb140-10" tabindex="-1"></a></span>
+<span id="cb140-11"><a href="batch-effects.html#cb140-11" tabindex="-1"></a><span class="fu">plot_grid</span>(p1, p2)</span></code></pre></div>
+<p><img src="07-batch_correction_files/figure-html/visualizing-batch-correction-harmony-1-1.png" width="672" /></p>
+<p>And we visualize selected marker expression as defined above.</p>
+<div class="sourceCode" id="cb141"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb141-1"><a href="batch-effects.html#cb141-1" tabindex="-1"></a><span class="co"># Before correction</span></span>
+<span id="cb141-2"><a href="batch-effects.html#cb141-2" tabindex="-1"></a>plot_list <span class="ot">&lt;-</span> <span class="fu">multi_dittoDimPlot</span>(spe, <span class="at">var =</span> markers, <span class="at">reduction.use =</span> <span class="st">&quot;UMAP&quot;</span>, </span>
+<span id="cb141-3"><a href="batch-effects.html#cb141-3" tabindex="-1"></a>                   <span class="at">assay =</span> <span class="st">&quot;exprs&quot;</span>, <span class="at">size =</span> <span class="fl">0.2</span>, <span class="at">list.out =</span> <span class="cn">TRUE</span>) </span>
+<span id="cb141-4"><a href="batch-effects.html#cb141-4" tabindex="-1"></a>plot_list <span class="ot">&lt;-</span> <span class="fu">lapply</span>(plot_list, <span class="cf">function</span>(x) x <span class="sc">+</span> <span class="fu">scale_color_viridis</span>())</span>
+<span id="cb141-5"><a href="batch-effects.html#cb141-5" tabindex="-1"></a><span class="fu">plot_grid</span>(<span class="at">plotlist =</span> plot_list) </span></code></pre></div>
+<p><img src="07-batch_correction_files/figure-html/visualizing-batch-correction-harmony-2-1.png" width="672" /></p>
+<div class="sourceCode" id="cb142"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb142-1"><a href="batch-effects.html#cb142-1" tabindex="-1"></a><span class="co"># After correction</span></span>
+<span id="cb142-2"><a href="batch-effects.html#cb142-2" tabindex="-1"></a>plot_list <span class="ot">&lt;-</span> <span class="fu">multi_dittoDimPlot</span>(spe, <span class="at">var =</span> markers, <span class="at">reduction.use =</span> <span class="st">&quot;UMAP_harmony&quot;</span>, </span>
+<span id="cb142-3"><a href="batch-effects.html#cb142-3" tabindex="-1"></a>                   <span class="at">assay =</span> <span class="st">&quot;exprs&quot;</span>, <span class="at">size =</span> <span class="fl">0.2</span>, <span class="at">list.out =</span> <span class="cn">TRUE</span>) </span>
+<span id="cb142-4"><a href="batch-effects.html#cb142-4" tabindex="-1"></a>plot_list <span class="ot">&lt;-</span> <span class="fu">lapply</span>(plot_list, <span class="cf">function</span>(x) x <span class="sc">+</span> <span class="fu">scale_color_viridis</span>())</span>
+<span id="cb142-5"><a href="batch-effects.html#cb142-5" tabindex="-1"></a><span class="fu">plot_grid</span>(<span class="at">plotlist =</span> plot_list) </span></code></pre></div>
+<p><img src="07-batch_correction_files/figure-html/visualizing-batch-correction-harmony-2-2.png" width="672" /></p>
+<p>We observe a more aggressive merging of cells from different patients compared
+to the results after <code>fastMNN</code> correction. Importantly, immune cell and epithelial
+markers are expressed in distinct regions of the UMAP.</p>
+</div>
+</div>
+<div id="seurat-correction" class="section level2 hasAnchor" number="8.3">
+<h2><span class="header-section-number">8.3</span> Seurat correction<a href="batch-effects.html#seurat-correction" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The <code>Seurat</code> package provides a number of functionalities to analyze single-cell
+data. As such it also allows the integration of cells across different samples.
+Conceptually, <code>Seurat</code> performs batch correction similarly to <code>fastMNN</code> by
+finding mutual nearest neighbors (MNN) in low dimensional space before
+correcting the expression values of cells <span class="citation">(<a href="#ref-Stuart2019">Stuart et al. 2019</a>)</span>.</p>
+<p>Paper: <a href="https://www.cell.com/cell/fulltext/S0092-8674(19)30559-8">Comprehensive Integration of Single-Cell Data</a><br />
+Documentation: <a href="https://satijalab.org/seurat/index.html">Seurat</a></p>
+<p>To use <code>Seurat</code>, we will first create a <code>Seurat</code> object from the <code>SpatialExperiment</code>
+object and add relevant metadata. The object also needs to be split by patient
+prior to integration.</p>
+<div class="sourceCode" id="cb143"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb143-1"><a href="batch-effects.html#cb143-1" tabindex="-1"></a><span class="fu">library</span>(Seurat)</span>
+<span id="cb143-2"><a href="batch-effects.html#cb143-2" tabindex="-1"></a><span class="fu">library</span>(SeuratObject)</span>
+<span id="cb143-3"><a href="batch-effects.html#cb143-3" tabindex="-1"></a>seurat_obj <span class="ot">&lt;-</span> <span class="fu">as.Seurat</span>(spe, <span class="at">counts =</span> <span class="st">&quot;counts&quot;</span>, <span class="at">data =</span> <span class="st">&quot;exprs&quot;</span>)</span>
+<span id="cb143-4"><a href="batch-effects.html#cb143-4" tabindex="-1"></a>seurat_obj <span class="ot">&lt;-</span> <span class="fu">AddMetaData</span>(seurat_obj, <span class="fu">as.data.frame</span>(<span class="fu">colData</span>(spe)))</span>
+<span id="cb143-5"><a href="batch-effects.html#cb143-5" tabindex="-1"></a></span>
+<span id="cb143-6"><a href="batch-effects.html#cb143-6" tabindex="-1"></a>seurat.list <span class="ot">&lt;-</span> <span class="fu">SplitObject</span>(seurat_obj, <span class="at">split.by =</span> <span class="st">&quot;patient_id&quot;</span>)</span></code></pre></div>
+<p>To avoid long run times, we will use an approach that relies on reciprocal PCA
+instead of canonical correlation analysis for dimensionality reduction and
+initial alignment. For an extended tutorial on how to use <code>Seurat</code> for data
+integration, please refer to their
+<a href="https://satijalab.org/seurat/articles/integration_rpca.html">vignette</a>.</p>
+<p>We will first define the features used for integration and perform PCA on cells
+of each patient individually. The <code>FindIntegrationAnchors</code> function detects MNNs between
+cells of different patients and the <code>IntegrateData</code> function corrects the
+expression values of cells. We slightly increase the number of neighbors to be
+considered for MNN detection (the <code>k.anchor</code> parameter). This increases the integration
+strength.</p>
+<div class="sourceCode" id="cb144"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb144-1"><a href="batch-effects.html#cb144-1" tabindex="-1"></a>features <span class="ot">&lt;-</span> <span class="fu">rownames</span>(spe)[<span class="fu">rowData</span>(spe)<span class="sc">$</span>use_channel]</span>
+<span id="cb144-2"><a href="batch-effects.html#cb144-2" tabindex="-1"></a>seurat.list <span class="ot">&lt;-</span> <span class="fu">lapply</span>(<span class="at">X =</span> seurat.list, <span class="at">FUN =</span> <span class="cf">function</span>(x) {</span>
+<span id="cb144-3"><a href="batch-effects.html#cb144-3" tabindex="-1"></a>    x <span class="ot">&lt;-</span> <span class="fu">ScaleData</span>(x, <span class="at">features =</span> features, <span class="at">verbose =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb144-4"><a href="batch-effects.html#cb144-4" tabindex="-1"></a>    x <span class="ot">&lt;-</span> <span class="fu">RunPCA</span>(x, <span class="at">features =</span> features, <span class="at">verbose =</span> <span class="cn">FALSE</span>, <span class="at">approx =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb144-5"><a href="batch-effects.html#cb144-5" tabindex="-1"></a>    <span class="fu">return</span>(x)</span>
+<span id="cb144-6"><a href="batch-effects.html#cb144-6" tabindex="-1"></a>})</span>
+<span id="cb144-7"><a href="batch-effects.html#cb144-7" tabindex="-1"></a></span>
+<span id="cb144-8"><a href="batch-effects.html#cb144-8" tabindex="-1"></a>anchors <span class="ot">&lt;-</span> <span class="fu">FindIntegrationAnchors</span>(<span class="at">object.list =</span> seurat.list, </span>
+<span id="cb144-9"><a href="batch-effects.html#cb144-9" tabindex="-1"></a>                                  <span class="at">anchor.features =</span> features,</span>
+<span id="cb144-10"><a href="batch-effects.html#cb144-10" tabindex="-1"></a>                                  <span class="at">reduction =</span> <span class="st">&quot;rpca&quot;</span>, </span>
+<span id="cb144-11"><a href="batch-effects.html#cb144-11" tabindex="-1"></a>                                  <span class="at">k.anchor =</span> <span class="dv">20</span>)</span>
+<span id="cb144-12"><a href="batch-effects.html#cb144-12" tabindex="-1"></a></span>
+<span id="cb144-13"><a href="batch-effects.html#cb144-13" tabindex="-1"></a>combined <span class="ot">&lt;-</span> <span class="fu">IntegrateData</span>(<span class="at">anchorset =</span> anchors)</span></code></pre></div>
+<p>We now select the <code>integrated</code> assay and perform PCA dimensionality reduction.
+The cell coordinates in PCA reduced space can then be transferred to the
+original <code>SpatialExperiment</code> object. <strong>Of note:</strong> by splitting the object into
+individual batch-specific objects, the ordering of cells in the integrated
+object might not match the ordering of cells in the input object. In this case,
+columns will need to be reordered. Here, we test if the ordering of cells in the
+integrated <code>Seurat</code> object matches the ordering of cells in the main
+<code>SpatialExperiment</code> object.</p>
+<div class="sourceCode" id="cb145"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb145-1"><a href="batch-effects.html#cb145-1" tabindex="-1"></a><span class="fu">DefaultAssay</span>(combined) <span class="ot">&lt;-</span> <span class="st">&quot;integrated&quot;</span></span>
+<span id="cb145-2"><a href="batch-effects.html#cb145-2" tabindex="-1"></a></span>
+<span id="cb145-3"><a href="batch-effects.html#cb145-3" tabindex="-1"></a>combined <span class="ot">&lt;-</span> <span class="fu">ScaleData</span>(combined, <span class="at">verbose =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb145-4"><a href="batch-effects.html#cb145-4" tabindex="-1"></a>combined <span class="ot">&lt;-</span> <span class="fu">RunPCA</span>(combined, <span class="at">npcs =</span> <span class="dv">30</span>, <span class="at">verbose =</span> <span class="cn">FALSE</span>, <span class="at">approx =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb145-5"><a href="batch-effects.html#cb145-5" tabindex="-1"></a></span>
+<span id="cb145-6"><a href="batch-effects.html#cb145-6" tabindex="-1"></a><span class="co"># Check that order of cells is the same</span></span>
+<span id="cb145-7"><a href="batch-effects.html#cb145-7" tabindex="-1"></a><span class="fu">stopifnot</span>(<span class="fu">all.equal</span>(<span class="fu">colnames</span>(spe), <span class="fu">colnames</span>(combined)))</span>
+<span id="cb145-8"><a href="batch-effects.html#cb145-8" tabindex="-1"></a></span>
+<span id="cb145-9"><a href="batch-effects.html#cb145-9" tabindex="-1"></a><span class="fu">reducedDim</span>(spe, <span class="st">&quot;seurat&quot;</span>) <span class="ot">&lt;-</span> <span class="fu">Embeddings</span>(combined, <span class="at">reduction =</span> <span class="st">&quot;pca&quot;</span>)</span></code></pre></div>
+<p>The computational time of the <code>Seurat</code> function calls is
+2.87 minutes.</p>
+<div id="visualization-2" class="section level3 hasAnchor" number="8.3.1">
+<h3><span class="header-section-number">8.3.1</span> Visualization<a href="batch-effects.html#visualization-2" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>As above, we recompute the UMAP embeddings based on <code>Seurat</code> integrated results
+and visualize the embedding.</p>
+<div class="sourceCode" id="cb146"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb146-1"><a href="batch-effects.html#cb146-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">220228</span>)</span>
+<span id="cb146-2"><a href="batch-effects.html#cb146-2" tabindex="-1"></a>spe <span class="ot">&lt;-</span> <span class="fu">runUMAP</span>(spe, <span class="at">dimred =</span> <span class="st">&quot;seurat&quot;</span>, <span class="at">name =</span> <span class="st">&quot;UMAP_seurat&quot;</span>) </span></code></pre></div>
+<p>Visualize patient IDs.</p>
+<div class="sourceCode" id="cb147"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb147-1"><a href="batch-effects.html#cb147-1" tabindex="-1"></a><span class="co"># visualize patient id </span></span>
+<span id="cb147-2"><a href="batch-effects.html#cb147-2" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> <span class="fu">dittoDimPlot</span>(spe, <span class="at">var =</span> <span class="st">&quot;patient_id&quot;</span>, </span>
+<span id="cb147-3"><a href="batch-effects.html#cb147-3" tabindex="-1"></a>                   <span class="at">reduction.use =</span> <span class="st">&quot;UMAP&quot;</span>, <span class="at">size =</span> <span class="fl">0.2</span>) <span class="sc">+</span> </span>
+<span id="cb147-4"><a href="batch-effects.html#cb147-4" tabindex="-1"></a>    <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">metadata</span>(spe)<span class="sc">$</span>color_vectors<span class="sc">$</span>patient_id) <span class="sc">+</span></span>
+<span id="cb147-5"><a href="batch-effects.html#cb147-5" tabindex="-1"></a>    <span class="fu">ggtitle</span>(<span class="st">&quot;Patient ID on UMAP before correction&quot;</span>)</span>
+<span id="cb147-6"><a href="batch-effects.html#cb147-6" tabindex="-1"></a>p2 <span class="ot">&lt;-</span> <span class="fu">dittoDimPlot</span>(spe, <span class="at">var =</span> <span class="st">&quot;patient_id&quot;</span>, </span>
+<span id="cb147-7"><a href="batch-effects.html#cb147-7" tabindex="-1"></a>                   <span class="at">reduction.use =</span> <span class="st">&quot;UMAP_seurat&quot;</span>, <span class="at">size =</span> <span class="fl">0.2</span>) <span class="sc">+</span> </span>
+<span id="cb147-8"><a href="batch-effects.html#cb147-8" tabindex="-1"></a>    <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">metadata</span>(spe)<span class="sc">$</span>color_vectors<span class="sc">$</span>patient_id) <span class="sc">+</span></span>
+<span id="cb147-9"><a href="batch-effects.html#cb147-9" tabindex="-1"></a>    <span class="fu">ggtitle</span>(<span class="st">&quot;Patient ID on UMAP after correction&quot;</span>)</span>
+<span id="cb147-10"><a href="batch-effects.html#cb147-10" tabindex="-1"></a></span>
+<span id="cb147-11"><a href="batch-effects.html#cb147-11" tabindex="-1"></a><span class="fu">plot_grid</span>(p1, p2)</span></code></pre></div>
+<p><img src="07-batch_correction_files/figure-html/visualizing-batch-correction-seurat-1-1.png" width="672" /></p>
+<p>Visualization of marker expression.</p>
+<div class="sourceCode" id="cb148"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb148-1"><a href="batch-effects.html#cb148-1" tabindex="-1"></a><span class="co"># Before correction</span></span>
+<span id="cb148-2"><a href="batch-effects.html#cb148-2" tabindex="-1"></a>plot_list <span class="ot">&lt;-</span> <span class="fu">multi_dittoDimPlot</span>(spe, <span class="at">var =</span> markers, <span class="at">reduction.use =</span> <span class="st">&quot;UMAP&quot;</span>, </span>
+<span id="cb148-3"><a href="batch-effects.html#cb148-3" tabindex="-1"></a>                   <span class="at">assay =</span> <span class="st">&quot;exprs&quot;</span>, <span class="at">size =</span> <span class="fl">0.2</span>, <span class="at">list.out =</span> <span class="cn">TRUE</span>) </span>
+<span id="cb148-4"><a href="batch-effects.html#cb148-4" tabindex="-1"></a>plot_list <span class="ot">&lt;-</span> <span class="fu">lapply</span>(plot_list, <span class="cf">function</span>(x) x <span class="sc">+</span> <span class="fu">scale_color_viridis</span>())</span>
+<span id="cb148-5"><a href="batch-effects.html#cb148-5" tabindex="-1"></a><span class="fu">plot_grid</span>(<span class="at">plotlist =</span> plot_list) </span></code></pre></div>
+<p><img src="07-batch_correction_files/figure-html/visualizing-batch-correction-seurat-2-1.png" width="672" /></p>
+<div class="sourceCode" id="cb149"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb149-1"><a href="batch-effects.html#cb149-1" tabindex="-1"></a><span class="co"># After correction</span></span>
+<span id="cb149-2"><a href="batch-effects.html#cb149-2" tabindex="-1"></a>plot_list <span class="ot">&lt;-</span> <span class="fu">multi_dittoDimPlot</span>(spe, <span class="at">var =</span> markers, <span class="at">reduction.use =</span> <span class="st">&quot;UMAP_seurat&quot;</span>, </span>
+<span id="cb149-3"><a href="batch-effects.html#cb149-3" tabindex="-1"></a>                   <span class="at">assay =</span> <span class="st">&quot;exprs&quot;</span>, <span class="at">size =</span> <span class="fl">0.2</span>, <span class="at">list.out =</span> <span class="cn">TRUE</span>) </span>
+<span id="cb149-4"><a href="batch-effects.html#cb149-4" tabindex="-1"></a>plot_list <span class="ot">&lt;-</span> <span class="fu">lapply</span>(plot_list, <span class="cf">function</span>(x) x <span class="sc">+</span> <span class="fu">scale_color_viridis</span>())</span>
+<span id="cb149-5"><a href="batch-effects.html#cb149-5" tabindex="-1"></a><span class="fu">plot_grid</span>(<span class="at">plotlist =</span> plot_list) </span></code></pre></div>
+<p><img src="07-batch_correction_files/figure-html/visualizing-batch-correction-seurat-2-2.png" width="672" /></p>
+<p>Similar to the methods presented above, <code>Seurat</code> integrates immune cells correctly.
+When visualizing the patient IDs, slight patient-to-patient differences within tumor
+cells can be detected.</p>
+<p>Choosing the correct integration approach is challenging without having ground truth
+cell labels available. It is recommended to compare different techniques and different
+parameter settings. Please refer to the documentation of the individual tools
+to become familiar with the possible parameter choices. Furthermore, in the following
+section, we will discuss clustering and classification approaches in light of
+expression differences between samples.</p>
+<p>In general, it appears that MNN-based approaches are less conservative in terms
+of merging compared to <code>harmony</code>. On the other hand, <code>harmony</code> could well merge
+cells in a way that regresses out biological signals.</p>
+</div>
+</div>
+<div id="save-objects-3" class="section level2 hasAnchor" number="8.4">
+<h2><span class="header-section-number">8.4</span> Save objects<a href="batch-effects.html#save-objects-3" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The modified <code>SpatialExperiment</code> object is saved for further downstream analysis.</p>
+<div class="sourceCode" id="cb150"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb150-1"><a href="batch-effects.html#cb150-1" tabindex="-1"></a><span class="fu">saveRDS</span>(spe, <span class="st">&quot;data/spe.rds&quot;</span>)</span></code></pre></div>
+</div>
+<div id="session-info-3" class="section level2 hasAnchor" number="8.5">
+<h2><span class="header-section-number">8.5</span> Session Info<a href="batch-effects.html#session-info-3" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<details>
+<summary>
+SessionInfo
+</summary>
+<pre><code>## R version 4.3.2 (2023-10-31)
+## Platform: x86_64-pc-linux-gnu (64-bit)
+## Running under: Ubuntu 22.04.3 LTS
+## 
+## Matrix products: default
+## BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
+## LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.20.so;  LAPACK version 3.10.0
+## 
+## locale:
+##  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+##  [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+##  [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+##  [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+##  [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+## [11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+## 
+## time zone: Etc/UTC
+## tzcode source: system (glibc)
+## 
+## attached base packages:
+## [1] stats4    stats     graphics  grDevices utils     datasets  methods  
+## [8] base     
+## 
+## other attached packages:
+##  [1] testthat_3.2.1              Seurat_5.0.1               
+##  [3] SeuratObject_5.0.1          sp_2.1-2                   
+##  [5] BiocSingular_1.18.0         harmony_1.2.0              
+##  [7] Rcpp_1.0.11                 viridis_0.6.4              
+##  [9] viridisLite_0.4.2           dittoSeq_1.14.0            
+## [11] cowplot_1.1.2               scater_1.30.1              
+## [13] ggplot2_3.4.4               scuttle_1.12.0             
+## [15] SpatialExperiment_1.12.0    batchelor_1.18.1           
+## [17] SingleCellExperiment_1.24.0 SummarizedExperiment_1.32.0
+## [19] Biobase_2.62.0              GenomicRanges_1.54.1       
+## [21] GenomeInfoDb_1.38.5         IRanges_2.36.0             
+## [23] S4Vectors_0.40.2            BiocGenerics_0.48.1        
+## [25] MatrixGenerics_1.14.0       matrixStats_1.2.0          
+## 
+## loaded via a namespace (and not attached):
+##   [1] RcppAnnoy_0.0.21          splines_4.3.2            
+##   [3] later_1.3.2               bitops_1.0-7             
+##   [5] tibble_3.2.1              polyclip_1.10-6          
+##   [7] fastDummies_1.7.3         lifecycle_1.0.4          
+##   [9] rprojroot_2.0.4           globals_0.16.2           
+##  [11] lattice_0.21-9            MASS_7.3-60              
+##  [13] magrittr_2.0.3            plotly_4.10.3            
+##  [15] sass_0.4.8                rmarkdown_2.25           
+##  [17] jquerylib_0.1.4           yaml_2.3.8               
+##  [19] httpuv_1.6.13             sctransform_0.4.1        
+##  [21] spam_2.10-0               spatstat.sparse_3.0-3    
+##  [23] reticulate_1.34.0         pbapply_1.7-2            
+##  [25] RColorBrewer_1.1-3        ResidualMatrix_1.12.0    
+##  [27] pkgload_1.3.3             abind_1.4-5              
+##  [29] zlibbioc_1.48.0           Rtsne_0.17               
+##  [31] purrr_1.0.2               RCurl_1.98-1.13          
+##  [33] GenomeInfoDbData_1.2.11   ggrepel_0.9.4            
+##  [35] irlba_2.3.5.1             spatstat.utils_3.0-4     
+##  [37] listenv_0.9.0             pheatmap_1.0.12          
+##  [39] goftest_1.2-3             RSpectra_0.16-1          
+##  [41] spatstat.random_3.2-2     fitdistrplus_1.1-11      
+##  [43] parallelly_1.36.0         DelayedMatrixStats_1.24.0
+##  [45] leiden_0.4.3.1            codetools_0.2-19         
+##  [47] DelayedArray_0.28.0       tidyselect_1.2.0         
+##  [49] farver_2.1.1              ScaledMatrix_1.10.0      
+##  [51] spatstat.explore_3.2-5    jsonlite_1.8.8           
+##  [53] BiocNeighbors_1.20.1      ellipsis_0.3.2           
+##  [55] progressr_0.14.0          ggridges_0.5.5           
+##  [57] survival_3.5-7            tools_4.3.2              
+##  [59] ica_1.0-3                 glue_1.6.2               
+##  [61] gridExtra_2.3             SparseArray_1.2.3        
+##  [63] xfun_0.41                 dplyr_1.1.4              
+##  [65] withr_2.5.2               fastmap_1.1.1            
+##  [67] fansi_1.0.6               digest_0.6.33            
+##  [69] rsvd_1.0.5                R6_2.5.1                 
+##  [71] mime_0.12                 colorspace_2.1-0         
+##  [73] scattermore_1.2           tensor_1.5               
+##  [75] spatstat.data_3.0-3       RhpcBLASctl_0.23-42      
+##  [77] utf8_1.2.4                tidyr_1.3.0              
+##  [79] generics_0.1.3            data.table_1.14.10       
+##  [81] httr_1.4.7                htmlwidgets_1.6.4        
+##  [83] S4Arrays_1.2.0            uwot_0.1.16              
+##  [85] pkgconfig_2.0.3           gtable_0.3.4             
+##  [87] lmtest_0.9-40             XVector_0.42.0           
+##  [89] brio_1.1.4                htmltools_0.5.7          
+##  [91] dotCall64_1.1-1           bookdown_0.37            
+##  [93] scales_1.3.0              png_0.1-8                
+##  [95] knitr_1.45                reshape2_1.4.4           
+##  [97] rjson_0.2.21              nlme_3.1-163             
+##  [99] cachem_1.0.8              zoo_1.8-12               
+## [101] stringr_1.5.1             KernSmooth_2.23-22       
+## [103] parallel_4.3.2            miniUI_0.1.1.1           
+## [105] vipor_0.4.7               desc_1.4.3               
+## [107] pillar_1.9.0              grid_4.3.2               
+## [109] vctrs_0.6.5               RANN_2.6.1               
+## [111] promises_1.2.1            beachmat_2.18.0          
+## [113] xtable_1.8-4              cluster_2.1.4            
+## [115] waldo_0.5.2               beeswarm_0.4.0           
+## [117] evaluate_0.23             magick_2.8.2             
+## [119] cli_3.6.2                 compiler_4.3.2           
+## [121] rlang_1.1.2               crayon_1.5.2             
+## [123] future.apply_1.11.1       labeling_0.4.3           
+## [125] plyr_1.8.9                ggbeeswarm_0.7.2         
+## [127] stringi_1.8.3             deldir_2.0-2             
+## [129] BiocParallel_1.36.0       munsell_0.5.0            
+## [131] lazyeval_0.2.2            spatstat.geom_3.2-7      
+## [133] Matrix_1.6-4              RcppHNSW_0.5.0           
+## [135] patchwork_1.1.3           sparseMatrixStats_1.14.0 
+## [137] future_1.33.1             shiny_1.8.0              
+## [139] highr_0.10                ROCR_1.0-11              
+## [141] igraph_1.6.0              bslib_0.6.1</code></pre>
+</details>
+
+</div>
+</div>
+<h3>References<a href="references.html#references" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-Haghverdi2018" class="csl-entry">
+Haghverdi, Laleh, Aaron T. L. Lun, Michael D. Morgan, and John C. Marioni. 2018. <span>“Batch Effects in Single-Cell RNA-Sequencing Data Are Corrected by Matching Mutual Nearest Neighbors.”</span> <em>Nature Biotechnology</em> 36: 421–27.
+</div>
+<div id="ref-Korsunsky2019" class="csl-entry">
+Korsunsky, Ilya, Nghia Millard, Jean Fan, Kamil Slowikowski, Fan Zhang, Kevin Wei, Yuriy Baglaenko, Michael Brenner, Po-ru Loh, and Soumya Raychaudhuri. 2019. <span>“Fast, Sensitive and Accurate Integration of Single-Cell Data with Harmony.”</span> <em>Nature Methods</em> 16: 1289–96.
+</div>
+<div id="ref-Stuart2019" class="csl-entry">
+Stuart, Tim, Andrew Butler, Paul Hoffman, Christoph Hafemeister, Efthymia Papalexi, William M. III Mauck, Yuhan Hao, Marlon Stoeckius, Peter Smibert, and Rahul Satija. 2019. <span>“Comprehensive Integration of Single-Cell Data.”</span> <em>Cell</em> 177: 1888–1902.
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="image-and-cell-level-quality-control.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="cell-phenotyping.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": true,
+"facebook": false,
+"twitter": true,
+"linkedin": true,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": "https://github.com/BodenmillerGroup/IMCDataAnalysis/blob/master/07-batch_correction.Rmd",
+"text": null
+},
+"download": null,
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "section"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

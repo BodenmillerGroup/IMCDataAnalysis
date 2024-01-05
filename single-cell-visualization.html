@@ -1,0 +1,1252 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>10 Single cell visualization | Analysis workflow for IMC data</title>
+  <meta name="description" content="This bookdown project highlights possible down-stream analyses performed on imaging mass cytometry data." />
+  <meta name="generator" content="bookdown 0.37 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="10 Single cell visualization | Analysis workflow for IMC data" />
+  <meta property="og:type" content="book" />
+  
+  <meta property="og:description" content="This bookdown project highlights possible down-stream analyses performed on imaging mass cytometry data." />
+  <meta name="github-repo" content="BodenmillerGroup/IMCDataAnalysis" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="10 Single cell visualization | Analysis workflow for IMC data" />
+  
+  <meta name="twitter:description" content="This bookdown project highlights possible down-stream analyses performed on imaging mass cytometry data." />
+  
+
+<meta name="author" content="Authors: Nils Eling 1,2,*, Vito Zanotelli 1,2, Michelle Daniel 1,2, Daniel Schulz 1,2, Jonas Windhager 1,2, Lasse Meyer 1,2" />
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="cell-phenotyping.html"/>
+<link rel="next" href="image-visualization.html"/>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+<style type="text/css">
+/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Multiplexed imaging data analysis</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> IMC Data Analysis Workflow</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="index.html"><a href="index.html#disclaimer"><i class="fa fa-check"></i><b>1.1</b> Disclaimer</a></li>
+<li class="chapter" data-level="1.2" data-path="index.html"><a href="index.html#update-freeze"><i class="fa fa-check"></i><b>1.2</b> Update freeze</a></li>
+<li class="chapter" data-level="1.3" data-path="index.html"><a href="index.html#feedback-and-contributing"><i class="fa fa-check"></i><b>1.3</b> Feedback and contributing</a></li>
+<li class="chapter" data-level="1.4" data-path="index.html"><a href="index.html#maintainer"><i class="fa fa-check"></i><b>1.4</b> Maintainer</a></li>
+<li class="chapter" data-level="1.5" data-path="index.html"><a href="index.html#contributors"><i class="fa fa-check"></i><b>1.5</b> Contributors</a></li>
+<li class="chapter" data-level="1.6" data-path="index.html"><a href="index.html#citation"><i class="fa fa-check"></i><b>1.6</b> Citation</a></li>
+<li class="chapter" data-level="1.7" data-path="index.html"><a href="index.html#changelog"><i class="fa fa-check"></i><b>1.7</b> Changelog</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="intro.html"><a href="intro.html"><i class="fa fa-check"></i><b>2</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="intro.html"><a href="intro.html#technical-details-of-imc"><i class="fa fa-check"></i><b>2.1</b> Technical details of IMC</a>
+<ul>
+<li class="chapter" data-level="2.1.1" data-path="intro.html"><a href="intro.html#metal-conjugated-antobodies-and-staining"><i class="fa fa-check"></i><b>2.1.1</b> Metal-conjugated antobodies and staining</a></li>
+<li class="chapter" data-level="2.1.2" data-path="intro.html"><a href="intro.html#data-acquisition"><i class="fa fa-check"></i><b>2.1.2</b> Data acquisition</a></li>
+</ul></li>
+<li class="chapter" data-level="2.2" data-path="intro.html"><a href="intro.html#data-format"><i class="fa fa-check"></i><b>2.2</b> IMC data format</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="processing.html"><a href="processing.html"><i class="fa fa-check"></i><b>3</b> Multi-channel image processing</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="processing.html"><a href="processing.html#image-pre-processing-imc-specific"><i class="fa fa-check"></i><b>3.1</b> Image pre-processing (IMC specific)</a></li>
+<li class="chapter" data-level="3.2" data-path="processing.html"><a href="processing.html#image-segmentation"><i class="fa fa-check"></i><b>3.2</b> Image segmentation</a></li>
+<li class="chapter" data-level="3.3" data-path="processing.html"><a href="processing.html#feature-extraction"><i class="fa fa-check"></i><b>3.3</b> Feature extraction</a></li>
+<li class="chapter" data-level="3.4" data-path="processing.html"><a href="processing.html#data-export"><i class="fa fa-check"></i><b>3.4</b> Data export</a></li>
+<li class="chapter" data-level="3.5" data-path="processing.html"><a href="processing.html#data-import-into-r"><i class="fa fa-check"></i><b>3.5</b> Data import into R</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="prerequisites.html"><a href="prerequisites.html"><i class="fa fa-check"></i><b>4</b> Prerequisites</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="prerequisites.html"><a href="prerequisites.html#obtain-the-code"><i class="fa fa-check"></i><b>4.1</b> Obtain the code</a></li>
+<li class="chapter" data-level="4.2" data-path="prerequisites.html"><a href="prerequisites.html#software-requirements"><i class="fa fa-check"></i><b>4.2</b> Software requirements</a>
+<ul>
+<li class="chapter" data-level="4.2.1" data-path="prerequisites.html"><a href="prerequisites.html#docker"><i class="fa fa-check"></i><b>4.2.1</b> Using Docker</a></li>
+<li class="chapter" data-level="4.2.2" data-path="prerequisites.html"><a href="prerequisites.html#manual-install"><i class="fa fa-check"></i><b>4.2.2</b> Manual installation</a></li>
+<li class="chapter" data-level="4.2.3" data-path="prerequisites.html"><a href="prerequisites.html#major-package-versions"><i class="fa fa-check"></i><b>4.2.3</b> Major package versions</a></li>
+</ul></li>
+<li class="chapter" data-level="4.3" data-path="prerequisites.html"><a href="prerequisites.html#image-processing"><i class="fa fa-check"></i><b>4.3</b> Image processing</a></li>
+<li class="chapter" data-level="4.4" data-path="prerequisites.html"><a href="prerequisites.html#download-data"><i class="fa fa-check"></i><b>4.4</b> Download example data</a>
+<ul>
+<li class="chapter" data-level="4.4.1" data-path="prerequisites.html"><a href="prerequisites.html#processed-multiplexed-imaging-data"><i class="fa fa-check"></i><b>4.4.1</b> Processed multiplexed imaging data</a></li>
+<li class="chapter" data-level="4.4.2" data-path="prerequisites.html"><a href="prerequisites.html#files-for-spillover-matrix-estimation"><i class="fa fa-check"></i><b>4.4.2</b> Files for spillover matrix estimation</a></li>
+<li class="chapter" data-level="4.4.3" data-path="prerequisites.html"><a href="prerequisites.html#gated-cells"><i class="fa fa-check"></i><b>4.4.3</b> Gated cells</a></li>
+</ul></li>
+<li class="chapter" data-level="4.5" data-path="prerequisites.html"><a href="prerequisites.html#sessionInfo"><i class="fa fa-check"></i><b>4.5</b> Software versions</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="read-data.html"><a href="read-data.html"><i class="fa fa-check"></i><b>5</b> Read in the data</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="read-data.html"><a href="read-data.html#read-in-single-cell-information"><i class="fa fa-check"></i><b>5.1</b> Read in single-cell information</a>
+<ul>
+<li class="chapter" data-level="5.1.1" data-path="read-data.html"><a href="read-data.html#steinbock-generated-data"><i class="fa fa-check"></i><b>5.1.1</b> steinbock generated data</a></li>
+<li class="chapter" data-level="5.1.2" data-path="read-data.html"><a href="read-data.html#imc-segmentation-pipeline-generated-data"><i class="fa fa-check"></i><b>5.1.2</b> IMC Segmentation Pipeline generated data</a></li>
+<li class="chapter" data-level="5.1.3" data-path="read-data.html"><a href="read-data.html#reading-custom-files"><i class="fa fa-check"></i><b>5.1.3</b> Reading custom files</a></li>
+</ul></li>
+<li class="chapter" data-level="5.2" data-path="read-data.html"><a href="read-data.html#cell-processing"><i class="fa fa-check"></i><b>5.2</b> Single-cell processing</a></li>
+<li class="chapter" data-level="5.3" data-path="read-data.html"><a href="read-data.html#read-images"><i class="fa fa-check"></i><b>5.3</b> Read in images</a></li>
+<li class="chapter" data-level="5.4" data-path="read-data.html"><a href="read-data.html#generate-single-cell-data-from-images"><i class="fa fa-check"></i><b>5.4</b> Generate single-cell data from images</a></li>
+<li class="chapter" data-level="5.5" data-path="read-data.html"><a href="read-data.html#accessing-publicly-available-imc-datasets"><i class="fa fa-check"></i><b>5.5</b> Accessing publicly available IMC datasets</a></li>
+<li class="chapter" data-level="5.6" data-path="read-data.html"><a href="read-data.html#save-objects"><i class="fa fa-check"></i><b>5.6</b> Save objects</a></li>
+<li class="chapter" data-level="5.7" data-path="read-data.html"><a href="read-data.html#session-info"><i class="fa fa-check"></i><b>5.7</b> Session Info</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="spillover-correction.html"><a href="spillover-correction.html"><i class="fa fa-check"></i><b>6</b> Spillover correction</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="spillover-correction.html"><a href="spillover-correction.html#generate-the-spillover-matrix"><i class="fa fa-check"></i><b>6.1</b> Generate the spillover matrix</a>
+<ul>
+<li class="chapter" data-level="6.1.1" data-path="spillover-correction.html"><a href="spillover-correction.html#read-in-the-data"><i class="fa fa-check"></i><b>6.1.1</b> Read in the data</a></li>
+<li class="chapter" data-level="6.1.2" data-path="spillover-correction.html"><a href="spillover-correction.html#quality-control"><i class="fa fa-check"></i><b>6.1.2</b> Quality control</a></li>
+<li class="chapter" data-level="6.1.3" data-path="spillover-correction.html"><a href="spillover-correction.html#pixel_binning"><i class="fa fa-check"></i><b>6.1.3</b> Optional pixel binning</a></li>
+<li class="chapter" data-level="6.1.4" data-path="spillover-correction.html"><a href="spillover-correction.html#filtering-incorrectly-assigned-pixels"><i class="fa fa-check"></i><b>6.1.4</b> Filtering incorrectly assigned pixels</a></li>
+<li class="chapter" data-level="6.1.5" data-path="spillover-correction.html"><a href="spillover-correction.html#compute-spillover-matrix"><i class="fa fa-check"></i><b>6.1.5</b> Compute spillover matrix</a></li>
+</ul></li>
+<li class="chapter" data-level="6.2" data-path="spillover-correction.html"><a href="spillover-correction.html#single-cell-data-compensation"><i class="fa fa-check"></i><b>6.2</b> Single-cell data compensation</a></li>
+<li class="chapter" data-level="6.3" data-path="spillover-correction.html"><a href="spillover-correction.html#image-compensation"><i class="fa fa-check"></i><b>6.3</b> Image compensation</a></li>
+<li class="chapter" data-level="6.4" data-path="spillover-correction.html"><a href="spillover-correction.html#write-out-compensated-images"><i class="fa fa-check"></i><b>6.4</b> Write out compensated images</a></li>
+<li class="chapter" data-level="6.5" data-path="spillover-correction.html"><a href="spillover-correction.html#save-objects-1"><i class="fa fa-check"></i><b>6.5</b> Save objects</a></li>
+<li class="chapter" data-level="6.6" data-path="spillover-correction.html"><a href="spillover-correction.html#session-info-1"><i class="fa fa-check"></i><b>6.6</b> Session Info</a></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="image-and-cell-level-quality-control.html"><a href="image-and-cell-level-quality-control.html"><i class="fa fa-check"></i><b>7</b> Image and cell-level quality control</a>
+<ul>
+<li class="chapter" data-level="7.1" data-path="image-and-cell-level-quality-control.html"><a href="image-and-cell-level-quality-control.html#read-in-the-data-1"><i class="fa fa-check"></i><b>7.1</b> Read in the data</a></li>
+<li class="chapter" data-level="7.2" data-path="image-and-cell-level-quality-control.html"><a href="image-and-cell-level-quality-control.html#seg-quality"><i class="fa fa-check"></i><b>7.2</b> Segmentation quality control</a></li>
+<li class="chapter" data-level="7.3" data-path="image-and-cell-level-quality-control.html"><a href="image-and-cell-level-quality-control.html#image-quality"><i class="fa fa-check"></i><b>7.3</b> Image-level quality control</a></li>
+<li class="chapter" data-level="7.4" data-path="image-and-cell-level-quality-control.html"><a href="image-and-cell-level-quality-control.html#cell-quality"><i class="fa fa-check"></i><b>7.4</b> Cell-level quality control</a></li>
+<li class="chapter" data-level="7.5" data-path="image-and-cell-level-quality-control.html"><a href="image-and-cell-level-quality-control.html#save-objects-2"><i class="fa fa-check"></i><b>7.5</b> Save objects</a></li>
+<li class="chapter" data-level="7.6" data-path="image-and-cell-level-quality-control.html"><a href="image-and-cell-level-quality-control.html#session-info-2"><i class="fa fa-check"></i><b>7.6</b> Session Info</a></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="batch-effects.html"><a href="batch-effects.html"><i class="fa fa-check"></i><b>8</b> Batch effect correction</a>
+<ul>
+<li class="chapter" data-level="8.1" data-path="batch-effects.html"><a href="batch-effects.html#fastmnn-correction"><i class="fa fa-check"></i><b>8.1</b> fastMNN correction</a>
+<ul>
+<li class="chapter" data-level="8.1.1" data-path="batch-effects.html"><a href="batch-effects.html#perform-sample-correction"><i class="fa fa-check"></i><b>8.1.1</b> Perform sample correction</a></li>
+<li class="chapter" data-level="8.1.2" data-path="batch-effects.html"><a href="batch-effects.html#quality-control-of-correction-results"><i class="fa fa-check"></i><b>8.1.2</b> Quality control of correction results</a></li>
+<li class="chapter" data-level="8.1.3" data-path="batch-effects.html"><a href="batch-effects.html#visualization"><i class="fa fa-check"></i><b>8.1.3</b> Visualization</a></li>
+</ul></li>
+<li class="chapter" data-level="8.2" data-path="batch-effects.html"><a href="batch-effects.html#harmony-correction"><i class="fa fa-check"></i><b>8.2</b> harmony correction</a>
+<ul>
+<li class="chapter" data-level="8.2.1" data-path="batch-effects.html"><a href="batch-effects.html#visualization-1"><i class="fa fa-check"></i><b>8.2.1</b> Visualization</a></li>
+</ul></li>
+<li class="chapter" data-level="8.3" data-path="batch-effects.html"><a href="batch-effects.html#seurat-correction"><i class="fa fa-check"></i><b>8.3</b> Seurat correction</a>
+<ul>
+<li class="chapter" data-level="8.3.1" data-path="batch-effects.html"><a href="batch-effects.html#visualization-2"><i class="fa fa-check"></i><b>8.3.1</b> Visualization</a></li>
+</ul></li>
+<li class="chapter" data-level="8.4" data-path="batch-effects.html"><a href="batch-effects.html#save-objects-3"><i class="fa fa-check"></i><b>8.4</b> Save objects</a></li>
+<li class="chapter" data-level="8.5" data-path="batch-effects.html"><a href="batch-effects.html#session-info-3"><i class="fa fa-check"></i><b>8.5</b> Session Info</a></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html"><i class="fa fa-check"></i><b>9</b> Cell phenotyping</a>
+<ul>
+<li class="chapter" data-level="9.1" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#load-data"><i class="fa fa-check"></i><b>9.1</b> Load data</a></li>
+<li class="chapter" data-level="9.2" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#clustering"><i class="fa fa-check"></i><b>9.2</b> Clustering approaches</a>
+<ul>
+<li class="chapter" data-level="9.2.1" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#rphenograph"><i class="fa fa-check"></i><b>9.2.1</b> Rphenograph</a></li>
+<li class="chapter" data-level="9.2.2" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#snn-graph"><i class="fa fa-check"></i><b>9.2.2</b> Shared nearest neighbour graph</a></li>
+<li class="chapter" data-level="9.2.3" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#self-organizing-maps"><i class="fa fa-check"></i><b>9.2.3</b> Self organizing maps</a></li>
+<li class="chapter" data-level="9.2.4" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#compare-between-clustering-approaches"><i class="fa fa-check"></i><b>9.2.4</b> Compare between clustering approaches</a></li>
+<li class="chapter" data-level="9.2.5" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#clustering-notes"><i class="fa fa-check"></i><b>9.2.5</b> Further clustering notes</a></li>
+</ul></li>
+<li class="chapter" data-level="9.3" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#classification"><i class="fa fa-check"></i><b>9.3</b> Classification approach</a>
+<ul>
+<li class="chapter" data-level="9.3.1" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#manual-labeling-of-cells"><i class="fa fa-check"></i><b>9.3.1</b> Manual labeling of cells</a></li>
+<li class="chapter" data-level="9.3.2" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#define-color-vectors"><i class="fa fa-check"></i><b>9.3.2</b> Define color vectors</a></li>
+<li class="chapter" data-level="9.3.3" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#read-in-and-consolidate-labeled-data"><i class="fa fa-check"></i><b>9.3.3</b> Read in and consolidate labeled data</a></li>
+<li class="chapter" data-level="9.3.4" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#train-classifier"><i class="fa fa-check"></i><b>9.3.4</b> Train classifier</a></li>
+<li class="chapter" data-level="9.3.5" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#classifier-performance"><i class="fa fa-check"></i><b>9.3.5</b> Classifier performance</a></li>
+<li class="chapter" data-level="9.3.6" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#classification-of-new-data"><i class="fa fa-check"></i><b>9.3.6</b> Classification of new data</a></li>
+</ul></li>
+<li class="chapter" data-level="9.4" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#session-info-4"><i class="fa fa-check"></i><b>9.4</b> Session Info</a></li>
+</ul></li>
+<li class="chapter" data-level="10" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html"><i class="fa fa-check"></i><b>10</b> Single cell visualization</a>
+<ul>
+<li class="chapter" data-level="10.1" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#load-data-1"><i class="fa fa-check"></i><b>10.1</b> Load data</a></li>
+<li class="chapter" data-level="10.2" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#cell-type-level"><i class="fa fa-check"></i><b>10.2</b> Cell-type level</a>
+<ul>
+<li class="chapter" data-level="10.2.1" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#dimensionality-reduction-visualization"><i class="fa fa-check"></i><b>10.2.1</b> Dimensionality reduction visualization</a></li>
+<li class="chapter" data-level="10.2.2" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#heatmap-visualization"><i class="fa fa-check"></i><b>10.2.2</b> Heatmap visualization</a></li>
+<li class="chapter" data-level="10.2.3" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#violin-plot-visualization"><i class="fa fa-check"></i><b>10.2.3</b> Violin plot visualization</a></li>
+<li class="chapter" data-level="10.2.4" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#scatter-plot-visualization"><i class="fa fa-check"></i><b>10.2.4</b> Scatter plot visualization</a></li>
+<li class="chapter" data-level="10.2.5" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#barplot-visualization"><i class="fa fa-check"></i><b>10.2.5</b> Barplot visualization</a></li>
+<li class="chapter" data-level="10.2.6" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#catalyst-based-visualization"><i class="fa fa-check"></i><b>10.2.6</b> CATALYST-based visualization</a></li>
+</ul></li>
+<li class="chapter" data-level="10.3" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#sample-level"><i class="fa fa-check"></i><b>10.3</b> Sample-level</a>
+<ul>
+<li class="chapter" data-level="10.3.1" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#dimensionality-reduction-visualization-1"><i class="fa fa-check"></i><b>10.3.1</b> Dimensionality reduction visualization</a></li>
+<li class="chapter" data-level="10.3.2" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#heatmap-visualization-1"><i class="fa fa-check"></i><b>10.3.2</b> Heatmap visualization</a></li>
+<li class="chapter" data-level="10.3.3" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#barplot-visualization-1"><i class="fa fa-check"></i><b>10.3.3</b> Barplot visualization</a></li>
+<li class="chapter" data-level="10.3.4" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#catalyst-based-visualization-1"><i class="fa fa-check"></i><b>10.3.4</b> CATALYST-based visualization</a></li>
+</ul></li>
+<li class="chapter" data-level="10.4" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#rich-example"><i class="fa fa-check"></i><b>10.4</b> Further examples</a>
+<ul>
+<li class="chapter" data-level="10.4.1" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#publication-ready-complexheatmap"><i class="fa fa-check"></i><b>10.4.1</b> Publication-ready ComplexHeatmap</a></li>
+<li class="chapter" data-level="10.4.2" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#interactive-visualization"><i class="fa fa-check"></i><b>10.4.2</b> Interactive visualization</a></li>
+</ul></li>
+<li class="chapter" data-level="10.5" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#session-info-5"><i class="fa fa-check"></i><b>10.5</b> Session Info</a></li>
+</ul></li>
+<li class="chapter" data-level="11" data-path="image-visualization.html"><a href="image-visualization.html"><i class="fa fa-check"></i><b>11</b> Image visualization</a>
+<ul>
+<li class="chapter" data-level="11.1" data-path="image-visualization.html"><a href="image-visualization.html#pixel-visualization"><i class="fa fa-check"></i><b>11.1</b> Pixel visualization</a>
+<ul>
+<li class="chapter" data-level="11.1.1" data-path="image-visualization.html"><a href="image-visualization.html#adjusting-colors"><i class="fa fa-check"></i><b>11.1.1</b> Adjusting colors</a></li>
+<li class="chapter" data-level="11.1.2" data-path="image-visualization.html"><a href="image-visualization.html#image-normalization"><i class="fa fa-check"></i><b>11.1.2</b> Image normalization</a></li>
+</ul></li>
+<li class="chapter" data-level="11.2" data-path="image-visualization.html"><a href="image-visualization.html#mask-visualization"><i class="fa fa-check"></i><b>11.2</b> Cell visualization</a>
+<ul>
+<li class="chapter" data-level="11.2.1" data-path="image-visualization.html"><a href="image-visualization.html#visualzing-metadata"><i class="fa fa-check"></i><b>11.2.1</b> Visualzing metadata</a></li>
+<li class="chapter" data-level="11.2.2" data-path="image-visualization.html"><a href="image-visualization.html#visualizating-expression"><i class="fa fa-check"></i><b>11.2.2</b> Visualizating expression</a></li>
+<li class="chapter" data-level="11.2.3" data-path="image-visualization.html"><a href="image-visualization.html#outline-cells"><i class="fa fa-check"></i><b>11.2.3</b> Outlining cells on images</a></li>
+</ul></li>
+<li class="chapter" data-level="11.3" data-path="image-visualization.html"><a href="image-visualization.html#adjusting-plot-annotations"><i class="fa fa-check"></i><b>11.3</b> Adjusting plot annotations</a></li>
+<li class="chapter" data-level="11.4" data-path="image-visualization.html"><a href="image-visualization.html#displaying-individual-images"><i class="fa fa-check"></i><b>11.4</b> Displaying individual images</a></li>
+<li class="chapter" data-level="11.5" data-path="image-visualization.html"><a href="image-visualization.html#saving-and-returning-images"><i class="fa fa-check"></i><b>11.5</b> Saving and returning images</a></li>
+<li class="chapter" data-level="11.6" data-path="image-visualization.html"><a href="image-visualization.html#cytoviewer"><i class="fa fa-check"></i><b>11.6</b> Interactive image visualization</a></li>
+<li class="chapter" data-level="11.7" data-path="image-visualization.html"><a href="image-visualization.html#session-info-6"><i class="fa fa-check"></i><b>11.7</b> Session Info</a></li>
+</ul></li>
+<li class="chapter" data-level="12" data-path="performing-spatial-analysis.html"><a href="performing-spatial-analysis.html"><i class="fa fa-check"></i><b>12</b> Performing spatial analysis</a>
+<ul>
+<li class="chapter" data-level="12.1" data-path="performing-spatial-analysis.html"><a href="performing-spatial-analysis.html#spatial-interaction-graphs"><i class="fa fa-check"></i><b>12.1</b> Spatial interaction graphs</a></li>
+<li class="chapter" data-level="12.2" data-path="performing-spatial-analysis.html"><a href="performing-spatial-analysis.html#spatial-viz"><i class="fa fa-check"></i><b>12.2</b> Spatial visualization</a></li>
+<li class="chapter" data-level="12.3" data-path="performing-spatial-analysis.html"><a href="performing-spatial-analysis.html#spatial-community-analysis"><i class="fa fa-check"></i><b>12.3</b> Spatial community analysis</a></li>
+<li class="chapter" data-level="12.4" data-path="performing-spatial-analysis.html"><a href="performing-spatial-analysis.html#cellular-neighborhood-analysis"><i class="fa fa-check"></i><b>12.4</b> Cellular neighborhood analysis</a></li>
+<li class="chapter" data-level="12.5" data-path="performing-spatial-analysis.html"><a href="performing-spatial-analysis.html#spatial-context-analysis"><i class="fa fa-check"></i><b>12.5</b> Spatial context analysis</a></li>
+<li class="chapter" data-level="12.6" data-path="performing-spatial-analysis.html"><a href="performing-spatial-analysis.html#patch-detection"><i class="fa fa-check"></i><b>12.6</b> Patch detection</a></li>
+<li class="chapter" data-level="12.7" data-path="performing-spatial-analysis.html"><a href="performing-spatial-analysis.html#interaction-analysis"><i class="fa fa-check"></i><b>12.7</b> Interaction analysis</a></li>
+<li class="chapter" data-level="12.8" data-path="performing-spatial-analysis.html"><a href="performing-spatial-analysis.html#session-info-7"><i class="fa fa-check"></i><b>12.8</b> Session Info</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
+<li class="divider"></li>
+<li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Analysis workflow for IMC data</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="single-cell-visualization" class="section level1 hasAnchor" number="10">
+<h1><span class="header-section-number">10</span> Single cell visualization<a href="single-cell-visualization.html#single-cell-visualization" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p>The following section describes typical approaches for visualizing
+single-cell data.</p>
+<p>This chapter is divided into three parts. Section <a href="single-cell-visualization.html#cell-type-level">10.2</a>
+will highlight visualization approaches downstream of cell type
+classification from Section <a href="cell-phenotyping.html#classification">9.3</a>. We will then focus on
+visualization methods that relate single-cell data to the sample level
+in Section <a href="single-cell-visualization.html#sample-level">10.3</a>. Lastly, Section <a href="single-cell-visualization.html#rich-example">10.4</a> will
+provide a more customized example on how to integrate various
+single-cell and sample metadata into one heatmap using the
+<a href="https://bioconductor.org/packages/release/bioc/html/ComplexHeatmap.html">ComplexHeatmap</a>
+package <span class="citation">(<a href="#ref-Gu2016">Gu, Eils, and Schlesner 2016</a>)</span>.</p>
+<p>Visualization functions from popular R packages in single-cell research
+such as
+<a href="https://bioconductor.org/packages/release/bioc/html/scater.html">scater</a>,
+<a href="https://bioconductor.org/packages/release/bioc/html/dittoSeq.html">DittoSeq</a>
+and
+<a href="https://bioconductor.org/packages/release/bioc/html/CATALYST.html">CATALYST</a>
+will be utilized. We will recycle methods and functions that we have
+used in previous sections, while also introducing new ones.</p>
+<p>Please note that this chapter aims to provide an overview on <strong>common</strong>
+visualization options and should be seen as a stepping-stone. However,
+many more options exist and the user should customize the visualization
+according to the biological question at hand.</p>
+<div id="load-data-1" class="section level2 hasAnchor" number="10.1">
+<h2><span class="header-section-number">10.1</span> Load data<a href="single-cell-visualization.html#load-data-1" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>First, we will read in the previously generated <code>SpatialExperiment</code>
+object.</p>
+<div class="sourceCode" id="cb208"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb208-1"><a href="single-cell-visualization.html#cb208-1" tabindex="-1"></a>spe <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">&quot;data/spe.rds&quot;</span>)</span></code></pre></div>
+<p>For visualization purposes, we will define markers that were used for
+cell type classification and markers that can indicate a specific cell
+state (e.g., Ki67 for proliferating cells).</p>
+<div class="sourceCode" id="cb209"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb209-1"><a href="single-cell-visualization.html#cb209-1" tabindex="-1"></a><span class="co"># Define cell phenotype markers </span></span>
+<span id="cb209-2"><a href="single-cell-visualization.html#cb209-2" tabindex="-1"></a>type_markers <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Ecad&quot;</span>, <span class="st">&quot;CD45RO&quot;</span>, <span class="st">&quot;CD20&quot;</span>, <span class="st">&quot;CD3&quot;</span>, <span class="st">&quot;FOXP3&quot;</span>, <span class="st">&quot;CD206&quot;</span>, <span class="st">&quot;MPO&quot;</span>, </span>
+<span id="cb209-3"><a href="single-cell-visualization.html#cb209-3" tabindex="-1"></a>                  <span class="st">&quot;SMA&quot;</span>, <span class="st">&quot;CD8a&quot;</span>, <span class="st">&quot;CD4&quot;</span>, <span class="st">&quot;HLADR&quot;</span>, <span class="st">&quot;CD15&quot;</span>, <span class="st">&quot;CD38&quot;</span>, <span class="st">&quot;PDGFRb&quot;</span>)</span>
+<span id="cb209-4"><a href="single-cell-visualization.html#cb209-4" tabindex="-1"></a></span>
+<span id="cb209-5"><a href="single-cell-visualization.html#cb209-5" tabindex="-1"></a><span class="co"># Define cell state markers </span></span>
+<span id="cb209-6"><a href="single-cell-visualization.html#cb209-6" tabindex="-1"></a>state_markers <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;CarbonicAnhydrase&quot;</span>, <span class="st">&quot;Ki67&quot;</span>, <span class="st">&quot;PD1&quot;</span>, <span class="st">&quot;GrzB&quot;</span>, <span class="st">&quot;PDL1&quot;</span>, </span>
+<span id="cb209-7"><a href="single-cell-visualization.html#cb209-7" tabindex="-1"></a>                   <span class="st">&quot;ICOS&quot;</span>, <span class="st">&quot;TCF7&quot;</span>, <span class="st">&quot;VISTA&quot;</span>)</span>
+<span id="cb209-8"><a href="single-cell-visualization.html#cb209-8" tabindex="-1"></a></span>
+<span id="cb209-9"><a href="single-cell-visualization.html#cb209-9" tabindex="-1"></a><span class="co"># Add to spe</span></span>
+<span id="cb209-10"><a href="single-cell-visualization.html#cb209-10" tabindex="-1"></a><span class="fu">rowData</span>(spe)<span class="sc">$</span>marker_class <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(<span class="fu">rownames</span>(spe) <span class="sc">%in%</span> type_markers, <span class="st">&quot;type&quot;</span>,</span>
+<span id="cb209-11"><a href="single-cell-visualization.html#cb209-11" tabindex="-1"></a>                                    <span class="fu">ifelse</span>(<span class="fu">rownames</span>(spe) <span class="sc">%in%</span> state_markers, <span class="st">&quot;state&quot;</span>, </span>
+<span id="cb209-12"><a href="single-cell-visualization.html#cb209-12" tabindex="-1"></a>                                    <span class="st">&quot;other&quot;</span>))</span></code></pre></div>
+</div>
+<div id="cell-type-level" class="section level2 hasAnchor" number="10.2">
+<h2><span class="header-section-number">10.2</span> Cell-type level<a href="single-cell-visualization.html#cell-type-level" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>In the first section of this chapter, the grouping-level for the
+visualization approaches will be the cell type classification from
+Section <a href="cell-phenotyping.html#classification">9.3</a>. Other grouping levels (e.g., cluster
+assignments from Section <a href="cell-phenotyping.html#clustering">9.2</a>) are possible and the user
+should adjust depending on the chosen analysis workflow.</p>
+<div id="dimensionality-reduction-visualization" class="section level3 hasAnchor" number="10.2.1">
+<h3><span class="header-section-number">10.2.1</span> Dimensionality reduction visualization<a href="single-cell-visualization.html#dimensionality-reduction-visualization" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>As seen before, we can visualize single-cells in low-dimensional space.
+Often, non-linear methods for dimensionality reduction such as tSNE and
+UMAP are used. They aim to preserve the distances between each cell and its
+neighbors in the high-dimensional space.</p>
+<p>Interpreting these plots is not trivial, but local neighborhoods in the
+plot can suggest similarity in expression for given cells. See
+<a href="https://bioconductor.org/books/release/OSCA/">Orchestrating Single-Cell Analysis with
+Bioconductor</a> for more
+details.</p>
+<p>Here, we will use <code>dittoDimPlot</code> from the
+<a href="https://bioconductor.org/packages/release/bioc/html/dittoSeq.html">DittoSeq</a>
+package and <code>plotReducedDim</code> from the
+<a href="https://bioconductor.org/packages/release/bioc/html/scater.html">scater</a> package
+to visualize the fastMNN-corrected UMAP colored by cell type and
+expression (using the asinh-transformed intensities), respectively.</p>
+<p>Both functions are highly flexible and return <code>ggplot</code> objects which can
+be further modified.</p>
+<div class="sourceCode" id="cb210"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb210-1"><a href="single-cell-visualization.html#cb210-1" tabindex="-1"></a><span class="fu">library</span>(dittoSeq)</span>
+<span id="cb210-2"><a href="single-cell-visualization.html#cb210-2" tabindex="-1"></a><span class="fu">library</span>(scater)</span>
+<span id="cb210-3"><a href="single-cell-visualization.html#cb210-3" tabindex="-1"></a><span class="fu">library</span>(patchwork)</span>
+<span id="cb210-4"><a href="single-cell-visualization.html#cb210-4" tabindex="-1"></a><span class="fu">library</span>(cowplot)</span>
+<span id="cb210-5"><a href="single-cell-visualization.html#cb210-5" tabindex="-1"></a><span class="fu">library</span>(viridis)</span>
+<span id="cb210-6"><a href="single-cell-visualization.html#cb210-6" tabindex="-1"></a></span>
+<span id="cb210-7"><a href="single-cell-visualization.html#cb210-7" tabindex="-1"></a><span class="do">## UMAP colored by cell type and expression - dittoDimPlot</span></span>
+<span id="cb210-8"><a href="single-cell-visualization.html#cb210-8" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> <span class="fu">dittoDimPlot</span>(spe, </span>
+<span id="cb210-9"><a href="single-cell-visualization.html#cb210-9" tabindex="-1"></a>                   <span class="at">var =</span> <span class="st">&quot;celltype&quot;</span>, </span>
+<span id="cb210-10"><a href="single-cell-visualization.html#cb210-10" tabindex="-1"></a>                   <span class="at">reduction.use =</span> <span class="st">&quot;UMAP_mnnCorrected&quot;</span>, </span>
+<span id="cb210-11"><a href="single-cell-visualization.html#cb210-11" tabindex="-1"></a>                   <span class="at">size =</span> <span class="fl">0.2</span>,</span>
+<span id="cb210-12"><a href="single-cell-visualization.html#cb210-12" tabindex="-1"></a>                   <span class="at">do.label =</span> <span class="cn">TRUE</span>) <span class="sc">+</span></span>
+<span id="cb210-13"><a href="single-cell-visualization.html#cb210-13" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">metadata</span>(spe)<span class="sc">$</span>color_vectors<span class="sc">$</span>celltype) <span class="sc">+</span></span>
+<span id="cb210-14"><a href="single-cell-visualization.html#cb210-14" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.title =</span> <span class="fu">element_blank</span>()) <span class="sc">+</span></span>
+<span id="cb210-15"><a href="single-cell-visualization.html#cb210-15" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">&quot;Cell types on UMAP, integrated cells&quot;</span>)</span>
+<span id="cb210-16"><a href="single-cell-visualization.html#cb210-16" tabindex="-1"></a></span>
+<span id="cb210-17"><a href="single-cell-visualization.html#cb210-17" tabindex="-1"></a>p2 <span class="ot">&lt;-</span> <span class="fu">dittoDimPlot</span>(spe, </span>
+<span id="cb210-18"><a href="single-cell-visualization.html#cb210-18" tabindex="-1"></a>                   <span class="at">var =</span> <span class="st">&quot;Ecad&quot;</span>, </span>
+<span id="cb210-19"><a href="single-cell-visualization.html#cb210-19" tabindex="-1"></a>                   <span class="at">assay =</span> <span class="st">&quot;exprs&quot;</span>,</span>
+<span id="cb210-20"><a href="single-cell-visualization.html#cb210-20" tabindex="-1"></a>                   <span class="at">reduction.use =</span> <span class="st">&quot;UMAP_mnnCorrected&quot;</span>, </span>
+<span id="cb210-21"><a href="single-cell-visualization.html#cb210-21" tabindex="-1"></a>                   <span class="at">size =</span> <span class="fl">0.2</span>, </span>
+<span id="cb210-22"><a href="single-cell-visualization.html#cb210-22" tabindex="-1"></a>                   <span class="at">colors =</span> <span class="fu">viridis</span>(<span class="dv">100</span>), </span>
+<span id="cb210-23"><a href="single-cell-visualization.html#cb210-23" tabindex="-1"></a>                   <span class="at">do.label =</span> <span class="cn">TRUE</span>) <span class="sc">+</span></span>
+<span id="cb210-24"><a href="single-cell-visualization.html#cb210-24" tabindex="-1"></a>    <span class="fu">scale_color_viridis</span>()</span>
+<span id="cb210-25"><a href="single-cell-visualization.html#cb210-25" tabindex="-1"></a>  </span>
+<span id="cb210-26"><a href="single-cell-visualization.html#cb210-26" tabindex="-1"></a>p1 <span class="sc">+</span> p2</span></code></pre></div>
+<p><img src="09-singlecell_visualization_files/figure-html/cell%20type%20umap-1.png" width="960" /></p>
+<p>The <code>plotReducedDim</code> function of the <code>scater</code> package provides an alternative
+way for visualizing cells in low dimensions. Here, we loop over all type
+markers, generate one plot per marker and plot the indivudual plots side-by-side.</p>
+<div class="sourceCode" id="cb211"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb211-1"><a href="single-cell-visualization.html#cb211-1" tabindex="-1"></a><span class="co"># UMAP colored by expression for all markers - plotReducedDim</span></span>
+<span id="cb211-2"><a href="single-cell-visualization.html#cb211-2" tabindex="-1"></a>plot_list  <span class="ot">&lt;-</span> <span class="fu">lapply</span>(<span class="fu">rownames</span>(spe)[<span class="fu">rowData</span>(spe)<span class="sc">$</span>marker_class <span class="sc">==</span> <span class="st">&quot;type&quot;</span>], <span class="cf">function</span>(x){</span>
+<span id="cb211-3"><a href="single-cell-visualization.html#cb211-3" tabindex="-1"></a>                      p <span class="ot">&lt;-</span> <span class="fu">plotReducedDim</span>(spe, </span>
+<span id="cb211-4"><a href="single-cell-visualization.html#cb211-4" tabindex="-1"></a>                                          <span class="at">dimred =</span> <span class="st">&quot;UMAP_mnnCorrected&quot;</span>,</span>
+<span id="cb211-5"><a href="single-cell-visualization.html#cb211-5" tabindex="-1"></a>                                          <span class="at">colour_by =</span> x,</span>
+<span id="cb211-6"><a href="single-cell-visualization.html#cb211-6" tabindex="-1"></a>                                          <span class="at">by_exprs_values =</span> <span class="st">&quot;exprs&quot;</span>,</span>
+<span id="cb211-7"><a href="single-cell-visualization.html#cb211-7" tabindex="-1"></a>                                          <span class="at">point_size =</span> <span class="fl">0.2</span>)</span>
+<span id="cb211-8"><a href="single-cell-visualization.html#cb211-8" tabindex="-1"></a>                      <span class="fu">return</span>(p)</span>
+<span id="cb211-9"><a href="single-cell-visualization.html#cb211-9" tabindex="-1"></a>                    })</span>
+<span id="cb211-10"><a href="single-cell-visualization.html#cb211-10" tabindex="-1"></a></span>
+<span id="cb211-11"><a href="single-cell-visualization.html#cb211-11" tabindex="-1"></a><span class="fu">plot_grid</span>(<span class="at">plotlist =</span> plot_list)</span></code></pre></div>
+<p><img src="09-singlecell_visualization_files/figure-html/cell%20type%20umap%202-1.png" width="960" /></p>
+</div>
+<div id="heatmap-visualization" class="section level3 hasAnchor" number="10.2.2">
+<h3><span class="header-section-number">10.2.2</span> Heatmap visualization<a href="single-cell-visualization.html#heatmap-visualization" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Next, it is often useful to visualize single-cell expression per cell
+type in form of a heatmap. For this, we will use the <code>dittoHeatmap</code>
+function from the
+<a href="https://bioconductor.org/packages/release/bioc/html/dittoSeq.html">DittoSeq</a>
+package.</p>
+<p>We sub-sample the dataset to 4000 cells for ease of visualization and
+overlay the cancer type and patient ID from which the cells were
+extracted.</p>
+<div class="sourceCode" id="cb212"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb212-1"><a href="single-cell-visualization.html#cb212-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">220818</span>)</span>
+<span id="cb212-2"><a href="single-cell-visualization.html#cb212-2" tabindex="-1"></a>cur_cells <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="fu">seq_len</span>(<span class="fu">ncol</span>(spe)), <span class="dv">4000</span>)</span>
+<span id="cb212-3"><a href="single-cell-visualization.html#cb212-3" tabindex="-1"></a></span>
+<span id="cb212-4"><a href="single-cell-visualization.html#cb212-4" tabindex="-1"></a><span class="co"># Heatmap visualization - DittoHeatmap</span></span>
+<span id="cb212-5"><a href="single-cell-visualization.html#cb212-5" tabindex="-1"></a><span class="fu">dittoHeatmap</span>(spe[,cur_cells], </span>
+<span id="cb212-6"><a href="single-cell-visualization.html#cb212-6" tabindex="-1"></a>             <span class="at">genes =</span> <span class="fu">rownames</span>(spe)[<span class="fu">rowData</span>(spe)<span class="sc">$</span>marker_class <span class="sc">==</span> <span class="st">&quot;type&quot;</span>],</span>
+<span id="cb212-7"><a href="single-cell-visualization.html#cb212-7" tabindex="-1"></a>             <span class="at">assay =</span> <span class="st">&quot;exprs&quot;</span>, </span>
+<span id="cb212-8"><a href="single-cell-visualization.html#cb212-8" tabindex="-1"></a>             <span class="at">cluster_cols =</span> <span class="cn">FALSE</span>, </span>
+<span id="cb212-9"><a href="single-cell-visualization.html#cb212-9" tabindex="-1"></a>             <span class="at">scale =</span> <span class="st">&quot;none&quot;</span>,</span>
+<span id="cb212-10"><a href="single-cell-visualization.html#cb212-10" tabindex="-1"></a>             <span class="at">heatmap.colors =</span> <span class="fu">viridis</span>(<span class="dv">100</span>), </span>
+<span id="cb212-11"><a href="single-cell-visualization.html#cb212-11" tabindex="-1"></a>             <span class="at">annot.by =</span> <span class="fu">c</span>(<span class="st">&quot;celltype&quot;</span>, <span class="st">&quot;indication&quot;</span>, <span class="st">&quot;patient_id&quot;</span>),</span>
+<span id="cb212-12"><a href="single-cell-visualization.html#cb212-12" tabindex="-1"></a>             <span class="at">annotation_colors =</span> <span class="fu">list</span>(<span class="at">indication =</span> <span class="fu">metadata</span>(spe)<span class="sc">$</span>color_vectors<span class="sc">$</span>indication,</span>
+<span id="cb212-13"><a href="single-cell-visualization.html#cb212-13" tabindex="-1"></a>                                      <span class="at">patient_id =</span> <span class="fu">metadata</span>(spe)<span class="sc">$</span>color_vectors<span class="sc">$</span>patient_id,</span>
+<span id="cb212-14"><a href="single-cell-visualization.html#cb212-14" tabindex="-1"></a>                                      <span class="at">celltype =</span> <span class="fu">metadata</span>(spe)<span class="sc">$</span>color_vectors<span class="sc">$</span>celltype))</span></code></pre></div>
+<p><img src="09-singlecell_visualization_files/figure-html/celltype%20heatmap-1.png" width="672" /></p>
+<p>Similarly, we can visualize the mean marker expression per cell type for all
+cells bu first calculating the mean marker expression per cell type using the
+<code>aggregateAcrossCells</code> function from the
+<a href="https://bioconductor.org/packages/release/bioc/html/scuttle.html">scuttle</a>
+package and then use <code>dittoHeatmap</code>. We will annotate the heatmap with the
+number of cells per cell type and we will used different ways for feature
+scaling.</p>
+<div class="sourceCode" id="cb213"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb213-1"><a href="single-cell-visualization.html#cb213-1" tabindex="-1"></a><span class="fu">library</span>(scuttle)</span>
+<span id="cb213-2"><a href="single-cell-visualization.html#cb213-2" tabindex="-1"></a></span>
+<span id="cb213-3"><a href="single-cell-visualization.html#cb213-3" tabindex="-1"></a><span class="do">## aggregate by cell type</span></span>
+<span id="cb213-4"><a href="single-cell-visualization.html#cb213-4" tabindex="-1"></a>celltype_mean <span class="ot">&lt;-</span> <span class="fu">aggregateAcrossCells</span>(<span class="fu">as</span>(spe, <span class="st">&quot;SingleCellExperiment&quot;</span>),  </span>
+<span id="cb213-5"><a href="single-cell-visualization.html#cb213-5" tabindex="-1"></a>                     <span class="at">ids =</span> spe<span class="sc">$</span>celltype, </span>
+<span id="cb213-6"><a href="single-cell-visualization.html#cb213-6" tabindex="-1"></a>                     <span class="at">statistics =</span> <span class="st">&quot;mean&quot;</span>,</span>
+<span id="cb213-7"><a href="single-cell-visualization.html#cb213-7" tabindex="-1"></a>                     <span class="at">use.assay.type =</span> <span class="st">&quot;exprs&quot;</span>, </span>
+<span id="cb213-8"><a href="single-cell-visualization.html#cb213-8" tabindex="-1"></a>                     <span class="at">subset.row =</span> <span class="fu">rownames</span>(spe)[<span class="fu">rowData</span>(spe)<span class="sc">$</span>marker_class <span class="sc">==</span> <span class="st">&quot;type&quot;</span>])</span>
+<span id="cb213-9"><a href="single-cell-visualization.html#cb213-9" tabindex="-1"></a></span>
+<span id="cb213-10"><a href="single-cell-visualization.html#cb213-10" tabindex="-1"></a><span class="co"># No scaling</span></span>
+<span id="cb213-11"><a href="single-cell-visualization.html#cb213-11" tabindex="-1"></a><span class="fu">dittoHeatmap</span>(celltype_mean,</span>
+<span id="cb213-12"><a href="single-cell-visualization.html#cb213-12" tabindex="-1"></a>             <span class="at">assay =</span> <span class="st">&quot;exprs&quot;</span>, </span>
+<span id="cb213-13"><a href="single-cell-visualization.html#cb213-13" tabindex="-1"></a>             <span class="at">cluster_cols =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb213-14"><a href="single-cell-visualization.html#cb213-14" tabindex="-1"></a>             <span class="at">scale =</span> <span class="st">&quot;none&quot;</span>,</span>
+<span id="cb213-15"><a href="single-cell-visualization.html#cb213-15" tabindex="-1"></a>             <span class="at">heatmap.colors =</span> <span class="fu">viridis</span>(<span class="dv">100</span>),</span>
+<span id="cb213-16"><a href="single-cell-visualization.html#cb213-16" tabindex="-1"></a>             <span class="at">annot.by =</span> <span class="fu">c</span>(<span class="st">&quot;celltype&quot;</span>, <span class="st">&quot;ncells&quot;</span>),</span>
+<span id="cb213-17"><a href="single-cell-visualization.html#cb213-17" tabindex="-1"></a>             <span class="at">annotation_colors =</span> <span class="fu">list</span>(<span class="at">celltype =</span> <span class="fu">metadata</span>(spe)<span class="sc">$</span>color_vectors<span class="sc">$</span>celltype,</span>
+<span id="cb213-18"><a href="single-cell-visualization.html#cb213-18" tabindex="-1"></a>                                      <span class="at">ncells =</span> <span class="fu">plasma</span>(<span class="dv">100</span>)))</span></code></pre></div>
+<p><img src="09-singlecell_visualization_files/figure-html/celltype%20mean-expression-per-cluster-1.png" width="672" /></p>
+<div class="sourceCode" id="cb214"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb214-1"><a href="single-cell-visualization.html#cb214-1" tabindex="-1"></a><span class="co"># Scaled to max</span></span>
+<span id="cb214-2"><a href="single-cell-visualization.html#cb214-2" tabindex="-1"></a><span class="fu">dittoHeatmap</span>(celltype_mean,</span>
+<span id="cb214-3"><a href="single-cell-visualization.html#cb214-3" tabindex="-1"></a>             <span class="at">assay =</span> <span class="st">&quot;exprs&quot;</span>, </span>
+<span id="cb214-4"><a href="single-cell-visualization.html#cb214-4" tabindex="-1"></a>             <span class="at">cluster_cols =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb214-5"><a href="single-cell-visualization.html#cb214-5" tabindex="-1"></a>             <span class="at">scaled.to.max =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb214-6"><a href="single-cell-visualization.html#cb214-6" tabindex="-1"></a>             <span class="at">heatmap.colors.max.scaled =</span> <span class="fu">inferno</span>(<span class="dv">100</span>),</span>
+<span id="cb214-7"><a href="single-cell-visualization.html#cb214-7" tabindex="-1"></a>             <span class="at">annot.by =</span> <span class="fu">c</span>(<span class="st">&quot;celltype&quot;</span>, <span class="st">&quot;ncells&quot;</span>),</span>
+<span id="cb214-8"><a href="single-cell-visualization.html#cb214-8" tabindex="-1"></a>             <span class="at">annotation_colors =</span> <span class="fu">list</span>(<span class="at">celltype =</span> <span class="fu">metadata</span>(spe)<span class="sc">$</span>color_vectors<span class="sc">$</span>celltype,</span>
+<span id="cb214-9"><a href="single-cell-visualization.html#cb214-9" tabindex="-1"></a>                                      <span class="at">ncells =</span> <span class="fu">plasma</span>(<span class="dv">100</span>)))</span></code></pre></div>
+<p><img src="09-singlecell_visualization_files/figure-html/celltype%20mean-expression-per-cluster-2.png" width="672" /></p>
+<div class="sourceCode" id="cb215"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb215-1"><a href="single-cell-visualization.html#cb215-1" tabindex="-1"></a><span class="co"># Z score scaled</span></span>
+<span id="cb215-2"><a href="single-cell-visualization.html#cb215-2" tabindex="-1"></a><span class="fu">dittoHeatmap</span>(celltype_mean,</span>
+<span id="cb215-3"><a href="single-cell-visualization.html#cb215-3" tabindex="-1"></a>             <span class="at">assay =</span> <span class="st">&quot;exprs&quot;</span>, </span>
+<span id="cb215-4"><a href="single-cell-visualization.html#cb215-4" tabindex="-1"></a>             <span class="at">cluster_cols =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb215-5"><a href="single-cell-visualization.html#cb215-5" tabindex="-1"></a>             <span class="at">annot.by =</span> <span class="fu">c</span>(<span class="st">&quot;celltype&quot;</span>, <span class="st">&quot;ncells&quot;</span>),</span>
+<span id="cb215-6"><a href="single-cell-visualization.html#cb215-6" tabindex="-1"></a>             <span class="at">annotation_colors =</span> <span class="fu">list</span>(<span class="at">celltype =</span> <span class="fu">metadata</span>(spe)<span class="sc">$</span>color_vectors<span class="sc">$</span>celltype,</span>
+<span id="cb215-7"><a href="single-cell-visualization.html#cb215-7" tabindex="-1"></a>                                      <span class="at">ncells =</span> <span class="fu">plasma</span>(<span class="dv">100</span>)))</span></code></pre></div>
+<p><img src="09-singlecell_visualization_files/figure-html/celltype%20mean-expression-per-cluster-3.png" width="672" /></p>
+<p>As illustrated above for not-, max-, and Z score-scaled expression values,
+different ways of scaling can have strong effects on visualization
+output and we encourage the user to test multiple options.</p>
+<p>Overall, we can observe cell-type specific marker expression (e.g., Tumor
+= Ecad high and B cells = CD20 high) in agreement with the gating scheme
+of Section <a href="cell-phenotyping.html#classification">9.3</a>.</p>
+</div>
+<div id="violin-plot-visualization" class="section level3 hasAnchor" number="10.2.3">
+<h3><span class="header-section-number">10.2.3</span> Violin plot visualization<a href="single-cell-visualization.html#violin-plot-visualization" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>The <code>plotExpression</code> function from the
+<a href="https://bioconductor.org/packages/release/bioc/html/scater.html">scater</a> package
+allows to plot the distribution of expression values across cell types
+for a chosen set of proteins. The output is a <code>ggplot</code> object which can be
+modified further.</p>
+<div class="sourceCode" id="cb216"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb216-1"><a href="single-cell-visualization.html#cb216-1" tabindex="-1"></a><span class="co"># Violin Plot - plotExpression</span></span>
+<span id="cb216-2"><a href="single-cell-visualization.html#cb216-2" tabindex="-1"></a><span class="fu">plotExpression</span>(spe[,cur_cells], </span>
+<span id="cb216-3"><a href="single-cell-visualization.html#cb216-3" tabindex="-1"></a>               <span class="at">features =</span> <span class="fu">rownames</span>(spe)[<span class="fu">rowData</span>(spe)<span class="sc">$</span>marker_class <span class="sc">==</span> <span class="st">&quot;type&quot;</span>],</span>
+<span id="cb216-4"><a href="single-cell-visualization.html#cb216-4" tabindex="-1"></a>               <span class="at">x =</span> <span class="st">&quot;celltype&quot;</span>, </span>
+<span id="cb216-5"><a href="single-cell-visualization.html#cb216-5" tabindex="-1"></a>               <span class="at">exprs_values =</span> <span class="st">&quot;exprs&quot;</span>, </span>
+<span id="cb216-6"><a href="single-cell-visualization.html#cb216-6" tabindex="-1"></a>               <span class="at">colour_by =</span> <span class="st">&quot;celltype&quot;</span>) <span class="sc">+</span></span>
+<span id="cb216-7"><a href="single-cell-visualization.html#cb216-7" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">axis.text.x =</span>  <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">90</span>))<span class="sc">+</span></span>
+<span id="cb216-8"><a href="single-cell-visualization.html#cb216-8" tabindex="-1"></a>    <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">metadata</span>(spe)<span class="sc">$</span>color_vectors<span class="sc">$</span>celltype)</span></code></pre></div>
+<p><img src="09-singlecell_visualization_files/figure-html/celltype%20violin-1.png" width="672" /></p>
+</div>
+<div id="scatter-plot-visualization" class="section level3 hasAnchor" number="10.2.4">
+<h3><span class="header-section-number">10.2.4</span> Scatter plot visualization<a href="single-cell-visualization.html#scatter-plot-visualization" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Moreover, a protein expression based scatter plot can be generated with
+<code>dittoScatterPlot</code> (returns a <code>ggplot</code> object). We overlay the plot with
+the cell type information.</p>
+<div class="sourceCode" id="cb217"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb217-1"><a href="single-cell-visualization.html#cb217-1" tabindex="-1"></a><span class="co"># Scatter plot</span></span>
+<span id="cb217-2"><a href="single-cell-visualization.html#cb217-2" tabindex="-1"></a><span class="fu">dittoScatterPlot</span>(spe, </span>
+<span id="cb217-3"><a href="single-cell-visualization.html#cb217-3" tabindex="-1"></a>                 <span class="at">x.var =</span> <span class="st">&quot;CD3&quot;</span>, </span>
+<span id="cb217-4"><a href="single-cell-visualization.html#cb217-4" tabindex="-1"></a>                 <span class="at">y.var=</span><span class="st">&quot;CD20&quot;</span>, </span>
+<span id="cb217-5"><a href="single-cell-visualization.html#cb217-5" tabindex="-1"></a>                 <span class="at">assay.x =</span> <span class="st">&quot;exprs&quot;</span>, </span>
+<span id="cb217-6"><a href="single-cell-visualization.html#cb217-6" tabindex="-1"></a>                 <span class="at">assay.y =</span> <span class="st">&quot;exprs&quot;</span>, </span>
+<span id="cb217-7"><a href="single-cell-visualization.html#cb217-7" tabindex="-1"></a>                 <span class="at">color.var =</span> <span class="st">&quot;celltype&quot;</span>) <span class="sc">+</span></span>
+<span id="cb217-8"><a href="single-cell-visualization.html#cb217-8" tabindex="-1"></a>    <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">metadata</span>(spe)<span class="sc">$</span>color_vectors<span class="sc">$</span>celltype) <span class="sc">+</span></span>
+<span id="cb217-9"><a href="single-cell-visualization.html#cb217-9" tabindex="-1"></a>    <span class="fu">ggtitle</span>(<span class="st">&quot;Scatterplot for CD3/CD20 labelled by celltype&quot;</span>)</span></code></pre></div>
+<p><img src="09-singlecell_visualization_files/figure-html/celltype%20scatter-1.png" width="672" /></p>
+<p>We can nicely observe how the “B next to T cell” phenotype (<code>BnTcell</code>)
+has high expression values for both CD20 and CD3.</p>
+<p><strong>Of note</strong>, in a setting where the user aims to assign labels to
+clusters based on marker genes/proteins, all of the above plots can be
+particularly helpful.</p>
+</div>
+<div id="barplot-visualization" class="section level3 hasAnchor" number="10.2.5">
+<h3><span class="header-section-number">10.2.5</span> Barplot visualization<a href="single-cell-visualization.html#barplot-visualization" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>In order to display frequencies of cell types per sample/patient, the
+<code>dittoBarPlot</code> function will be used. Data can be represented as
+percentages or counts and again <code>ggplot</code> objects are outputted.</p>
+<div class="sourceCode" id="cb218"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb218-1"><a href="single-cell-visualization.html#cb218-1" tabindex="-1"></a><span class="co"># by sample_id - percentage</span></span>
+<span id="cb218-2"><a href="single-cell-visualization.html#cb218-2" tabindex="-1"></a><span class="fu">dittoBarPlot</span>(spe, </span>
+<span id="cb218-3"><a href="single-cell-visualization.html#cb218-3" tabindex="-1"></a>             <span class="at">var =</span> <span class="st">&quot;celltype&quot;</span>, </span>
+<span id="cb218-4"><a href="single-cell-visualization.html#cb218-4" tabindex="-1"></a>             <span class="at">group.by =</span> <span class="st">&quot;sample_id&quot;</span>) <span class="sc">+</span></span>
+<span id="cb218-5"><a href="single-cell-visualization.html#cb218-5" tabindex="-1"></a>    <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">metadata</span>(spe)<span class="sc">$</span>color_vectors<span class="sc">$</span>celltype)</span></code></pre></div>
+<p><img src="09-singlecell_visualization_files/figure-html/barplot%20celltype-1.png" width="672" /></p>
+<div class="sourceCode" id="cb219"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb219-1"><a href="single-cell-visualization.html#cb219-1" tabindex="-1"></a><span class="co"># by patient_id - percentage</span></span>
+<span id="cb219-2"><a href="single-cell-visualization.html#cb219-2" tabindex="-1"></a><span class="fu">dittoBarPlot</span>(spe, </span>
+<span id="cb219-3"><a href="single-cell-visualization.html#cb219-3" tabindex="-1"></a>             <span class="at">var =</span> <span class="st">&quot;celltype&quot;</span>, </span>
+<span id="cb219-4"><a href="single-cell-visualization.html#cb219-4" tabindex="-1"></a>             <span class="at">group.by =</span> <span class="st">&quot;patient_id&quot;</span>) <span class="sc">+</span></span>
+<span id="cb219-5"><a href="single-cell-visualization.html#cb219-5" tabindex="-1"></a>    <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">metadata</span>(spe)<span class="sc">$</span>color_vectors<span class="sc">$</span>celltype)</span></code></pre></div>
+<p><img src="09-singlecell_visualization_files/figure-html/barplot%20celltype-2.png" width="672" /></p>
+<div class="sourceCode" id="cb220"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb220-1"><a href="single-cell-visualization.html#cb220-1" tabindex="-1"></a><span class="co"># by patient_id - count</span></span>
+<span id="cb220-2"><a href="single-cell-visualization.html#cb220-2" tabindex="-1"></a><span class="fu">dittoBarPlot</span>(spe, </span>
+<span id="cb220-3"><a href="single-cell-visualization.html#cb220-3" tabindex="-1"></a>             <span class="at">scale =</span> <span class="st">&quot;count&quot;</span>,</span>
+<span id="cb220-4"><a href="single-cell-visualization.html#cb220-4" tabindex="-1"></a>             <span class="at">var =</span> <span class="st">&quot;celltype&quot;</span>, </span>
+<span id="cb220-5"><a href="single-cell-visualization.html#cb220-5" tabindex="-1"></a>             <span class="at">group.by =</span> <span class="st">&quot;patient_id&quot;</span>) <span class="sc">+</span></span>
+<span id="cb220-6"><a href="single-cell-visualization.html#cb220-6" tabindex="-1"></a>    <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">metadata</span>(spe)<span class="sc">$</span>color_vectors<span class="sc">$</span>celltype)</span></code></pre></div>
+<p><img src="09-singlecell_visualization_files/figure-html/barplot%20celltype-3.png" width="672" /></p>
+<p>We can see that cell type frequencies change between samples/patients
+and that the highest proportion/counts of plasma cells and stromal
+cells can be observed for Patient 2 and Patient 4, respectively.</p>
+</div>
+<div id="catalyst-based-visualization" class="section level3 hasAnchor" number="10.2.6">
+<h3><span class="header-section-number">10.2.6</span> CATALYST-based visualization<a href="single-cell-visualization.html#catalyst-based-visualization" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>In the following, we highlight some useful visualization
+functions from the
+<a href="https://bioconductor.org/packages/release/bioc/html/CATALYST.html">CATALYST</a>
+package.</p>
+<p>To this end, we will first convert the <code>SpatialExperiment</code> object into a
+CATALYST-compatible format.</p>
+<div class="sourceCode" id="cb221"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb221-1"><a href="single-cell-visualization.html#cb221-1" tabindex="-1"></a><span class="fu">library</span>(CATALYST)</span>
+<span id="cb221-2"><a href="single-cell-visualization.html#cb221-2" tabindex="-1"></a></span>
+<span id="cb221-3"><a href="single-cell-visualization.html#cb221-3" tabindex="-1"></a><span class="co"># Save SPE in CATALYST-compatible object with renamed colData entries and </span></span>
+<span id="cb221-4"><a href="single-cell-visualization.html#cb221-4" tabindex="-1"></a><span class="co"># new metadata information</span></span>
+<span id="cb221-5"><a href="single-cell-visualization.html#cb221-5" tabindex="-1"></a>spe_cat <span class="ot">&lt;-</span> spe </span>
+<span id="cb221-6"><a href="single-cell-visualization.html#cb221-6" tabindex="-1"></a></span>
+<span id="cb221-7"><a href="single-cell-visualization.html#cb221-7" tabindex="-1"></a>spe_cat<span class="sc">$</span>sample_id <span class="ot">&lt;-</span> <span class="fu">factor</span>(spe<span class="sc">$</span>sample_id)</span>
+<span id="cb221-8"><a href="single-cell-visualization.html#cb221-8" tabindex="-1"></a>spe_cat<span class="sc">$</span>condition <span class="ot">&lt;-</span> <span class="fu">factor</span>(spe<span class="sc">$</span>indication)</span>
+<span id="cb221-9"><a href="single-cell-visualization.html#cb221-9" tabindex="-1"></a>spe_cat<span class="sc">$</span>cluster_id <span class="ot">&lt;-</span> <span class="fu">factor</span>(spe<span class="sc">$</span>celltype)</span>
+<span id="cb221-10"><a href="single-cell-visualization.html#cb221-10" tabindex="-1"></a></span>
+<span id="cb221-11"><a href="single-cell-visualization.html#cb221-11" tabindex="-1"></a><span class="co"># Add celltype information to metadata</span></span>
+<span id="cb221-12"><a href="single-cell-visualization.html#cb221-12" tabindex="-1"></a><span class="fu">metadata</span>(spe_cat)<span class="sc">$</span>cluster_codes <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">celltype =</span> <span class="fu">factor</span>(spe_cat<span class="sc">$</span>celltype))</span></code></pre></div>
+<p>All of the <code>CATALYST</code> functions presented below return <code>ggplot</code> objects,
+which allow flexible downstream adjustment.</p>
+<div id="pseudobulk-level-mds-plot" class="section level4 hasAnchor" number="10.2.6.1">
+<h4><span class="header-section-number">10.2.6.1</span> Pseudobulk-level MDS plot<a href="single-cell-visualization.html#pseudobulk-level-mds-plot" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p>Pseudobulk-level multi-dimensional scaling (MDS) plots can be rendered
+with the exported <code>pbMDS</code> function.</p>
+<p>Here, we will use <code>pbMDS</code> to highlight expression similarities between
+cell types and subsequently for each celltype-sample-combination.</p>
+<div class="sourceCode" id="cb222"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb222-1"><a href="single-cell-visualization.html#cb222-1" tabindex="-1"></a><span class="co"># MDS pseudobulk by cell type</span></span>
+<span id="cb222-2"><a href="single-cell-visualization.html#cb222-2" tabindex="-1"></a><span class="fu">pbMDS</span>(spe_cat, </span>
+<span id="cb222-3"><a href="single-cell-visualization.html#cb222-3" tabindex="-1"></a>      <span class="at">by =</span> <span class="st">&quot;cluster_id&quot;</span>, </span>
+<span id="cb222-4"><a href="single-cell-visualization.html#cb222-4" tabindex="-1"></a>      <span class="at">features =</span> <span class="fu">rownames</span>(spe_cat)[<span class="fu">rowData</span>(spe_cat)<span class="sc">$</span>marker_class <span class="sc">==</span> <span class="st">&quot;type&quot;</span>], </span>
+<span id="cb222-5"><a href="single-cell-visualization.html#cb222-5" tabindex="-1"></a>      <span class="at">label_by =</span> <span class="st">&quot;cluster_id&quot;</span>, </span>
+<span id="cb222-6"><a href="single-cell-visualization.html#cb222-6" tabindex="-1"></a>      <span class="at">k =</span> <span class="st">&quot;celltype&quot;</span>) <span class="sc">+</span></span>
+<span id="cb222-7"><a href="single-cell-visualization.html#cb222-7" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">metadata</span>(spe_cat)<span class="sc">$</span>color_vectors<span class="sc">$</span>celltype)</span></code></pre></div>
+<p><img src="09-singlecell_visualization_files/figure-html/celltype%20pbmds-1.png" width="672" /></p>
+<div class="sourceCode" id="cb223"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb223-1"><a href="single-cell-visualization.html#cb223-1" tabindex="-1"></a><span class="co"># MDS pseudobulk by cell type and sample_id</span></span>
+<span id="cb223-2"><a href="single-cell-visualization.html#cb223-2" tabindex="-1"></a><span class="fu">pbMDS</span>(spe_cat, </span>
+<span id="cb223-3"><a href="single-cell-visualization.html#cb223-3" tabindex="-1"></a>      <span class="at">by =</span> <span class="st">&quot;both&quot;</span>, </span>
+<span id="cb223-4"><a href="single-cell-visualization.html#cb223-4" tabindex="-1"></a>      <span class="at">features =</span> <span class="fu">rownames</span>(spe_cat)[<span class="fu">rowData</span>(spe_cat)<span class="sc">$</span>marker_class <span class="sc">==</span> <span class="st">&quot;type&quot;</span>], </span>
+<span id="cb223-5"><a href="single-cell-visualization.html#cb223-5" tabindex="-1"></a>      <span class="at">k =</span> <span class="st">&quot;celltype&quot;</span>, </span>
+<span id="cb223-6"><a href="single-cell-visualization.html#cb223-6" tabindex="-1"></a>      <span class="at">shape_by =</span> <span class="st">&quot;condition&quot;</span>, </span>
+<span id="cb223-7"><a href="single-cell-visualization.html#cb223-7" tabindex="-1"></a>      <span class="at">size_by =</span> <span class="cn">TRUE</span>) <span class="sc">+</span></span>
+<span id="cb223-8"><a href="single-cell-visualization.html#cb223-8" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">metadata</span>(spe_cat)<span class="sc">$</span>color_vectors<span class="sc">$</span>celltype)</span></code></pre></div>
+<p><img src="09-singlecell_visualization_files/figure-html/celltype%20pbmds-2.png" width="672" /></p>
+<p>We can see that the pseudobulk-expression profile of neutrophils seems
+markedly distinct from the other cell types, while comparable cell types
+such as the T cell subtypes group together. Furthermore, pseudobulk
+cell-type profiles from SCCHN appear different from the other
+indications.</p>
+</div>
+<div id="reduced-dimension-plot-on-clr-of-proportions" class="section level4 hasAnchor" number="10.2.6.2">
+<h4><span class="header-section-number">10.2.6.2</span> Reduced dimension plot on CLR of proportions<a href="single-cell-visualization.html#reduced-dimension-plot-on-clr-of-proportions" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p>The <code>clrDR</code> function produces dimensionality reduction plots on centered
+log-ratios (CLR) of sample/cell type proportions across cell
+type/samples.</p>
+<p>As with <code>pbMDS</code>, the output plots aim to illustrate the degree of
+similarity between cell types based on sample proportions.</p>
+<div class="sourceCode" id="cb224"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb224-1"><a href="single-cell-visualization.html#cb224-1" tabindex="-1"></a><span class="co"># CLR on cluster proportions across samples</span></span>
+<span id="cb224-2"><a href="single-cell-visualization.html#cb224-2" tabindex="-1"></a><span class="fu">clrDR</span>(spe_cat, </span>
+<span id="cb224-3"><a href="single-cell-visualization.html#cb224-3" tabindex="-1"></a>      <span class="at">dr =</span> <span class="st">&quot;PCA&quot;</span>, </span>
+<span id="cb224-4"><a href="single-cell-visualization.html#cb224-4" tabindex="-1"></a>      <span class="at">by =</span> <span class="st">&quot;cluster_id&quot;</span>, </span>
+<span id="cb224-5"><a href="single-cell-visualization.html#cb224-5" tabindex="-1"></a>      <span class="at">k =</span> <span class="st">&quot;celltype&quot;</span>, </span>
+<span id="cb224-6"><a href="single-cell-visualization.html#cb224-6" tabindex="-1"></a>      <span class="at">label_by =</span> <span class="st">&quot;cluster_id&quot;</span>, </span>
+<span id="cb224-7"><a href="single-cell-visualization.html#cb224-7" tabindex="-1"></a>      <span class="at">arrow_col =</span> <span class="st">&quot;sample_id&quot;</span>, </span>
+<span id="cb224-8"><a href="single-cell-visualization.html#cb224-8" tabindex="-1"></a>      <span class="at">point_pal =</span> <span class="fu">metadata</span>(spe_cat)<span class="sc">$</span>color_vectors<span class="sc">$</span>celltype) </span></code></pre></div>
+<p><img src="09-singlecell_visualization_files/figure-html/celltype%20-%20clrDR-1.png" width="672" /></p>
+<p>We can again observe that neutrophils have a divergent profile also in
+terms of their sample proportions.</p>
+</div>
+<div id="pseudobulk-expression-boxplot" class="section level4 hasAnchor" number="10.2.6.3">
+<h4><span class="header-section-number">10.2.6.3</span> Pseudobulk expression boxplot<a href="single-cell-visualization.html#pseudobulk-expression-boxplot" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p>The <code>plotPbExprs</code> generates combined box- and jitter-plots of aggregated marker
+expression per cell type and sample (image). Here, we further split the data by
+cancer type.</p>
+<div class="sourceCode" id="cb225"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb225-1"><a href="single-cell-visualization.html#cb225-1" tabindex="-1"></a><span class="fu">plotPbExprs</span>(spe_cat, </span>
+<span id="cb225-2"><a href="single-cell-visualization.html#cb225-2" tabindex="-1"></a>            <span class="at">k =</span> <span class="st">&quot;celltype&quot;</span>, </span>
+<span id="cb225-3"><a href="single-cell-visualization.html#cb225-3" tabindex="-1"></a>            <span class="at">facet_by =</span> <span class="st">&quot;cluster_id&quot;</span>, </span>
+<span id="cb225-4"><a href="single-cell-visualization.html#cb225-4" tabindex="-1"></a>            <span class="at">ncol =</span> <span class="dv">2</span>, </span>
+<span id="cb225-5"><a href="single-cell-visualization.html#cb225-5" tabindex="-1"></a>            <span class="at">features =</span> <span class="fu">rownames</span>(spe_cat)[<span class="fu">rowData</span>(spe_cat)<span class="sc">$</span>marker_class <span class="sc">==</span> <span class="st">&quot;type&quot;</span>]) <span class="sc">+</span></span>
+<span id="cb225-6"><a href="single-cell-visualization.html#cb225-6" tabindex="-1"></a>    <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">metadata</span>(spe_cat)<span class="sc">$</span>color_vectors<span class="sc">$</span>indication)</span></code></pre></div>
+<p><img src="09-singlecell_visualization_files/figure-html/celltype%20pbExprs-1.png" width="672" /></p>
+<p>Notably, CD15 levels are elevated in SCCHN in comparison to all other
+indications for most cell types.</p>
+</div>
+</div>
+</div>
+<div id="sample-level" class="section level2 hasAnchor" number="10.3">
+<h2><span class="header-section-number">10.3</span> Sample-level<a href="single-cell-visualization.html#sample-level" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>In the next section, we will shift the grouping-level focus from the
+cell type to the sample-level. Sample-levels will be further divided
+into the sample-(image) and patient-level.</p>
+<p>Although we will mostly repeat the functions from the previous section
+<a href="single-cell-visualization.html#cell-type-level">10.2</a>, sample- and patient-level centered visualization
+can provide additional quality control and biological interpretation.</p>
+<div id="dimensionality-reduction-visualization-1" class="section level3 hasAnchor" number="10.3.1">
+<h3><span class="header-section-number">10.3.1</span> Dimensionality reduction visualization<a href="single-cell-visualization.html#dimensionality-reduction-visualization-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Visualization of low-dimensional embeddings, here comparing non-corrected and
+fastMNN-corrected UMAPs, and coloring it by sample-levels is often used
+for “batch effect” assessment as mentioned in Section
+<a href="image-and-cell-level-quality-control.html#cell-quality">7.4</a>.</p>
+<p>We will again use <code>dittoDimPlot</code>.</p>
+<div class="sourceCode" id="cb226"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb226-1"><a href="single-cell-visualization.html#cb226-1" tabindex="-1"></a><span class="do">## UMAP colored by cell type and expression - dittoDimPlot</span></span>
+<span id="cb226-2"><a href="single-cell-visualization.html#cb226-2" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> <span class="fu">dittoDimPlot</span>(spe, </span>
+<span id="cb226-3"><a href="single-cell-visualization.html#cb226-3" tabindex="-1"></a>                   <span class="at">var =</span> <span class="st">&quot;sample_id&quot;</span>,</span>
+<span id="cb226-4"><a href="single-cell-visualization.html#cb226-4" tabindex="-1"></a>                   <span class="at">reduction.use =</span> <span class="st">&quot;UMAP&quot;</span>, </span>
+<span id="cb226-5"><a href="single-cell-visualization.html#cb226-5" tabindex="-1"></a>                   <span class="at">size =</span> <span class="fl">0.2</span>, </span>
+<span id="cb226-6"><a href="single-cell-visualization.html#cb226-6" tabindex="-1"></a>                   <span class="at">colors =</span> <span class="fu">viridis</span>(<span class="dv">100</span>), </span>
+<span id="cb226-7"><a href="single-cell-visualization.html#cb226-7" tabindex="-1"></a>                   <span class="at">do.label =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb226-8"><a href="single-cell-visualization.html#cb226-8" tabindex="-1"></a>    <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">metadata</span>(spe)<span class="sc">$</span>color_vectors<span class="sc">$</span>sample_id) <span class="sc">+</span></span>
+<span id="cb226-9"><a href="single-cell-visualization.html#cb226-9" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.title =</span> <span class="fu">element_blank</span>()) <span class="sc">+</span></span>
+<span id="cb226-10"><a href="single-cell-visualization.html#cb226-10" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">&quot;Sample ID&quot;</span>)</span>
+<span id="cb226-11"><a href="single-cell-visualization.html#cb226-11" tabindex="-1"></a></span>
+<span id="cb226-12"><a href="single-cell-visualization.html#cb226-12" tabindex="-1"></a>p2 <span class="ot">&lt;-</span> <span class="fu">dittoDimPlot</span>(spe, </span>
+<span id="cb226-13"><a href="single-cell-visualization.html#cb226-13" tabindex="-1"></a>                   <span class="at">var =</span> <span class="st">&quot;sample_id&quot;</span>,</span>
+<span id="cb226-14"><a href="single-cell-visualization.html#cb226-14" tabindex="-1"></a>                   <span class="at">reduction.use =</span> <span class="st">&quot;UMAP_mnnCorrected&quot;</span>, </span>
+<span id="cb226-15"><a href="single-cell-visualization.html#cb226-15" tabindex="-1"></a>                   <span class="at">size =</span> <span class="fl">0.2</span>, </span>
+<span id="cb226-16"><a href="single-cell-visualization.html#cb226-16" tabindex="-1"></a>                   <span class="at">colors =</span> <span class="fu">viridis</span>(<span class="dv">100</span>), </span>
+<span id="cb226-17"><a href="single-cell-visualization.html#cb226-17" tabindex="-1"></a>                   <span class="at">do.label =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb226-18"><a href="single-cell-visualization.html#cb226-18" tabindex="-1"></a>    <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">metadata</span>(spe)<span class="sc">$</span>color_vectors<span class="sc">$</span>sample_id) <span class="sc">+</span></span>
+<span id="cb226-19"><a href="single-cell-visualization.html#cb226-19" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.title =</span> <span class="fu">element_blank</span>()) <span class="sc">+</span></span>
+<span id="cb226-20"><a href="single-cell-visualization.html#cb226-20" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">&quot;Sample ID&quot;</span>)</span>
+<span id="cb226-21"><a href="single-cell-visualization.html#cb226-21" tabindex="-1"></a></span>
+<span id="cb226-22"><a href="single-cell-visualization.html#cb226-22" tabindex="-1"></a>p3 <span class="ot">&lt;-</span> <span class="fu">dittoDimPlot</span>(spe, </span>
+<span id="cb226-23"><a href="single-cell-visualization.html#cb226-23" tabindex="-1"></a>                   <span class="at">var =</span> <span class="st">&quot;patient_id&quot;</span>,</span>
+<span id="cb226-24"><a href="single-cell-visualization.html#cb226-24" tabindex="-1"></a>                   <span class="at">reduction.use =</span> <span class="st">&quot;UMAP&quot;</span>, </span>
+<span id="cb226-25"><a href="single-cell-visualization.html#cb226-25" tabindex="-1"></a>                   <span class="at">size =</span> <span class="fl">0.2</span>,</span>
+<span id="cb226-26"><a href="single-cell-visualization.html#cb226-26" tabindex="-1"></a>                   <span class="at">do.label =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb226-27"><a href="single-cell-visualization.html#cb226-27" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">metadata</span>(spe)<span class="sc">$</span>color_vectors<span class="sc">$</span>patient_id) <span class="sc">+</span></span>
+<span id="cb226-28"><a href="single-cell-visualization.html#cb226-28" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.title =</span> <span class="fu">element_blank</span>()) <span class="sc">+</span></span>
+<span id="cb226-29"><a href="single-cell-visualization.html#cb226-29" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">&quot;Patient ID&quot;</span>)</span>
+<span id="cb226-30"><a href="single-cell-visualization.html#cb226-30" tabindex="-1"></a></span>
+<span id="cb226-31"><a href="single-cell-visualization.html#cb226-31" tabindex="-1"></a>p4 <span class="ot">&lt;-</span> <span class="fu">dittoDimPlot</span>(spe, </span>
+<span id="cb226-32"><a href="single-cell-visualization.html#cb226-32" tabindex="-1"></a>                   <span class="at">var =</span> <span class="st">&quot;patient_id&quot;</span>, </span>
+<span id="cb226-33"><a href="single-cell-visualization.html#cb226-33" tabindex="-1"></a>                   <span class="at">reduction.use =</span> <span class="st">&quot;UMAP_mnnCorrected&quot;</span>, </span>
+<span id="cb226-34"><a href="single-cell-visualization.html#cb226-34" tabindex="-1"></a>                   <span class="at">size =</span> <span class="fl">0.2</span>,</span>
+<span id="cb226-35"><a href="single-cell-visualization.html#cb226-35" tabindex="-1"></a>                   <span class="at">do.label =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb226-36"><a href="single-cell-visualization.html#cb226-36" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">metadata</span>(spe)<span class="sc">$</span>color_vectors<span class="sc">$</span>patient_id) <span class="sc">+</span></span>
+<span id="cb226-37"><a href="single-cell-visualization.html#cb226-37" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.title =</span> <span class="fu">element_blank</span>()) <span class="sc">+</span></span>
+<span id="cb226-38"><a href="single-cell-visualization.html#cb226-38" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">&quot;Patient ID&quot;</span>)</span>
+<span id="cb226-39"><a href="single-cell-visualization.html#cb226-39" tabindex="-1"></a></span>
+<span id="cb226-40"><a href="single-cell-visualization.html#cb226-40" tabindex="-1"></a>(p1 <span class="sc">+</span> p2) <span class="sc">/</span> (p3 <span class="sc">+</span> p4)</span></code></pre></div>
+<p><img src="09-singlecell_visualization_files/figure-html/sample%20umap-1.png" width="768" /></p>
+<p>As illustrated in Section <a href="batch-effects.html#batch-effects">8</a>, we see that the fastMNN
+approach (right side of the plot) leads to mixing of cells across
+samples/patients and thus batch effect correction.</p>
+</div>
+<div id="heatmap-visualization-1" class="section level3 hasAnchor" number="10.3.2">
+<h3><span class="header-section-number">10.3.2</span> Heatmap visualization<a href="single-cell-visualization.html#heatmap-visualization-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>It can be beneficial to use a heatmap to visualize single-cell
+expression per sample and patient. Such a plot, which we will create
+using <code>dittoHeatmap</code>, can highlight biological differences across
+samples/patients.</p>
+<div class="sourceCode" id="cb227"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb227-1"><a href="single-cell-visualization.html#cb227-1" tabindex="-1"></a><span class="co"># Heatmap visualization - DittoHeatmap</span></span>
+<span id="cb227-2"><a href="single-cell-visualization.html#cb227-2" tabindex="-1"></a><span class="fu">dittoHeatmap</span>(spe[,cur_cells], </span>
+<span id="cb227-3"><a href="single-cell-visualization.html#cb227-3" tabindex="-1"></a>             <span class="at">genes =</span> <span class="fu">rownames</span>(spe)[<span class="fu">rowData</span>(spe)<span class="sc">$</span>marker_class <span class="sc">==</span> <span class="st">&quot;type&quot;</span>],</span>
+<span id="cb227-4"><a href="single-cell-visualization.html#cb227-4" tabindex="-1"></a>             <span class="at">assay =</span> <span class="st">&quot;exprs&quot;</span>, </span>
+<span id="cb227-5"><a href="single-cell-visualization.html#cb227-5" tabindex="-1"></a>             <span class="at">order.by =</span> <span class="fu">c</span>(<span class="st">&quot;patient_id&quot;</span>,<span class="st">&quot;sample_id&quot;</span>),</span>
+<span id="cb227-6"><a href="single-cell-visualization.html#cb227-6" tabindex="-1"></a>             <span class="at">cluster_cols =</span> <span class="cn">FALSE</span>, </span>
+<span id="cb227-7"><a href="single-cell-visualization.html#cb227-7" tabindex="-1"></a>             <span class="at">scale =</span> <span class="st">&quot;none&quot;</span>,</span>
+<span id="cb227-8"><a href="single-cell-visualization.html#cb227-8" tabindex="-1"></a>             <span class="at">heatmap.colors =</span> <span class="fu">viridis</span>(<span class="dv">100</span>), </span>
+<span id="cb227-9"><a href="single-cell-visualization.html#cb227-9" tabindex="-1"></a>             <span class="at">annot.by =</span> <span class="fu">c</span>(<span class="st">&quot;celltype&quot;</span>, <span class="st">&quot;indication&quot;</span>, <span class="st">&quot;patient_id&quot;</span>, <span class="st">&quot;sample_id&quot;</span>),</span>
+<span id="cb227-10"><a href="single-cell-visualization.html#cb227-10" tabindex="-1"></a>             <span class="at">annotation_colors =</span> <span class="fu">list</span>(<span class="at">celltype =</span> <span class="fu">metadata</span>(spe)<span class="sc">$</span>color_vectors<span class="sc">$</span>celltype,</span>
+<span id="cb227-11"><a href="single-cell-visualization.html#cb227-11" tabindex="-1"></a>                                      <span class="at">indication =</span> <span class="fu">metadata</span>(spe)<span class="sc">$</span>color_vectors<span class="sc">$</span>indication,</span>
+<span id="cb227-12"><a href="single-cell-visualization.html#cb227-12" tabindex="-1"></a>                                      <span class="at">patient_id =</span> <span class="fu">metadata</span>(spe)<span class="sc">$</span>color_vectors<span class="sc">$</span>patient_id,</span>
+<span id="cb227-13"><a href="single-cell-visualization.html#cb227-13" tabindex="-1"></a>                                      <span class="at">sample_id =</span> <span class="fu">metadata</span>(spe)<span class="sc">$</span>color_vectors<span class="sc">$</span>sample_id))</span></code></pre></div>
+<p><img src="09-singlecell_visualization_files/figure-html/sample%20heatmap-1.png" width="768" /></p>
+<p>As in Section <a href="image-and-cell-level-quality-control.html#image-quality">7.3</a>, aggregated mean marker expression
+per sample/patient allow identification of samples/patients with
+outlying expression patterns.</p>
+<p>Here, we will focus on the patient level and use <code>aggregateAcrossCells</code>
+and <code>dittoHeatmap</code>. The heatmap will be annotated with the number of
+cells per patient and cancer type and displayed using two scaling
+options.</p>
+<div class="sourceCode" id="cb228"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb228-1"><a href="single-cell-visualization.html#cb228-1" tabindex="-1"></a><span class="co"># mean expression by patient_id</span></span>
+<span id="cb228-2"><a href="single-cell-visualization.html#cb228-2" tabindex="-1"></a>patient_mean <span class="ot">&lt;-</span> <span class="fu">aggregateAcrossCells</span>(<span class="fu">as</span>(spe, <span class="st">&quot;SingleCellExperiment&quot;</span>),  </span>
+<span id="cb228-3"><a href="single-cell-visualization.html#cb228-3" tabindex="-1"></a>                     <span class="at">ids =</span> spe<span class="sc">$</span>patient_id, </span>
+<span id="cb228-4"><a href="single-cell-visualization.html#cb228-4" tabindex="-1"></a>                     <span class="at">statistics =</span> <span class="st">&quot;mean&quot;</span>,</span>
+<span id="cb228-5"><a href="single-cell-visualization.html#cb228-5" tabindex="-1"></a>                     <span class="at">use.assay.type =</span> <span class="st">&quot;exprs&quot;</span>, </span>
+<span id="cb228-6"><a href="single-cell-visualization.html#cb228-6" tabindex="-1"></a>                     <span class="at">subset.row =</span> <span class="fu">rownames</span>(spe)[<span class="fu">rowData</span>(spe)<span class="sc">$</span>marker_class <span class="sc">==</span> <span class="st">&quot;type&quot;</span>])</span>
+<span id="cb228-7"><a href="single-cell-visualization.html#cb228-7" tabindex="-1"></a></span>
+<span id="cb228-8"><a href="single-cell-visualization.html#cb228-8" tabindex="-1"></a><span class="co"># No scaling</span></span>
+<span id="cb228-9"><a href="single-cell-visualization.html#cb228-9" tabindex="-1"></a><span class="fu">dittoHeatmap</span>(patient_mean,</span>
+<span id="cb228-10"><a href="single-cell-visualization.html#cb228-10" tabindex="-1"></a>             <span class="at">assay =</span> <span class="st">&quot;exprs&quot;</span>, </span>
+<span id="cb228-11"><a href="single-cell-visualization.html#cb228-11" tabindex="-1"></a>             <span class="at">cluster_cols =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb228-12"><a href="single-cell-visualization.html#cb228-12" tabindex="-1"></a>             <span class="at">scale =</span> <span class="st">&quot;none&quot;</span>,</span>
+<span id="cb228-13"><a href="single-cell-visualization.html#cb228-13" tabindex="-1"></a>             <span class="at">heatmap.colors =</span> <span class="fu">viridis</span>(<span class="dv">100</span>),</span>
+<span id="cb228-14"><a href="single-cell-visualization.html#cb228-14" tabindex="-1"></a>             <span class="at">annot.by =</span> <span class="fu">c</span>(<span class="st">&quot;patient_id&quot;</span>,<span class="st">&quot;indication&quot;</span>,<span class="st">&quot;ncells&quot;</span>),</span>
+<span id="cb228-15"><a href="single-cell-visualization.html#cb228-15" tabindex="-1"></a>             <span class="at">annotation_colors =</span> <span class="fu">list</span>(<span class="at">patient_id =</span> <span class="fu">metadata</span>(spe)<span class="sc">$</span>color_vectors<span class="sc">$</span>patient_id,</span>
+<span id="cb228-16"><a href="single-cell-visualization.html#cb228-16" tabindex="-1"></a>                                      <span class="at">indication =</span> <span class="fu">metadata</span>(spe)<span class="sc">$</span>color_vectors<span class="sc">$</span>indication,</span>
+<span id="cb228-17"><a href="single-cell-visualization.html#cb228-17" tabindex="-1"></a>                                      <span class="at">ncells =</span> <span class="fu">plasma</span>(<span class="dv">100</span>)))</span></code></pre></div>
+<p><img src="09-singlecell_visualization_files/figure-html/sample%20mean-expression-per-cluster-1.png" width="672" /></p>
+<div class="sourceCode" id="cb229"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb229-1"><a href="single-cell-visualization.html#cb229-1" tabindex="-1"></a><span class="co"># Max expression scaling</span></span>
+<span id="cb229-2"><a href="single-cell-visualization.html#cb229-2" tabindex="-1"></a><span class="fu">dittoHeatmap</span>(patient_mean,</span>
+<span id="cb229-3"><a href="single-cell-visualization.html#cb229-3" tabindex="-1"></a>             <span class="at">assay =</span> <span class="st">&quot;exprs&quot;</span>, </span>
+<span id="cb229-4"><a href="single-cell-visualization.html#cb229-4" tabindex="-1"></a>             <span class="at">cluster_cols =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb229-5"><a href="single-cell-visualization.html#cb229-5" tabindex="-1"></a>             <span class="at">scaled.to.max =</span>  <span class="cn">TRUE</span>,</span>
+<span id="cb229-6"><a href="single-cell-visualization.html#cb229-6" tabindex="-1"></a>             <span class="at">heatmap.colors.max.scaled =</span> <span class="fu">inferno</span>(<span class="dv">100</span>),</span>
+<span id="cb229-7"><a href="single-cell-visualization.html#cb229-7" tabindex="-1"></a>             <span class="at">annot.by =</span> <span class="fu">c</span>(<span class="st">&quot;patient_id&quot;</span>,<span class="st">&quot;indication&quot;</span>,<span class="st">&quot;ncells&quot;</span>),</span>
+<span id="cb229-8"><a href="single-cell-visualization.html#cb229-8" tabindex="-1"></a>             <span class="at">annotation_colors =</span> <span class="fu">list</span>(<span class="at">patient_id =</span> <span class="fu">metadata</span>(spe)<span class="sc">$</span>color_vectors<span class="sc">$</span>patient_id,</span>
+<span id="cb229-9"><a href="single-cell-visualization.html#cb229-9" tabindex="-1"></a>                                      <span class="at">indication =</span> <span class="fu">metadata</span>(spe)<span class="sc">$</span>color_vectors<span class="sc">$</span>indication,</span>
+<span id="cb229-10"><a href="single-cell-visualization.html#cb229-10" tabindex="-1"></a>                                      <span class="at">ncells =</span> <span class="fu">plasma</span>(<span class="dv">100</span>)))</span></code></pre></div>
+<p><img src="09-singlecell_visualization_files/figure-html/sample%20mean-expression-per-cluster-2.png" width="672" /></p>
+<p>As seen before, CD15 levels are elevated in Patient 4 (SCCHN), while SMA
+levels are highest for Patient 4 (CRC).</p>
+</div>
+<div id="barplot-visualization-1" class="section level3 hasAnchor" number="10.3.3">
+<h3><span class="header-section-number">10.3.3</span> Barplot visualization<a href="single-cell-visualization.html#barplot-visualization-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Complementary to displaying cell type frequencies per sample/patient, we
+can use <code>dittoBarPlot</code> to display sample/patient frequencies per cell
+type.</p>
+<div class="sourceCode" id="cb230"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb230-1"><a href="single-cell-visualization.html#cb230-1" tabindex="-1"></a><span class="fu">dittoBarPlot</span>(spe, </span>
+<span id="cb230-2"><a href="single-cell-visualization.html#cb230-2" tabindex="-1"></a>             <span class="at">var =</span> <span class="st">&quot;patient_id&quot;</span>, </span>
+<span id="cb230-3"><a href="single-cell-visualization.html#cb230-3" tabindex="-1"></a>             <span class="at">group.by =</span> <span class="st">&quot;celltype&quot;</span>) <span class="sc">+</span></span>
+<span id="cb230-4"><a href="single-cell-visualization.html#cb230-4" tabindex="-1"></a>    <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">metadata</span>(spe)<span class="sc">$</span>color_vectors<span class="sc">$</span>patient_id)</span></code></pre></div>
+<p><img src="09-singlecell_visualization_files/figure-html/barplot%20sample-1.png" width="672" /></p>
+<div class="sourceCode" id="cb231"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb231-1"><a href="single-cell-visualization.html#cb231-1" tabindex="-1"></a><span class="fu">dittoBarPlot</span>(spe, </span>
+<span id="cb231-2"><a href="single-cell-visualization.html#cb231-2" tabindex="-1"></a>             <span class="at">var =</span> <span class="st">&quot;sample_id&quot;</span>, </span>
+<span id="cb231-3"><a href="single-cell-visualization.html#cb231-3" tabindex="-1"></a>             <span class="at">group.by =</span> <span class="st">&quot;celltype&quot;</span>) <span class="sc">+</span></span>
+<span id="cb231-4"><a href="single-cell-visualization.html#cb231-4" tabindex="-1"></a>    <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">metadata</span>(spe)<span class="sc">$</span>color_vectors<span class="sc">$</span>sample_id)</span></code></pre></div>
+<p><img src="09-singlecell_visualization_files/figure-html/barplot%20sample-2.png" width="672" /></p>
+<p><code>Patient2</code> has the highest and lowest proportion of plasma cells and
+neutrophils, respectively.</p>
+</div>
+<div id="catalyst-based-visualization-1" class="section level3 hasAnchor" number="10.3.4">
+<h3><span class="header-section-number">10.3.4</span> CATALYST-based visualization<a href="single-cell-visualization.html#catalyst-based-visualization-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="pseudobulk-level-mds-plot-1" class="section level4 hasAnchor" number="10.3.4.1">
+<h4><span class="header-section-number">10.3.4.1</span> Pseudobulk-level MDS plot<a href="single-cell-visualization.html#pseudobulk-level-mds-plot-1" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p>Expression-based pseudobulks for each sample can be compared with the
+<code>pbMDS</code> function.</p>
+<div class="sourceCode" id="cb232"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb232-1"><a href="single-cell-visualization.html#cb232-1" tabindex="-1"></a><span class="co"># MDS pseudobulk by sample_id </span></span>
+<span id="cb232-2"><a href="single-cell-visualization.html#cb232-2" tabindex="-1"></a><span class="fu">pbMDS</span>(spe_cat, </span>
+<span id="cb232-3"><a href="single-cell-visualization.html#cb232-3" tabindex="-1"></a>      <span class="at">by =</span> <span class="st">&quot;sample_id&quot;</span>, </span>
+<span id="cb232-4"><a href="single-cell-visualization.html#cb232-4" tabindex="-1"></a>      <span class="at">color_by =</span> <span class="st">&quot;sample_id&quot;</span>, </span>
+<span id="cb232-5"><a href="single-cell-visualization.html#cb232-5" tabindex="-1"></a>      <span class="at">features =</span> <span class="fu">rownames</span>(spe_cat)[<span class="fu">rowData</span>(spe_cat)<span class="sc">$</span>marker_class <span class="sc">==</span> <span class="st">&quot;type&quot;</span>]) <span class="sc">+</span></span>
+<span id="cb232-6"><a href="single-cell-visualization.html#cb232-6" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">metadata</span>(spe_cat)<span class="sc">$</span>color_vectors<span class="sc">$</span>sample_id)</span></code></pre></div>
+<p><img src="09-singlecell_visualization_files/figure-html/sample-pbmds-1.png" width="672" /></p>
+<p>There are marked differences in pseudobulk-expression patterns between
+samples and across patients, which can be driven by biological
+differences and also technical aspects such as divergent region
+selection.</p>
+</div>
+<div id="reduced-dimension-plot-on-clr-of-proportions-1" class="section level4 hasAnchor" number="10.3.4.2">
+<h4><span class="header-section-number">10.3.4.2</span> Reduced dimension plot on CLR of proportions<a href="single-cell-visualization.html#reduced-dimension-plot-on-clr-of-proportions-1" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p>The <code>clrDR</code> function can also be used to analyze similarity of samples
+based on cell type proportions.</p>
+<div class="sourceCode" id="cb233"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb233-1"><a href="single-cell-visualization.html#cb233-1" tabindex="-1"></a><span class="co"># CLR on sample proportions across clusters</span></span>
+<span id="cb233-2"><a href="single-cell-visualization.html#cb233-2" tabindex="-1"></a><span class="fu">clrDR</span>(spe_cat, </span>
+<span id="cb233-3"><a href="single-cell-visualization.html#cb233-3" tabindex="-1"></a>      <span class="at">dr =</span> <span class="st">&quot;PCA&quot;</span>, </span>
+<span id="cb233-4"><a href="single-cell-visualization.html#cb233-4" tabindex="-1"></a>      <span class="at">by =</span> <span class="st">&quot;sample_id&quot;</span>, </span>
+<span id="cb233-5"><a href="single-cell-visualization.html#cb233-5" tabindex="-1"></a>      <span class="at">point_col =</span> <span class="st">&quot;sample_id&quot;</span>,</span>
+<span id="cb233-6"><a href="single-cell-visualization.html#cb233-6" tabindex="-1"></a>      <span class="at">k =</span> <span class="st">&quot;celltype&quot;</span>, </span>
+<span id="cb233-7"><a href="single-cell-visualization.html#cb233-7" tabindex="-1"></a>      <span class="at">point_pal =</span> <span class="fu">metadata</span>(spe_cat)<span class="sc">$</span>color_vectors<span class="sc">$</span>sample_id) <span class="sc">+</span></span>
+<span id="cb233-8"><a href="single-cell-visualization.html#cb233-8" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">metadata</span>(spe_cat)<span class="sc">$</span>color_vectors<span class="sc">$</span>celltype)</span></code></pre></div>
+<pre><code>## Scale for colour is already present.
+## Adding another scale for colour, which will replace the existing scale.</code></pre>
+<p><img src="09-singlecell_visualization_files/figure-html/sample-clrDR-1.png" width="672" /></p>
+<p>There are notable differences between samples based on their cell type
+proportions.</p>
+<p>Interestingly, <code>Patient3_001</code>, <code>Patient1_003</code>, <code>Patient4_007</code> and
+<code>Patient4_006</code> group together and the PC loadings indicate a strong
+contribution of BnT and B cells, which could propose formation of
+tertiary lymphoid structures (TLS). In section <a href="performing-spatial-analysis.html#spatial-viz">12.2</a>, we
+will be able to confirm this hypothesis visually on the images.</p>
+</div>
+</div>
+</div>
+<div id="rich-example" class="section level2 hasAnchor" number="10.4">
+<h2><span class="header-section-number">10.4</span> Further examples<a href="single-cell-visualization.html#rich-example" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>In the last section of this chapter, we will use the popular
+<a href="https://bioconductor.org/packages/release/bioc/html/ComplexHeatmap.html">ComplexHeatmap</a>
+package to create a visualization example that combines various
+cell-type- and sample-level information.</p>
+<p><a href="https://bioconductor.org/packages/release/bioc/html/ComplexHeatmap.html">ComplexHeatmap</a>
+is highly versatile and is originally inspired from the
+<a href="https://cran.r-project.org/web/packages/pheatmap/index.html">pheatmap</a>
+package. Therefore, many arguments have the same/similar names.</p>
+<p>For more details, we would recommend to read the <a href="https://jokergoo.github.io/ComplexHeatmap-reference/book/">reference
+book</a>.</p>
+<div id="publication-ready-complexheatmap" class="section level3 hasAnchor" number="10.4.1">
+<h3><span class="header-section-number">10.4.1</span> Publication-ready ComplexHeatmap<a href="single-cell-visualization.html#publication-ready-complexheatmap" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>For this example, we will concatenate heatmaps and annotations
+horizontally into one rich heatmap list. The grouping-level for the
+visualization will again be the cell type information from Section
+<a href="cell-phenotyping.html#classification">9.3</a></p>
+<p>Initially, we will create two separate <code>Heatmap</code> objects for cell type
+and state markers.</p>
+<p>Then, metadata information, including the cancer type proportion and
+number of cells/patients per cell type, will be extracted into
+<code>HeatmapAnnotation</code> objects.</p>
+<p>Notably, we will add spatial features per cell type, here the number of
+neighbors extracted from <code>colPair(spe)</code> and cell area, in another
+<code>HeatmapAnnotation</code> object.</p>
+<p>Ultimately, all objects are combined in a <code>HeatmapList</code> and visualized.</p>
+<div class="sourceCode" id="cb235"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb235-1"><a href="single-cell-visualization.html#cb235-1" tabindex="-1"></a><span class="fu">library</span>(ComplexHeatmap)</span>
+<span id="cb235-2"><a href="single-cell-visualization.html#cb235-2" tabindex="-1"></a><span class="fu">library</span>(circlize)</span>
+<span id="cb235-3"><a href="single-cell-visualization.html#cb235-3" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb235-4"><a href="single-cell-visualization.html#cb235-4" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">22</span>)</span>
+<span id="cb235-5"><a href="single-cell-visualization.html#cb235-5" tabindex="-1"></a></span>
+<span id="cb235-6"><a href="single-cell-visualization.html#cb235-6" tabindex="-1"></a><span class="do">### 1. Heatmap bodies </span><span class="al">###</span></span>
+<span id="cb235-7"><a href="single-cell-visualization.html#cb235-7" tabindex="-1"></a></span>
+<span id="cb235-8"><a href="single-cell-visualization.html#cb235-8" tabindex="-1"></a><span class="co"># Heatmap body color </span></span>
+<span id="cb235-9"><a href="single-cell-visualization.html#cb235-9" tabindex="-1"></a>col_exprs <span class="ot">&lt;-</span> <span class="fu">colorRamp2</span>(<span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>), </span>
+<span id="cb235-10"><a href="single-cell-visualization.html#cb235-10" tabindex="-1"></a>                        <span class="fu">c</span>(<span class="st">&quot;#440154FF&quot;</span>,<span class="st">&quot;#3B518BFF&quot;</span>,<span class="st">&quot;#20938CFF&quot;</span>,</span>
+<span id="cb235-11"><a href="single-cell-visualization.html#cb235-11" tabindex="-1"></a>                          <span class="st">&quot;#6ACD5AFF&quot;</span>,<span class="st">&quot;#FDE725FF&quot;</span>))</span>
+<span id="cb235-12"><a href="single-cell-visualization.html#cb235-12" tabindex="-1"></a></span>
+<span id="cb235-13"><a href="single-cell-visualization.html#cb235-13" tabindex="-1"></a><span class="co"># Create Heatmap objects</span></span>
+<span id="cb235-14"><a href="single-cell-visualization.html#cb235-14" tabindex="-1"></a><span class="co"># By cell type markers</span></span>
+<span id="cb235-15"><a href="single-cell-visualization.html#cb235-15" tabindex="-1"></a>celltype_mean <span class="ot">&lt;-</span> <span class="fu">aggregateAcrossCells</span>(<span class="fu">as</span>(spe, <span class="st">&quot;SingleCellExperiment&quot;</span>),  </span>
+<span id="cb235-16"><a href="single-cell-visualization.html#cb235-16" tabindex="-1"></a>                     <span class="at">ids =</span> spe<span class="sc">$</span>celltype, </span>
+<span id="cb235-17"><a href="single-cell-visualization.html#cb235-17" tabindex="-1"></a>                     <span class="at">statistics =</span> <span class="st">&quot;mean&quot;</span>,</span>
+<span id="cb235-18"><a href="single-cell-visualization.html#cb235-18" tabindex="-1"></a>                     <span class="at">use.assay.type =</span> <span class="st">&quot;exprs&quot;</span>, </span>
+<span id="cb235-19"><a href="single-cell-visualization.html#cb235-19" tabindex="-1"></a>                     <span class="at">subset.row =</span> <span class="fu">rownames</span>(spe)[<span class="fu">rowData</span>(spe)<span class="sc">$</span>marker_class <span class="sc">==</span> <span class="st">&quot;type&quot;</span>])</span>
+<span id="cb235-20"><a href="single-cell-visualization.html#cb235-20" tabindex="-1"></a></span>
+<span id="cb235-21"><a href="single-cell-visualization.html#cb235-21" tabindex="-1"></a>h_type <span class="ot">&lt;-</span> <span class="fu">Heatmap</span>(<span class="fu">t</span>(<span class="fu">assay</span>(celltype_mean, <span class="st">&quot;exprs&quot;</span>)),</span>
+<span id="cb235-22"><a href="single-cell-visualization.html#cb235-22" tabindex="-1"></a>        <span class="at">column_title =</span> <span class="st">&quot;type_markers&quot;</span>,</span>
+<span id="cb235-23"><a href="single-cell-visualization.html#cb235-23" tabindex="-1"></a>        <span class="at">col =</span> col_exprs,</span>
+<span id="cb235-24"><a href="single-cell-visualization.html#cb235-24" tabindex="-1"></a>        <span class="at">name=</span> <span class="st">&quot;mean exprs&quot;</span>,</span>
+<span id="cb235-25"><a href="single-cell-visualization.html#cb235-25" tabindex="-1"></a>        <span class="at">show_row_names =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb235-26"><a href="single-cell-visualization.html#cb235-26" tabindex="-1"></a>        <span class="at">show_column_names =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb235-27"><a href="single-cell-visualization.html#cb235-27" tabindex="-1"></a>    </span>
+<span id="cb235-28"><a href="single-cell-visualization.html#cb235-28" tabindex="-1"></a><span class="co"># By cell state markers</span></span>
+<span id="cb235-29"><a href="single-cell-visualization.html#cb235-29" tabindex="-1"></a>cellstate_mean <span class="ot">&lt;-</span> <span class="fu">aggregateAcrossCells</span>(<span class="fu">as</span>(spe, <span class="st">&quot;SingleCellExperiment&quot;</span>),  </span>
+<span id="cb235-30"><a href="single-cell-visualization.html#cb235-30" tabindex="-1"></a>                     <span class="at">ids =</span> spe<span class="sc">$</span>celltype, </span>
+<span id="cb235-31"><a href="single-cell-visualization.html#cb235-31" tabindex="-1"></a>                     <span class="at">statistics =</span> <span class="st">&quot;mean&quot;</span>,</span>
+<span id="cb235-32"><a href="single-cell-visualization.html#cb235-32" tabindex="-1"></a>                     <span class="at">use.assay.type =</span> <span class="st">&quot;exprs&quot;</span>, </span>
+<span id="cb235-33"><a href="single-cell-visualization.html#cb235-33" tabindex="-1"></a>                     <span class="at">subset.row =</span> <span class="fu">rownames</span>(spe)[<span class="fu">rowData</span>(spe)<span class="sc">$</span>marker_class <span class="sc">==</span> <span class="st">&quot;state&quot;</span>])</span>
+<span id="cb235-34"><a href="single-cell-visualization.html#cb235-34" tabindex="-1"></a></span>
+<span id="cb235-35"><a href="single-cell-visualization.html#cb235-35" tabindex="-1"></a>h_state <span class="ot">&lt;-</span> <span class="fu">Heatmap</span>(<span class="fu">t</span>(<span class="fu">assay</span>(cellstate_mean, <span class="st">&quot;exprs&quot;</span>)),</span>
+<span id="cb235-36"><a href="single-cell-visualization.html#cb235-36" tabindex="-1"></a>        <span class="at">column_title =</span> <span class="st">&quot;state_markers&quot;</span>,</span>
+<span id="cb235-37"><a href="single-cell-visualization.html#cb235-37" tabindex="-1"></a>        <span class="at">col =</span> col_exprs,</span>
+<span id="cb235-38"><a href="single-cell-visualization.html#cb235-38" tabindex="-1"></a>        <span class="at">name=</span> <span class="st">&quot;mean exprs&quot;</span>,</span>
+<span id="cb235-39"><a href="single-cell-visualization.html#cb235-39" tabindex="-1"></a>        <span class="at">show_row_names =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb235-40"><a href="single-cell-visualization.html#cb235-40" tabindex="-1"></a>        <span class="at">show_column_names =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb235-41"><a href="single-cell-visualization.html#cb235-41" tabindex="-1"></a></span>
+<span id="cb235-42"><a href="single-cell-visualization.html#cb235-42" tabindex="-1"></a></span>
+<span id="cb235-43"><a href="single-cell-visualization.html#cb235-43" tabindex="-1"></a><span class="do">### 2. Heatmap annotation </span><span class="al">###</span></span>
+<span id="cb235-44"><a href="single-cell-visualization.html#cb235-44" tabindex="-1"></a></span>
+<span id="cb235-45"><a href="single-cell-visualization.html#cb235-45" tabindex="-1"></a><span class="do">### 2.1  Metadata features</span></span>
+<span id="cb235-46"><a href="single-cell-visualization.html#cb235-46" tabindex="-1"></a></span>
+<span id="cb235-47"><a href="single-cell-visualization.html#cb235-47" tabindex="-1"></a>anno <span class="ot">&lt;-</span> <span class="fu">colData</span>(celltype_mean) <span class="sc">%&gt;%</span> as.data.frame <span class="sc">%&gt;%</span> <span class="fu">select</span>(celltype, ncells)</span>
+<span id="cb235-48"><a href="single-cell-visualization.html#cb235-48" tabindex="-1"></a></span>
+<span id="cb235-49"><a href="single-cell-visualization.html#cb235-49" tabindex="-1"></a><span class="co"># Proportion of indication per celltype</span></span>
+<span id="cb235-50"><a href="single-cell-visualization.html#cb235-50" tabindex="-1"></a>indication <span class="ot">&lt;-</span> <span class="fu">unclass</span>(<span class="fu">prop.table</span>(<span class="fu">table</span>(spe<span class="sc">$</span>celltype, spe<span class="sc">$</span>indication), <span class="at">margin =</span> <span class="dv">1</span>))</span>
+<span id="cb235-51"><a href="single-cell-visualization.html#cb235-51" tabindex="-1"></a></span>
+<span id="cb235-52"><a href="single-cell-visualization.html#cb235-52" tabindex="-1"></a><span class="co"># Number of contributing patients per celltype</span></span>
+<span id="cb235-53"><a href="single-cell-visualization.html#cb235-53" tabindex="-1"></a>cluster_PID <span class="ot">&lt;-</span> <span class="fu">colData</span>(spe) <span class="sc">%&gt;%</span> </span>
+<span id="cb235-54"><a href="single-cell-visualization.html#cb235-54" tabindex="-1"></a>    <span class="fu">as.data.frame</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb235-55"><a href="single-cell-visualization.html#cb235-55" tabindex="-1"></a>    <span class="fu">select</span>(celltype, patient_id) <span class="sc">%&gt;%</span> </span>
+<span id="cb235-56"><a href="single-cell-visualization.html#cb235-56" tabindex="-1"></a>    <span class="fu">group_by</span>(celltype) <span class="sc">%&gt;%</span> <span class="fu">table</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb235-57"><a href="single-cell-visualization.html#cb235-57" tabindex="-1"></a>    <span class="fu">as.data.frame</span>()</span>
+<span id="cb235-58"><a href="single-cell-visualization.html#cb235-58" tabindex="-1"></a></span>
+<span id="cb235-59"><a href="single-cell-visualization.html#cb235-59" tabindex="-1"></a>n_PID <span class="ot">&lt;-</span> cluster_PID <span class="sc">%&gt;%</span> </span>
+<span id="cb235-60"><a href="single-cell-visualization.html#cb235-60" tabindex="-1"></a>    <span class="fu">filter</span>(Freq<span class="sc">&gt;</span><span class="dv">0</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb235-61"><a href="single-cell-visualization.html#cb235-61" tabindex="-1"></a>    <span class="fu">group_by</span>(celltype) <span class="sc">%&gt;%</span> </span>
+<span id="cb235-62"><a href="single-cell-visualization.html#cb235-62" tabindex="-1"></a>    <span class="fu">count</span>(<span class="at">name =</span> <span class="st">&quot;n_PID&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb235-63"><a href="single-cell-visualization.html#cb235-63" tabindex="-1"></a>    <span class="fu">column_to_rownames</span>(<span class="st">&quot;celltype&quot;</span>)</span>
+<span id="cb235-64"><a href="single-cell-visualization.html#cb235-64" tabindex="-1"></a></span>
+<span id="cb235-65"><a href="single-cell-visualization.html#cb235-65" tabindex="-1"></a><span class="co"># Create HeatmapAnnotation objects</span></span>
+<span id="cb235-66"><a href="single-cell-visualization.html#cb235-66" tabindex="-1"></a>ha_anno <span class="ot">&lt;-</span> <span class="fu">HeatmapAnnotation</span>(<span class="at">celltype =</span> anno<span class="sc">$</span>celltype,</span>
+<span id="cb235-67"><a href="single-cell-visualization.html#cb235-67" tabindex="-1"></a>                            <span class="at">border =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb235-68"><a href="single-cell-visualization.html#cb235-68" tabindex="-1"></a>                            <span class="at">gap =</span> <span class="fu">unit</span>(<span class="dv">1</span>,<span class="st">&quot;mm&quot;</span>),</span>
+<span id="cb235-69"><a href="single-cell-visualization.html#cb235-69" tabindex="-1"></a>                            <span class="at">col =</span> <span class="fu">list</span>(<span class="at">celltype =</span> <span class="fu">metadata</span>(spe)<span class="sc">$</span>color_vectors<span class="sc">$</span>celltype),</span>
+<span id="cb235-70"><a href="single-cell-visualization.html#cb235-70" tabindex="-1"></a>                            <span class="at">which =</span> <span class="st">&quot;row&quot;</span>)</span>
+<span id="cb235-71"><a href="single-cell-visualization.html#cb235-71" tabindex="-1"></a>    </span>
+<span id="cb235-72"><a href="single-cell-visualization.html#cb235-72" tabindex="-1"></a>ha_meta <span class="ot">&lt;-</span> <span class="fu">HeatmapAnnotation</span>(<span class="at">n_cells =</span> <span class="fu">anno_barplot</span>(anno<span class="sc">$</span>ncells, <span class="at">width =</span> <span class="fu">unit</span>(<span class="dv">10</span>, <span class="st">&quot;mm&quot;</span>)),</span>
+<span id="cb235-73"><a href="single-cell-visualization.html#cb235-73" tabindex="-1"></a>                            <span class="at">n_PID =</span> <span class="fu">anno_barplot</span>(n_PID, <span class="at">width =</span> <span class="fu">unit</span>(<span class="dv">10</span>, <span class="st">&quot;mm&quot;</span>)),</span>
+<span id="cb235-74"><a href="single-cell-visualization.html#cb235-74" tabindex="-1"></a>                            <span class="at">indication =</span> <span class="fu">anno_barplot</span>(indication,<span class="at">width =</span> <span class="fu">unit</span>(<span class="dv">10</span>, <span class="st">&quot;mm&quot;</span>),</span>
+<span id="cb235-75"><a href="single-cell-visualization.html#cb235-75" tabindex="-1"></a>                                                      <span class="at">gp =</span> <span class="fu">gpar</span>(<span class="at">fill =</span> <span class="fu">metadata</span>(spe)<span class="sc">$</span>color_vectors<span class="sc">$</span>indication)),</span>
+<span id="cb235-76"><a href="single-cell-visualization.html#cb235-76" tabindex="-1"></a>                            <span class="at">border =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb235-77"><a href="single-cell-visualization.html#cb235-77" tabindex="-1"></a>                            <span class="at">annotation_name_rot =</span> <span class="dv">90</span>,</span>
+<span id="cb235-78"><a href="single-cell-visualization.html#cb235-78" tabindex="-1"></a>                            <span class="at">gap =</span> <span class="fu">unit</span>(<span class="dv">1</span>,<span class="st">&quot;mm&quot;</span>),</span>
+<span id="cb235-79"><a href="single-cell-visualization.html#cb235-79" tabindex="-1"></a>                            <span class="at">which =</span> <span class="st">&quot;row&quot;</span>)</span>
+<span id="cb235-80"><a href="single-cell-visualization.html#cb235-80" tabindex="-1"></a></span>
+<span id="cb235-81"><a href="single-cell-visualization.html#cb235-81" tabindex="-1"></a><span class="do">### 2.2 Spatial features</span></span>
+<span id="cb235-82"><a href="single-cell-visualization.html#cb235-82" tabindex="-1"></a></span>
+<span id="cb235-83"><a href="single-cell-visualization.html#cb235-83" tabindex="-1"></a><span class="co"># Add number of neighbors to spe object (saved in colPair)</span></span>
+<span id="cb235-84"><a href="single-cell-visualization.html#cb235-84" tabindex="-1"></a>spe<span class="sc">$</span>n_neighbors <span class="ot">&lt;-</span> <span class="fu">countLnodeHits</span>(<span class="fu">colPair</span>(spe, <span class="st">&quot;neighborhood&quot;</span>))</span>
+<span id="cb235-85"><a href="single-cell-visualization.html#cb235-85" tabindex="-1"></a></span>
+<span id="cb235-86"><a href="single-cell-visualization.html#cb235-86" tabindex="-1"></a><span class="co"># Select spatial features and average over celltypes</span></span>
+<span id="cb235-87"><a href="single-cell-visualization.html#cb235-87" tabindex="-1"></a>spatial <span class="ot">&lt;-</span> <span class="fu">colData</span>(spe) <span class="sc">%&gt;%</span> </span>
+<span id="cb235-88"><a href="single-cell-visualization.html#cb235-88" tabindex="-1"></a>    <span class="fu">as.data.frame</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb235-89"><a href="single-cell-visualization.html#cb235-89" tabindex="-1"></a>    <span class="fu">select</span>(area, celltype, n_neighbors)</span>
+<span id="cb235-90"><a href="single-cell-visualization.html#cb235-90" tabindex="-1"></a></span>
+<span id="cb235-91"><a href="single-cell-visualization.html#cb235-91" tabindex="-1"></a>spatial <span class="ot">&lt;-</span> spatial <span class="sc">%&gt;%</span> </span>
+<span id="cb235-92"><a href="single-cell-visualization.html#cb235-92" tabindex="-1"></a>    <span class="fu">select</span>(<span class="sc">-</span>celltype) <span class="sc">%&gt;%</span> </span>
+<span id="cb235-93"><a href="single-cell-visualization.html#cb235-93" tabindex="-1"></a>    <span class="fu">aggregate</span>(<span class="at">by =</span> <span class="fu">list</span>(<span class="at">celltype =</span> spatial<span class="sc">$</span>celltype), <span class="at">FUN =</span> mean) <span class="sc">%&gt;%</span> </span>
+<span id="cb235-94"><a href="single-cell-visualization.html#cb235-94" tabindex="-1"></a>    <span class="fu">column_to_rownames</span>(<span class="st">&quot;celltype&quot;</span>)</span>
+<span id="cb235-95"><a href="single-cell-visualization.html#cb235-95" tabindex="-1"></a></span>
+<span id="cb235-96"><a href="single-cell-visualization.html#cb235-96" tabindex="-1"></a><span class="co"># Create HeatmapAnnotation object</span></span>
+<span id="cb235-97"><a href="single-cell-visualization.html#cb235-97" tabindex="-1"></a>ha_spatial <span class="ot">&lt;-</span> <span class="fu">HeatmapAnnotation</span>(</span>
+<span id="cb235-98"><a href="single-cell-visualization.html#cb235-98" tabindex="-1"></a>    <span class="at">area =</span> spatial<span class="sc">$</span>area,</span>
+<span id="cb235-99"><a href="single-cell-visualization.html#cb235-99" tabindex="-1"></a>    <span class="at">n_neighbors =</span> spatial<span class="sc">$</span>n_neighbors,</span>
+<span id="cb235-100"><a href="single-cell-visualization.html#cb235-100" tabindex="-1"></a>    <span class="at">border =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb235-101"><a href="single-cell-visualization.html#cb235-101" tabindex="-1"></a>    <span class="at">gap =</span> <span class="fu">unit</span>(<span class="dv">1</span>,<span class="st">&quot;mm&quot;</span>),</span>
+<span id="cb235-102"><a href="single-cell-visualization.html#cb235-102" tabindex="-1"></a>    <span class="at">which =</span> <span class="st">&quot;row&quot;</span>)</span>
+<span id="cb235-103"><a href="single-cell-visualization.html#cb235-103" tabindex="-1"></a></span>
+<span id="cb235-104"><a href="single-cell-visualization.html#cb235-104" tabindex="-1"></a><span class="do">### 3. Plot rich heatmap </span><span class="al">###</span></span>
+<span id="cb235-105"><a href="single-cell-visualization.html#cb235-105" tabindex="-1"></a></span>
+<span id="cb235-106"><a href="single-cell-visualization.html#cb235-106" tabindex="-1"></a><span class="co"># Create HeatmapList object</span></span>
+<span id="cb235-107"><a href="single-cell-visualization.html#cb235-107" tabindex="-1"></a>h_list <span class="ot">&lt;-</span> h_type <span class="sc">+</span></span>
+<span id="cb235-108"><a href="single-cell-visualization.html#cb235-108" tabindex="-1"></a>    h_state <span class="sc">+</span></span>
+<span id="cb235-109"><a href="single-cell-visualization.html#cb235-109" tabindex="-1"></a>    ha_anno <span class="sc">+</span></span>
+<span id="cb235-110"><a href="single-cell-visualization.html#cb235-110" tabindex="-1"></a>    ha_spatial <span class="sc">+</span></span>
+<span id="cb235-111"><a href="single-cell-visualization.html#cb235-111" tabindex="-1"></a>    ha_meta</span>
+<span id="cb235-112"><a href="single-cell-visualization.html#cb235-112" tabindex="-1"></a></span>
+<span id="cb235-113"><a href="single-cell-visualization.html#cb235-113" tabindex="-1"></a><span class="co"># Add customized legend for anno_barplot()</span></span>
+<span id="cb235-114"><a href="single-cell-visualization.html#cb235-114" tabindex="-1"></a>lgd <span class="ot">&lt;-</span> <span class="fu">Legend</span>(<span class="at">title =</span> <span class="st">&quot;indication&quot;</span>, </span>
+<span id="cb235-115"><a href="single-cell-visualization.html#cb235-115" tabindex="-1"></a>              <span class="at">at =</span> <span class="fu">colnames</span>(indication), </span>
+<span id="cb235-116"><a href="single-cell-visualization.html#cb235-116" tabindex="-1"></a>              <span class="at">legend_gp =</span> <span class="fu">gpar</span>(<span class="at">fill =</span> <span class="fu">metadata</span>(spe)<span class="sc">$</span>color_vectors<span class="sc">$</span>indication))</span>
+<span id="cb235-117"><a href="single-cell-visualization.html#cb235-117" tabindex="-1"></a>             </span>
+<span id="cb235-118"><a href="single-cell-visualization.html#cb235-118" tabindex="-1"></a><span class="co"># Plot</span></span>
+<span id="cb235-119"><a href="single-cell-visualization.html#cb235-119" tabindex="-1"></a><span class="fu">draw</span>(h_list,<span class="at">annotation_legend_list =</span> <span class="fu">list</span>(lgd))</span></code></pre></div>
+<p><img src="09-singlecell_visualization_files/figure-html/complex-heatmap-1.png" width="864" /></p>
+<p>This plot summarizes most of the information we have seen in this
+chapter previously. In addition, we can observe that tumor cells have
+the largest mean cell area, high number of neighbors and elevated Ki67
+expression. BnT cells have the highest number of neighbors on average,
+which is biological sound given their predominant location in highly
+immune infiltrated regions (such as TLS).</p>
+</div>
+<div id="interactive-visualization" class="section level3 hasAnchor" number="10.4.2">
+<h3><span class="header-section-number">10.4.2</span> Interactive visualization<a href="single-cell-visualization.html#interactive-visualization" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>For interactive visualization of the single-cell data the
+<a href="https://www.bioconductor.org/packages/release/bioc/html/iSEE.html">iSEE</a> shiny
+application can be used. For a comprehensive tutorial, please refer to the
+<a href="https://www.bioconductor.org/packages/release/bioc/vignettes/iSEE/inst/doc/basic.html">iSEE vignette</a>.</p>
+<div class="sourceCode" id="cb236"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb236-1"><a href="single-cell-visualization.html#cb236-1" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">interactive</span>()) {</span>
+<span id="cb236-2"><a href="single-cell-visualization.html#cb236-2" tabindex="-1"></a>    <span class="fu">library</span>(iSEE)</span>
+<span id="cb236-3"><a href="single-cell-visualization.html#cb236-3" tabindex="-1"></a></span>
+<span id="cb236-4"><a href="single-cell-visualization.html#cb236-4" tabindex="-1"></a>    <span class="fu">iSEE</span>(spe)   </span>
+<span id="cb236-5"><a href="single-cell-visualization.html#cb236-5" tabindex="-1"></a>}</span></code></pre></div>
+</div>
+</div>
+<div id="session-info-5" class="section level2 hasAnchor" number="10.5">
+<h2><span class="header-section-number">10.5</span> Session Info<a href="single-cell-visualization.html#session-info-5" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<details>
+<summary>
+SessionInfo
+</summary>
+<pre><code>## R version 4.3.2 (2023-10-31)
+## Platform: x86_64-pc-linux-gnu (64-bit)
+## Running under: Ubuntu 22.04.3 LTS
+## 
+## Matrix products: default
+## BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
+## LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.20.so;  LAPACK version 3.10.0
+## 
+## locale:
+##  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+##  [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+##  [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+##  [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+##  [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+## [11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+## 
+## time zone: Etc/UTC
+## tzcode source: system (glibc)
+## 
+## attached base packages:
+## [1] grid      stats4    stats     graphics  grDevices utils     datasets 
+## [8] methods   base     
+## 
+## other attached packages:
+##  [1] lubridate_1.9.3             forcats_1.0.0              
+##  [3] stringr_1.5.1               dplyr_1.1.4                
+##  [5] purrr_1.0.2                 readr_2.1.4                
+##  [7] tidyr_1.3.0                 tibble_3.2.1               
+##  [9] tidyverse_2.0.0             circlize_0.4.15            
+## [11] ComplexHeatmap_2.18.0       CATALYST_1.26.0            
+## [13] viridis_0.6.4               viridisLite_0.4.2          
+## [15] cowplot_1.1.2               patchwork_1.1.3            
+## [17] scater_1.30.1               scuttle_1.12.0             
+## [19] dittoSeq_1.14.0             ggplot2_3.4.4              
+## [21] SpatialExperiment_1.12.0    SingleCellExperiment_1.24.0
+## [23] SummarizedExperiment_1.32.0 Biobase_2.62.0             
+## [25] GenomicRanges_1.54.1        GenomeInfoDb_1.38.5        
+## [27] IRanges_2.36.0              S4Vectors_0.40.2           
+## [29] BiocGenerics_0.48.1         MatrixGenerics_1.14.0      
+## [31] matrixStats_1.2.0          
+## 
+## loaded via a namespace (and not attached):
+##   [1] RColorBrewer_1.1-3          jsonlite_1.8.8             
+##   [3] shape_1.4.6                 magrittr_2.0.3             
+##   [5] magick_2.8.2                ggbeeswarm_0.7.2           
+##   [7] TH.data_1.1-2               farver_2.1.1               
+##   [9] rmarkdown_2.25              GlobalOptions_0.1.2        
+##  [11] zlibbioc_1.48.0             vctrs_0.6.5                
+##  [13] Cairo_1.6-2                 DelayedMatrixStats_1.24.0  
+##  [15] RCurl_1.98-1.13             rstatix_0.7.2              
+##  [17] htmltools_0.5.7             S4Arrays_1.2.0             
+##  [19] plotrix_3.8-4               BiocNeighbors_1.20.1       
+##  [21] broom_1.0.5                 SparseArray_1.2.3          
+##  [23] sass_0.4.8                  bslib_0.6.1                
+##  [25] plyr_1.8.9                  sandwich_3.1-0             
+##  [27] zoo_1.8-12                  cachem_1.0.8               
+##  [29] igraph_1.6.0                lifecycle_1.0.4            
+##  [31] iterators_1.0.14            pkgconfig_2.0.3            
+##  [33] rsvd_1.0.5                  Matrix_1.6-4               
+##  [35] R6_2.5.1                    fastmap_1.1.1              
+##  [37] GenomeInfoDbData_1.2.11     clue_0.3-65                
+##  [39] digest_0.6.33               colorspace_2.1-0           
+##  [41] ggnewscale_0.4.9            irlba_2.3.5.1              
+##  [43] ggpubr_0.6.0                beachmat_2.18.0            
+##  [45] labeling_0.4.3              cytolib_2.14.0             
+##  [47] timechange_0.2.0            fansi_1.0.6                
+##  [49] colorRamps_2.3.1            nnls_1.5                   
+##  [51] polyclip_1.10-6             abind_1.4-5                
+##  [53] compiler_4.3.2              withr_2.5.2                
+##  [55] doParallel_1.0.17           ConsensusClusterPlus_1.66.0
+##  [57] backports_1.4.1             BiocParallel_1.36.0        
+##  [59] carData_3.0-5               highr_0.10                 
+##  [61] ggforce_0.4.1               ggsignif_0.6.4             
+##  [63] MASS_7.3-60                 drc_3.0-1                  
+##  [65] DelayedArray_0.28.0         rjson_0.2.21               
+##  [67] FlowSOM_2.10.0              gtools_3.9.5               
+##  [69] tools_4.3.2                 vipor_0.4.7                
+##  [71] beeswarm_0.4.0              glue_1.6.2                 
+##  [73] Rtsne_0.17                  cluster_2.1.4              
+##  [75] reshape2_1.4.4              generics_0.1.3             
+##  [77] gtable_0.3.4                tzdb_0.4.0                 
+##  [79] hms_1.1.3                   data.table_1.14.10         
+##  [81] BiocSingular_1.18.0         ScaledMatrix_1.10.0        
+##  [83] car_3.1-2                   utf8_1.2.4                 
+##  [85] XVector_0.42.0              ggrepel_0.9.4              
+##  [87] foreach_1.5.2               pillar_1.9.0               
+##  [89] splines_4.3.2               flowCore_2.14.0            
+##  [91] tweenr_2.0.2                lattice_0.21-9             
+##  [93] survival_3.5-7              RProtoBufLib_2.14.0        
+##  [95] tidyselect_1.2.0            knitr_1.45                 
+##  [97] gridExtra_2.3               bookdown_0.37              
+##  [99] xfun_0.41                   pheatmap_1.0.12            
+## [101] stringi_1.8.3               yaml_2.3.8                 
+## [103] evaluate_0.23               codetools_0.2-19           
+## [105] cli_3.6.2                   munsell_0.5.0              
+## [107] jquerylib_0.1.4             Rcpp_1.0.11                
+## [109] png_0.1-8                   XML_3.99-0.16              
+## [111] parallel_4.3.2              sparseMatrixStats_1.14.0   
+## [113] bitops_1.0-7                mvtnorm_1.2-4              
+## [115] scales_1.3.0                ggridges_0.5.5             
+## [117] crayon_1.5.2                GetoptLong_1.0.5           
+## [119] rlang_1.1.2                 multcomp_1.4-25</code></pre>
+</details>
+
+</div>
+</div>
+<h3>References<a href="references.html#references" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-Gu2016" class="csl-entry">
+Gu, Zuguang, Roland Eils, and Matthias Schlesner. 2016. <span>“Complex Heatmaps Reveal Patterns and Correlations in Multidimensional Genomic Data.”</span> <em>Bioinformatics</em> 32: 2847–49.
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="cell-phenotyping.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="image-visualization.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": true,
+"facebook": false,
+"twitter": true,
+"linkedin": true,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": "https://github.com/BodenmillerGroup/IMCDataAnalysis/blob/master/09-singlecell_visualization.Rmd",
+"text": null
+},
+"download": null,
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "section"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

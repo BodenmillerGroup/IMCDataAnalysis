@@ -1,0 +1,121 @@
+--- 
+title: "Analysis workflow for IMC data"
+author: "**Authors:** Nils Eling [<sup>1</sup>](#DQBM)<sup>,</sup>[<sup>2</sup>](#IMHS)<sup>,</sup>[<sup>*</sup>](#email), Vito Zanotelli [<sup>1</sup>](#DQBM)<sup>,</sup>[<sup>2</sup>](#IMHS), Michelle Daniel [<sup>1</sup>](#DQBM)<sup>,</sup>[<sup>2</sup>](#IMHS), Daniel Schulz [<sup>1</sup>](#DQBM)<sup>,</sup>[<sup>2</sup>](#IMHS), Jonas Windhager [<sup>1</sup>](#DQBM)<sup>,</sup>[<sup>2</sup>](#IMHS), Lasse Meyer [<sup>1</sup>](#DQBM)<sup>,</sup>[<sup>2</sup>](#IMHS)"
+date: "**Compiled:** 2024-01-05"
+site: bookdown::bookdown_site
+github-repo: "BodenmillerGroup/IMCDataAnalysis"
+documentclass: book
+bibliography: [book.bib, packages.bib]
+biblio-style: apalike
+link-citations: yes
+description: "This bookdown project highlights possible down-stream analyses performed on imaging mass cytometry data."
+---
+
+# IMC Data Analysis Workflow {#preamble}
+
+This workflow highlights the use of common R/Bioconductor packages
+to analyze single-cell data obtained from segmented multi-channel images. We will not perform multi-channel image processing and segmentation in R
+but rather link to available approaches in Section \@ref(processing). While we
+use imaging mass cytometry (IMC) data as an example, the concepts presented here can be applied to images
+obtained by other highly-multiplexed imaging technologies (e.g. CODEX, MIBI,
+mIF, etc.).
+
+We will give an introduction to IMC in Section \@ref(intro) and highlight
+strategies to extract single-cell data from multi-channel images in Section
+\@ref(processing).
+
+Reproducible code written in R is available from Section \@ref(prerequisites)
+onwards and the workflow can be largely divided into the following parts:
+
+1. Preprocessing (reading in the data, spillover correction)
+2. Image- and cell-level quality control, low-dimensional visualization
+3. Sample/batch effect correction
+4. Cell phenotyping via clustering or classification
+5. Single-cell and image visualization
+6. Spatial analyses
+
+## Disclaimer
+
+Multi-channel image and spatial, single-cell analysis is complex and we
+highlight an example workflow here. However, this workflow is not complete and
+does not cover all possible aspects of exploratory data analysis. Instead, we
+demonstrate this workflow as a solid basis that supports other aspects of data
+analysis. It offers interoperability with other packages for single-cell and
+spatial analysis and the user will need to become familiar with the general
+framework to efficiently analyse data obtained from multiplexed imaging
+technologies.
+
+## Update freeze
+
+This workflow has been actively developed until December 2023. At that time
+we used the most recent (`v.0.16.0`) version of `steinbock` to process the 
+example data. If you are having issues when using newer versions of `steinbock`
+please open an issue [here](https://github.com/BodenmillerGroup/IMCDataAnalysis/issues).
+
+## Feedback and contributing
+
+We provide the workflow as an open-source resource. It does not mean that
+this workflow is tested on all possible datasets or biological questions and 
+there exist multiple ways of analysing data. It is therefore recommended to
+check the results and question their biological interpretation.
+
+If you notice an issue or missing information, please report an issue
+[here](https://github.com/BodenmillerGroup/IMCDataAnalysis/issues). We also
+welcome contributions in form of pull requests or feature requests in form of
+issues. Have a look at the source code at:
+
+[https://github.com/BodenmillerGroup/IMCDataAnalysis](https://github.com/BodenmillerGroup/IMCDataAnalysis)
+
+## Maintainer
+
+[Daniel Schulz](https://github.com/SchulzDan)  
+
+## Contributors
+
+[Nils Eling](https://github.com/nilseling)
+[Vito Zanotelli](https://github.com/votti)  
+[Daniel Schulz](https://github.com/SchulzDan)  
+[Jonas Windhager](https://github.com/jwindhager)   
+[Michelle Daniel](https://github.com/michdaniel)  
+[Lasse Meyer](https://github.com/lassedochreden)
+
+## Citation
+
+The workflow has been published in  
+[https://www.nature.com/articles/s41596-023-00881-0](https://www.nature.com/articles/s41596-023-00881-0) 
+which you can cite as follows:
+
+```
+Windhager, J., Zanotelli, V.R.T., Schulz, D. et al. An end-to-end workflow for multiplexed image processing and analysis.
+    Nat Protoc (2023). 
+```
+
+## Changelog
+
+
+```{=html}
+<p><strong>Version 1.0.0</strong> [2023-06-30]</p>
+<ul>
+<li>First stable release of the workflow</li>
+</ul>
+<p><strong>Version 1.0.1</strong> [2023-10-19]</p>
+<ul>
+<li>Added seed before <code>predict</code> call after training a classifier</li>
+</ul>
+<p><strong>Version 1.0.2</strong> [2023-11-27]</p>
+<ul>
+<li>Added developers documentation</li>
+<li>Added more ways to visualize cell type composition per CN</li>
+</ul>
+<p><strong>Version 1.0.3</strong> [2024-01-05]</p>
+<ul>
+<li>Updated cytoviewer citation and corresponding text</li>
+</ul>
+
+```
+
+---
+
+<a name="email"><sup>*</sup></a> nils.eling@uzh.ch  
+<a name="DQBM">1:</a> Department for Quantitative Biomedicine, University of Zurich  
+<a name="IMHS">2:</a> Institute for Molecular Health Sciences, ETH Zurich  

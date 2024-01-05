@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>5 Read in the data | Analysis workflow for IMC data</title>
+  <meta name="description" content="This bookdown project highlights possible down-stream analyses performed on imaging mass cytometry data." />
+  <meta name="generator" content="bookdown 0.37 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="5 Read in the data | Analysis workflow for IMC data" />
+  <meta property="og:type" content="book" />
+  
+  <meta property="og:description" content="This bookdown project highlights possible down-stream analyses performed on imaging mass cytometry data." />
+  <meta name="github-repo" content="BodenmillerGroup/IMCDataAnalysis" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="5 Read in the data | Analysis workflow for IMC data" />
+  
+  <meta name="twitter:description" content="This bookdown project highlights possible down-stream analyses performed on imaging mass cytometry data." />
+  
+
+<meta name="author" content="Authors: Nils Eling 1,2,*, Vito Zanotelli 1,2, Michelle Daniel 1,2, Daniel Schulz 1,2, Jonas Windhager 1,2, Lasse Meyer 1,2" />
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="prerequisites.html"/>
+<link rel="next" href="spillover-correction.html"/>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+<style type="text/css">
+/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Multiplexed imaging data analysis</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> IMC Data Analysis Workflow</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="index.html"><a href="index.html#disclaimer"><i class="fa fa-check"></i><b>1.1</b> Disclaimer</a></li>
+<li class="chapter" data-level="1.2" data-path="index.html"><a href="index.html#update-freeze"><i class="fa fa-check"></i><b>1.2</b> Update freeze</a></li>
+<li class="chapter" data-level="1.3" data-path="index.html"><a href="index.html#feedback-and-contributing"><i class="fa fa-check"></i><b>1.3</b> Feedback and contributing</a></li>
+<li class="chapter" data-level="1.4" data-path="index.html"><a href="index.html#maintainer"><i class="fa fa-check"></i><b>1.4</b> Maintainer</a></li>
+<li class="chapter" data-level="1.5" data-path="index.html"><a href="index.html#contributors"><i class="fa fa-check"></i><b>1.5</b> Contributors</a></li>
+<li class="chapter" data-level="1.6" data-path="index.html"><a href="index.html#citation"><i class="fa fa-check"></i><b>1.6</b> Citation</a></li>
+<li class="chapter" data-level="1.7" data-path="index.html"><a href="index.html#changelog"><i class="fa fa-check"></i><b>1.7</b> Changelog</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="intro.html"><a href="intro.html"><i class="fa fa-check"></i><b>2</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="intro.html"><a href="intro.html#technical-details-of-imc"><i class="fa fa-check"></i><b>2.1</b> Technical details of IMC</a>
+<ul>
+<li class="chapter" data-level="2.1.1" data-path="intro.html"><a href="intro.html#metal-conjugated-antobodies-and-staining"><i class="fa fa-check"></i><b>2.1.1</b> Metal-conjugated antobodies and staining</a></li>
+<li class="chapter" data-level="2.1.2" data-path="intro.html"><a href="intro.html#data-acquisition"><i class="fa fa-check"></i><b>2.1.2</b> Data acquisition</a></li>
+</ul></li>
+<li class="chapter" data-level="2.2" data-path="intro.html"><a href="intro.html#data-format"><i class="fa fa-check"></i><b>2.2</b> IMC data format</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="processing.html"><a href="processing.html"><i class="fa fa-check"></i><b>3</b> Multi-channel image processing</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="processing.html"><a href="processing.html#image-pre-processing-imc-specific"><i class="fa fa-check"></i><b>3.1</b> Image pre-processing (IMC specific)</a></li>
+<li class="chapter" data-level="3.2" data-path="processing.html"><a href="processing.html#image-segmentation"><i class="fa fa-check"></i><b>3.2</b> Image segmentation</a></li>
+<li class="chapter" data-level="3.3" data-path="processing.html"><a href="processing.html#feature-extraction"><i class="fa fa-check"></i><b>3.3</b> Feature extraction</a></li>
+<li class="chapter" data-level="3.4" data-path="processing.html"><a href="processing.html#data-export"><i class="fa fa-check"></i><b>3.4</b> Data export</a></li>
+<li class="chapter" data-level="3.5" data-path="processing.html"><a href="processing.html#data-import-into-r"><i class="fa fa-check"></i><b>3.5</b> Data import into R</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="prerequisites.html"><a href="prerequisites.html"><i class="fa fa-check"></i><b>4</b> Prerequisites</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="prerequisites.html"><a href="prerequisites.html#obtain-the-code"><i class="fa fa-check"></i><b>4.1</b> Obtain the code</a></li>
+<li class="chapter" data-level="4.2" data-path="prerequisites.html"><a href="prerequisites.html#software-requirements"><i class="fa fa-check"></i><b>4.2</b> Software requirements</a>
+<ul>
+<li class="chapter" data-level="4.2.1" data-path="prerequisites.html"><a href="prerequisites.html#docker"><i class="fa fa-check"></i><b>4.2.1</b> Using Docker</a></li>
+<li class="chapter" data-level="4.2.2" data-path="prerequisites.html"><a href="prerequisites.html#manual-install"><i class="fa fa-check"></i><b>4.2.2</b> Manual installation</a></li>
+<li class="chapter" data-level="4.2.3" data-path="prerequisites.html"><a href="prerequisites.html#major-package-versions"><i class="fa fa-check"></i><b>4.2.3</b> Major package versions</a></li>
+</ul></li>
+<li class="chapter" data-level="4.3" data-path="prerequisites.html"><a href="prerequisites.html#image-processing"><i class="fa fa-check"></i><b>4.3</b> Image processing</a></li>
+<li class="chapter" data-level="4.4" data-path="prerequisites.html"><a href="prerequisites.html#download-data"><i class="fa fa-check"></i><b>4.4</b> Download example data</a>
+<ul>
+<li class="chapter" data-level="4.4.1" data-path="prerequisites.html"><a href="prerequisites.html#processed-multiplexed-imaging-data"><i class="fa fa-check"></i><b>4.4.1</b> Processed multiplexed imaging data</a></li>
+<li class="chapter" data-level="4.4.2" data-path="prerequisites.html"><a href="prerequisites.html#files-for-spillover-matrix-estimation"><i class="fa fa-check"></i><b>4.4.2</b> Files for spillover matrix estimation</a></li>
+<li class="chapter" data-level="4.4.3" data-path="prerequisites.html"><a href="prerequisites.html#gated-cells"><i class="fa fa-check"></i><b>4.4.3</b> Gated cells</a></li>
+</ul></li>
+<li class="chapter" data-level="4.5" data-path="prerequisites.html"><a href="prerequisites.html#sessionInfo"><i class="fa fa-check"></i><b>4.5</b> Software versions</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="read-data.html"><a href="read-data.html"><i class="fa fa-check"></i><b>5</b> Read in the data</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="read-data.html"><a href="read-data.html#read-in-single-cell-information"><i class="fa fa-check"></i><b>5.1</b> Read in single-cell information</a>
+<ul>
+<li class="chapter" data-level="5.1.1" data-path="read-data.html"><a href="read-data.html#steinbock-generated-data"><i class="fa fa-check"></i><b>5.1.1</b> steinbock generated data</a></li>
+<li class="chapter" data-level="5.1.2" data-path="read-data.html"><a href="read-data.html#imc-segmentation-pipeline-generated-data"><i class="fa fa-check"></i><b>5.1.2</b> IMC Segmentation Pipeline generated data</a></li>
+<li class="chapter" data-level="5.1.3" data-path="read-data.html"><a href="read-data.html#reading-custom-files"><i class="fa fa-check"></i><b>5.1.3</b> Reading custom files</a></li>
+</ul></li>
+<li class="chapter" data-level="5.2" data-path="read-data.html"><a href="read-data.html#cell-processing"><i class="fa fa-check"></i><b>5.2</b> Single-cell processing</a></li>
+<li class="chapter" data-level="5.3" data-path="read-data.html"><a href="read-data.html#read-images"><i class="fa fa-check"></i><b>5.3</b> Read in images</a></li>
+<li class="chapter" data-level="5.4" data-path="read-data.html"><a href="read-data.html#generate-single-cell-data-from-images"><i class="fa fa-check"></i><b>5.4</b> Generate single-cell data from images</a></li>
+<li class="chapter" data-level="5.5" data-path="read-data.html"><a href="read-data.html#accessing-publicly-available-imc-datasets"><i class="fa fa-check"></i><b>5.5</b> Accessing publicly available IMC datasets</a></li>
+<li class="chapter" data-level="5.6" data-path="read-data.html"><a href="read-data.html#save-objects"><i class="fa fa-check"></i><b>5.6</b> Save objects</a></li>
+<li class="chapter" data-level="5.7" data-path="read-data.html"><a href="read-data.html#session-info"><i class="fa fa-check"></i><b>5.7</b> Session Info</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="spillover-correction.html"><a href="spillover-correction.html"><i class="fa fa-check"></i><b>6</b> Spillover correction</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="spillover-correction.html"><a href="spillover-correction.html#generate-the-spillover-matrix"><i class="fa fa-check"></i><b>6.1</b> Generate the spillover matrix</a>
+<ul>
+<li class="chapter" data-level="6.1.1" data-path="spillover-correction.html"><a href="spillover-correction.html#read-in-the-data"><i class="fa fa-check"></i><b>6.1.1</b> Read in the data</a></li>
+<li class="chapter" data-level="6.1.2" data-path="spillover-correction.html"><a href="spillover-correction.html#quality-control"><i class="fa fa-check"></i><b>6.1.2</b> Quality control</a></li>
+<li class="chapter" data-level="6.1.3" data-path="spillover-correction.html"><a href="spillover-correction.html#pixel_binning"><i class="fa fa-check"></i><b>6.1.3</b> Optional pixel binning</a></li>
+<li class="chapter" data-level="6.1.4" data-path="spillover-correction.html"><a href="spillover-correction.html#filtering-incorrectly-assigned-pixels"><i class="fa fa-check"></i><b>6.1.4</b> Filtering incorrectly assigned pixels</a></li>
+<li class="chapter" data-level="6.1.5" data-path="spillover-correction.html"><a href="spillover-correction.html#compute-spillover-matrix"><i class="fa fa-check"></i><b>6.1.5</b> Compute spillover matrix</a></li>
+</ul></li>
+<li class="chapter" data-level="6.2" data-path="spillover-correction.html"><a href="spillover-correction.html#single-cell-data-compensation"><i class="fa fa-check"></i><b>6.2</b> Single-cell data compensation</a></li>
+<li class="chapter" data-level="6.3" data-path="spillover-correction.html"><a href="spillover-correction.html#image-compensation"><i class="fa fa-check"></i><b>6.3</b> Image compensation</a></li>
+<li class="chapter" data-level="6.4" data-path="spillover-correction.html"><a href="spillover-correction.html#write-out-compensated-images"><i class="fa fa-check"></i><b>6.4</b> Write out compensated images</a></li>
+<li class="chapter" data-level="6.5" data-path="spillover-correction.html"><a href="spillover-correction.html#save-objects-1"><i class="fa fa-check"></i><b>6.5</b> Save objects</a></li>
+<li class="chapter" data-level="6.6" data-path="spillover-correction.html"><a href="spillover-correction.html#session-info-1"><i class="fa fa-check"></i><b>6.6</b> Session Info</a></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="image-and-cell-level-quality-control.html"><a href="image-and-cell-level-quality-control.html"><i class="fa fa-check"></i><b>7</b> Image and cell-level quality control</a>
+<ul>
+<li class="chapter" data-level="7.1" data-path="image-and-cell-level-quality-control.html"><a href="image-and-cell-level-quality-control.html#read-in-the-data-1"><i class="fa fa-check"></i><b>7.1</b> Read in the data</a></li>
+<li class="chapter" data-level="7.2" data-path="image-and-cell-level-quality-control.html"><a href="image-and-cell-level-quality-control.html#seg-quality"><i class="fa fa-check"></i><b>7.2</b> Segmentation quality control</a></li>
+<li class="chapter" data-level="7.3" data-path="image-and-cell-level-quality-control.html"><a href="image-and-cell-level-quality-control.html#image-quality"><i class="fa fa-check"></i><b>7.3</b> Image-level quality control</a></li>
+<li class="chapter" data-level="7.4" data-path="image-and-cell-level-quality-control.html"><a href="image-and-cell-level-quality-control.html#cell-quality"><i class="fa fa-check"></i><b>7.4</b> Cell-level quality control</a></li>
+<li class="chapter" data-level="7.5" data-path="image-and-cell-level-quality-control.html"><a href="image-and-cell-level-quality-control.html#save-objects-2"><i class="fa fa-check"></i><b>7.5</b> Save objects</a></li>
+<li class="chapter" data-level="7.6" data-path="image-and-cell-level-quality-control.html"><a href="image-and-cell-level-quality-control.html#session-info-2"><i class="fa fa-check"></i><b>7.6</b> Session Info</a></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="batch-effects.html"><a href="batch-effects.html"><i class="fa fa-check"></i><b>8</b> Batch effect correction</a>
+<ul>
+<li class="chapter" data-level="8.1" data-path="batch-effects.html"><a href="batch-effects.html#fastmnn-correction"><i class="fa fa-check"></i><b>8.1</b> fastMNN correction</a>
+<ul>
+<li class="chapter" data-level="8.1.1" data-path="batch-effects.html"><a href="batch-effects.html#perform-sample-correction"><i class="fa fa-check"></i><b>8.1.1</b> Perform sample correction</a></li>
+<li class="chapter" data-level="8.1.2" data-path="batch-effects.html"><a href="batch-effects.html#quality-control-of-correction-results"><i class="fa fa-check"></i><b>8.1.2</b> Quality control of correction results</a></li>
+<li class="chapter" data-level="8.1.3" data-path="batch-effects.html"><a href="batch-effects.html#visualization"><i class="fa fa-check"></i><b>8.1.3</b> Visualization</a></li>
+</ul></li>
+<li class="chapter" data-level="8.2" data-path="batch-effects.html"><a href="batch-effects.html#harmony-correction"><i class="fa fa-check"></i><b>8.2</b> harmony correction</a>
+<ul>
+<li class="chapter" data-level="8.2.1" data-path="batch-effects.html"><a href="batch-effects.html#visualization-1"><i class="fa fa-check"></i><b>8.2.1</b> Visualization</a></li>
+</ul></li>
+<li class="chapter" data-level="8.3" data-path="batch-effects.html"><a href="batch-effects.html#seurat-correction"><i class="fa fa-check"></i><b>8.3</b> Seurat correction</a>
+<ul>
+<li class="chapter" data-level="8.3.1" data-path="batch-effects.html"><a href="batch-effects.html#visualization-2"><i class="fa fa-check"></i><b>8.3.1</b> Visualization</a></li>
+</ul></li>
+<li class="chapter" data-level="8.4" data-path="batch-effects.html"><a href="batch-effects.html#save-objects-3"><i class="fa fa-check"></i><b>8.4</b> Save objects</a></li>
+<li class="chapter" data-level="8.5" data-path="batch-effects.html"><a href="batch-effects.html#session-info-3"><i class="fa fa-check"></i><b>8.5</b> Session Info</a></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html"><i class="fa fa-check"></i><b>9</b> Cell phenotyping</a>
+<ul>
+<li class="chapter" data-level="9.1" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#load-data"><i class="fa fa-check"></i><b>9.1</b> Load data</a></li>
+<li class="chapter" data-level="9.2" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#clustering"><i class="fa fa-check"></i><b>9.2</b> Clustering approaches</a>
+<ul>
+<li class="chapter" data-level="9.2.1" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#rphenograph"><i class="fa fa-check"></i><b>9.2.1</b> Rphenograph</a></li>
+<li class="chapter" data-level="9.2.2" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#snn-graph"><i class="fa fa-check"></i><b>9.2.2</b> Shared nearest neighbour graph</a></li>
+<li class="chapter" data-level="9.2.3" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#self-organizing-maps"><i class="fa fa-check"></i><b>9.2.3</b> Self organizing maps</a></li>
+<li class="chapter" data-level="9.2.4" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#compare-between-clustering-approaches"><i class="fa fa-check"></i><b>9.2.4</b> Compare between clustering approaches</a></li>
+<li class="chapter" data-level="9.2.5" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#clustering-notes"><i class="fa fa-check"></i><b>9.2.5</b> Further clustering notes</a></li>
+</ul></li>
+<li class="chapter" data-level="9.3" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#classification"><i class="fa fa-check"></i><b>9.3</b> Classification approach</a>
+<ul>
+<li class="chapter" data-level="9.3.1" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#manual-labeling-of-cells"><i class="fa fa-check"></i><b>9.3.1</b> Manual labeling of cells</a></li>
+<li class="chapter" data-level="9.3.2" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#define-color-vectors"><i class="fa fa-check"></i><b>9.3.2</b> Define color vectors</a></li>
+<li class="chapter" data-level="9.3.3" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#read-in-and-consolidate-labeled-data"><i class="fa fa-check"></i><b>9.3.3</b> Read in and consolidate labeled data</a></li>
+<li class="chapter" data-level="9.3.4" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#train-classifier"><i class="fa fa-check"></i><b>9.3.4</b> Train classifier</a></li>
+<li class="chapter" data-level="9.3.5" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#classifier-performance"><i class="fa fa-check"></i><b>9.3.5</b> Classifier performance</a></li>
+<li class="chapter" data-level="9.3.6" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#classification-of-new-data"><i class="fa fa-check"></i><b>9.3.6</b> Classification of new data</a></li>
+</ul></li>
+<li class="chapter" data-level="9.4" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#session-info-4"><i class="fa fa-check"></i><b>9.4</b> Session Info</a></li>
+</ul></li>
+<li class="chapter" data-level="10" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html"><i class="fa fa-check"></i><b>10</b> Single cell visualization</a>
+<ul>
+<li class="chapter" data-level="10.1" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#load-data-1"><i class="fa fa-check"></i><b>10.1</b> Load data</a></li>
+<li class="chapter" data-level="10.2" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#cell-type-level"><i class="fa fa-check"></i><b>10.2</b> Cell-type level</a>
+<ul>
+<li class="chapter" data-level="10.2.1" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#dimensionality-reduction-visualization"><i class="fa fa-check"></i><b>10.2.1</b> Dimensionality reduction visualization</a></li>
+<li class="chapter" data-level="10.2.2" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#heatmap-visualization"><i class="fa fa-check"></i><b>10.2.2</b> Heatmap visualization</a></li>
+<li class="chapter" data-level="10.2.3" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#violin-plot-visualization"><i class="fa fa-check"></i><b>10.2.3</b> Violin plot visualization</a></li>
+<li class="chapter" data-level="10.2.4" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#scatter-plot-visualization"><i class="fa fa-check"></i><b>10.2.4</b> Scatter plot visualization</a></li>
+<li class="chapter" data-level="10.2.5" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#barplot-visualization"><i class="fa fa-check"></i><b>10.2.5</b> Barplot visualization</a></li>
+<li class="chapter" data-level="10.2.6" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#catalyst-based-visualization"><i class="fa fa-check"></i><b>10.2.6</b> CATALYST-based visualization</a></li>
+</ul></li>
+<li class="chapter" data-level="10.3" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#sample-level"><i class="fa fa-check"></i><b>10.3</b> Sample-level</a>
+<ul>
+<li class="chapter" data-level="10.3.1" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#dimensionality-reduction-visualization-1"><i class="fa fa-check"></i><b>10.3.1</b> Dimensionality reduction visualization</a></li>
+<li class="chapter" data-level="10.3.2" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#heatmap-visualization-1"><i class="fa fa-check"></i><b>10.3.2</b> Heatmap visualization</a></li>
+<li class="chapter" data-level="10.3.3" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#barplot-visualization-1"><i class="fa fa-check"></i><b>10.3.3</b> Barplot visualization</a></li>
+<li class="chapter" data-level="10.3.4" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#catalyst-based-visualization-1"><i class="fa fa-check"></i><b>10.3.4</b> CATALYST-based visualization</a></li>
+</ul></li>
+<li class="chapter" data-level="10.4" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#rich-example"><i class="fa fa-check"></i><b>10.4</b> Further examples</a>
+<ul>
+<li class="chapter" data-level="10.4.1" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#publication-ready-complexheatmap"><i class="fa fa-check"></i><b>10.4.1</b> Publication-ready ComplexHeatmap</a></li>
+<li class="chapter" data-level="10.4.2" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#interactive-visualization"><i class="fa fa-check"></i><b>10.4.2</b> Interactive visualization</a></li>
+</ul></li>
+<li class="chapter" data-level="10.5" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#session-info-5"><i class="fa fa-check"></i><b>10.5</b> Session Info</a></li>
+</ul></li>
+<li class="chapter" data-level="11" data-path="image-visualization.html"><a href="image-visualization.html"><i class="fa fa-check"></i><b>11</b> Image visualization</a>
+<ul>
+<li class="chapter" data-level="11.1" data-path="image-visualization.html"><a href="image-visualization.html#pixel-visualization"><i class="fa fa-check"></i><b>11.1</b> Pixel visualization</a>
+<ul>
+<li class="chapter" data-level="11.1.1" data-path="image-visualization.html"><a href="image-visualization.html#adjusting-colors"><i class="fa fa-check"></i><b>11.1.1</b> Adjusting colors</a></li>
+<li class="chapter" data-level="11.1.2" data-path="image-visualization.html"><a href="image-visualization.html#image-normalization"><i class="fa fa-check"></i><b>11.1.2</b> Image normalization</a></li>
+</ul></li>
+<li class="chapter" data-level="11.2" data-path="image-visualization.html"><a href="image-visualization.html#mask-visualization"><i class="fa fa-check"></i><b>11.2</b> Cell visualization</a>
+<ul>
+<li class="chapter" data-level="11.2.1" data-path="image-visualization.html"><a href="image-visualization.html#visualzing-metadata"><i class="fa fa-check"></i><b>11.2.1</b> Visualzing metadata</a></li>
+<li class="chapter" data-level="11.2.2" data-path="image-visualization.html"><a href="image-visualization.html#visualizating-expression"><i class="fa fa-check"></i><b>11.2.2</b> Visualizating expression</a></li>
+<li class="chapter" data-level="11.2.3" data-path="image-visualization.html"><a href="image-visualization.html#outline-cells"><i class="fa fa-check"></i><b>11.2.3</b> Outlining cells on images</a></li>
+</ul></li>
+<li class="chapter" data-level="11.3" data-path="image-visualization.html"><a href="image-visualization.html#adjusting-plot-annotations"><i class="fa fa-check"></i><b>11.3</b> Adjusting plot annotations</a></li>
+<li class="chapter" data-level="11.4" data-path="image-visualization.html"><a href="image-visualization.html#displaying-individual-images"><i class="fa fa-check"></i><b>11.4</b> Displaying individual images</a></li>
+<li class="chapter" data-level="11.5" data-path="image-visualization.html"><a href="image-visualization.html#saving-and-returning-images"><i class="fa fa-check"></i><b>11.5</b> Saving and returning images</a></li>
+<li class="chapter" data-level="11.6" data-path="image-visualization.html"><a href="image-visualization.html#cytoviewer"><i class="fa fa-check"></i><b>11.6</b> Interactive image visualization</a></li>
+<li class="chapter" data-level="11.7" data-path="image-visualization.html"><a href="image-visualization.html#session-info-6"><i class="fa fa-check"></i><b>11.7</b> Session Info</a></li>
+</ul></li>
+<li class="chapter" data-level="12" data-path="performing-spatial-analysis.html"><a href="performing-spatial-analysis.html"><i class="fa fa-check"></i><b>12</b> Performing spatial analysis</a>
+<ul>
+<li class="chapter" data-level="12.1" data-path="performing-spatial-analysis.html"><a href="performing-spatial-analysis.html#spatial-interaction-graphs"><i class="fa fa-check"></i><b>12.1</b> Spatial interaction graphs</a></li>
+<li class="chapter" data-level="12.2" data-path="performing-spatial-analysis.html"><a href="performing-spatial-analysis.html#spatial-viz"><i class="fa fa-check"></i><b>12.2</b> Spatial visualization</a></li>
+<li class="chapter" data-level="12.3" data-path="performing-spatial-analysis.html"><a href="performing-spatial-analysis.html#spatial-community-analysis"><i class="fa fa-check"></i><b>12.3</b> Spatial community analysis</a></li>
+<li class="chapter" data-level="12.4" data-path="performing-spatial-analysis.html"><a href="performing-spatial-analysis.html#cellular-neighborhood-analysis"><i class="fa fa-check"></i><b>12.4</b> Cellular neighborhood analysis</a></li>
+<li class="chapter" data-level="12.5" data-path="performing-spatial-analysis.html"><a href="performing-spatial-analysis.html#spatial-context-analysis"><i class="fa fa-check"></i><b>12.5</b> Spatial context analysis</a></li>
+<li class="chapter" data-level="12.6" data-path="performing-spatial-analysis.html"><a href="performing-spatial-analysis.html#patch-detection"><i class="fa fa-check"></i><b>12.6</b> Patch detection</a></li>
+<li class="chapter" data-level="12.7" data-path="performing-spatial-analysis.html"><a href="performing-spatial-analysis.html#interaction-analysis"><i class="fa fa-check"></i><b>12.7</b> Interaction analysis</a></li>
+<li class="chapter" data-level="12.8" data-path="performing-spatial-analysis.html"><a href="performing-spatial-analysis.html#session-info-7"><i class="fa fa-check"></i><b>12.8</b> Session Info</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
+<li class="divider"></li>
+<li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Analysis workflow for IMC data</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="read-data" class="section level1 hasAnchor" number="5">
+<h1><span class="header-section-number">5</span> Read in the data<a href="read-data.html#read-data" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p>This section describes how to read in single-cell data and images into <code>R</code>
+<strong>after</strong> image processing and segmentation (see Section <a href="processing.html#processing">3</a>).</p>
+<p>To highlight examples for IMC data analysis, we provide already processed data at
+<a href="https://zenodo.org/record/6043599">10.5281/zenodo.6043599</a>.
+This data has already been downloaded in Section <a href="prerequisites.html#download-data">4.4</a> and can
+be accessed in the folder <code>data</code>.</p>
+<p>We use the <a href="https://github.com/BodenmillerGroup/imcRtools">imcRtools</a> package to
+read in single-cell data extracted using the <code>steinbock</code> framework or the IMC
+Segmentation Pipeline. Both image processing approaches also generate
+multi-channel images and segmentation masks that can be read into <code>R</code> using the
+<a href="https://github.com/BodenmillerGroup/cytomapper">cytomapper</a> package.</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="read-data.html#cb15-1" tabindex="-1"></a><span class="fu">library</span>(imcRtools)</span>
+<span id="cb15-2"><a href="read-data.html#cb15-2" tabindex="-1"></a><span class="fu">library</span>(cytomapper)</span></code></pre></div>
+<div id="read-in-single-cell-information" class="section level2 hasAnchor" number="5.1">
+<h2><span class="header-section-number">5.1</span> Read in single-cell information<a href="read-data.html#read-in-single-cell-information" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>For single-cell data analysis in <code>R</code> the
+<a href="https://bioconductor.org/packages/release/bioc/html/SingleCellExperiment.html">SingleCellExperiment</a>
+<span class="citation">(<a href="#ref-Amezquita2019">Amezquita et al. 2019</a>)</span> data container is commonly used within the Bioconductor
+framework. It allows standardized access to (i) expression data, (ii) cellular
+metadata (e.g., cell type), (iii) feature metadata (e.g., marker name) and (iv)
+experiment-wide metadata. For an in-depth introduction to the <code>SingleCellExperiment</code>
+container, please refer to the <a href="https://bioconductor.org/books/release/OSCA.intro/the-singlecellexperiment-class.html">SingleCellExperiment class</a>.</p>
+<p>The <a href="https://bioconductor.org/packages/release/bioc/html/SingleCellExperiment.html">SpatialExperiment</a>
+class <span class="citation">(<a href="#ref-Righelli2022">Righelli et al. 2022</a>)</span> is an extension of the <code>SingleCellExperiment</code> class. It
+was developed to store spatial data in addition to single-cell data and an
+extended introduction is accessible
+<a href="https://bioconductor.org/packages/release/bioc/vignettes/SpatialExperiment/inst/doc/SpatialExperiment.html">here</a>.</p>
+<p>To read in single-cell data generated by the <code>steinbock</code> framework or the IMC
+Segmentation Pipeline, the <code>imcRtools</code> package provides the <code>read_steinbock</code> and
+<code>read_cpout</code> functions, respectively. By default, the data is read into a
+<code>SpatialExperiment</code> object; however, data can be read in as a
+<code>SingleCellExperiment</code> object by setting <code>return_as = "sce"</code>. All functions
+presented in this book are applicable to both data containers.</p>
+<div id="steinbock-generated-data" class="section level3 hasAnchor" number="5.1.1">
+<h3><span class="header-section-number">5.1.1</span> steinbock generated data<a href="read-data.html#steinbock-generated-data" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>The downloaded example data (Section <a href="prerequisites.html#download-data">4.4</a>) processed with the <a href="https://github.com/BodenmillerGroup/steinbock">steinbock</a> framework can be read in with the <code>read_steinbock</code> function provided by <code>imcRtools</code>. For more information, please refer to
+<code>?read_steinbock</code>.</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="read-data.html#cb16-1" tabindex="-1"></a>spe <span class="ot">&lt;-</span> <span class="fu">read_steinbock</span>(<span class="st">&quot;data/steinbock/&quot;</span>)</span>
+<span id="cb16-2"><a href="read-data.html#cb16-2" tabindex="-1"></a>spe</span></code></pre></div>
+<pre><code>## class: SpatialExperiment 
+## dim: 40 47859 
+## metadata(0):
+## assays(1): counts
+## rownames(40): MPO HistoneH3 ... DNA1 DNA2
+## rowData names(12): channel name ... Final.Concentration...Dilution
+##   uL.to.add
+## colnames: NULL
+## colData names(8): sample_id ObjectNumber ... width_px height_px
+## reducedDimNames(0):
+## mainExpName: NULL
+## altExpNames(0):
+## spatialCoords names(2) : Pos_X Pos_Y
+## imgData names(1): sample_id</code></pre>
+<p>By default, single-cell data is read in as <code>SpatialExperiment</code> object.
+The summarized pixel intensities per channel and cell (here mean intensity) are
+stored in the <code>counts</code> slot. Columns represent cells and rows represent channels.</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="read-data.html#cb18-1" tabindex="-1"></a><span class="fu">counts</span>(spe)[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>,<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>]</span></code></pre></div>
+<pre><code>##                [,1]       [,2]      [,3]      [,4]      [,5]
+## MPO       0.5751064  0.4166667 0.4975494  0.890154 0.1818182
+## HistoneH3 3.1273082 11.3597883 2.3841440  7.712961 1.4512715
+## SMA       0.2600939  1.6720383 0.1535190  1.193948 0.2986703
+## CD16      2.0347747  2.5880536 2.2943074 15.629083 0.6084220
+## CD38      0.2530137  0.6826669 1.1902979  2.126060 0.2917793</code></pre>
+<p>Metadata associated to individual cells are stored in the <code>colData</code> slot. After
+initial image processing, these metadata include the numeric identifier (<code>ObjectNumber</code>),
+the area, and morphological features of each cell. In addition, <code>sample_id</code> stores
+the image name from which each cell was extracted and the width and height of the
+corresponding images are stored.</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="read-data.html#cb20-1" tabindex="-1"></a><span class="fu">head</span>(<span class="fu">colData</span>(spe))</span></code></pre></div>
+<pre><code>## DataFrame with 6 rows and 8 columns
+##      sample_id ObjectNumber      area axis_major_length axis_minor_length
+##    &lt;character&gt;    &lt;numeric&gt; &lt;numeric&gt;         &lt;numeric&gt;         &lt;numeric&gt;
+## 1 Patient1_001            1        12           7.40623           1.89529
+## 2 Patient1_001            2        24          16.48004           1.96284
+## 3 Patient1_001            3        17           9.85085           1.98582
+## 4 Patient1_001            4        24           8.08290           3.91578
+## 5 Patient1_001            5        22           8.79367           3.11653
+## 6 Patient1_001            6        25           9.17436           3.46929
+##   eccentricity  width_px height_px
+##      &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt;
+## 1     0.966702       600       600
+## 2     0.992882       600       600
+## 3     0.979470       600       600
+## 4     0.874818       600       600
+## 5     0.935091       600       600
+## 6     0.925744       600       600</code></pre>
+<p>The main difference between the <code>SpatialExperiment</code> and the
+<code>SingleCellExperiment</code> data container is the way spatial
+locations of all cells are stored. For the <code>SingleCellExperiment</code> container, the
+locations are stored in the <code>colData</code> slot while the <code>SpatialExperiment</code>
+container stores them in the <code>spatialCoords</code> slot:</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="read-data.html#cb22-1" tabindex="-1"></a><span class="fu">head</span>(<span class="fu">spatialCoords</span>(spe))</span></code></pre></div>
+<pre><code>##         Pos_X     Pos_Y
+## [1,] 468.5833 0.4166667
+## [2,] 515.8333 0.4166667
+## [3,] 587.2353 0.4705882
+## [4,] 192.2500 1.2500000
+## [5,] 231.7727 0.9090909
+## [6,] 270.1600 1.0400000</code></pre>
+<p>The <em>spatial object graphs</em> generated by steinbock (see Section
+<a href="processing.html#feature-extraction">3.3</a> are read into a <code>colPair</code> slot with the name
+<code>neighborhood</code> of the <code>SpatialExperiment</code> (or <code>SingleCellExperiment</code>) object.
+Cell-cell interactions (cells in close spatial proximity) are represented as
+“edge list” (stored as <code>SelfHits</code> object). Here, the left side represents the
+column indices of the <code>SpatialExperiment</code> object of the “from” cells and the
+right side represents the column indices of the “to” cells. For visualization of
+the <em>spatial object graphs</em>, please refer to Section <a href="performing-spatial-analysis.html#spatial-viz">12.2</a>.</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="read-data.html#cb24-1" tabindex="-1"></a><span class="fu">colPair</span>(spe, <span class="st">&quot;neighborhood&quot;</span>)</span></code></pre></div>
+<pre><code>## SelfHits object with 257116 hits and 0 metadata columns:
+##                 from        to
+##            &lt;integer&gt; &lt;integer&gt;
+##        [1]         1        27
+##        [2]         1        55
+##        [3]         2        10
+##        [4]         2        44
+##        [5]         2        81
+##        ...       ...       ...
+##   [257112]     47858     47836
+##   [257113]     47859     47792
+##   [257114]     47859     47819
+##   [257115]     47859     47828
+##   [257116]     47859     47854
+##   -------
+##   nnode: 47859</code></pre>
+<p>Finally, metadata regarding the channels are stored in the <code>rowData</code> slot. This
+information is extracted from the <code>panel.csv</code> file.</p>
+<p>Channels have the same order as the rows in the <code>panel.csv</code> file for which the
+keep column is set to 1, and match the order of channels in the multi-channel
+images (see Section <a href="read-data.html#read-images">5.3</a>). For the example data, channels are
+ordered by isotope mass.</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="read-data.html#cb26-1" tabindex="-1"></a><span class="fu">head</span>(<span class="fu">rowData</span>(spe))</span></code></pre></div>
+<pre><code>## DataFrame with 6 rows and 12 columns
+##               channel        name      keep   ilastik  deepcell  cellpose
+##           &lt;character&gt; &lt;character&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;logical&gt;
+## MPO               Y89         MPO         1        NA        NA        NA
+## HistoneH3       In113   HistoneH3         1         1         1        NA
+## SMA             In115         SMA         1        NA        NA        NA
+## CD16            Pr141        CD16         1        NA        NA        NA
+## CD38            Nd142        CD38         1        NA        NA        NA
+## HLADR           Nd143       HLADR         1        NA        NA        NA
+##           Tube.Number              Target Antibody.Clone Stock.Concentration
+##             &lt;numeric&gt;         &lt;character&gt;    &lt;character&gt;           &lt;numeric&gt;
+## MPO              2101 Myeloperoxidase MPO Polyclonal MPO                 500
+## HistoneH3        2113          Histone H3           D1H2                 500
+## SMA              1914                 SMA            1A4                 500
+## CD16             2079                CD16       EPR16784                 500
+## CD38             2095                CD38        EPR4106                 500
+## HLADR            2087              HLA-DR        TAL 1B5                 500
+##           Final.Concentration...Dilution   uL.to.add
+##                              &lt;character&gt; &lt;character&gt;
+## MPO                              4 ug/mL         0.8
+## HistoneH3                        1 ug/mL         0.2
+## SMA                           0.25 ug/mL        0.05
+## CD16                             5 ug/mL           1
+## CD38                           2.5 ug/mL         0.5
+## HLADR                            1 ug/mL         0.2</code></pre>
+</div>
+<div id="imc-segmentation-pipeline-generated-data" class="section level3 hasAnchor" number="5.1.2">
+<h3><span class="header-section-number">5.1.2</span> IMC Segmentation Pipeline generated data<a href="read-data.html#imc-segmentation-pipeline-generated-data" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>The <a href="https://github.com/BodenmillerGroup/ImcSegmentationPipeline">IMC Segmentation Pipeline</a> offers an
+alternative approach to multiplexed image processing and segmentation. The
+default pipeline is also available via <code>steinbock</code>. The IMC Segmentation
+Pipeline is based on <a href="https://www.ilastik.org/">Ilastik</a> pixel classification
+and image segmentation using <a href="https://cellprofiler.org/">CellProfiler</a>. We recommend
+to become familiar with the pipeline as it allows flexible extension to more
+complicated image analysis and segmentation tasks. For standard image analysis
+and segmentation, <code>steinbock</code> is the preferred choice. Please refer to
+the <a href="https://bodenmillergroup.github.io/ImcSegmentationPipeline/">documentation</a>
+to get an overview on the pipeline.</p>
+<p>All relevant <a href="https://bodenmillergroup.github.io/ImcSegmentationPipeline/output.html">output</a>
+storing single-cell data is contained in the <code>cpout</code> folder.
+For reading in the single-cell measurement, the <code>imcRtools</code> package offers the
+<code>read_cpout</code> function:</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="read-data.html#cb28-1" tabindex="-1"></a>spe2 <span class="ot">&lt;-</span> <span class="fu">read_cpout</span>(<span class="st">&quot;data/ImcSegmentationPipeline/analysis/cpout/&quot;</span>)</span>
+<span id="cb28-2"><a href="read-data.html#cb28-2" tabindex="-1"></a><span class="fu">rownames</span>(spe2) <span class="ot">&lt;-</span> <span class="fu">rowData</span>(spe2)<span class="sc">$</span>Clean_Target</span>
+<span id="cb28-3"><a href="read-data.html#cb28-3" tabindex="-1"></a>spe2</span></code></pre></div>
+<pre><code>## class: SpatialExperiment 
+## dim: 40 43796 
+## metadata(0):
+## assays(1): counts
+## rownames(40): MPO HistoneH3 ... DNA1 DNA2
+## rowData names(11): Tube.Number Metal.Tag ... ilastik deepcell
+## colnames: NULL
+## colData names(12): sample_id ObjectNumber ... Metadata_acid
+##   Metadata_description
+## reducedDimNames(0):
+## mainExpName: NULL
+## altExpNames(0):
+## spatialCoords names(2) : Pos_X Pos_Y
+## imgData names(1): sample_id</code></pre>
+<p>Similar to the <code>steinbock</code> output, cell morphological features and image level
+metadata are stored in the <code>colData(spe2)</code> slot, the interaction information
+is contained in <code>colPair(spe2, type = "neighborhood")</code> and the mean intensity
+per channel and cell is stored in <code>counts(spe2)</code>.</p>
+</div>
+<div id="reading-custom-files" class="section level3 hasAnchor" number="5.1.3">
+<h3><span class="header-section-number">5.1.3</span> Reading custom files<a href="read-data.html#reading-custom-files" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>When not using <code>steinbock</code> or the <code>ImcSegmentationPipeline</code>, the single-cell
+information has to be read in from custom files. We now demonstrate how
+to generate a <code>SpatialExperiment</code> object from single-cell data contained
+in individual files. As an example, we use files generated by <code>CellProfiler</code>
+as part of the <code>ImcSegmentationPipeline</code>.</p>
+<p>First we will read in the single-cell features stored in a CSV file:</p>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="read-data.html#cb30-1" tabindex="-1"></a><span class="fu">library</span>(readr)</span>
+<span id="cb30-2"><a href="read-data.html#cb30-2" tabindex="-1"></a></span>
+<span id="cb30-3"><a href="read-data.html#cb30-3" tabindex="-1"></a>cur_features <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;data/ImcSegmentationPipeline/analysis/cpout/cell.csv&quot;</span>)</span>
+<span id="cb30-4"><a href="read-data.html#cb30-4" tabindex="-1"></a></span>
+<span id="cb30-5"><a href="read-data.html#cb30-5" tabindex="-1"></a><span class="fu">dim</span>(cur_features)</span></code></pre></div>
+<pre><code>## [1] 43796   941</code></pre>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="read-data.html#cb32-1" tabindex="-1"></a><span class="fu">head</span>(<span class="fu">colnames</span>(cur_features))</span></code></pre></div>
+<pre><code>## [1] &quot;ImageNumber&quot;                    &quot;ObjectNumber&quot;                  
+## [3] &quot;AreaShape_Area&quot;                 &quot;AreaShape_BoundingBoxArea&quot;     
+## [5] &quot;AreaShape_BoundingBoxMaximum_X&quot; &quot;AreaShape_BoundingBoxMaximum_Y&quot;</code></pre>
+<p>This file contains a large number of single-cell features including the cell
+identifier (<code>ObjectNumber</code>), the image identifier (<code>ImageNumber</code>), morphological
+features (<code>AreaShape_*</code>), the cells’ locations (<code>Location_Center_*</code>) and the
+mean pixel intensity per cell and per channel (<code>Intensity_MeanIntensity_FullStack_*</code>).</p>
+<p>Now, we split the features into intensity features, cell-specific metadata and
+the physical location of the cells:</p>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="read-data.html#cb34-1" tabindex="-1"></a>counts <span class="ot">&lt;-</span> cur_features[,<span class="fu">grepl</span>(<span class="st">&quot;Intensity_MeanIntensity_FullStack&quot;</span>, </span>
+<span id="cb34-2"><a href="read-data.html#cb34-2" tabindex="-1"></a>                                  <span class="fu">colnames</span>(cur_features))]</span>
+<span id="cb34-3"><a href="read-data.html#cb34-3" tabindex="-1"></a></span>
+<span id="cb34-4"><a href="read-data.html#cb34-4" tabindex="-1"></a>meta <span class="ot">&lt;-</span> cur_features[,<span class="fu">c</span>(<span class="st">&quot;ImageNumber&quot;</span>, <span class="st">&quot;ObjectNumber&quot;</span>, <span class="st">&quot;AreaShape_Area&quot;</span>,</span>
+<span id="cb34-5"><a href="read-data.html#cb34-5" tabindex="-1"></a>                            <span class="st">&quot;AreaShape_Eccentricity&quot;</span>, <span class="st">&quot;AreaShape_MeanRadius&quot;</span>)]</span>
+<span id="cb34-6"><a href="read-data.html#cb34-6" tabindex="-1"></a></span>
+<span id="cb34-7"><a href="read-data.html#cb34-7" tabindex="-1"></a>coords <span class="ot">&lt;-</span> cur_features[,<span class="fu">c</span>(<span class="st">&quot;Location_Center_X&quot;</span>, <span class="st">&quot;Location_Center_Y&quot;</span>)]</span></code></pre></div>
+<p><code>CellProfiler</code> writes out the mean pixel intensities after scaling them
+bit a scaling factor which is bit encoding-specific. The images to which
+the IMC Segmentation Pipeline was applied were saved with 16-bit encoding.
+This means for the example data, the mean pixel intensities need to
+be scaled by a factor of <code>2 ^ 16 - 1 = 65535</code>.</p>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="read-data.html#cb35-1" tabindex="-1"></a>counts <span class="ot">&lt;-</span> counts <span class="sc">*</span> <span class="dv">65535</span></span></code></pre></div>
+<p>In addition, <code>CellProfiler</code> does not order the channel numerically but rather
+as a character; <code>1, 10, 2, 3, ...</code> rather than <code>1, 2, 3, ...</code>. Therefore we
+will need to reorder the channels.</p>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="read-data.html#cb36-1" tabindex="-1"></a><span class="fu">library</span>(stringr)</span>
+<span id="cb36-2"><a href="read-data.html#cb36-2" tabindex="-1"></a>cur_ch <span class="ot">&lt;-</span> <span class="fu">str_split</span>(<span class="fu">colnames</span>(counts), <span class="st">&quot;_&quot;</span>, <span class="at">simplify =</span> <span class="cn">TRUE</span>)[,<span class="dv">4</span>]</span>
+<span id="cb36-3"><a href="read-data.html#cb36-3" tabindex="-1"></a>cur_ch <span class="ot">&lt;-</span> <span class="fu">sub</span>(<span class="st">&quot;c&quot;</span>, <span class="st">&quot;&quot;</span>, cur_ch)</span>
+<span id="cb36-4"><a href="read-data.html#cb36-4" tabindex="-1"></a></span>
+<span id="cb36-5"><a href="read-data.html#cb36-5" tabindex="-1"></a>counts <span class="ot">&lt;-</span> counts[,<span class="fu">order</span>(<span class="fu">as.numeric</span>(cur_ch))]</span></code></pre></div>
+<p>From these features we can now construct the <code>SpatialExperiment</code> object.</p>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="read-data.html#cb37-1" tabindex="-1"></a>spe3 <span class="ot">&lt;-</span> <span class="fu">SpatialExperiment</span>(<span class="at">assays =</span> <span class="fu">list</span>(<span class="at">counts =</span> <span class="fu">t</span>(counts)),</span>
+<span id="cb37-2"><a href="read-data.html#cb37-2" tabindex="-1"></a>                          <span class="at">colData =</span> meta, </span>
+<span id="cb37-3"><a href="read-data.html#cb37-3" tabindex="-1"></a>                          <span class="at">sample_id =</span> <span class="fu">as.character</span>(meta<span class="sc">$</span>ImageNumber),</span>
+<span id="cb37-4"><a href="read-data.html#cb37-4" tabindex="-1"></a>                          <span class="at">spatialCoords =</span> <span class="fu">as.matrix</span>(coords))</span></code></pre></div>
+<p>Next, we can store the spatial cell graph generated by <code>CellProfiler</code> in the
+<code>colPairs</code> slot of the object. Spatial cell graphs are usually stored as edge
+list in form of a CSV file. The <code>colPairs</code> slot requires a <code>SelfHits</code> entry
+storing an edge list where numeric entries represent the index of the <code>from</code> and
+<code>to</code> cell in the <code>SpatialExperiment</code> object. To generate such an edge list, we
+need to match the cell IDs contained in the CSV against the cell IDs in the
+<code>SpatialExperiment</code> object.</p>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="read-data.html#cb38-1" tabindex="-1"></a>cur_pairs <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;data/ImcSegmentationPipeline/analysis/cpout/Object relationships.csv&quot;</span>)</span>
+<span id="cb38-2"><a href="read-data.html#cb38-2" tabindex="-1"></a></span>
+<span id="cb38-3"><a href="read-data.html#cb38-3" tabindex="-1"></a>cur_from <span class="ot">&lt;-</span> <span class="fu">paste</span>(cur_pairs<span class="sc">$</span><span class="st">`</span><span class="at">First Image Number</span><span class="st">`</span>, cur_pairs<span class="sc">$</span><span class="st">`</span><span class="at">First Object Number</span><span class="st">`</span>)</span>
+<span id="cb38-4"><a href="read-data.html#cb38-4" tabindex="-1"></a>cur_to <span class="ot">&lt;-</span> <span class="fu">paste</span>(cur_pairs<span class="sc">$</span><span class="st">`</span><span class="at">Second Image Number</span><span class="st">`</span>, cur_pairs<span class="sc">$</span><span class="st">`</span><span class="at">Second Object Number</span><span class="st">`</span>)</span>
+<span id="cb38-5"><a href="read-data.html#cb38-5" tabindex="-1"></a></span>
+<span id="cb38-6"><a href="read-data.html#cb38-6" tabindex="-1"></a>edgelist <span class="ot">&lt;-</span> <span class="fu">SelfHits</span>(<span class="at">from =</span> <span class="fu">match</span>(cur_from, </span>
+<span id="cb38-7"><a href="read-data.html#cb38-7" tabindex="-1"></a>                                  <span class="fu">paste</span>(spe3<span class="sc">$</span>ImageNumber, spe3<span class="sc">$</span>ObjectNumber)),</span>
+<span id="cb38-8"><a href="read-data.html#cb38-8" tabindex="-1"></a>                     <span class="at">to =</span> <span class="fu">match</span>(cur_to, </span>
+<span id="cb38-9"><a href="read-data.html#cb38-9" tabindex="-1"></a>                                  <span class="fu">paste</span>(spe3<span class="sc">$</span>ImageNumber, spe3<span class="sc">$</span>ObjectNumber)),</span>
+<span id="cb38-10"><a href="read-data.html#cb38-10" tabindex="-1"></a>                     <span class="at">nnode =</span> <span class="fu">ncol</span>(spe3))</span>
+<span id="cb38-11"><a href="read-data.html#cb38-11" tabindex="-1"></a></span>
+<span id="cb38-12"><a href="read-data.html#cb38-12" tabindex="-1"></a><span class="fu">colPair</span>(spe3, <span class="st">&quot;neighborhood&quot;</span>) <span class="ot">&lt;-</span> edgelist</span></code></pre></div>
+<p>For further downstream analysis, we will use the <code>steinbock</code> results.</p>
+</div>
+</div>
+<div id="cell-processing" class="section level2 hasAnchor" number="5.2">
+<h2><span class="header-section-number">5.2</span> Single-cell processing<a href="read-data.html#cell-processing" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>After reading in the single-cell data, few further processing steps need to be
+taken.</p>
+<p><strong>Add additional metadata</strong></p>
+<p>We can set the <code>colnames</code> of the object to generate unique identifiers per cell:</p>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="read-data.html#cb39-1" tabindex="-1"></a><span class="fu">colnames</span>(spe) <span class="ot">&lt;-</span> <span class="fu">paste0</span>(spe<span class="sc">$</span>sample_id, <span class="st">&quot;_&quot;</span>, spe<span class="sc">$</span>ObjectNumber)</span></code></pre></div>
+<p>It is also often the case that sample-specific metadata are available externally.
+For the current data, we need to link the cancer type (also referred to as “Indication”)
+to each sample. This metadata is available as external CSV file:</p>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="read-data.html#cb40-1" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb40-2"><a href="read-data.html#cb40-2" tabindex="-1"></a></span>
+<span id="cb40-3"><a href="read-data.html#cb40-3" tabindex="-1"></a><span class="co"># Read patient metadata</span></span>
+<span id="cb40-4"><a href="read-data.html#cb40-4" tabindex="-1"></a>meta <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;data/sample_metadata.csv&quot;</span>)</span>
+<span id="cb40-5"><a href="read-data.html#cb40-5" tabindex="-1"></a></span>
+<span id="cb40-6"><a href="read-data.html#cb40-6" tabindex="-1"></a><span class="co"># Extract patient id and ROI id from sample name</span></span>
+<span id="cb40-7"><a href="read-data.html#cb40-7" tabindex="-1"></a>spe<span class="sc">$</span>patient_id <span class="ot">&lt;-</span> <span class="fu">str_extract</span>(spe<span class="sc">$</span>sample_id, <span class="st">&quot;Patient[1-4]&quot;</span>)</span>
+<span id="cb40-8"><a href="read-data.html#cb40-8" tabindex="-1"></a>spe<span class="sc">$</span>ROI <span class="ot">&lt;-</span> <span class="fu">str_extract</span>(spe<span class="sc">$</span>sample_id, <span class="st">&quot;00[1-8]&quot;</span>)</span>
+<span id="cb40-9"><a href="read-data.html#cb40-9" tabindex="-1"></a></span>
+<span id="cb40-10"><a href="read-data.html#cb40-10" tabindex="-1"></a><span class="co"># Store cancer type in SPE object</span></span>
+<span id="cb40-11"><a href="read-data.html#cb40-11" tabindex="-1"></a>spe<span class="sc">$</span>indication <span class="ot">&lt;-</span> meta<span class="sc">$</span>Indication[<span class="fu">match</span>(spe<span class="sc">$</span>patient_id, meta<span class="sc">$</span><span class="st">`</span><span class="at">Sample ID</span><span class="st">`</span>)]</span>
+<span id="cb40-12"><a href="read-data.html#cb40-12" tabindex="-1"></a></span>
+<span id="cb40-13"><a href="read-data.html#cb40-13" tabindex="-1"></a><span class="fu">unique</span>(spe<span class="sc">$</span>patient_id)</span></code></pre></div>
+<pre><code>## [1] &quot;Patient1&quot; &quot;Patient2&quot; &quot;Patient3&quot; &quot;Patient4&quot;</code></pre>
+<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb42-1"><a href="read-data.html#cb42-1" tabindex="-1"></a><span class="fu">unique</span>(spe<span class="sc">$</span>ROI)</span></code></pre></div>
+<pre><code>## [1] &quot;001&quot; &quot;002&quot; &quot;003&quot; &quot;004&quot; &quot;005&quot; &quot;006&quot; &quot;007&quot; &quot;008&quot;</code></pre>
+<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb44-1"><a href="read-data.html#cb44-1" tabindex="-1"></a><span class="fu">unique</span>(spe<span class="sc">$</span>indication)</span></code></pre></div>
+<pre><code>## [1] &quot;SCCHN&quot; &quot;BCC&quot;   &quot;NSCLC&quot; &quot;CRC&quot;</code></pre>
+<p>The selected patients were diagnosed with different cancer types:</p>
+<ul>
+<li>SCCHN - head and neck cancer<br />
+</li>
+<li>BCC - breast cancer<br />
+</li>
+<li>NSCLC - lung cancer<br />
+</li>
+<li>CRC - colorectal cancer</li>
+</ul>
+<p><strong>Transform counts</strong></p>
+<p>The distribution of expression counts across cells is often observed to be
+skewed towards the right side meaning lots of cells display low counts and few
+cells have high counts. To avoid analysis biases from these high-expressing
+cells, the expression counts are commonly transformed or clipped.</p>
+<p>Here, we perform counts transformation using an inverse hyperbolic sine
+function. This transformation is commonly applied to <a href="https://support.cytobank.org/hc/en-us/articles/206148057-About-the-Arcsinh-transform">flow cytometry
+data</a>.
+The <code>cofactor</code> here defines the expression range on which no scaling is
+performed. While the <code>cofactor</code> for CyTOF data is often set to <code>5</code>, IMC data
+usually display much lower counts. We therefore apply a <code>cofactor</code> of <code>1</code>.</p>
+<p>However, other transformations such as <code>log(counts(spe) + 0.01)</code> should be
+tested when analysing IMC data.</p>
+<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb46-1"><a href="read-data.html#cb46-1" tabindex="-1"></a><span class="fu">library</span>(dittoSeq)</span>
+<span id="cb46-2"><a href="read-data.html#cb46-2" tabindex="-1"></a><span class="fu">dittoRidgePlot</span>(spe, <span class="at">var =</span> <span class="st">&quot;CD3&quot;</span>, <span class="at">group.by =</span> <span class="st">&quot;patient_id&quot;</span>, <span class="at">assay =</span> <span class="st">&quot;counts&quot;</span>) <span class="sc">+</span></span>
+<span id="cb46-3"><a href="read-data.html#cb46-3" tabindex="-1"></a>    <span class="fu">ggtitle</span>(<span class="st">&quot;CD3 - before transformation&quot;</span>)</span></code></pre></div>
+<pre><code>## Warning in (function (mapping = NULL, data = NULL, stat = &quot;density_ridges&quot;, :
+## Ignoring unknown parameters: `size`</code></pre>
+<p><img src="04-read_data_files/figure-html/transform-counts-1.png" width="672" /></p>
+<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb48-1"><a href="read-data.html#cb48-1" tabindex="-1"></a><span class="fu">assay</span>(spe, <span class="st">&quot;exprs&quot;</span>) <span class="ot">&lt;-</span> <span class="fu">asinh</span>(<span class="fu">counts</span>(spe)<span class="sc">/</span><span class="dv">1</span>)</span>
+<span id="cb48-2"><a href="read-data.html#cb48-2" tabindex="-1"></a><span class="fu">dittoRidgePlot</span>(spe, <span class="at">var =</span> <span class="st">&quot;CD3&quot;</span>, <span class="at">group.by =</span> <span class="st">&quot;patient_id&quot;</span>, <span class="at">assay =</span> <span class="st">&quot;exprs&quot;</span>) <span class="sc">+</span></span>
+<span id="cb48-3"><a href="read-data.html#cb48-3" tabindex="-1"></a>    <span class="fu">ggtitle</span>(<span class="st">&quot;CD3 - after transformation&quot;</span>)</span></code></pre></div>
+<pre><code>## Warning in (function (mapping = NULL, data = NULL, stat = &quot;density_ridges&quot;, :
+## Ignoring unknown parameters: `size`</code></pre>
+<p><img src="04-read_data_files/figure-html/transform-counts-2.png" width="672" /></p>
+<p><strong>Define interesting channels</strong></p>
+<p>For downstream analysis such as visualization, dimensionality reduction and
+clustering, only a subset of markers should be used. As convenience, we can
+store an additional entry in the <code>rowData</code> slot that specifies the markers of
+interest. Here, we deselect the nuclear markers, which were primarily used for
+cell segmentation, and keep all other biological targets. However, more informed
+marker selection should be performed to exclude lowly expressed marker or
+markers with low signal-to-noise ratio.</p>
+<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb50-1"><a href="read-data.html#cb50-1" tabindex="-1"></a><span class="fu">rowData</span>(spe)<span class="sc">$</span>use_channel <span class="ot">&lt;-</span> <span class="sc">!</span><span class="fu">grepl</span>(<span class="st">&quot;DNA|Histone&quot;</span>, <span class="fu">rownames</span>(spe))</span></code></pre></div>
+<p><strong>Define color schemes</strong></p>
+<p>We will define color schemes for different metadata entries of the data and
+conveniently store them in the <code>metadata</code> slot of the <code>SpatialExperiment</code> which
+will be helpful for downstream data visualizations. We will use colors from the
+<code>RColorBrewer</code> and <code>dittoSeq</code> packages but any other coloring package will
+suffice.</p>
+<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb51-1"><a href="read-data.html#cb51-1" tabindex="-1"></a><span class="fu">library</span>(RColorBrewer)</span>
+<span id="cb51-2"><a href="read-data.html#cb51-2" tabindex="-1"></a>color_vectors <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb51-3"><a href="read-data.html#cb51-3" tabindex="-1"></a></span>
+<span id="cb51-4"><a href="read-data.html#cb51-4" tabindex="-1"></a>ROI <span class="ot">&lt;-</span> <span class="fu">setNames</span>(<span class="fu">brewer.pal</span>(<span class="fu">length</span>(<span class="fu">unique</span>(spe<span class="sc">$</span>ROI)), <span class="at">name =</span> <span class="st">&quot;BrBG&quot;</span>), </span>
+<span id="cb51-5"><a href="read-data.html#cb51-5" tabindex="-1"></a>                <span class="fu">unique</span>(spe<span class="sc">$</span>ROI))</span>
+<span id="cb51-6"><a href="read-data.html#cb51-6" tabindex="-1"></a>patient_id <span class="ot">&lt;-</span> <span class="fu">setNames</span>(<span class="fu">brewer.pal</span>(<span class="fu">length</span>(<span class="fu">unique</span>(spe<span class="sc">$</span>patient_id)), <span class="at">name =</span> <span class="st">&quot;Set1&quot;</span>), </span>
+<span id="cb51-7"><a href="read-data.html#cb51-7" tabindex="-1"></a>                <span class="fu">unique</span>(spe<span class="sc">$</span>patient_id))</span>
+<span id="cb51-8"><a href="read-data.html#cb51-8" tabindex="-1"></a>sample_id <span class="ot">&lt;-</span> <span class="fu">setNames</span>(<span class="fu">c</span>(<span class="fu">brewer.pal</span>(<span class="dv">6</span>, <span class="st">&quot;YlOrRd&quot;</span>)[<span class="dv">3</span><span class="sc">:</span><span class="dv">5</span>],</span>
+<span id="cb51-9"><a href="read-data.html#cb51-9" tabindex="-1"></a>                        <span class="fu">brewer.pal</span>(<span class="dv">6</span>, <span class="st">&quot;PuBu&quot;</span>)[<span class="dv">3</span><span class="sc">:</span><span class="dv">6</span>],</span>
+<span id="cb51-10"><a href="read-data.html#cb51-10" tabindex="-1"></a>                        <span class="fu">brewer.pal</span>(<span class="dv">6</span>, <span class="st">&quot;YlGn&quot;</span>)[<span class="dv">3</span><span class="sc">:</span><span class="dv">5</span>],</span>
+<span id="cb51-11"><a href="read-data.html#cb51-11" tabindex="-1"></a>                        <span class="fu">brewer.pal</span>(<span class="dv">6</span>, <span class="st">&quot;BuPu&quot;</span>)[<span class="dv">3</span><span class="sc">:</span><span class="dv">6</span>]),</span>
+<span id="cb51-12"><a href="read-data.html#cb51-12" tabindex="-1"></a>                <span class="fu">unique</span>(spe<span class="sc">$</span>sample_id))</span>
+<span id="cb51-13"><a href="read-data.html#cb51-13" tabindex="-1"></a>indication <span class="ot">&lt;-</span> <span class="fu">setNames</span>(<span class="fu">brewer.pal</span>(<span class="fu">length</span>(<span class="fu">unique</span>(spe<span class="sc">$</span>indication)), <span class="at">name =</span> <span class="st">&quot;Set2&quot;</span>), </span>
+<span id="cb51-14"><a href="read-data.html#cb51-14" tabindex="-1"></a>                <span class="fu">unique</span>(spe<span class="sc">$</span>indication))</span>
+<span id="cb51-15"><a href="read-data.html#cb51-15" tabindex="-1"></a></span>
+<span id="cb51-16"><a href="read-data.html#cb51-16" tabindex="-1"></a>color_vectors<span class="sc">$</span>ROI <span class="ot">&lt;-</span> ROI</span>
+<span id="cb51-17"><a href="read-data.html#cb51-17" tabindex="-1"></a>color_vectors<span class="sc">$</span>patient_id <span class="ot">&lt;-</span> patient_id</span>
+<span id="cb51-18"><a href="read-data.html#cb51-18" tabindex="-1"></a>color_vectors<span class="sc">$</span>sample_id <span class="ot">&lt;-</span> sample_id</span>
+<span id="cb51-19"><a href="read-data.html#cb51-19" tabindex="-1"></a>color_vectors<span class="sc">$</span>indication <span class="ot">&lt;-</span> indication</span>
+<span id="cb51-20"><a href="read-data.html#cb51-20" tabindex="-1"></a></span>
+<span id="cb51-21"><a href="read-data.html#cb51-21" tabindex="-1"></a><span class="fu">metadata</span>(spe)<span class="sc">$</span>color_vectors <span class="ot">&lt;-</span> color_vectors</span></code></pre></div>
+</div>
+<div id="read-images" class="section level2 hasAnchor" number="5.3">
+<h2><span class="header-section-number">5.3</span> Read in images<a href="read-data.html#read-images" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The <code>cytomapper</code> package allows multi-channel image handling and visualization
+within the Bioconductor framework. The most common data format for multi-channel
+images or segmentation masks is the TIFF file format, which is used by <code>steinbock</code>
+and the <code>IMC segementation pipeline</code> to save images.</p>
+<p>Here, we will read in multi-channel images and segmentation masks into a
+<a href="https://www.bioconductor.org/packages/release/bioc/vignettes/cytomapper/inst/doc/cytomapper.html#5_The_CytoImageList_object">CytoImageList</a>
+data container. It allows storing multiple multi-channel images and requires
+matched channels across all images within the object.</p>
+<p>The <code>loadImages</code> function is used to read in processed multi-channel images and
+their corresponding segmentation masks. <strong>Of note</strong>: the multi-channel images
+generated by <code>steinbock</code> are saved as 32-bit images while the segmentation masks
+are saved as 16-bit images. To correctly scale pixel values of the segmentation
+masks when reading them in, we will need to set <code>as.is = TRUE</code>.</p>
+<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb52-1"><a href="read-data.html#cb52-1" tabindex="-1"></a>images <span class="ot">&lt;-</span> <span class="fu">loadImages</span>(<span class="st">&quot;data/steinbock/img/&quot;</span>)</span></code></pre></div>
+<pre><code>## All files in the provided location will be read in.</code></pre>
+<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb54-1"><a href="read-data.html#cb54-1" tabindex="-1"></a>masks <span class="ot">&lt;-</span> <span class="fu">loadImages</span>(<span class="st">&quot;data/steinbock/masks_deepcell/&quot;</span>, <span class="at">as.is =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<pre><code>## All files in the provided location will be read in.</code></pre>
+<p>In the case of multi-channel images, it is beneficial to set the <code>channelNames</code>
+for easy visualization. Using the <code>steinbock</code> framework, the channel order of
+the single-cell data matches the channel order of the multi-channel images.
+However, it is recommended to make sure that the channel order is identical
+between the single-cell data and the images.</p>
+<div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb56-1"><a href="read-data.html#cb56-1" tabindex="-1"></a><span class="fu">channelNames</span>(images) <span class="ot">&lt;-</span> <span class="fu">rownames</span>(spe)</span>
+<span id="cb56-2"><a href="read-data.html#cb56-2" tabindex="-1"></a>images</span></code></pre></div>
+<pre><code>## CytoImageList containing 14 image(s)
+## names(14): Patient1_001 Patient1_002 Patient1_003 Patient2_001 Patient2_002 Patient2_003 Patient2_004 Patient3_001 Patient3_002 Patient3_003 Patient4_005 Patient4_006 Patient4_007 Patient4_008 
+## Each image contains 40 channel(s)
+## channelNames(40): MPO HistoneH3 SMA CD16 CD38 HLADR CD27 CD15 CD45RA CD163 B2M CD20 CD68 Ido1 CD3 LAG3 / LAG33 CD11c PD1 PDGFRb CD7 GrzB PDL1 TCF7 CD45RO FOXP3 ICOS CD8a CarbonicAnhydrase CD33 Ki67 VISTA CD40 CD4 CD14 Ecad CD303 CD206 cleavedPARP DNA1 DNA2</code></pre>
+<p>For visualization shown in Section <a href="image-visualization.html#image-visualization">11</a> we will need to
+add additional metadata to the <code>elementMetadata</code> slot of the <code>CytoImageList</code>
+objects. This slot is easily accessible using the <code>mcols</code> function.</p>
+<p>Here, we will store the matched <code>sample_id</code>, <code>patient_id</code> and <code>indication</code>
+information within the <code>elementMetadata</code> slot of the multi-channel images and
+segmentation masks objects. It is crucial that the order of the images in
+both <code>CytoImageList</code> objects is the same.</p>
+<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb58-1"><a href="read-data.html#cb58-1" tabindex="-1"></a><span class="fu">all.equal</span>(<span class="fu">names</span>(images), <span class="fu">names</span>(masks))</span></code></pre></div>
+<pre><code>## [1] TRUE</code></pre>
+<div class="sourceCode" id="cb60"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb60-1"><a href="read-data.html#cb60-1" tabindex="-1"></a><span class="co"># Extract patient id from image name</span></span>
+<span id="cb60-2"><a href="read-data.html#cb60-2" tabindex="-1"></a>patient_id <span class="ot">&lt;-</span> <span class="fu">str_extract</span>(<span class="fu">names</span>(images), <span class="st">&quot;Patient[1-4]&quot;</span>)</span>
+<span id="cb60-3"><a href="read-data.html#cb60-3" tabindex="-1"></a></span>
+<span id="cb60-4"><a href="read-data.html#cb60-4" tabindex="-1"></a><span class="co"># Retrieve cancer type per patient from metadata file</span></span>
+<span id="cb60-5"><a href="read-data.html#cb60-5" tabindex="-1"></a>indication <span class="ot">&lt;-</span> meta<span class="sc">$</span>Indication[<span class="fu">match</span>(patient_id, meta<span class="sc">$</span><span class="st">`</span><span class="at">Sample ID</span><span class="st">`</span>)] </span>
+<span id="cb60-6"><a href="read-data.html#cb60-6" tabindex="-1"></a></span>
+<span id="cb60-7"><a href="read-data.html#cb60-7" tabindex="-1"></a><span class="co"># Store patient and image level information in elementMetadata</span></span>
+<span id="cb60-8"><a href="read-data.html#cb60-8" tabindex="-1"></a><span class="fu">mcols</span>(images) <span class="ot">&lt;-</span> <span class="fu">mcols</span>(masks) <span class="ot">&lt;-</span> <span class="fu">DataFrame</span>(<span class="at">sample_id =</span> <span class="fu">names</span>(images),</span>
+<span id="cb60-9"><a href="read-data.html#cb60-9" tabindex="-1"></a>                                           <span class="at">patient_id =</span> patient_id,</span>
+<span id="cb60-10"><a href="read-data.html#cb60-10" tabindex="-1"></a>                                           <span class="at">indication =</span> indication)</span></code></pre></div>
+</div>
+<div id="generate-single-cell-data-from-images" class="section level2 hasAnchor" number="5.4">
+<h2><span class="header-section-number">5.4</span> Generate single-cell data from images<a href="read-data.html#generate-single-cell-data-from-images" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>An alternative way of generating a <code>SingleCellExperiment</code> object directly
+from the multi-channel images and segmentation masks is supported by the
+<a href="https://bodenmillergroup.github.io/cytomapper/reference/measureObjects.html">measureObjects</a>
+function of the <code>cytomapper</code> package. For each cell present in the <code>masks</code>
+object, the function computes the mean pixel intensity per channel as well as
+morphological features (area, radius, major axis length, eccentricity) and the
+location of cells:</p>
+<div class="sourceCode" id="cb61"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb61-1"><a href="read-data.html#cb61-1" tabindex="-1"></a>cytomapper_sce <span class="ot">&lt;-</span> <span class="fu">measureObjects</span>(masks, <span class="at">image =</span> images, <span class="at">img_id =</span> <span class="st">&quot;sample_id&quot;</span>)</span>
+<span id="cb61-2"><a href="read-data.html#cb61-2" tabindex="-1"></a></span>
+<span id="cb61-3"><a href="read-data.html#cb61-3" tabindex="-1"></a>cytomapper_sce</span></code></pre></div>
+<pre><code>## class: SingleCellExperiment 
+## dim: 40 47859 
+## metadata(0):
+## assays(1): counts
+## rownames(40): MPO HistoneH3 ... DNA1 DNA2
+## rowData names(0):
+## colnames: NULL
+## colData names(10): sample_id object_id ... patient_id indication
+## reducedDimNames(0):
+## mainExpName: NULL
+## altExpNames(0):</code></pre>
+</div>
+<div id="accessing-publicly-available-imc-datasets" class="section level2 hasAnchor" number="5.5">
+<h2><span class="header-section-number">5.5</span> Accessing publicly available IMC datasets<a href="read-data.html#accessing-publicly-available-imc-datasets" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The <a href="https://github.com/BodenmillerGroup/imcdatasets">imcdatasets</a>
+R/Bioconductor package provides a number of publicly available IMC datasets. For
+a complete introduction to the package, please refer to the
+<a href="https://bioconductor.org/packages/release/data/experiment/vignettes/imcdatasets/inst/doc/imcdatasets.html">documentation</a>.
+Here, we can read in example data of <span class="citation">(<a href="#ref-Damond2019">Damond et al. 2019</a>)</span> taken from patients diagnosed
+with Type I Diabetes. The example here consists of a <code>CytoImageList</code> object of
+100 images, a <code>CytoImageList</code> object of 100 segmentation masks and a
+<code>SingleCellExperiment</code> object containing 252059 cells. <strong>Of note:</strong> downloading the
+images takes quite some time and uses 8GB of memory.</p>
+<div class="sourceCode" id="cb63"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb63-1"><a href="read-data.html#cb63-1" tabindex="-1"></a><span class="fu">library</span>(imcdatasets)</span>
+<span id="cb63-2"><a href="read-data.html#cb63-2" tabindex="-1"></a></span>
+<span id="cb63-3"><a href="read-data.html#cb63-3" tabindex="-1"></a>pancreasImages <span class="ot">&lt;-</span> <span class="fu">Damond_2019_Pancreas</span>(<span class="at">data_type =</span> <span class="st">&quot;images&quot;</span>)</span>
+<span id="cb63-4"><a href="read-data.html#cb63-4" tabindex="-1"></a>pancreasMasks <span class="ot">&lt;-</span> <span class="fu">Damond_2019_Pancreas</span>(<span class="at">data_type =</span> <span class="st">&quot;masks&quot;</span>)</span>
+<span id="cb63-5"><a href="read-data.html#cb63-5" tabindex="-1"></a>pancreasSCE <span class="ot">&lt;-</span> <span class="fu">Damond_2019_Pancreas</span>(<span class="at">data_type =</span> <span class="st">&quot;sce&quot;</span>)</span></code></pre></div>
+</div>
+<div id="save-objects" class="section level2 hasAnchor" number="5.6">
+<h2><span class="header-section-number">5.6</span> Save objects<a href="read-data.html#save-objects" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Finally, the generated data objects can be saved for further downstream
+processing and analysis.</p>
+<div class="sourceCode" id="cb64"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb64-1"><a href="read-data.html#cb64-1" tabindex="-1"></a><span class="fu">saveRDS</span>(spe, <span class="st">&quot;data/spe.rds&quot;</span>)</span>
+<span id="cb64-2"><a href="read-data.html#cb64-2" tabindex="-1"></a><span class="fu">saveRDS</span>(images, <span class="st">&quot;data/images.rds&quot;</span>)</span>
+<span id="cb64-3"><a href="read-data.html#cb64-3" tabindex="-1"></a><span class="fu">saveRDS</span>(masks, <span class="st">&quot;data/masks.rds&quot;</span>)</span></code></pre></div>
+</div>
+<div id="session-info" class="section level2 hasAnchor" number="5.7">
+<h2><span class="header-section-number">5.7</span> Session Info<a href="read-data.html#session-info" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<details>
+<summary>
+SessionInfo
+</summary>
+<pre><code>## R version 4.3.2 (2023-10-31)
+## Platform: x86_64-pc-linux-gnu (64-bit)
+## Running under: Ubuntu 22.04.3 LTS
+## 
+## Matrix products: default
+## BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
+## LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.20.so;  LAPACK version 3.10.0
+## 
+## locale:
+##  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+##  [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+##  [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+##  [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+##  [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+## [11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+## 
+## time zone: Etc/UTC
+## tzcode source: system (glibc)
+## 
+## attached base packages:
+## [1] stats4    stats     graphics  grDevices utils     datasets  methods  
+## [8] base     
+## 
+## other attached packages:
+##  [1] testthat_3.2.1              RColorBrewer_1.1-3         
+##  [3] dittoSeq_1.14.0             lubridate_1.9.3            
+##  [5] forcats_1.0.0               dplyr_1.1.4                
+##  [7] purrr_1.0.2                 tidyr_1.3.0                
+##  [9] tibble_3.2.1                ggplot2_3.4.4              
+## [11] tidyverse_2.0.0             stringr_1.5.1              
+## [13] readr_2.1.4                 cytomapper_1.14.0          
+## [15] EBImage_4.44.0              imcRtools_1.8.0            
+## [17] SpatialExperiment_1.12.0    SingleCellExperiment_1.24.0
+## [19] SummarizedExperiment_1.32.0 Biobase_2.62.0             
+## [21] GenomicRanges_1.54.1        GenomeInfoDb_1.38.5        
+## [23] IRanges_2.36.0              S4Vectors_0.40.2           
+## [25] BiocGenerics_0.48.1         MatrixGenerics_1.14.0      
+## [27] matrixStats_1.2.0          
+## 
+## loaded via a namespace (and not attached):
+##   [1] later_1.3.2               bitops_1.0-7             
+##   [3] svgPanZoom_0.3.4          polyclip_1.10-6          
+##   [5] lifecycle_1.0.4           sf_1.0-15                
+##   [7] rprojroot_2.0.4           lattice_0.21-9           
+##   [9] vroom_1.6.5               MASS_7.3-60              
+##  [11] magrittr_2.0.3            sass_0.4.8               
+##  [13] rmarkdown_2.25            jquerylib_0.1.4          
+##  [15] yaml_2.3.8                httpuv_1.6.13            
+##  [17] sp_2.1-2                  cowplot_1.1.2            
+##  [19] DBI_1.2.0                 pkgload_1.3.3            
+##  [21] abind_1.4-5               zlibbioc_1.48.0          
+##  [23] ggraph_2.1.0              RCurl_1.98-1.13          
+##  [25] tweenr_2.0.2              GenomeInfoDbData_1.2.11  
+##  [27] ggrepel_0.9.4             RTriangle_1.6-0.12       
+##  [29] terra_1.7-65              pheatmap_1.0.12          
+##  [31] units_0.8-5               svglite_2.1.3            
+##  [33] DelayedMatrixStats_1.24.0 codetools_0.2-19         
+##  [35] DelayedArray_0.28.0       DT_0.31                  
+##  [37] scuttle_1.12.0            ggforce_0.4.1            
+##  [39] tidyselect_1.2.0          raster_3.6-26            
+##  [41] farver_2.1.1              viridis_0.6.4            
+##  [43] jsonlite_1.8.8            BiocNeighbors_1.20.1     
+##  [45] e1071_1.7-14              ellipsis_0.3.2           
+##  [47] tidygraph_1.3.0           ggridges_0.5.5           
+##  [49] systemfonts_1.0.5         tools_4.3.2              
+##  [51] Rcpp_1.0.11               glue_1.6.2               
+##  [53] gridExtra_2.3             SparseArray_1.2.3        
+##  [55] xfun_0.41                 HDF5Array_1.30.0         
+##  [57] shinydashboard_0.7.2      withr_2.5.2              
+##  [59] fastmap_1.1.1             rhdf5filters_1.14.1      
+##  [61] fansi_1.0.6               digest_0.6.33            
+##  [63] timechange_0.2.0          R6_2.5.1                 
+##  [65] mime_0.12                 colorspace_2.1-0         
+##  [67] jpeg_0.1-10               utf8_1.2.4               
+##  [69] generics_0.1.3            data.table_1.14.10       
+##  [71] class_7.3-22              graphlayouts_1.0.2       
+##  [73] htmlwidgets_1.6.4         S4Arrays_1.2.0           
+##  [75] pkgconfig_2.0.3           gtable_0.3.4             
+##  [77] XVector_0.42.0            brio_1.1.4               
+##  [79] htmltools_0.5.7           bookdown_0.37            
+##  [81] fftwtools_0.9-11          scales_1.3.0             
+##  [83] png_0.1-8                 knitr_1.45               
+##  [85] tzdb_0.4.0                rjson_0.2.21             
+##  [87] proxy_0.4-27              cachem_1.0.8             
+##  [89] rhdf5_2.46.1              KernSmooth_2.23-22       
+##  [91] parallel_4.3.2            vipor_0.4.7              
+##  [93] concaveman_1.1.0          desc_1.4.3               
+##  [95] pillar_1.9.0              grid_4.3.2               
+##  [97] vctrs_0.6.5               promises_1.2.1           
+##  [99] distances_0.1.10          beachmat_2.18.0          
+## [101] xtable_1.8-4              archive_1.1.7            
+## [103] beeswarm_0.4.0            evaluate_0.23            
+## [105] magick_2.8.2              cli_3.6.2                
+## [107] locfit_1.5-9.8            compiler_4.3.2           
+## [109] rlang_1.1.2               crayon_1.5.2             
+## [111] labeling_0.4.3            classInt_0.4-10          
+## [113] ggbeeswarm_0.7.2          stringi_1.8.3            
+## [115] viridisLite_0.4.2         BiocParallel_1.36.0      
+## [117] nnls_1.5                  munsell_0.5.0            
+## [119] tiff_0.1-12               Matrix_1.6-4             
+## [121] hms_1.1.3                 sparseMatrixStats_1.14.0 
+## [123] bit64_4.0.5               Rhdf5lib_1.24.1          
+## [125] shiny_1.8.0               highr_0.10               
+## [127] igraph_1.6.0              bslib_0.6.1              
+## [129] bit_4.0.5</code></pre>
+</details>
+
+</div>
+</div>
+<h3>References<a href="references.html#references" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-Amezquita2019" class="csl-entry">
+Amezquita, Robert A., Aaron T. L. Lun, Etienne Becht, Vince J. Carey, Lindsay N. Carpp, Ludwig Geistlinger, Federico Marini, et al. 2019. <span>“Orchestrating Single-Cell Analysis with Bioconductor.”</span> <em>Nature Methods</em> 17: 137–45.
+</div>
+<div id="ref-Damond2019" class="csl-entry">
+Damond, Nicolas, Stefanie Engler, Vito R. T. Zanotelli, Denis Schapiro, Clive H. Wasserfall, Irina Kusmartseva, Harry S. Nick, et al. 2019. <span>“A Map of Human Type 1 Diabetes Progression by Imaging Mass Cytometry.”</span> <em>Cell Metabolism</em> 29: 755–768.e5.
+</div>
+<div id="ref-Righelli2022" class="csl-entry">
+Righelli, Dario, Lukas M Weber, Helena L Crowell, Brenda Pardo, Leonardo Collado-Torres, Shila Ghazanfar, Aaron T L Lun, Stephanie C Hicks, and Davide Risso. 2022. <span>“<span>SpatialExperiment</span>: Infrastructure for Spatially-Resolved Transcriptomics Data in r Using Bioconductor.”</span> <em>Bioinformatics</em> 38: 3128–31.
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="prerequisites.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="spillover-correction.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": true,
+"facebook": false,
+"twitter": true,
+"linkedin": true,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": "https://github.com/BodenmillerGroup/IMCDataAnalysis/blob/master/04-read_data.Rmd",
+"text": null
+},
+"download": null,
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "section"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

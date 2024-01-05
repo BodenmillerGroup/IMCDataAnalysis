@@ -1,0 +1,1376 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>12 Performing spatial analysis | Analysis workflow for IMC data</title>
+  <meta name="description" content="This bookdown project highlights possible down-stream analyses performed on imaging mass cytometry data." />
+  <meta name="generator" content="bookdown 0.37 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="12 Performing spatial analysis | Analysis workflow for IMC data" />
+  <meta property="og:type" content="book" />
+  
+  <meta property="og:description" content="This bookdown project highlights possible down-stream analyses performed on imaging mass cytometry data." />
+  <meta name="github-repo" content="BodenmillerGroup/IMCDataAnalysis" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="12 Performing spatial analysis | Analysis workflow for IMC data" />
+  
+  <meta name="twitter:description" content="This bookdown project highlights possible down-stream analyses performed on imaging mass cytometry data." />
+  
+
+<meta name="author" content="Authors: Nils Eling 1,2,*, Vito Zanotelli 1,2, Michelle Daniel 1,2, Daniel Schulz 1,2, Jonas Windhager 1,2, Lasse Meyer 1,2" />
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="image-visualization.html"/>
+<link rel="next" href="references.html"/>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+<style type="text/css">
+/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Multiplexed imaging data analysis</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> IMC Data Analysis Workflow</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="index.html"><a href="index.html#disclaimer"><i class="fa fa-check"></i><b>1.1</b> Disclaimer</a></li>
+<li class="chapter" data-level="1.2" data-path="index.html"><a href="index.html#update-freeze"><i class="fa fa-check"></i><b>1.2</b> Update freeze</a></li>
+<li class="chapter" data-level="1.3" data-path="index.html"><a href="index.html#feedback-and-contributing"><i class="fa fa-check"></i><b>1.3</b> Feedback and contributing</a></li>
+<li class="chapter" data-level="1.4" data-path="index.html"><a href="index.html#maintainer"><i class="fa fa-check"></i><b>1.4</b> Maintainer</a></li>
+<li class="chapter" data-level="1.5" data-path="index.html"><a href="index.html#contributors"><i class="fa fa-check"></i><b>1.5</b> Contributors</a></li>
+<li class="chapter" data-level="1.6" data-path="index.html"><a href="index.html#citation"><i class="fa fa-check"></i><b>1.6</b> Citation</a></li>
+<li class="chapter" data-level="1.7" data-path="index.html"><a href="index.html#changelog"><i class="fa fa-check"></i><b>1.7</b> Changelog</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="intro.html"><a href="intro.html"><i class="fa fa-check"></i><b>2</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="intro.html"><a href="intro.html#technical-details-of-imc"><i class="fa fa-check"></i><b>2.1</b> Technical details of IMC</a>
+<ul>
+<li class="chapter" data-level="2.1.1" data-path="intro.html"><a href="intro.html#metal-conjugated-antobodies-and-staining"><i class="fa fa-check"></i><b>2.1.1</b> Metal-conjugated antobodies and staining</a></li>
+<li class="chapter" data-level="2.1.2" data-path="intro.html"><a href="intro.html#data-acquisition"><i class="fa fa-check"></i><b>2.1.2</b> Data acquisition</a></li>
+</ul></li>
+<li class="chapter" data-level="2.2" data-path="intro.html"><a href="intro.html#data-format"><i class="fa fa-check"></i><b>2.2</b> IMC data format</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="processing.html"><a href="processing.html"><i class="fa fa-check"></i><b>3</b> Multi-channel image processing</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="processing.html"><a href="processing.html#image-pre-processing-imc-specific"><i class="fa fa-check"></i><b>3.1</b> Image pre-processing (IMC specific)</a></li>
+<li class="chapter" data-level="3.2" data-path="processing.html"><a href="processing.html#image-segmentation"><i class="fa fa-check"></i><b>3.2</b> Image segmentation</a></li>
+<li class="chapter" data-level="3.3" data-path="processing.html"><a href="processing.html#feature-extraction"><i class="fa fa-check"></i><b>3.3</b> Feature extraction</a></li>
+<li class="chapter" data-level="3.4" data-path="processing.html"><a href="processing.html#data-export"><i class="fa fa-check"></i><b>3.4</b> Data export</a></li>
+<li class="chapter" data-level="3.5" data-path="processing.html"><a href="processing.html#data-import-into-r"><i class="fa fa-check"></i><b>3.5</b> Data import into R</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="prerequisites.html"><a href="prerequisites.html"><i class="fa fa-check"></i><b>4</b> Prerequisites</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="prerequisites.html"><a href="prerequisites.html#obtain-the-code"><i class="fa fa-check"></i><b>4.1</b> Obtain the code</a></li>
+<li class="chapter" data-level="4.2" data-path="prerequisites.html"><a href="prerequisites.html#software-requirements"><i class="fa fa-check"></i><b>4.2</b> Software requirements</a>
+<ul>
+<li class="chapter" data-level="4.2.1" data-path="prerequisites.html"><a href="prerequisites.html#docker"><i class="fa fa-check"></i><b>4.2.1</b> Using Docker</a></li>
+<li class="chapter" data-level="4.2.2" data-path="prerequisites.html"><a href="prerequisites.html#manual-install"><i class="fa fa-check"></i><b>4.2.2</b> Manual installation</a></li>
+<li class="chapter" data-level="4.2.3" data-path="prerequisites.html"><a href="prerequisites.html#major-package-versions"><i class="fa fa-check"></i><b>4.2.3</b> Major package versions</a></li>
+</ul></li>
+<li class="chapter" data-level="4.3" data-path="prerequisites.html"><a href="prerequisites.html#image-processing"><i class="fa fa-check"></i><b>4.3</b> Image processing</a></li>
+<li class="chapter" data-level="4.4" data-path="prerequisites.html"><a href="prerequisites.html#download-data"><i class="fa fa-check"></i><b>4.4</b> Download example data</a>
+<ul>
+<li class="chapter" data-level="4.4.1" data-path="prerequisites.html"><a href="prerequisites.html#processed-multiplexed-imaging-data"><i class="fa fa-check"></i><b>4.4.1</b> Processed multiplexed imaging data</a></li>
+<li class="chapter" data-level="4.4.2" data-path="prerequisites.html"><a href="prerequisites.html#files-for-spillover-matrix-estimation"><i class="fa fa-check"></i><b>4.4.2</b> Files for spillover matrix estimation</a></li>
+<li class="chapter" data-level="4.4.3" data-path="prerequisites.html"><a href="prerequisites.html#gated-cells"><i class="fa fa-check"></i><b>4.4.3</b> Gated cells</a></li>
+</ul></li>
+<li class="chapter" data-level="4.5" data-path="prerequisites.html"><a href="prerequisites.html#sessionInfo"><i class="fa fa-check"></i><b>4.5</b> Software versions</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="read-data.html"><a href="read-data.html"><i class="fa fa-check"></i><b>5</b> Read in the data</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="read-data.html"><a href="read-data.html#read-in-single-cell-information"><i class="fa fa-check"></i><b>5.1</b> Read in single-cell information</a>
+<ul>
+<li class="chapter" data-level="5.1.1" data-path="read-data.html"><a href="read-data.html#steinbock-generated-data"><i class="fa fa-check"></i><b>5.1.1</b> steinbock generated data</a></li>
+<li class="chapter" data-level="5.1.2" data-path="read-data.html"><a href="read-data.html#imc-segmentation-pipeline-generated-data"><i class="fa fa-check"></i><b>5.1.2</b> IMC Segmentation Pipeline generated data</a></li>
+<li class="chapter" data-level="5.1.3" data-path="read-data.html"><a href="read-data.html#reading-custom-files"><i class="fa fa-check"></i><b>5.1.3</b> Reading custom files</a></li>
+</ul></li>
+<li class="chapter" data-level="5.2" data-path="read-data.html"><a href="read-data.html#cell-processing"><i class="fa fa-check"></i><b>5.2</b> Single-cell processing</a></li>
+<li class="chapter" data-level="5.3" data-path="read-data.html"><a href="read-data.html#read-images"><i class="fa fa-check"></i><b>5.3</b> Read in images</a></li>
+<li class="chapter" data-level="5.4" data-path="read-data.html"><a href="read-data.html#generate-single-cell-data-from-images"><i class="fa fa-check"></i><b>5.4</b> Generate single-cell data from images</a></li>
+<li class="chapter" data-level="5.5" data-path="read-data.html"><a href="read-data.html#accessing-publicly-available-imc-datasets"><i class="fa fa-check"></i><b>5.5</b> Accessing publicly available IMC datasets</a></li>
+<li class="chapter" data-level="5.6" data-path="read-data.html"><a href="read-data.html#save-objects"><i class="fa fa-check"></i><b>5.6</b> Save objects</a></li>
+<li class="chapter" data-level="5.7" data-path="read-data.html"><a href="read-data.html#session-info"><i class="fa fa-check"></i><b>5.7</b> Session Info</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="spillover-correction.html"><a href="spillover-correction.html"><i class="fa fa-check"></i><b>6</b> Spillover correction</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="spillover-correction.html"><a href="spillover-correction.html#generate-the-spillover-matrix"><i class="fa fa-check"></i><b>6.1</b> Generate the spillover matrix</a>
+<ul>
+<li class="chapter" data-level="6.1.1" data-path="spillover-correction.html"><a href="spillover-correction.html#read-in-the-data"><i class="fa fa-check"></i><b>6.1.1</b> Read in the data</a></li>
+<li class="chapter" data-level="6.1.2" data-path="spillover-correction.html"><a href="spillover-correction.html#quality-control"><i class="fa fa-check"></i><b>6.1.2</b> Quality control</a></li>
+<li class="chapter" data-level="6.1.3" data-path="spillover-correction.html"><a href="spillover-correction.html#pixel_binning"><i class="fa fa-check"></i><b>6.1.3</b> Optional pixel binning</a></li>
+<li class="chapter" data-level="6.1.4" data-path="spillover-correction.html"><a href="spillover-correction.html#filtering-incorrectly-assigned-pixels"><i class="fa fa-check"></i><b>6.1.4</b> Filtering incorrectly assigned pixels</a></li>
+<li class="chapter" data-level="6.1.5" data-path="spillover-correction.html"><a href="spillover-correction.html#compute-spillover-matrix"><i class="fa fa-check"></i><b>6.1.5</b> Compute spillover matrix</a></li>
+</ul></li>
+<li class="chapter" data-level="6.2" data-path="spillover-correction.html"><a href="spillover-correction.html#single-cell-data-compensation"><i class="fa fa-check"></i><b>6.2</b> Single-cell data compensation</a></li>
+<li class="chapter" data-level="6.3" data-path="spillover-correction.html"><a href="spillover-correction.html#image-compensation"><i class="fa fa-check"></i><b>6.3</b> Image compensation</a></li>
+<li class="chapter" data-level="6.4" data-path="spillover-correction.html"><a href="spillover-correction.html#write-out-compensated-images"><i class="fa fa-check"></i><b>6.4</b> Write out compensated images</a></li>
+<li class="chapter" data-level="6.5" data-path="spillover-correction.html"><a href="spillover-correction.html#save-objects-1"><i class="fa fa-check"></i><b>6.5</b> Save objects</a></li>
+<li class="chapter" data-level="6.6" data-path="spillover-correction.html"><a href="spillover-correction.html#session-info-1"><i class="fa fa-check"></i><b>6.6</b> Session Info</a></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="image-and-cell-level-quality-control.html"><a href="image-and-cell-level-quality-control.html"><i class="fa fa-check"></i><b>7</b> Image and cell-level quality control</a>
+<ul>
+<li class="chapter" data-level="7.1" data-path="image-and-cell-level-quality-control.html"><a href="image-and-cell-level-quality-control.html#read-in-the-data-1"><i class="fa fa-check"></i><b>7.1</b> Read in the data</a></li>
+<li class="chapter" data-level="7.2" data-path="image-and-cell-level-quality-control.html"><a href="image-and-cell-level-quality-control.html#seg-quality"><i class="fa fa-check"></i><b>7.2</b> Segmentation quality control</a></li>
+<li class="chapter" data-level="7.3" data-path="image-and-cell-level-quality-control.html"><a href="image-and-cell-level-quality-control.html#image-quality"><i class="fa fa-check"></i><b>7.3</b> Image-level quality control</a></li>
+<li class="chapter" data-level="7.4" data-path="image-and-cell-level-quality-control.html"><a href="image-and-cell-level-quality-control.html#cell-quality"><i class="fa fa-check"></i><b>7.4</b> Cell-level quality control</a></li>
+<li class="chapter" data-level="7.5" data-path="image-and-cell-level-quality-control.html"><a href="image-and-cell-level-quality-control.html#save-objects-2"><i class="fa fa-check"></i><b>7.5</b> Save objects</a></li>
+<li class="chapter" data-level="7.6" data-path="image-and-cell-level-quality-control.html"><a href="image-and-cell-level-quality-control.html#session-info-2"><i class="fa fa-check"></i><b>7.6</b> Session Info</a></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="batch-effects.html"><a href="batch-effects.html"><i class="fa fa-check"></i><b>8</b> Batch effect correction</a>
+<ul>
+<li class="chapter" data-level="8.1" data-path="batch-effects.html"><a href="batch-effects.html#fastmnn-correction"><i class="fa fa-check"></i><b>8.1</b> fastMNN correction</a>
+<ul>
+<li class="chapter" data-level="8.1.1" data-path="batch-effects.html"><a href="batch-effects.html#perform-sample-correction"><i class="fa fa-check"></i><b>8.1.1</b> Perform sample correction</a></li>
+<li class="chapter" data-level="8.1.2" data-path="batch-effects.html"><a href="batch-effects.html#quality-control-of-correction-results"><i class="fa fa-check"></i><b>8.1.2</b> Quality control of correction results</a></li>
+<li class="chapter" data-level="8.1.3" data-path="batch-effects.html"><a href="batch-effects.html#visualization"><i class="fa fa-check"></i><b>8.1.3</b> Visualization</a></li>
+</ul></li>
+<li class="chapter" data-level="8.2" data-path="batch-effects.html"><a href="batch-effects.html#harmony-correction"><i class="fa fa-check"></i><b>8.2</b> harmony correction</a>
+<ul>
+<li class="chapter" data-level="8.2.1" data-path="batch-effects.html"><a href="batch-effects.html#visualization-1"><i class="fa fa-check"></i><b>8.2.1</b> Visualization</a></li>
+</ul></li>
+<li class="chapter" data-level="8.3" data-path="batch-effects.html"><a href="batch-effects.html#seurat-correction"><i class="fa fa-check"></i><b>8.3</b> Seurat correction</a>
+<ul>
+<li class="chapter" data-level="8.3.1" data-path="batch-effects.html"><a href="batch-effects.html#visualization-2"><i class="fa fa-check"></i><b>8.3.1</b> Visualization</a></li>
+</ul></li>
+<li class="chapter" data-level="8.4" data-path="batch-effects.html"><a href="batch-effects.html#save-objects-3"><i class="fa fa-check"></i><b>8.4</b> Save objects</a></li>
+<li class="chapter" data-level="8.5" data-path="batch-effects.html"><a href="batch-effects.html#session-info-3"><i class="fa fa-check"></i><b>8.5</b> Session Info</a></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html"><i class="fa fa-check"></i><b>9</b> Cell phenotyping</a>
+<ul>
+<li class="chapter" data-level="9.1" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#load-data"><i class="fa fa-check"></i><b>9.1</b> Load data</a></li>
+<li class="chapter" data-level="9.2" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#clustering"><i class="fa fa-check"></i><b>9.2</b> Clustering approaches</a>
+<ul>
+<li class="chapter" data-level="9.2.1" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#rphenograph"><i class="fa fa-check"></i><b>9.2.1</b> Rphenograph</a></li>
+<li class="chapter" data-level="9.2.2" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#snn-graph"><i class="fa fa-check"></i><b>9.2.2</b> Shared nearest neighbour graph</a></li>
+<li class="chapter" data-level="9.2.3" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#self-organizing-maps"><i class="fa fa-check"></i><b>9.2.3</b> Self organizing maps</a></li>
+<li class="chapter" data-level="9.2.4" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#compare-between-clustering-approaches"><i class="fa fa-check"></i><b>9.2.4</b> Compare between clustering approaches</a></li>
+<li class="chapter" data-level="9.2.5" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#clustering-notes"><i class="fa fa-check"></i><b>9.2.5</b> Further clustering notes</a></li>
+</ul></li>
+<li class="chapter" data-level="9.3" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#classification"><i class="fa fa-check"></i><b>9.3</b> Classification approach</a>
+<ul>
+<li class="chapter" data-level="9.3.1" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#manual-labeling-of-cells"><i class="fa fa-check"></i><b>9.3.1</b> Manual labeling of cells</a></li>
+<li class="chapter" data-level="9.3.2" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#define-color-vectors"><i class="fa fa-check"></i><b>9.3.2</b> Define color vectors</a></li>
+<li class="chapter" data-level="9.3.3" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#read-in-and-consolidate-labeled-data"><i class="fa fa-check"></i><b>9.3.3</b> Read in and consolidate labeled data</a></li>
+<li class="chapter" data-level="9.3.4" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#train-classifier"><i class="fa fa-check"></i><b>9.3.4</b> Train classifier</a></li>
+<li class="chapter" data-level="9.3.5" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#classifier-performance"><i class="fa fa-check"></i><b>9.3.5</b> Classifier performance</a></li>
+<li class="chapter" data-level="9.3.6" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#classification-of-new-data"><i class="fa fa-check"></i><b>9.3.6</b> Classification of new data</a></li>
+</ul></li>
+<li class="chapter" data-level="9.4" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#session-info-4"><i class="fa fa-check"></i><b>9.4</b> Session Info</a></li>
+</ul></li>
+<li class="chapter" data-level="10" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html"><i class="fa fa-check"></i><b>10</b> Single cell visualization</a>
+<ul>
+<li class="chapter" data-level="10.1" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#load-data-1"><i class="fa fa-check"></i><b>10.1</b> Load data</a></li>
+<li class="chapter" data-level="10.2" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#cell-type-level"><i class="fa fa-check"></i><b>10.2</b> Cell-type level</a>
+<ul>
+<li class="chapter" data-level="10.2.1" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#dimensionality-reduction-visualization"><i class="fa fa-check"></i><b>10.2.1</b> Dimensionality reduction visualization</a></li>
+<li class="chapter" data-level="10.2.2" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#heatmap-visualization"><i class="fa fa-check"></i><b>10.2.2</b> Heatmap visualization</a></li>
+<li class="chapter" data-level="10.2.3" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#violin-plot-visualization"><i class="fa fa-check"></i><b>10.2.3</b> Violin plot visualization</a></li>
+<li class="chapter" data-level="10.2.4" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#scatter-plot-visualization"><i class="fa fa-check"></i><b>10.2.4</b> Scatter plot visualization</a></li>
+<li class="chapter" data-level="10.2.5" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#barplot-visualization"><i class="fa fa-check"></i><b>10.2.5</b> Barplot visualization</a></li>
+<li class="chapter" data-level="10.2.6" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#catalyst-based-visualization"><i class="fa fa-check"></i><b>10.2.6</b> CATALYST-based visualization</a></li>
+</ul></li>
+<li class="chapter" data-level="10.3" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#sample-level"><i class="fa fa-check"></i><b>10.3</b> Sample-level</a>
+<ul>
+<li class="chapter" data-level="10.3.1" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#dimensionality-reduction-visualization-1"><i class="fa fa-check"></i><b>10.3.1</b> Dimensionality reduction visualization</a></li>
+<li class="chapter" data-level="10.3.2" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#heatmap-visualization-1"><i class="fa fa-check"></i><b>10.3.2</b> Heatmap visualization</a></li>
+<li class="chapter" data-level="10.3.3" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#barplot-visualization-1"><i class="fa fa-check"></i><b>10.3.3</b> Barplot visualization</a></li>
+<li class="chapter" data-level="10.3.4" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#catalyst-based-visualization-1"><i class="fa fa-check"></i><b>10.3.4</b> CATALYST-based visualization</a></li>
+</ul></li>
+<li class="chapter" data-level="10.4" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#rich-example"><i class="fa fa-check"></i><b>10.4</b> Further examples</a>
+<ul>
+<li class="chapter" data-level="10.4.1" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#publication-ready-complexheatmap"><i class="fa fa-check"></i><b>10.4.1</b> Publication-ready ComplexHeatmap</a></li>
+<li class="chapter" data-level="10.4.2" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#interactive-visualization"><i class="fa fa-check"></i><b>10.4.2</b> Interactive visualization</a></li>
+</ul></li>
+<li class="chapter" data-level="10.5" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#session-info-5"><i class="fa fa-check"></i><b>10.5</b> Session Info</a></li>
+</ul></li>
+<li class="chapter" data-level="11" data-path="image-visualization.html"><a href="image-visualization.html"><i class="fa fa-check"></i><b>11</b> Image visualization</a>
+<ul>
+<li class="chapter" data-level="11.1" data-path="image-visualization.html"><a href="image-visualization.html#pixel-visualization"><i class="fa fa-check"></i><b>11.1</b> Pixel visualization</a>
+<ul>
+<li class="chapter" data-level="11.1.1" data-path="image-visualization.html"><a href="image-visualization.html#adjusting-colors"><i class="fa fa-check"></i><b>11.1.1</b> Adjusting colors</a></li>
+<li class="chapter" data-level="11.1.2" data-path="image-visualization.html"><a href="image-visualization.html#image-normalization"><i class="fa fa-check"></i><b>11.1.2</b> Image normalization</a></li>
+</ul></li>
+<li class="chapter" data-level="11.2" data-path="image-visualization.html"><a href="image-visualization.html#mask-visualization"><i class="fa fa-check"></i><b>11.2</b> Cell visualization</a>
+<ul>
+<li class="chapter" data-level="11.2.1" data-path="image-visualization.html"><a href="image-visualization.html#visualzing-metadata"><i class="fa fa-check"></i><b>11.2.1</b> Visualzing metadata</a></li>
+<li class="chapter" data-level="11.2.2" data-path="image-visualization.html"><a href="image-visualization.html#visualizating-expression"><i class="fa fa-check"></i><b>11.2.2</b> Visualizating expression</a></li>
+<li class="chapter" data-level="11.2.3" data-path="image-visualization.html"><a href="image-visualization.html#outline-cells"><i class="fa fa-check"></i><b>11.2.3</b> Outlining cells on images</a></li>
+</ul></li>
+<li class="chapter" data-level="11.3" data-path="image-visualization.html"><a href="image-visualization.html#adjusting-plot-annotations"><i class="fa fa-check"></i><b>11.3</b> Adjusting plot annotations</a></li>
+<li class="chapter" data-level="11.4" data-path="image-visualization.html"><a href="image-visualization.html#displaying-individual-images"><i class="fa fa-check"></i><b>11.4</b> Displaying individual images</a></li>
+<li class="chapter" data-level="11.5" data-path="image-visualization.html"><a href="image-visualization.html#saving-and-returning-images"><i class="fa fa-check"></i><b>11.5</b> Saving and returning images</a></li>
+<li class="chapter" data-level="11.6" data-path="image-visualization.html"><a href="image-visualization.html#cytoviewer"><i class="fa fa-check"></i><b>11.6</b> Interactive image visualization</a></li>
+<li class="chapter" data-level="11.7" data-path="image-visualization.html"><a href="image-visualization.html#session-info-6"><i class="fa fa-check"></i><b>11.7</b> Session Info</a></li>
+</ul></li>
+<li class="chapter" data-level="12" data-path="performing-spatial-analysis.html"><a href="performing-spatial-analysis.html"><i class="fa fa-check"></i><b>12</b> Performing spatial analysis</a>
+<ul>
+<li class="chapter" data-level="12.1" data-path="performing-spatial-analysis.html"><a href="performing-spatial-analysis.html#spatial-interaction-graphs"><i class="fa fa-check"></i><b>12.1</b> Spatial interaction graphs</a></li>
+<li class="chapter" data-level="12.2" data-path="performing-spatial-analysis.html"><a href="performing-spatial-analysis.html#spatial-viz"><i class="fa fa-check"></i><b>12.2</b> Spatial visualization</a></li>
+<li class="chapter" data-level="12.3" data-path="performing-spatial-analysis.html"><a href="performing-spatial-analysis.html#spatial-community-analysis"><i class="fa fa-check"></i><b>12.3</b> Spatial community analysis</a></li>
+<li class="chapter" data-level="12.4" data-path="performing-spatial-analysis.html"><a href="performing-spatial-analysis.html#cellular-neighborhood-analysis"><i class="fa fa-check"></i><b>12.4</b> Cellular neighborhood analysis</a></li>
+<li class="chapter" data-level="12.5" data-path="performing-spatial-analysis.html"><a href="performing-spatial-analysis.html#spatial-context-analysis"><i class="fa fa-check"></i><b>12.5</b> Spatial context analysis</a></li>
+<li class="chapter" data-level="12.6" data-path="performing-spatial-analysis.html"><a href="performing-spatial-analysis.html#patch-detection"><i class="fa fa-check"></i><b>12.6</b> Patch detection</a></li>
+<li class="chapter" data-level="12.7" data-path="performing-spatial-analysis.html"><a href="performing-spatial-analysis.html#interaction-analysis"><i class="fa fa-check"></i><b>12.7</b> Interaction analysis</a></li>
+<li class="chapter" data-level="12.8" data-path="performing-spatial-analysis.html"><a href="performing-spatial-analysis.html#session-info-7"><i class="fa fa-check"></i><b>12.8</b> Session Info</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
+<li class="divider"></li>
+<li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Analysis workflow for IMC data</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="performing-spatial-analysis" class="section level1 hasAnchor" number="12">
+<h1><span class="header-section-number">12</span> Performing spatial analysis<a href="performing-spatial-analysis.html#performing-spatial-analysis" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p>Highly multiplexed imaging technologies measure the spatial distributions of
+molecule abundances across tissue sections. As such, having the option to
+analyze single cells in their spatial tissue context is a key strength of these
+technologies.</p>
+<p>A number of software packages such as
+<a href="https://squidpy.readthedocs.io/en/stable/">squidpy</a>,
+<a href="https://giottosuite.readthedocs.io/en/master/">giotto</a> and
+<a href="https://satijalab.org/seurat/articles/spatial_vignette_2.html">Seurat</a> have
+been developed to analyse and visualize cells in their spatial context. The
+following chapter will highlight the use of
+<a href="https://bioconductor.org/packages/release/bioc/html/imcRtools.html">imcRtools</a>
+and other Bioconductor packages to visualize and analyse single-cell data
+obtained from highly multiplexed imaging technologies.</p>
+<p>We will first read in the spatially-annotated single-cell data processed in the
+previous sections.</p>
+<div class="sourceCode" id="cb262"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb262-1"><a href="performing-spatial-analysis.html#cb262-1" tabindex="-1"></a><span class="fu">library</span>(SpatialExperiment)</span>
+<span id="cb262-2"><a href="performing-spatial-analysis.html#cb262-2" tabindex="-1"></a>spe <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">&quot;data/spe.rds&quot;</span>)</span></code></pre></div>
+<div id="spatial-interaction-graphs" class="section level2 hasAnchor" number="12.1">
+<h2><span class="header-section-number">12.1</span> Spatial interaction graphs<a href="performing-spatial-analysis.html#spatial-interaction-graphs" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Many spatial analysis approaches either compare the observed versus expected
+number of cells around a given cell type (point process) or utilize interaction
+graphs (spatial object graphs) to estimate clustering or interaction frequencies
+between cell types.</p>
+<p>The <a href="https://bodenmillergroup.github.io/steinbock/latest/cli/measurement/">steinbock</a>
+framework allows the construction of these spatial graphs. During image
+processing (see Section <a href="prerequisites.html#image-processing">4.3</a>), we have constructed
+a spatial graph by expanding the individual cell masks by 4 pixels.</p>
+<p>The <code>imcRtools</code> package further allows the <em>ad hoc</em> consctruction of spatial
+graphs directly using a <code>SpatialExperiment</code> or <code>SingleCellExperiment</code> object
+while considering the spatial location (centroids) of individual cells. The
+<a href="https://bodenmillergroup.github.io/imcRtools/reference/buildSpatialGraph.html">buildSpatialGraph</a>
+function allows constructing spatial graphs by detecting the k-nearest neighbors
+in 2D (<code>knn</code>), by detecting all cells within a given distance to the center cell
+(<code>expansion</code>) and by Delaunay triangulation (<code>delaunay</code>).</p>
+<p>When constructing a knn graph, the number of neighbors (<code>k</code>) needs to be set and
+(optionally) the maximum distance to consider (<code>max_dist</code>) can be specified.
+When constructing a graph via expansion, the distance to expand (<code>threshold</code>)
+needs to be provided. For graphs constructed via Delaunay triangulation,
+the <code>max_dist</code> parameter can be set to avoid unusually large connections at the
+edge of the image.</p>
+<div class="sourceCode" id="cb263"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb263-1"><a href="performing-spatial-analysis.html#cb263-1" tabindex="-1"></a><span class="fu">library</span>(imcRtools)</span></code></pre></div>
+<div class="sourceCode" id="cb264"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb264-1"><a href="performing-spatial-analysis.html#cb264-1" tabindex="-1"></a>spe <span class="ot">&lt;-</span> <span class="fu">buildSpatialGraph</span>(spe, <span class="at">img_id =</span> <span class="st">&quot;sample_id&quot;</span>, <span class="at">type =</span> <span class="st">&quot;knn&quot;</span>, <span class="at">k =</span> <span class="dv">20</span>)</span></code></pre></div>
+<pre><code>## The returned object is ordered by the &#39;sample_id&#39; entry.</code></pre>
+<div class="sourceCode" id="cb266"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb266-1"><a href="performing-spatial-analysis.html#cb266-1" tabindex="-1"></a>spe <span class="ot">&lt;-</span> <span class="fu">buildSpatialGraph</span>(spe, <span class="at">img_id =</span> <span class="st">&quot;sample_id&quot;</span>, <span class="at">type =</span> <span class="st">&quot;expansion&quot;</span>, <span class="at">threshold =</span> <span class="dv">20</span>)</span></code></pre></div>
+<pre><code>## The returned object is ordered by the &#39;sample_id&#39; entry.</code></pre>
+<div class="sourceCode" id="cb268"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb268-1"><a href="performing-spatial-analysis.html#cb268-1" tabindex="-1"></a>spe <span class="ot">&lt;-</span> <span class="fu">buildSpatialGraph</span>(spe, <span class="at">img_id =</span> <span class="st">&quot;sample_id&quot;</span>, <span class="at">type =</span> <span class="st">&quot;delaunay&quot;</span>, <span class="at">max_dist =</span> <span class="dv">20</span>)</span></code></pre></div>
+<pre><code>## The returned object is ordered by the &#39;sample_id&#39; entry.</code></pre>
+<p>The spatial graphs are stored in <code>colPair(spe, name)</code> slots. These slots store
+<code>SelfHits</code> objects representing edge lists in which the first column indicates
+the index of the “from” cell and the second column the index of the “to” cell.
+Each edge list is newly constructed when subsetting the object.</p>
+<div class="sourceCode" id="cb270"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb270-1"><a href="performing-spatial-analysis.html#cb270-1" tabindex="-1"></a><span class="fu">colPairNames</span>(spe)</span></code></pre></div>
+<pre><code>## [1] &quot;neighborhood&quot;                &quot;knn_interaction_graph&quot;      
+## [3] &quot;expansion_interaction_graph&quot; &quot;delaunay_interaction_graph&quot;</code></pre>
+<p>Here, <code>colPair(spe, "neighborhood")</code> stores the spatial graph constructed by
+<code>steinbock</code>, <code>colPair(spe, "knn_interaction_graph")</code> stores the knn spatial
+graph, <code>colPair(spe, "expansion_interaction_graph")</code> stores the expansion graph
+and <code>colPair(spe, "delaunay_interaction_graph")</code> stores the graph constructed by
+Delaunay triangulation.</p>
+</div>
+<div id="spatial-viz" class="section level2 hasAnchor" number="12.2">
+<h2><span class="header-section-number">12.2</span> Spatial visualization<a href="performing-spatial-analysis.html#spatial-viz" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Section <a href="image-visualization.html#image-visualization">11</a> highlights the use of the
+<a href="https://www.bioconductor.org/packages/release/bioc/html/cytomapper.html">cytomapper</a>
+package to visualize multichannel images and segmentation masks. Here, we
+introduce the
+<a href="https://bodenmillergroup.github.io/imcRtools/reference/plotSpatial.html">plotSpatial</a>
+function of the <a href="https://www.bioconductor.org/packages/release/bioc/html/imcRtools.html">imcRtools</a> package to visualize the cells’ centroids and
+cell-cell interactions as spatial graphs.</p>
+<p>In the following example, we select one image for visualization purposes.
+Here, each dot (node) represents a cell and edges are drawn between cells
+in close physical proximity as detected by <code>steinbock</code> or the <code>buildSpatialGraph</code>
+function. Nodes are variably colored based on the cell type and edges are
+colored in grey.</p>
+<div class="sourceCode" id="cb272"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb272-1"><a href="performing-spatial-analysis.html#cb272-1" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb272-2"><a href="performing-spatial-analysis.html#cb272-2" tabindex="-1"></a><span class="fu">library</span>(viridis)</span>
+<span id="cb272-3"><a href="performing-spatial-analysis.html#cb272-3" tabindex="-1"></a></span>
+<span id="cb272-4"><a href="performing-spatial-analysis.html#cb272-4" tabindex="-1"></a><span class="co"># steinbock interaction graph </span></span>
+<span id="cb272-5"><a href="performing-spatial-analysis.html#cb272-5" tabindex="-1"></a><span class="fu">plotSpatial</span>(spe[,spe<span class="sc">$</span>sample_id <span class="sc">==</span> <span class="st">&quot;Patient3_001&quot;</span>], </span>
+<span id="cb272-6"><a href="performing-spatial-analysis.html#cb272-6" tabindex="-1"></a>            <span class="at">node_color_by =</span> <span class="st">&quot;celltype&quot;</span>, </span>
+<span id="cb272-7"><a href="performing-spatial-analysis.html#cb272-7" tabindex="-1"></a>            <span class="at">img_id =</span> <span class="st">&quot;sample_id&quot;</span>, </span>
+<span id="cb272-8"><a href="performing-spatial-analysis.html#cb272-8" tabindex="-1"></a>            <span class="at">draw_edges =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb272-9"><a href="performing-spatial-analysis.html#cb272-9" tabindex="-1"></a>            <span class="at">colPairName =</span> <span class="st">&quot;neighborhood&quot;</span>, </span>
+<span id="cb272-10"><a href="performing-spatial-analysis.html#cb272-10" tabindex="-1"></a>            <span class="at">nodes_first =</span> <span class="cn">FALSE</span>, </span>
+<span id="cb272-11"><a href="performing-spatial-analysis.html#cb272-11" tabindex="-1"></a>            <span class="at">edge_color_fix =</span> <span class="st">&quot;grey&quot;</span>) <span class="sc">+</span> </span>
+<span id="cb272-12"><a href="performing-spatial-analysis.html#cb272-12" tabindex="-1"></a>    <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">metadata</span>(spe)<span class="sc">$</span>color_vectors<span class="sc">$</span>celltype) <span class="sc">+</span></span>
+<span id="cb272-13"><a href="performing-spatial-analysis.html#cb272-13" tabindex="-1"></a>    <span class="fu">ggtitle</span>(<span class="st">&quot;steinbock interaction graph&quot;</span>)</span></code></pre></div>
+<p><img src="11-spatial_analysis_files/figure-html/spatial-viz-1-1.png" width="672" /></p>
+<div class="sourceCode" id="cb273"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb273-1"><a href="performing-spatial-analysis.html#cb273-1" tabindex="-1"></a><span class="co"># knn interaction graph </span></span>
+<span id="cb273-2"><a href="performing-spatial-analysis.html#cb273-2" tabindex="-1"></a><span class="fu">plotSpatial</span>(spe[,spe<span class="sc">$</span>sample_id <span class="sc">==</span> <span class="st">&quot;Patient3_001&quot;</span>], </span>
+<span id="cb273-3"><a href="performing-spatial-analysis.html#cb273-3" tabindex="-1"></a>            <span class="at">node_color_by =</span> <span class="st">&quot;celltype&quot;</span>, </span>
+<span id="cb273-4"><a href="performing-spatial-analysis.html#cb273-4" tabindex="-1"></a>            <span class="at">img_id =</span> <span class="st">&quot;sample_id&quot;</span>, </span>
+<span id="cb273-5"><a href="performing-spatial-analysis.html#cb273-5" tabindex="-1"></a>            <span class="at">draw_edges =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb273-6"><a href="performing-spatial-analysis.html#cb273-6" tabindex="-1"></a>            <span class="at">colPairName =</span> <span class="st">&quot;knn_interaction_graph&quot;</span>, </span>
+<span id="cb273-7"><a href="performing-spatial-analysis.html#cb273-7" tabindex="-1"></a>            <span class="at">nodes_first =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb273-8"><a href="performing-spatial-analysis.html#cb273-8" tabindex="-1"></a>            <span class="at">edge_color_fix =</span> <span class="st">&quot;grey&quot;</span>) <span class="sc">+</span> </span>
+<span id="cb273-9"><a href="performing-spatial-analysis.html#cb273-9" tabindex="-1"></a>    <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">metadata</span>(spe)<span class="sc">$</span>color_vectors<span class="sc">$</span>celltype) <span class="sc">+</span></span>
+<span id="cb273-10"><a href="performing-spatial-analysis.html#cb273-10" tabindex="-1"></a>    <span class="fu">ggtitle</span>(<span class="st">&quot;knn interaction graph&quot;</span>)</span></code></pre></div>
+<p><img src="11-spatial_analysis_files/figure-html/spatial-viz-1-2.png" width="672" /></p>
+<div class="sourceCode" id="cb274"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb274-1"><a href="performing-spatial-analysis.html#cb274-1" tabindex="-1"></a><span class="co"># expansion interaction graph </span></span>
+<span id="cb274-2"><a href="performing-spatial-analysis.html#cb274-2" tabindex="-1"></a><span class="fu">plotSpatial</span>(spe[,spe<span class="sc">$</span>sample_id <span class="sc">==</span> <span class="st">&quot;Patient3_001&quot;</span>], </span>
+<span id="cb274-3"><a href="performing-spatial-analysis.html#cb274-3" tabindex="-1"></a>            <span class="at">node_color_by =</span> <span class="st">&quot;celltype&quot;</span>, </span>
+<span id="cb274-4"><a href="performing-spatial-analysis.html#cb274-4" tabindex="-1"></a>            <span class="at">img_id =</span> <span class="st">&quot;sample_id&quot;</span>, </span>
+<span id="cb274-5"><a href="performing-spatial-analysis.html#cb274-5" tabindex="-1"></a>            <span class="at">draw_edges =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb274-6"><a href="performing-spatial-analysis.html#cb274-6" tabindex="-1"></a>            <span class="at">colPairName =</span> <span class="st">&quot;expansion_interaction_graph&quot;</span>, </span>
+<span id="cb274-7"><a href="performing-spatial-analysis.html#cb274-7" tabindex="-1"></a>            <span class="at">nodes_first =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb274-8"><a href="performing-spatial-analysis.html#cb274-8" tabindex="-1"></a>            <span class="at">edge_color_fix =</span> <span class="st">&quot;grey&quot;</span>) <span class="sc">+</span> </span>
+<span id="cb274-9"><a href="performing-spatial-analysis.html#cb274-9" tabindex="-1"></a>    <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">metadata</span>(spe)<span class="sc">$</span>color_vectors<span class="sc">$</span>celltype) <span class="sc">+</span></span>
+<span id="cb274-10"><a href="performing-spatial-analysis.html#cb274-10" tabindex="-1"></a>    <span class="fu">ggtitle</span>(<span class="st">&quot;expansion interaction graph&quot;</span>)</span></code></pre></div>
+<p><img src="11-spatial_analysis_files/figure-html/spatial-viz-1-3.png" width="672" /></p>
+<div class="sourceCode" id="cb275"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb275-1"><a href="performing-spatial-analysis.html#cb275-1" tabindex="-1"></a><span class="co"># delaunay interaction graph </span></span>
+<span id="cb275-2"><a href="performing-spatial-analysis.html#cb275-2" tabindex="-1"></a><span class="fu">plotSpatial</span>(spe[,spe<span class="sc">$</span>sample_id <span class="sc">==</span> <span class="st">&quot;Patient3_001&quot;</span>], </span>
+<span id="cb275-3"><a href="performing-spatial-analysis.html#cb275-3" tabindex="-1"></a>            <span class="at">node_color_by =</span> <span class="st">&quot;celltype&quot;</span>, </span>
+<span id="cb275-4"><a href="performing-spatial-analysis.html#cb275-4" tabindex="-1"></a>            <span class="at">img_id =</span> <span class="st">&quot;sample_id&quot;</span>, </span>
+<span id="cb275-5"><a href="performing-spatial-analysis.html#cb275-5" tabindex="-1"></a>            <span class="at">draw_edges =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb275-6"><a href="performing-spatial-analysis.html#cb275-6" tabindex="-1"></a>            <span class="at">colPairName =</span> <span class="st">&quot;delaunay_interaction_graph&quot;</span>, </span>
+<span id="cb275-7"><a href="performing-spatial-analysis.html#cb275-7" tabindex="-1"></a>            <span class="at">nodes_first =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb275-8"><a href="performing-spatial-analysis.html#cb275-8" tabindex="-1"></a>            <span class="at">edge_color_fix =</span> <span class="st">&quot;grey&quot;</span>) <span class="sc">+</span> </span>
+<span id="cb275-9"><a href="performing-spatial-analysis.html#cb275-9" tabindex="-1"></a>    <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">metadata</span>(spe)<span class="sc">$</span>color_vectors<span class="sc">$</span>celltype) <span class="sc">+</span></span>
+<span id="cb275-10"><a href="performing-spatial-analysis.html#cb275-10" tabindex="-1"></a>    <span class="fu">ggtitle</span>(<span class="st">&quot;delaunay interaction graph&quot;</span>)</span></code></pre></div>
+<p><img src="11-spatial_analysis_files/figure-html/spatial-viz-1-4.png" width="672" /></p>
+<p>Nodes can also be colored based on the cells’ expression levels (e.g.,
+E-cadherin expression) and their size can be adjusted (e.g., based on measured
+cell area).</p>
+<div class="sourceCode" id="cb276"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb276-1"><a href="performing-spatial-analysis.html#cb276-1" tabindex="-1"></a><span class="fu">plotSpatial</span>(spe[,spe<span class="sc">$</span>sample_id <span class="sc">==</span> <span class="st">&quot;Patient3_001&quot;</span>], </span>
+<span id="cb276-2"><a href="performing-spatial-analysis.html#cb276-2" tabindex="-1"></a>            <span class="at">node_color_by =</span> <span class="st">&quot;Ecad&quot;</span>, </span>
+<span id="cb276-3"><a href="performing-spatial-analysis.html#cb276-3" tabindex="-1"></a>            <span class="at">assay_type =</span> <span class="st">&quot;exprs&quot;</span>,</span>
+<span id="cb276-4"><a href="performing-spatial-analysis.html#cb276-4" tabindex="-1"></a>            <span class="at">img_id =</span> <span class="st">&quot;sample_id&quot;</span>, </span>
+<span id="cb276-5"><a href="performing-spatial-analysis.html#cb276-5" tabindex="-1"></a>            <span class="at">draw_edges =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb276-6"><a href="performing-spatial-analysis.html#cb276-6" tabindex="-1"></a>            <span class="at">colPairName =</span> <span class="st">&quot;expansion_interaction_graph&quot;</span>, </span>
+<span id="cb276-7"><a href="performing-spatial-analysis.html#cb276-7" tabindex="-1"></a>            <span class="at">nodes_first =</span> <span class="cn">FALSE</span>, </span>
+<span id="cb276-8"><a href="performing-spatial-analysis.html#cb276-8" tabindex="-1"></a>            <span class="at">node_size_by =</span> <span class="st">&quot;area&quot;</span>, </span>
+<span id="cb276-9"><a href="performing-spatial-analysis.html#cb276-9" tabindex="-1"></a>            <span class="at">directed =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb276-10"><a href="performing-spatial-analysis.html#cb276-10" tabindex="-1"></a>            <span class="at">edge_color_fix =</span> <span class="st">&quot;grey&quot;</span>) <span class="sc">+</span> </span>
+<span id="cb276-11"><a href="performing-spatial-analysis.html#cb276-11" tabindex="-1"></a>    <span class="fu">scale_size_continuous</span>(<span class="at">range =</span> <span class="fu">c</span>(<span class="fl">0.1</span>, <span class="dv">2</span>)) <span class="sc">+</span></span>
+<span id="cb276-12"><a href="performing-spatial-analysis.html#cb276-12" tabindex="-1"></a>    <span class="fu">ggtitle</span>(<span class="st">&quot;E-cadherin expression&quot;</span>)</span></code></pre></div>
+<p><img src="11-spatial_analysis_files/figure-html/spatial-viz-2-1.png" width="672" /></p>
+<p>Finally, the <code>plotSpatial</code> function allows displaying all images at once. This
+visualization can be useful to quickly detect larger structures of interest.</p>
+<div class="sourceCode" id="cb277"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb277-1"><a href="performing-spatial-analysis.html#cb277-1" tabindex="-1"></a><span class="fu">plotSpatial</span>(spe, </span>
+<span id="cb277-2"><a href="performing-spatial-analysis.html#cb277-2" tabindex="-1"></a>            <span class="at">node_color_by =</span> <span class="st">&quot;celltype&quot;</span>, </span>
+<span id="cb277-3"><a href="performing-spatial-analysis.html#cb277-3" tabindex="-1"></a>            <span class="at">img_id =</span> <span class="st">&quot;sample_id&quot;</span>, </span>
+<span id="cb277-4"><a href="performing-spatial-analysis.html#cb277-4" tabindex="-1"></a>            <span class="at">node_size_fix =</span> <span class="fl">0.5</span>) <span class="sc">+</span> </span>
+<span id="cb277-5"><a href="performing-spatial-analysis.html#cb277-5" tabindex="-1"></a>    <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">metadata</span>(spe)<span class="sc">$</span>color_vectors<span class="sc">$</span>celltype)</span></code></pre></div>
+<p><img src="11-spatial_analysis_files/figure-html/spatial-viz-3-1.png" width="1152" /></p>
+<p>For a full documentation on the <code>plotSpatial</code> function, please refer to
+<code>?plotSpatial</code>.</p>
+</div>
+<div id="spatial-community-analysis" class="section level2 hasAnchor" number="12.3">
+<h2><span class="header-section-number">12.3</span> Spatial community analysis<a href="performing-spatial-analysis.html#spatial-community-analysis" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The detection of spatial communities was proposed by <span class="citation">(<a href="#ref-Jackson2020">Jackson et al. 2020</a>)</span>. Here, cells
+are clustered solely based on their interactions as defined by the spatial
+object graph. We can perform spatial community detection across all cells as
+displayed in the next code chunk. Communities with less than 10 cells are
+excluded. <strong>Of note:</strong> we set the seed outside of the function call for
+reproducibility porposes as internally the <code>louvain</code> modularity optimization
+function is used which gives different results over different runs.</p>
+<div class="sourceCode" id="cb278"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb278-1"><a href="performing-spatial-analysis.html#cb278-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">230621</span>)</span>
+<span id="cb278-2"><a href="performing-spatial-analysis.html#cb278-2" tabindex="-1"></a>spe <span class="ot">&lt;-</span> <span class="fu">detectCommunity</span>(spe, </span>
+<span id="cb278-3"><a href="performing-spatial-analysis.html#cb278-3" tabindex="-1"></a>                       <span class="at">colPairName =</span> <span class="st">&quot;neighborhood&quot;</span>, </span>
+<span id="cb278-4"><a href="performing-spatial-analysis.html#cb278-4" tabindex="-1"></a>                       <span class="at">size_threshold =</span> <span class="dv">10</span>)</span>
+<span id="cb278-5"><a href="performing-spatial-analysis.html#cb278-5" tabindex="-1"></a></span>
+<span id="cb278-6"><a href="performing-spatial-analysis.html#cb278-6" tabindex="-1"></a><span class="fu">plotSpatial</span>(spe, </span>
+<span id="cb278-7"><a href="performing-spatial-analysis.html#cb278-7" tabindex="-1"></a>            <span class="at">node_color_by =</span> <span class="st">&quot;spatial_community&quot;</span>, </span>
+<span id="cb278-8"><a href="performing-spatial-analysis.html#cb278-8" tabindex="-1"></a>            <span class="at">img_id =</span> <span class="st">&quot;sample_id&quot;</span>, </span>
+<span id="cb278-9"><a href="performing-spatial-analysis.html#cb278-9" tabindex="-1"></a>            <span class="at">node_size_fix =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb278-10"><a href="performing-spatial-analysis.html#cb278-10" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&quot;none&quot;</span>) <span class="sc">+</span></span>
+<span id="cb278-11"><a href="performing-spatial-analysis.html#cb278-11" tabindex="-1"></a>    <span class="fu">ggtitle</span>(<span class="st">&quot;Spatial tumor communities&quot;</span>) <span class="sc">+</span></span>
+<span id="cb278-12"><a href="performing-spatial-analysis.html#cb278-12" tabindex="-1"></a>    <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">rev</span>(<span class="fu">colors</span>()))</span></code></pre></div>
+<p><img src="11-spatial_analysis_files/figure-html/spatial-community-1-1.png" width="1152" /></p>
+<p>The example shown above might not be of interest if different tissue structures
+exist within which spatial communities should be computed. In the following
+example, we perform spatial community detection separately for tumor and stromal
+cells.</p>
+<p>The general procedure is as follows:</p>
+<ol style="list-style-type: decimal">
+<li><p>create a <code>colData(spe)</code> entry that specifies if a cell is part of the tumor
+or stroma compartment.</p></li>
+<li><p>use the <code>detectCommunity</code> function of the <code>imcRtools</code>
+package to cluster cells within the tumor or stroma compartment solely based on
+their spatial interaction graph as constructed by the <code>steinbock</code> package.</p></li>
+</ol>
+<p>Both tumor and stromal spatial communities are stored in the <code>colData</code> of
+the <code>SpatialExperiment</code> object under the <code>spatial_community</code> identifier.</p>
+<p><strong>Of note:</strong> Here, and in contrast to the function call above, we set the seed
+argument within the <code>SerialParam</code> function for reproducibility
+purposes. We need this here due to the way the <code>detectCommunity</code> function
+is implemented when setting the <code>group_by</code> parameter.</p>
+<div class="sourceCode" id="cb279"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb279-1"><a href="performing-spatial-analysis.html#cb279-1" tabindex="-1"></a>spe<span class="sc">$</span>tumor_stroma <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(spe<span class="sc">$</span>celltype <span class="sc">==</span> <span class="st">&quot;Tumor&quot;</span>, <span class="st">&quot;Tumor&quot;</span>, <span class="st">&quot;Stroma&quot;</span>)</span>
+<span id="cb279-2"><a href="performing-spatial-analysis.html#cb279-2" tabindex="-1"></a></span>
+<span id="cb279-3"><a href="performing-spatial-analysis.html#cb279-3" tabindex="-1"></a><span class="fu">library</span>(BiocParallel)</span>
+<span id="cb279-4"><a href="performing-spatial-analysis.html#cb279-4" tabindex="-1"></a>spe <span class="ot">&lt;-</span> <span class="fu">detectCommunity</span>(spe, </span>
+<span id="cb279-5"><a href="performing-spatial-analysis.html#cb279-5" tabindex="-1"></a>                       <span class="at">colPairName =</span> <span class="st">&quot;neighborhood&quot;</span>, </span>
+<span id="cb279-6"><a href="performing-spatial-analysis.html#cb279-6" tabindex="-1"></a>                       <span class="at">size_threshold =</span> <span class="dv">10</span>,</span>
+<span id="cb279-7"><a href="performing-spatial-analysis.html#cb279-7" tabindex="-1"></a>                       <span class="at">group_by =</span> <span class="st">&quot;tumor_stroma&quot;</span>,</span>
+<span id="cb279-8"><a href="performing-spatial-analysis.html#cb279-8" tabindex="-1"></a>                       <span class="at">BPPARAM =</span> <span class="fu">SerialParam</span>(<span class="at">RNGseed =</span> <span class="dv">220819</span>))</span></code></pre></div>
+<p>We can now separately visualize the tumor and stromal communities.</p>
+<div class="sourceCode" id="cb280"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb280-1"><a href="performing-spatial-analysis.html#cb280-1" tabindex="-1"></a><span class="fu">plotSpatial</span>(spe[,spe<span class="sc">$</span>celltype <span class="sc">==</span> <span class="st">&quot;Tumor&quot;</span>], </span>
+<span id="cb280-2"><a href="performing-spatial-analysis.html#cb280-2" tabindex="-1"></a>            <span class="at">node_color_by =</span> <span class="st">&quot;spatial_community&quot;</span>, </span>
+<span id="cb280-3"><a href="performing-spatial-analysis.html#cb280-3" tabindex="-1"></a>            <span class="at">img_id =</span> <span class="st">&quot;sample_id&quot;</span>, </span>
+<span id="cb280-4"><a href="performing-spatial-analysis.html#cb280-4" tabindex="-1"></a>            <span class="at">node_size_fix =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb280-5"><a href="performing-spatial-analysis.html#cb280-5" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&quot;none&quot;</span>) <span class="sc">+</span></span>
+<span id="cb280-6"><a href="performing-spatial-analysis.html#cb280-6" tabindex="-1"></a>    <span class="fu">ggtitle</span>(<span class="st">&quot;Spatial tumor communities&quot;</span>) <span class="sc">+</span></span>
+<span id="cb280-7"><a href="performing-spatial-analysis.html#cb280-7" tabindex="-1"></a>    <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">rev</span>(<span class="fu">colors</span>()))</span></code></pre></div>
+<p><img src="11-spatial_analysis_files/figure-html/spatial-community-viz-1.png" width="1152" /></p>
+<div class="sourceCode" id="cb281"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb281-1"><a href="performing-spatial-analysis.html#cb281-1" tabindex="-1"></a><span class="fu">plotSpatial</span>(spe[,spe<span class="sc">$</span>celltype <span class="sc">!=</span> <span class="st">&quot;Tumor&quot;</span>], </span>
+<span id="cb281-2"><a href="performing-spatial-analysis.html#cb281-2" tabindex="-1"></a>            <span class="at">node_color_by =</span> <span class="st">&quot;spatial_community&quot;</span>, </span>
+<span id="cb281-3"><a href="performing-spatial-analysis.html#cb281-3" tabindex="-1"></a>            <span class="at">img_id =</span> <span class="st">&quot;sample_id&quot;</span>, </span>
+<span id="cb281-4"><a href="performing-spatial-analysis.html#cb281-4" tabindex="-1"></a>            <span class="at">node_size_fix =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb281-5"><a href="performing-spatial-analysis.html#cb281-5" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&quot;none&quot;</span>) <span class="sc">+</span></span>
+<span id="cb281-6"><a href="performing-spatial-analysis.html#cb281-6" tabindex="-1"></a>    <span class="fu">ggtitle</span>(<span class="st">&quot;Spatial non-tumor communities&quot;</span>) <span class="sc">+</span></span>
+<span id="cb281-7"><a href="performing-spatial-analysis.html#cb281-7" tabindex="-1"></a>    <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">rev</span>(<span class="fu">colors</span>()))</span></code></pre></div>
+<p><img src="11-spatial_analysis_files/figure-html/spatial-community-viz-2.png" width="1152" /></p>
+<p>The example data was acquired using a panel that mainly focuses on immune cells.
+We are therefore unable to detect many tumor sub-phenotypes and will
+focus on the stromal communities.</p>
+<p>In the next step, the fraction of cell types within each
+spatial stromal community is displayed.</p>
+<div class="sourceCode" id="cb282"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb282-1"><a href="performing-spatial-analysis.html#cb282-1" tabindex="-1"></a><span class="fu">library</span>(pheatmap)</span>
+<span id="cb282-2"><a href="performing-spatial-analysis.html#cb282-2" tabindex="-1"></a><span class="fu">library</span>(viridis)</span>
+<span id="cb282-3"><a href="performing-spatial-analysis.html#cb282-3" tabindex="-1"></a></span>
+<span id="cb282-4"><a href="performing-spatial-analysis.html#cb282-4" tabindex="-1"></a>cur_spe <span class="ot">&lt;-</span> spe[,spe<span class="sc">$</span>celltype <span class="sc">!=</span> <span class="st">&quot;Tumor&quot;</span>]</span>
+<span id="cb282-5"><a href="performing-spatial-analysis.html#cb282-5" tabindex="-1"></a></span>
+<span id="cb282-6"><a href="performing-spatial-analysis.html#cb282-6" tabindex="-1"></a>for_plot <span class="ot">&lt;-</span> <span class="fu">prop.table</span>(<span class="fu">table</span>(cur_spe<span class="sc">$</span>spatial_community, </span>
+<span id="cb282-7"><a href="performing-spatial-analysis.html#cb282-7" tabindex="-1"></a>                             cur_spe<span class="sc">$</span>celltype), </span>
+<span id="cb282-8"><a href="performing-spatial-analysis.html#cb282-8" tabindex="-1"></a>                       <span class="at">margin =</span> <span class="dv">1</span>)</span>
+<span id="cb282-9"><a href="performing-spatial-analysis.html#cb282-9" tabindex="-1"></a></span>
+<span id="cb282-10"><a href="performing-spatial-analysis.html#cb282-10" tabindex="-1"></a><span class="fu">pheatmap</span>(for_plot, </span>
+<span id="cb282-11"><a href="performing-spatial-analysis.html#cb282-11" tabindex="-1"></a>         <span class="at">color =</span> <span class="fu">colorRampPalette</span>(<span class="fu">c</span>(<span class="st">&quot;dark blue&quot;</span>, <span class="st">&quot;white&quot;</span>, <span class="st">&quot;dark red&quot;</span>))(<span class="dv">100</span>), </span>
+<span id="cb282-12"><a href="performing-spatial-analysis.html#cb282-12" tabindex="-1"></a>         <span class="at">show_rownames =</span> <span class="cn">FALSE</span>, </span>
+<span id="cb282-13"><a href="performing-spatial-analysis.html#cb282-13" tabindex="-1"></a>         <span class="at">scale =</span> <span class="st">&quot;column&quot;</span>)</span></code></pre></div>
+<p><img src="11-spatial_analysis_files/figure-html/spatial-community-heatmap-1.png" width="672" /></p>
+<p>We observe that many spatial stromal communities are made up of myeloid cells or
+“stromal” (non-immune) cells. Other communities are mainly made up of B cells
+and BnT cells indicating tertiary lymphoid structures (TLS). While plasma cells,
+CD4<span class="math inline">\(^+\)</span> or CD8<span class="math inline">\(^+\)</span> T cells tend to aggregate, only in few spatial stromal
+communities consists of mainly neutrophils.</p>
+</div>
+<div id="cellular-neighborhood-analysis" class="section level2 hasAnchor" number="12.4">
+<h2><span class="header-section-number">12.4</span> Cellular neighborhood analysis<a href="performing-spatial-analysis.html#cellular-neighborhood-analysis" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The following section highlights the use of the <code>imcRtools</code> package to
+detect cellular neighborhoods. This approach has been proposed by
+<span class="citation">(<a href="#ref-Goltsev2018">Goltsev et al. 2018</a>)</span> and <span class="citation">(<a href="#ref-Schurch2020">Schürch et al. 2020</a>)</span> to group cells based on information
+contained in their direct neighborhood.</p>
+<p><span class="citation">(<a href="#ref-Goltsev2018">Goltsev et al. 2018</a>)</span> perfomed Delaunay triangulation-based graph construction,
+neighborhood aggregation and then clustered cells. <span class="citation">(<a href="#ref-Schurch2020">Schürch et al. 2020</a>)</span> on the
+other hand constructed a 10-nearest neighbor graph before aggregating
+information across neighboring cells.</p>
+<p>In the following code chunk we will use the 20-nearest neighbor graph as
+constructed above to define the direct cellular neighborhood. The
+<a href="https://bodenmillergroup.github.io/imcRtools/reference/aggregateNeighbors.html">aggregateNeighbors</a>
+function allows neighborhood aggregation in 2 different ways:</p>
+<ol style="list-style-type: decimal">
+<li>For each cell the function computes the fraction of cells of a
+certain type (e.g., cell type) among its neighbors.</li>
+<li>For each cell it aggregates (e.g., mean) the expression counts
+across all neighboring cells.</li>
+</ol>
+<p>Based on these measures, cells can now be clustered into cellular
+neighborhoods. We will first compute the fraction of the different cell
+types among the 20-nearest neighbors and use kmeans clustering to group
+cells into 6 cellular neighborhoods.</p>
+<p><strong>Of note:</strong> constructing a 20-nearest neighbor graph and clustering
+using kmeans with <code>k=6</code> is only an example. Similar to the analysis done
+in Section <a href="cell-phenotyping.html#snn-graph">9.2.2</a>, it is recommended to perform a parameter
+sweep across different graph construction algorithms and different
+parmaters <code>k</code> for kmeans clustering. Finding the best CN detection
+settings is also subject to the question at hand. Constructing graphs
+with more neighbors usually results in larger CNs.</p>
+<div class="sourceCode" id="cb283"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb283-1"><a href="performing-spatial-analysis.html#cb283-1" tabindex="-1"></a><span class="co"># By celltypes</span></span>
+<span id="cb283-2"><a href="performing-spatial-analysis.html#cb283-2" tabindex="-1"></a>spe <span class="ot">&lt;-</span> <span class="fu">aggregateNeighbors</span>(spe, </span>
+<span id="cb283-3"><a href="performing-spatial-analysis.html#cb283-3" tabindex="-1"></a>                          <span class="at">colPairName =</span> <span class="st">&quot;knn_interaction_graph&quot;</span>, </span>
+<span id="cb283-4"><a href="performing-spatial-analysis.html#cb283-4" tabindex="-1"></a>                          <span class="at">aggregate_by =</span> <span class="st">&quot;metadata&quot;</span>, </span>
+<span id="cb283-5"><a href="performing-spatial-analysis.html#cb283-5" tabindex="-1"></a>                          <span class="at">count_by =</span> <span class="st">&quot;celltype&quot;</span>)</span>
+<span id="cb283-6"><a href="performing-spatial-analysis.html#cb283-6" tabindex="-1"></a></span>
+<span id="cb283-7"><a href="performing-spatial-analysis.html#cb283-7" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">220705</span>)</span>
+<span id="cb283-8"><a href="performing-spatial-analysis.html#cb283-8" tabindex="-1"></a></span>
+<span id="cb283-9"><a href="performing-spatial-analysis.html#cb283-9" tabindex="-1"></a>cn_1 <span class="ot">&lt;-</span> <span class="fu">kmeans</span>(spe<span class="sc">$</span>aggregatedNeighbors, <span class="at">centers =</span> <span class="dv">6</span>)</span>
+<span id="cb283-10"><a href="performing-spatial-analysis.html#cb283-10" tabindex="-1"></a>spe<span class="sc">$</span>cn_celltypes <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(cn_1<span class="sc">$</span>cluster)</span>
+<span id="cb283-11"><a href="performing-spatial-analysis.html#cb283-11" tabindex="-1"></a></span>
+<span id="cb283-12"><a href="performing-spatial-analysis.html#cb283-12" tabindex="-1"></a><span class="fu">plotSpatial</span>(spe, </span>
+<span id="cb283-13"><a href="performing-spatial-analysis.html#cb283-13" tabindex="-1"></a>            <span class="at">node_color_by =</span> <span class="st">&quot;cn_celltypes&quot;</span>, </span>
+<span id="cb283-14"><a href="performing-spatial-analysis.html#cb283-14" tabindex="-1"></a>            <span class="at">img_id =</span> <span class="st">&quot;sample_id&quot;</span>, </span>
+<span id="cb283-15"><a href="performing-spatial-analysis.html#cb283-15" tabindex="-1"></a>            <span class="at">node_size_fix =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb283-16"><a href="performing-spatial-analysis.html#cb283-16" tabindex="-1"></a>    <span class="fu">scale_color_brewer</span>(<span class="at">palette =</span> <span class="st">&quot;Set3&quot;</span>)</span></code></pre></div>
+<p><img src="11-spatial_analysis_files/figure-html/cn-analysis-1.png" width="1152" /></p>
+<p>There are now different visualizations to examine the cell type composition
+of the detected cellular neighborhoods (CN). First we can look at the total
+number of cells per cell type and CN.</p>
+<div class="sourceCode" id="cb284"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb284-1"><a href="performing-spatial-analysis.html#cb284-1" tabindex="-1"></a>for_plot <span class="ot">&lt;-</span> <span class="fu">table</span>(<span class="fu">as.character</span>(spe<span class="sc">$</span>cn_celltypes), spe<span class="sc">$</span>celltype)</span>
+<span id="cb284-2"><a href="performing-spatial-analysis.html#cb284-2" tabindex="-1"></a></span>
+<span id="cb284-3"><a href="performing-spatial-analysis.html#cb284-3" tabindex="-1"></a><span class="fu">pheatmap</span>(for_plot, </span>
+<span id="cb284-4"><a href="performing-spatial-analysis.html#cb284-4" tabindex="-1"></a>         <span class="at">color =</span> <span class="fu">viridis</span>(<span class="dv">100</span>), <span class="at">display_numbers =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb284-5"><a href="performing-spatial-analysis.html#cb284-5" tabindex="-1"></a>         <span class="at">number_color =</span> <span class="st">&quot;white&quot;</span>, <span class="at">number_format =</span> <span class="st">&quot;%.0f&quot;</span>)</span></code></pre></div>
+<p><img src="11-spatial_analysis_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+<p>Next, we can observe per cell type the fraction of CN that they are distributed
+across.</p>
+<div class="sourceCode" id="cb285"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb285-1"><a href="performing-spatial-analysis.html#cb285-1" tabindex="-1"></a>for_plot <span class="ot">&lt;-</span> <span class="fu">prop.table</span>(<span class="fu">table</span>(<span class="fu">as.character</span>(spe<span class="sc">$</span>cn_celltypes), spe<span class="sc">$</span>celltype), <span class="at">margin =</span> <span class="dv">2</span>)</span>
+<span id="cb285-2"><a href="performing-spatial-analysis.html#cb285-2" tabindex="-1"></a></span>
+<span id="cb285-3"><a href="performing-spatial-analysis.html#cb285-3" tabindex="-1"></a><span class="fu">pheatmap</span>(for_plot, </span>
+<span id="cb285-4"><a href="performing-spatial-analysis.html#cb285-4" tabindex="-1"></a>         <span class="at">color =</span> <span class="fu">viridis</span>(<span class="dv">100</span>), <span class="at">display_numbers =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb285-5"><a href="performing-spatial-analysis.html#cb285-5" tabindex="-1"></a>         <span class="at">number_color =</span> <span class="st">&quot;white&quot;</span>, <span class="at">number_format =</span> <span class="st">&quot;%.2f&quot;</span>)</span></code></pre></div>
+<p><img src="11-spatial_analysis_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<p>Similarly, we can visualize the fraction of each CN made up of each cell type.</p>
+<div class="sourceCode" id="cb286"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb286-1"><a href="performing-spatial-analysis.html#cb286-1" tabindex="-1"></a>for_plot <span class="ot">&lt;-</span> <span class="fu">prop.table</span>(<span class="fu">table</span>(<span class="fu">as.character</span>(spe<span class="sc">$</span>cn_celltypes), spe<span class="sc">$</span>celltype), <span class="at">margin =</span> <span class="dv">1</span>)</span>
+<span id="cb286-2"><a href="performing-spatial-analysis.html#cb286-2" tabindex="-1"></a></span>
+<span id="cb286-3"><a href="performing-spatial-analysis.html#cb286-3" tabindex="-1"></a><span class="fu">pheatmap</span>(for_plot, </span>
+<span id="cb286-4"><a href="performing-spatial-analysis.html#cb286-4" tabindex="-1"></a>         <span class="at">color =</span> <span class="fu">viridis</span>(<span class="dv">100</span>), <span class="at">display_numbers =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb286-5"><a href="performing-spatial-analysis.html#cb286-5" tabindex="-1"></a>         <span class="at">number_color =</span> <span class="st">&quot;white&quot;</span>, <span class="at">number_format =</span> <span class="st">&quot;%.2f&quot;</span>)</span></code></pre></div>
+<p><img src="11-spatial_analysis_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<p>This visualization can also be scaled by column to account for the relative
+cell type abundance.</p>
+<div class="sourceCode" id="cb287"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb287-1"><a href="performing-spatial-analysis.html#cb287-1" tabindex="-1"></a><span class="fu">pheatmap</span>(for_plot, </span>
+<span id="cb287-2"><a href="performing-spatial-analysis.html#cb287-2" tabindex="-1"></a>         <span class="at">color =</span> <span class="fu">colorRampPalette</span>(<span class="fu">c</span>(<span class="st">&quot;dark blue&quot;</span>, <span class="st">&quot;white&quot;</span>, <span class="st">&quot;dark red&quot;</span>))(<span class="dv">100</span>), </span>
+<span id="cb287-3"><a href="performing-spatial-analysis.html#cb287-3" tabindex="-1"></a>         <span class="at">scale =</span> <span class="st">&quot;column&quot;</span>)</span></code></pre></div>
+<p><img src="11-spatial_analysis_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p>Lastly, we can visualize the enrichment of cell types within cellular neighborhoods
+using the <code>regionMap</code> function of the <code>lisaClust</code> package.</p>
+<div class="sourceCode" id="cb288"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb288-1"><a href="performing-spatial-analysis.html#cb288-1" tabindex="-1"></a><span class="fu">library</span>(lisaClust)</span>
+<span id="cb288-2"><a href="performing-spatial-analysis.html#cb288-2" tabindex="-1"></a><span class="fu">regionMap</span>(spe, </span>
+<span id="cb288-3"><a href="performing-spatial-analysis.html#cb288-3" tabindex="-1"></a>          <span class="at">cellType =</span> <span class="st">&quot;celltype&quot;</span>,</span>
+<span id="cb288-4"><a href="performing-spatial-analysis.html#cb288-4" tabindex="-1"></a>          <span class="at">region =</span> <span class="st">&quot;cn_celltypes&quot;</span>)</span></code></pre></div>
+<p><img src="11-spatial_analysis_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p>It is also recommended to visualize some images to confirm the interpretation of
+cellular neighborhoods. For this we can either use the <code>lisClust::hatchingPlot</code> or
+the <code>imcRtools::plotSpatial</code> functions:</p>
+<div class="sourceCode" id="cb289"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb289-1"><a href="performing-spatial-analysis.html#cb289-1" tabindex="-1"></a><span class="co"># hatchingPlot</span></span>
+<span id="cb289-2"><a href="performing-spatial-analysis.html#cb289-2" tabindex="-1"></a>cur_spe <span class="ot">&lt;-</span> spe[,spe<span class="sc">$</span>sample_id <span class="sc">==</span> <span class="st">&quot;Patient1_003&quot;</span>]</span>
+<span id="cb289-3"><a href="performing-spatial-analysis.html#cb289-3" tabindex="-1"></a>cur_sce <span class="ot">&lt;-</span> <span class="fu">as</span>(cur_spe, <span class="st">&quot;SingleCellExperiment&quot;</span>)</span>
+<span id="cb289-4"><a href="performing-spatial-analysis.html#cb289-4" tabindex="-1"></a>cur_sce<span class="sc">$</span>x <span class="ot">&lt;-</span> <span class="fu">spatialCoords</span>(cur_spe)[,<span class="dv">1</span>]</span>
+<span id="cb289-5"><a href="performing-spatial-analysis.html#cb289-5" tabindex="-1"></a>cur_sce<span class="sc">$</span>y <span class="ot">&lt;-</span> <span class="fu">spatialCoords</span>(cur_spe)[,<span class="dv">2</span>]</span>
+<span id="cb289-6"><a href="performing-spatial-analysis.html#cb289-6" tabindex="-1"></a>cur_sce<span class="sc">$</span>region <span class="ot">&lt;-</span> <span class="fu">as.character</span>(cur_sce<span class="sc">$</span>cn_celltypes)</span>
+<span id="cb289-7"><a href="performing-spatial-analysis.html#cb289-7" tabindex="-1"></a></span>
+<span id="cb289-8"><a href="performing-spatial-analysis.html#cb289-8" tabindex="-1"></a><span class="fu">hatchingPlot</span>(cur_sce, <span class="at">region =</span> <span class="st">&quot;region&quot;</span>, <span class="at">cellType =</span> <span class="st">&quot;celltype&quot;</span>) <span class="sc">+</span></span>
+<span id="cb289-9"><a href="performing-spatial-analysis.html#cb289-9" tabindex="-1"></a>    <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">metadata</span>(spe)<span class="sc">$</span>color_vectors<span class="sc">$</span>celltype)</span></code></pre></div>
+<pre><code>## There is no cellID. I&#39;ll create these</code></pre>
+<pre><code>## There is no image specific imageCellID. I&#39;ll create these</code></pre>
+<pre><code>## There is no imageID. I&#39;ll assume this is only one image and create an arbitrary imageID</code></pre>
+<pre><code>## Creating variable region</code></pre>
+<pre><code>## Concave windows are temperamental. Try choosing values of window.length &gt; and &lt; 1 if you have problems.</code></pre>
+<p><img src="11-spatial_analysis_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<div class="sourceCode" id="cb295"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb295-1"><a href="performing-spatial-analysis.html#cb295-1" tabindex="-1"></a><span class="co"># plotSpatial</span></span>
+<span id="cb295-2"><a href="performing-spatial-analysis.html#cb295-2" tabindex="-1"></a><span class="fu">plotSpatial</span>(spe[,spe<span class="sc">$</span>sample_id <span class="sc">==</span> <span class="st">&quot;Patient1_003&quot;</span>],</span>
+<span id="cb295-3"><a href="performing-spatial-analysis.html#cb295-3" tabindex="-1"></a>            <span class="at">img_id =</span> <span class="st">&quot;cn_celltypes&quot;</span>, <span class="at">node_color_by =</span> <span class="st">&quot;celltype&quot;</span>, <span class="at">node_size_fix =</span> <span class="fl">0.7</span>) <span class="sc">+</span></span>
+<span id="cb295-4"><a href="performing-spatial-analysis.html#cb295-4" tabindex="-1"></a>    <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">metadata</span>(spe)<span class="sc">$</span>color_vectors<span class="sc">$</span>celltype)</span></code></pre></div>
+<p><img src="11-spatial_analysis_files/figure-html/unnamed-chunk-7-1.png" width="960" /></p>
+<p>CN 1 and CN 6 are mainly enriched for tumor cells with CN 6 forming the
+tumor/stroma border. CN 3 is mainly enriched for B and BnT cells
+indicating TLS. CN 5 is composed of aggregated plasma cells and most T
+cells.</p>
+<p>We will now detect cellular neighborhoods by computing the mean
+expression across the 20-nearest neighbor prior to kmeans clustering
+(k=6).</p>
+<div class="sourceCode" id="cb296"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb296-1"><a href="performing-spatial-analysis.html#cb296-1" tabindex="-1"></a><span class="co"># By expression</span></span>
+<span id="cb296-2"><a href="performing-spatial-analysis.html#cb296-2" tabindex="-1"></a>spe <span class="ot">&lt;-</span> <span class="fu">aggregateNeighbors</span>(spe, </span>
+<span id="cb296-3"><a href="performing-spatial-analysis.html#cb296-3" tabindex="-1"></a>                          <span class="at">colPairName =</span> <span class="st">&quot;knn_interaction_graph&quot;</span>, </span>
+<span id="cb296-4"><a href="performing-spatial-analysis.html#cb296-4" tabindex="-1"></a>                          <span class="at">aggregate_by =</span> <span class="st">&quot;expression&quot;</span>, </span>
+<span id="cb296-5"><a href="performing-spatial-analysis.html#cb296-5" tabindex="-1"></a>                          <span class="at">assay_type =</span> <span class="st">&quot;exprs&quot;</span>,</span>
+<span id="cb296-6"><a href="performing-spatial-analysis.html#cb296-6" tabindex="-1"></a>                          <span class="at">subset_row =</span> <span class="fu">rowData</span>(spe)<span class="sc">$</span>use_channel)</span>
+<span id="cb296-7"><a href="performing-spatial-analysis.html#cb296-7" tabindex="-1"></a></span>
+<span id="cb296-8"><a href="performing-spatial-analysis.html#cb296-8" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">220705</span>)</span>
+<span id="cb296-9"><a href="performing-spatial-analysis.html#cb296-9" tabindex="-1"></a></span>
+<span id="cb296-10"><a href="performing-spatial-analysis.html#cb296-10" tabindex="-1"></a>cn_2 <span class="ot">&lt;-</span> <span class="fu">kmeans</span>(spe<span class="sc">$</span>mean_aggregatedExpression, <span class="at">centers =</span> <span class="dv">6</span>)</span>
+<span id="cb296-11"><a href="performing-spatial-analysis.html#cb296-11" tabindex="-1"></a>spe<span class="sc">$</span>cn_expression <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(cn_2<span class="sc">$</span>cluster)</span>
+<span id="cb296-12"><a href="performing-spatial-analysis.html#cb296-12" tabindex="-1"></a></span>
+<span id="cb296-13"><a href="performing-spatial-analysis.html#cb296-13" tabindex="-1"></a><span class="fu">plotSpatial</span>(spe, </span>
+<span id="cb296-14"><a href="performing-spatial-analysis.html#cb296-14" tabindex="-1"></a>            <span class="at">node_color_by =</span> <span class="st">&quot;cn_expression&quot;</span>, </span>
+<span id="cb296-15"><a href="performing-spatial-analysis.html#cb296-15" tabindex="-1"></a>            <span class="at">img_id =</span> <span class="st">&quot;sample_id&quot;</span>, </span>
+<span id="cb296-16"><a href="performing-spatial-analysis.html#cb296-16" tabindex="-1"></a>            <span class="at">node_size_fix =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb296-17"><a href="performing-spatial-analysis.html#cb296-17" tabindex="-1"></a>    <span class="fu">scale_color_brewer</span>(<span class="at">palette =</span> <span class="st">&quot;Set3&quot;</span>)</span></code></pre></div>
+<p><img src="11-spatial_analysis_files/figure-html/unnamed-chunk-8-1.png" width="1152" /></p>
+<p>Also here, we can visualize the cell type composition of each cellular
+neighborhood.</p>
+<div class="sourceCode" id="cb297"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb297-1"><a href="performing-spatial-analysis.html#cb297-1" tabindex="-1"></a>for_plot <span class="ot">&lt;-</span> <span class="fu">prop.table</span>(<span class="fu">table</span>(spe<span class="sc">$</span>cn_expression, spe<span class="sc">$</span>celltype), </span>
+<span id="cb297-2"><a href="performing-spatial-analysis.html#cb297-2" tabindex="-1"></a>                  <span class="at">margin =</span> <span class="dv">1</span>)</span>
+<span id="cb297-3"><a href="performing-spatial-analysis.html#cb297-3" tabindex="-1"></a></span>
+<span id="cb297-4"><a href="performing-spatial-analysis.html#cb297-4" tabindex="-1"></a><span class="fu">pheatmap</span>(for_plot, </span>
+<span id="cb297-5"><a href="performing-spatial-analysis.html#cb297-5" tabindex="-1"></a>         <span class="at">color =</span> <span class="fu">colorRampPalette</span>(<span class="fu">c</span>(<span class="st">&quot;dark blue&quot;</span>, <span class="st">&quot;white&quot;</span>, <span class="st">&quot;dark red&quot;</span>))(<span class="dv">100</span>), </span>
+<span id="cb297-6"><a href="performing-spatial-analysis.html#cb297-6" tabindex="-1"></a>         <span class="at">scale =</span> <span class="st">&quot;column&quot;</span>)</span></code></pre></div>
+<p><img src="11-spatial_analysis_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<p>When clustering cells based on the mean expression within the direct
+neighborhood, tumor cells are split across CN 6, CN 1 and CN 4 without
+forming a clear tumor/stroma interface. This result reflects
+patient-to-patient differences in the expression of tumor markers.</p>
+<p>CN 3 again contains B cells and BnT cells but also CD8 and undefined
+cells, therefore it is less representative of TLS compared to CN 3 in
+previous CN approach. CN detection based on mean marker expression is
+therefore sensitive to staining/expression differences between samples
+as well as lateral spillover due to imperfect segmentation.</p>
+<p>An alternative to the <code>aggregateNeighbors</code> function is provided by the
+<a href="https://bioconductor.org/packages/release/bioc/html/lisaClust.html">lisaClust</a>
+Bioconductor package <span class="citation">(<a href="#ref-Patrick2023">Patrick et al. 2023</a>)</span>. In contrast to <code>imcRtools</code>, the
+<code>lisaClust</code> package computes local indicators of spatial associations
+(LISA) functions and clusters cells based on those. More precise, the
+package summarizes L-functions from a Poisson point process model to
+derive numeric vectors for each cell which can then again be clustered
+using kmeans. All steps are supported by the <code>lisaClust</code> function which
+can be applied to a <code>SingleCellExperiment</code> and <code>SpatialExperiment</code> object.</p>
+<p>In the following example, we calculate the LISA curves within a 10µm, 20µm and
+50µm neighborhood around each cell. Increasing these radii will lead to broader
+and smoother spatial clusters. However, a number of parameter settings should be
+tested to estimate the robustness of the results.</p>
+<div class="sourceCode" id="cb298"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb298-1"><a href="performing-spatial-analysis.html#cb298-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">220705</span>)</span>
+<span id="cb298-2"><a href="performing-spatial-analysis.html#cb298-2" tabindex="-1"></a>spe <span class="ot">&lt;-</span> <span class="fu">lisaClust</span>(spe, </span>
+<span id="cb298-3"><a href="performing-spatial-analysis.html#cb298-3" tabindex="-1"></a>                 <span class="at">k =</span> <span class="dv">6</span>,</span>
+<span id="cb298-4"><a href="performing-spatial-analysis.html#cb298-4" tabindex="-1"></a>                 <span class="at">Rs =</span> <span class="fu">c</span>(<span class="dv">10</span>, <span class="dv">20</span>, <span class="dv">50</span>),</span>
+<span id="cb298-5"><a href="performing-spatial-analysis.html#cb298-5" tabindex="-1"></a>                 <span class="at">spatialCoords =</span> <span class="fu">c</span>(<span class="st">&quot;Pos_X&quot;</span>, <span class="st">&quot;Pos_Y&quot;</span>),</span>
+<span id="cb298-6"><a href="performing-spatial-analysis.html#cb298-6" tabindex="-1"></a>                 <span class="at">cellType =</span> <span class="st">&quot;celltype&quot;</span>,</span>
+<span id="cb298-7"><a href="performing-spatial-analysis.html#cb298-7" tabindex="-1"></a>                 <span class="at">imageID =</span> <span class="st">&quot;sample_id&quot;</span>)</span>
+<span id="cb298-8"><a href="performing-spatial-analysis.html#cb298-8" tabindex="-1"></a></span>
+<span id="cb298-9"><a href="performing-spatial-analysis.html#cb298-9" tabindex="-1"></a><span class="fu">plotSpatial</span>(spe, </span>
+<span id="cb298-10"><a href="performing-spatial-analysis.html#cb298-10" tabindex="-1"></a>            <span class="at">node_color_by =</span> <span class="st">&quot;region&quot;</span>, </span>
+<span id="cb298-11"><a href="performing-spatial-analysis.html#cb298-11" tabindex="-1"></a>            <span class="at">img_id =</span> <span class="st">&quot;sample_id&quot;</span>, </span>
+<span id="cb298-12"><a href="performing-spatial-analysis.html#cb298-12" tabindex="-1"></a>            <span class="at">node_size_fix =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb298-13"><a href="performing-spatial-analysis.html#cb298-13" tabindex="-1"></a>    <span class="fu">scale_color_brewer</span>(<span class="at">palette =</span> <span class="st">&quot;Set3&quot;</span>)</span></code></pre></div>
+<p><img src="11-spatial_analysis_files/figure-html/lisaClust-1.png" width="1152" /></p>
+<p>Similar to the example above, we can now observe the cell type
+composition per spatial cluster.</p>
+<div class="sourceCode" id="cb299"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb299-1"><a href="performing-spatial-analysis.html#cb299-1" tabindex="-1"></a>for_plot <span class="ot">&lt;-</span> <span class="fu">prop.table</span>(<span class="fu">table</span>(spe<span class="sc">$</span>region, spe<span class="sc">$</span>celltype), </span>
+<span id="cb299-2"><a href="performing-spatial-analysis.html#cb299-2" tabindex="-1"></a>                  <span class="at">margin =</span> <span class="dv">1</span>)</span>
+<span id="cb299-3"><a href="performing-spatial-analysis.html#cb299-3" tabindex="-1"></a></span>
+<span id="cb299-4"><a href="performing-spatial-analysis.html#cb299-4" tabindex="-1"></a><span class="fu">pheatmap</span>(for_plot, </span>
+<span id="cb299-5"><a href="performing-spatial-analysis.html#cb299-5" tabindex="-1"></a>         <span class="at">color =</span> <span class="fu">colorRampPalette</span>(<span class="fu">c</span>(<span class="st">&quot;dark blue&quot;</span>, <span class="st">&quot;white&quot;</span>, <span class="st">&quot;dark red&quot;</span>))(<span class="dv">100</span>), </span>
+<span id="cb299-6"><a href="performing-spatial-analysis.html#cb299-6" tabindex="-1"></a>         <span class="at">scale =</span> <span class="st">&quot;column&quot;</span>)</span></code></pre></div>
+<p><img src="11-spatial_analysis_files/figure-html/lisaClust-3-1.png" width="672" /></p>
+<p>In this case, CN 1 and 4 contain tumor cells but no CN is forming the
+tumor/stroma interface. CN 3 represents TLS. CN 2 indicates T cell
+subtypes and plasma cells are aggregated to CN 5.</p>
+</div>
+<div id="spatial-context-analysis" class="section level2 hasAnchor" number="12.5">
+<h2><span class="header-section-number">12.5</span> Spatial context analysis<a href="performing-spatial-analysis.html#spatial-context-analysis" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Downstream of CN assignments, we will analyze the spatial context (SC)
+of each cell using three functions from the <code>imcRtools</code> package.</p>
+<p>While CNs can represent sites of unique local processes, the term SC was
+coined by Bhate and colleagues <span class="citation">(<a href="#ref-Bhate2022">Bhate et al. 2022</a>)</span> and describes tissue regions
+in which distinct CNs may be interacting. Hence, SCs may be interesting
+regions of specialized biological events.</p>
+<p>Here, we will first detect SCs using the <code>detectSpatialContext</code> function. This
+function relies on CN fractions for each cell in a spatial interaction
+graph (originally a KNN graph), which we will calculate using
+<code>buildSpatialGraph</code> and <code>aggregateNeighbors</code>. We will focus on the CNs
+derived from cell type fractions but other CN assignments are possible.</p>
+<p><strong>Of note</strong>, the window size (k for KNN) for <code>buildSpatialGraph</code> should
+reflect a length scale on which biological signals can be exchanged and
+depends, among others, on cell density and tissue area. In view of their
+divergent functionality, we recommend to use a larger window size for SC
+(interaction between local processes) than for CN (local processes)
+detection. Since we used a 20-nearest neighbor graph for CN assignment,
+we will use a 40-nearest neighbor graph for SC detection. As before,
+different parameters should be tested.</p>
+<p>Subsequently, the CN fractions are sorted from high-to-low and the SC of
+each cell is assigned as the minimal combination of SCs that additively
+surpass a user-defined threshold. The default threshold of 0.9 aims to
+represent the dominant CNs, hence the most prevalent signals, in a given
+window.</p>
+<p>For more details and biological validation, please refer to
+<span class="citation">(<a href="#ref-Bhate2022">Bhate et al. 2022</a>)</span>.</p>
+<div class="sourceCode" id="cb300"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb300-1"><a href="performing-spatial-analysis.html#cb300-1" tabindex="-1"></a><span class="fu">library</span>(circlize)</span>
+<span id="cb300-2"><a href="performing-spatial-analysis.html#cb300-2" tabindex="-1"></a><span class="fu">library</span>(RColorBrewer)</span>
+<span id="cb300-3"><a href="performing-spatial-analysis.html#cb300-3" tabindex="-1"></a></span>
+<span id="cb300-4"><a href="performing-spatial-analysis.html#cb300-4" tabindex="-1"></a><span class="co"># Construct a 40-nearest neighbor graph</span></span>
+<span id="cb300-5"><a href="performing-spatial-analysis.html#cb300-5" tabindex="-1"></a>spe <span class="ot">&lt;-</span> <span class="fu">buildSpatialGraph</span>(spe, </span>
+<span id="cb300-6"><a href="performing-spatial-analysis.html#cb300-6" tabindex="-1"></a>                         <span class="at">img_id =</span> <span class="st">&quot;sample_id&quot;</span>, </span>
+<span id="cb300-7"><a href="performing-spatial-analysis.html#cb300-7" tabindex="-1"></a>                         <span class="at">type =</span> <span class="st">&quot;knn&quot;</span>, </span>
+<span id="cb300-8"><a href="performing-spatial-analysis.html#cb300-8" tabindex="-1"></a>                         <span class="at">name =</span> <span class="st">&quot;knn_spatialcontext_graph&quot;</span>, </span>
+<span id="cb300-9"><a href="performing-spatial-analysis.html#cb300-9" tabindex="-1"></a>                         <span class="at">k =</span> <span class="dv">40</span>)</span>
+<span id="cb300-10"><a href="performing-spatial-analysis.html#cb300-10" tabindex="-1"></a></span>
+<span id="cb300-11"><a href="performing-spatial-analysis.html#cb300-11" tabindex="-1"></a><span class="co"># Compute the fraction of cellular neighborhoods around each cell</span></span>
+<span id="cb300-12"><a href="performing-spatial-analysis.html#cb300-12" tabindex="-1"></a>spe <span class="ot">&lt;-</span> <span class="fu">aggregateNeighbors</span>(spe, </span>
+<span id="cb300-13"><a href="performing-spatial-analysis.html#cb300-13" tabindex="-1"></a>                          <span class="at">colPairName =</span> <span class="st">&quot;knn_spatialcontext_graph&quot;</span>,</span>
+<span id="cb300-14"><a href="performing-spatial-analysis.html#cb300-14" tabindex="-1"></a>                          <span class="at">aggregate_by =</span> <span class="st">&quot;metadata&quot;</span>,</span>
+<span id="cb300-15"><a href="performing-spatial-analysis.html#cb300-15" tabindex="-1"></a>                          <span class="at">count_by =</span> <span class="st">&quot;cn_celltypes&quot;</span>,</span>
+<span id="cb300-16"><a href="performing-spatial-analysis.html#cb300-16" tabindex="-1"></a>                          <span class="at">name =</span> <span class="st">&quot;aggregatedNeighborhood&quot;</span>)</span>
+<span id="cb300-17"><a href="performing-spatial-analysis.html#cb300-17" tabindex="-1"></a></span>
+<span id="cb300-18"><a href="performing-spatial-analysis.html#cb300-18" tabindex="-1"></a><span class="co"># Detect spatial contexts</span></span>
+<span id="cb300-19"><a href="performing-spatial-analysis.html#cb300-19" tabindex="-1"></a>spe <span class="ot">&lt;-</span> <span class="fu">detectSpatialContext</span>(spe, </span>
+<span id="cb300-20"><a href="performing-spatial-analysis.html#cb300-20" tabindex="-1"></a>                            <span class="at">entry =</span> <span class="st">&quot;aggregatedNeighborhood&quot;</span>,</span>
+<span id="cb300-21"><a href="performing-spatial-analysis.html#cb300-21" tabindex="-1"></a>                            <span class="at">threshold =</span> <span class="fl">0.90</span>,</span>
+<span id="cb300-22"><a href="performing-spatial-analysis.html#cb300-22" tabindex="-1"></a>                            <span class="at">name =</span> <span class="st">&quot;spatial_context&quot;</span>)</span>
+<span id="cb300-23"><a href="performing-spatial-analysis.html#cb300-23" tabindex="-1"></a></span>
+<span id="cb300-24"><a href="performing-spatial-analysis.html#cb300-24" tabindex="-1"></a><span class="co"># Define SC color scheme</span></span>
+<span id="cb300-25"><a href="performing-spatial-analysis.html#cb300-25" tabindex="-1"></a>n_SCs <span class="ot">&lt;-</span> <span class="fu">length</span>(<span class="fu">unique</span>(spe<span class="sc">$</span>spatial_context))</span>
+<span id="cb300-26"><a href="performing-spatial-analysis.html#cb300-26" tabindex="-1"></a>col_SC <span class="ot">&lt;-</span> <span class="fu">setNames</span>(<span class="fu">colorRampPalette</span>(<span class="fu">brewer.pal</span>(<span class="dv">9</span>, <span class="st">&quot;Paired&quot;</span>))(n_SCs), </span>
+<span id="cb300-27"><a href="performing-spatial-analysis.html#cb300-27" tabindex="-1"></a>                   <span class="fu">sort</span>(<span class="fu">unique</span>(spe<span class="sc">$</span>spatial_context)))</span>
+<span id="cb300-28"><a href="performing-spatial-analysis.html#cb300-28" tabindex="-1"></a></span>
+<span id="cb300-29"><a href="performing-spatial-analysis.html#cb300-29" tabindex="-1"></a><span class="co"># Visualize spatial contexts on images</span></span>
+<span id="cb300-30"><a href="performing-spatial-analysis.html#cb300-30" tabindex="-1"></a><span class="fu">plotSpatial</span>(spe, </span>
+<span id="cb300-31"><a href="performing-spatial-analysis.html#cb300-31" tabindex="-1"></a>            <span class="at">node_color_by =</span> <span class="st">&quot;spatial_context&quot;</span>, </span>
+<span id="cb300-32"><a href="performing-spatial-analysis.html#cb300-32" tabindex="-1"></a>            <span class="at">img_id =</span> <span class="st">&quot;sample_id&quot;</span>, </span>
+<span id="cb300-33"><a href="performing-spatial-analysis.html#cb300-33" tabindex="-1"></a>            <span class="at">node_size_fix =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb300-34"><a href="performing-spatial-analysis.html#cb300-34" tabindex="-1"></a>    <span class="fu">scale_color_manual</span>(<span class="at">values =</span> col_SC)</span></code></pre></div>
+<p><img src="11-spatial_analysis_files/figure-html/detectSpatialContext-1.png" width="1440" /></p>
+<p>We detect a total of 52 distinct
+SCs across this dataset.</p>
+<p>For ease of interpretation, we will directly compare the CN and SC
+assignments for <code>Patient3_001</code>.</p>
+<div class="sourceCode" id="cb301"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb301-1"><a href="performing-spatial-analysis.html#cb301-1" tabindex="-1"></a><span class="fu">library</span>(patchwork)</span>
+<span id="cb301-2"><a href="performing-spatial-analysis.html#cb301-2" tabindex="-1"></a></span>
+<span id="cb301-3"><a href="performing-spatial-analysis.html#cb301-3" tabindex="-1"></a><span class="co"># Compare CN and SC for one patient </span></span>
+<span id="cb301-4"><a href="performing-spatial-analysis.html#cb301-4" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> <span class="fu">plotSpatial</span>(spe[,spe<span class="sc">$</span>sample_id <span class="sc">==</span> <span class="st">&quot;Patient3_001&quot;</span>], </span>
+<span id="cb301-5"><a href="performing-spatial-analysis.html#cb301-5" tabindex="-1"></a>            <span class="at">node_color_by =</span> <span class="st">&quot;cn_celltypes&quot;</span>, </span>
+<span id="cb301-6"><a href="performing-spatial-analysis.html#cb301-6" tabindex="-1"></a>            <span class="at">img_id =</span> <span class="st">&quot;sample_id&quot;</span>, </span>
+<span id="cb301-7"><a href="performing-spatial-analysis.html#cb301-7" tabindex="-1"></a>            <span class="at">node_size_fix =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb301-8"><a href="performing-spatial-analysis.html#cb301-8" tabindex="-1"></a>    <span class="fu">scale_color_brewer</span>(<span class="at">palette =</span> <span class="st">&quot;Set3&quot;</span>)</span>
+<span id="cb301-9"><a href="performing-spatial-analysis.html#cb301-9" tabindex="-1"></a></span>
+<span id="cb301-10"><a href="performing-spatial-analysis.html#cb301-10" tabindex="-1"></a>p2 <span class="ot">&lt;-</span> <span class="fu">plotSpatial</span>(spe[,spe<span class="sc">$</span>sample_id <span class="sc">==</span> <span class="st">&quot;Patient3_001&quot;</span>], </span>
+<span id="cb301-11"><a href="performing-spatial-analysis.html#cb301-11" tabindex="-1"></a>            <span class="at">node_color_by =</span> <span class="st">&quot;spatial_context&quot;</span>, </span>
+<span id="cb301-12"><a href="performing-spatial-analysis.html#cb301-12" tabindex="-1"></a>            <span class="at">img_id =</span> <span class="st">&quot;sample_id&quot;</span>, </span>
+<span id="cb301-13"><a href="performing-spatial-analysis.html#cb301-13" tabindex="-1"></a>            <span class="at">node_size_fix =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb301-14"><a href="performing-spatial-analysis.html#cb301-14" tabindex="-1"></a>    <span class="fu">scale_color_manual</span>(<span class="at">values =</span> col_SC, <span class="at">limits =</span> force)</span>
+<span id="cb301-15"><a href="performing-spatial-analysis.html#cb301-15" tabindex="-1"></a></span>
+<span id="cb301-16"><a href="performing-spatial-analysis.html#cb301-16" tabindex="-1"></a>p1 <span class="sc">+</span> p2</span></code></pre></div>
+<p><img src="11-spatial_analysis_files/figure-html/compare%20cn%20sc-1.png" width="960" /></p>
+<p>As expected, we can observe that interfaces between different CNs make
+up distinct SCs. For instance, interface between CN 3 (TLS region
+consisting of B and BnT cells) and CN 5 (Plasma- and T-cell dominated)
+turns to SC 3_5. On the other hand, the core of CN 3 becomes SC 3, since
+the most abundant CN of the neighborhood for these cells is just the CN
+itself.</p>
+<p>Next, we filter the SCs based on user-defined thresholds for number of
+group entries (here at least 3 patients) and/or total number of cells
+(here minimum of 100 cells) per SC using the <code>filterSpatialContext</code> function.</p>
+<div class="sourceCode" id="cb302"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb302-1"><a href="performing-spatial-analysis.html#cb302-1" tabindex="-1"></a><span class="do">## Filter spatial contexts</span></span>
+<span id="cb302-2"><a href="performing-spatial-analysis.html#cb302-2" tabindex="-1"></a><span class="co"># By number of group entries</span></span>
+<span id="cb302-3"><a href="performing-spatial-analysis.html#cb302-3" tabindex="-1"></a>spe <span class="ot">&lt;-</span> <span class="fu">filterSpatialContext</span>(spe, </span>
+<span id="cb302-4"><a href="performing-spatial-analysis.html#cb302-4" tabindex="-1"></a>                            <span class="at">entry =</span> <span class="st">&quot;spatial_context&quot;</span>,</span>
+<span id="cb302-5"><a href="performing-spatial-analysis.html#cb302-5" tabindex="-1"></a>                            <span class="at">group_by =</span> <span class="st">&quot;patient_id&quot;</span>, </span>
+<span id="cb302-6"><a href="performing-spatial-analysis.html#cb302-6" tabindex="-1"></a>                            <span class="at">group_threshold =</span> <span class="dv">3</span>,</span>
+<span id="cb302-7"><a href="performing-spatial-analysis.html#cb302-7" tabindex="-1"></a>                            <span class="at">name =</span> <span class="st">&quot;spatial_context_filtered&quot;</span>)</span>
+<span id="cb302-8"><a href="performing-spatial-analysis.html#cb302-8" tabindex="-1"></a></span>
+<span id="cb302-9"><a href="performing-spatial-analysis.html#cb302-9" tabindex="-1"></a><span class="fu">plotSpatial</span>(spe, </span>
+<span id="cb302-10"><a href="performing-spatial-analysis.html#cb302-10" tabindex="-1"></a>            <span class="at">node_color_by =</span> <span class="st">&quot;spatial_context_filtered&quot;</span>, </span>
+<span id="cb302-11"><a href="performing-spatial-analysis.html#cb302-11" tabindex="-1"></a>            <span class="at">img_id =</span> <span class="st">&quot;sample_id&quot;</span>, </span>
+<span id="cb302-12"><a href="performing-spatial-analysis.html#cb302-12" tabindex="-1"></a>            <span class="at">node_size_fix =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb302-13"><a href="performing-spatial-analysis.html#cb302-13" tabindex="-1"></a>    <span class="fu">scale_color_manual</span>(<span class="at">values =</span> col_SC, <span class="at">limits =</span> force)</span></code></pre></div>
+<p><img src="11-spatial_analysis_files/figure-html/filterSpatialContext-1.png" width="1248" /></p>
+<div class="sourceCode" id="cb303"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb303-1"><a href="performing-spatial-analysis.html#cb303-1" tabindex="-1"></a><span class="co"># Filter out small and infrequent spatial contexts</span></span>
+<span id="cb303-2"><a href="performing-spatial-analysis.html#cb303-2" tabindex="-1"></a>spe <span class="ot">&lt;-</span> <span class="fu">filterSpatialContext</span>(spe, </span>
+<span id="cb303-3"><a href="performing-spatial-analysis.html#cb303-3" tabindex="-1"></a>                            <span class="at">entry =</span> <span class="st">&quot;spatial_context&quot;</span>,</span>
+<span id="cb303-4"><a href="performing-spatial-analysis.html#cb303-4" tabindex="-1"></a>                            <span class="at">group_by =</span> <span class="st">&quot;patient_id&quot;</span>, </span>
+<span id="cb303-5"><a href="performing-spatial-analysis.html#cb303-5" tabindex="-1"></a>                            <span class="at">group_threshold =</span> <span class="dv">3</span>,</span>
+<span id="cb303-6"><a href="performing-spatial-analysis.html#cb303-6" tabindex="-1"></a>                            <span class="at">cells_threshold =</span> <span class="dv">100</span>,</span>
+<span id="cb303-7"><a href="performing-spatial-analysis.html#cb303-7" tabindex="-1"></a>                            <span class="at">name =</span> <span class="st">&quot;spatial_context_filtered&quot;</span>)</span>
+<span id="cb303-8"><a href="performing-spatial-analysis.html#cb303-8" tabindex="-1"></a></span>
+<span id="cb303-9"><a href="performing-spatial-analysis.html#cb303-9" tabindex="-1"></a><span class="fu">plotSpatial</span>(spe, </span>
+<span id="cb303-10"><a href="performing-spatial-analysis.html#cb303-10" tabindex="-1"></a>            <span class="at">node_color_by =</span> <span class="st">&quot;spatial_context_filtered&quot;</span>, </span>
+<span id="cb303-11"><a href="performing-spatial-analysis.html#cb303-11" tabindex="-1"></a>            <span class="at">img_id =</span> <span class="st">&quot;sample_id&quot;</span>, </span>
+<span id="cb303-12"><a href="performing-spatial-analysis.html#cb303-12" tabindex="-1"></a>            <span class="at">node_size_fix =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb303-13"><a href="performing-spatial-analysis.html#cb303-13" tabindex="-1"></a>    <span class="fu">scale_color_manual</span>(<span class="at">values =</span> col_SC, <span class="at">limits =</span> force)</span></code></pre></div>
+<p><img src="11-spatial_analysis_files/figure-html/filterSpatialContext-2.png" width="1248" /></p>
+<p>Lastly, we can use the <code>plotSpatialContext</code> function to generate <em>SC
+graphs</em>, analogous to <em>CN combination maps</em> in <span class="citation">(<a href="#ref-Bhate2022">Bhate et al. 2022</a>)</span>. Returned
+objects are <code>ggplots</code>, which can be easily modified further. We will
+create a SC graph for the filtered SCs here.</p>
+<div class="sourceCode" id="cb304"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb304-1"><a href="performing-spatial-analysis.html#cb304-1" tabindex="-1"></a><span class="do">## Plot spatial context graph </span></span>
+<span id="cb304-2"><a href="performing-spatial-analysis.html#cb304-2" tabindex="-1"></a></span>
+<span id="cb304-3"><a href="performing-spatial-analysis.html#cb304-3" tabindex="-1"></a><span class="co"># Colored by name, size by n_cells</span></span>
+<span id="cb304-4"><a href="performing-spatial-analysis.html#cb304-4" tabindex="-1"></a><span class="fu">plotSpatialContext</span>(spe, </span>
+<span id="cb304-5"><a href="performing-spatial-analysis.html#cb304-5" tabindex="-1"></a>                   <span class="at">entry =</span> <span class="st">&quot;spatial_context_filtered&quot;</span>,</span>
+<span id="cb304-6"><a href="performing-spatial-analysis.html#cb304-6" tabindex="-1"></a>                   <span class="at">group_by =</span> <span class="st">&quot;sample_id&quot;</span>,</span>
+<span id="cb304-7"><a href="performing-spatial-analysis.html#cb304-7" tabindex="-1"></a>                   <span class="at">node_color_by =</span> <span class="st">&quot;name&quot;</span>,</span>
+<span id="cb304-8"><a href="performing-spatial-analysis.html#cb304-8" tabindex="-1"></a>                   <span class="at">node_size_by =</span> <span class="st">&quot;n_cells&quot;</span>,</span>
+<span id="cb304-9"><a href="performing-spatial-analysis.html#cb304-9" tabindex="-1"></a>                   <span class="at">node_label_color_by =</span> <span class="st">&quot;name&quot;</span>)</span></code></pre></div>
+<p><img src="11-spatial_analysis_files/figure-html/plotSpatialContext-1.png" width="672" /></p>
+<div class="sourceCode" id="cb305"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb305-1"><a href="performing-spatial-analysis.html#cb305-1" tabindex="-1"></a><span class="co"># Colored by n_cells, size by n_group                   </span></span>
+<span id="cb305-2"><a href="performing-spatial-analysis.html#cb305-2" tabindex="-1"></a><span class="fu">plotSpatialContext</span>(spe, </span>
+<span id="cb305-3"><a href="performing-spatial-analysis.html#cb305-3" tabindex="-1"></a>                   <span class="at">entry =</span> <span class="st">&quot;spatial_context_filtered&quot;</span>,</span>
+<span id="cb305-4"><a href="performing-spatial-analysis.html#cb305-4" tabindex="-1"></a>                   <span class="at">group_by =</span> <span class="st">&quot;sample_id&quot;</span>,</span>
+<span id="cb305-5"><a href="performing-spatial-analysis.html#cb305-5" tabindex="-1"></a>                   <span class="at">node_color_by =</span> <span class="st">&quot;n_cells&quot;</span>,</span>
+<span id="cb305-6"><a href="performing-spatial-analysis.html#cb305-6" tabindex="-1"></a>                   <span class="at">node_size_by =</span> <span class="st">&quot;n_group&quot;</span>,</span>
+<span id="cb305-7"><a href="performing-spatial-analysis.html#cb305-7" tabindex="-1"></a>                   <span class="at">node_label_color_by =</span> <span class="st">&quot;n_cells&quot;</span>) <span class="sc">+</span></span>
+<span id="cb305-8"><a href="performing-spatial-analysis.html#cb305-8" tabindex="-1"></a>  <span class="fu">scale_color_viridis</span>()</span></code></pre></div>
+<p><img src="11-spatial_analysis_files/figure-html/plotSpatialContext-2.png" width="672" /></p>
+<p>SC 1 (Tumor-dominated), SC 1_6 (Tumor and Tumor-Stroma interface) and SC
+4_5 (Plasma/T cell and Myeloid/Neutrophil interface) are the most
+frequent SCs in this dataset. Moreover, we may compare the degree of the
+different nodes in the SC graph. For example, we can observe that SC 1
+has only one degree (directed to SC 1_6), while SC 5 (T cells and plasma cells) has
+a much higher degree (n = 4) and potentially more CN interactions.</p>
+</div>
+<div id="patch-detection" class="section level2 hasAnchor" number="12.6">
+<h2><span class="header-section-number">12.6</span> Patch detection<a href="performing-spatial-analysis.html#patch-detection" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The previous section focused on detecting cellular neighborhoods in a rather
+unsupervised fashion. However, the <code>imcRtools</code> package also provides methods for
+detecting spatial compartments in a supervised fashion. The
+<a href="https://bodenmillergroup.github.io/imcRtools/reference/patchDetection.html">patchDetection</a>
+function allows the detection of connected sets of similar cells as proposed by
+<span class="citation">(<a href="#ref-Hoch2022">Hoch et al. 2022</a>)</span>. In the following example, we will use the <code>patchDetection</code> function
+to detect tumor patches in three steps:</p>
+<ol style="list-style-type: decimal">
+<li>Find connected sets of tumor cells (using the <code>steinbock</code> graph).<br />
+</li>
+<li>Components which contain less than 10 cells are excluded.<br />
+</li>
+<li>Expand the components by 1µm to construct a concave hull around the patch and
+include cells within the patch.</li>
+</ol>
+<div class="sourceCode" id="cb306"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb306-1"><a href="performing-spatial-analysis.html#cb306-1" tabindex="-1"></a>spe <span class="ot">&lt;-</span> <span class="fu">patchDetection</span>(spe, </span>
+<span id="cb306-2"><a href="performing-spatial-analysis.html#cb306-2" tabindex="-1"></a>                      <span class="at">patch_cells =</span> spe<span class="sc">$</span>celltype <span class="sc">==</span> <span class="st">&quot;Tumor&quot;</span>,</span>
+<span id="cb306-3"><a href="performing-spatial-analysis.html#cb306-3" tabindex="-1"></a>                      <span class="at">img_id =</span> <span class="st">&quot;sample_id&quot;</span>,</span>
+<span id="cb306-4"><a href="performing-spatial-analysis.html#cb306-4" tabindex="-1"></a>                      <span class="at">expand_by =</span> <span class="dv">1</span>,</span>
+<span id="cb306-5"><a href="performing-spatial-analysis.html#cb306-5" tabindex="-1"></a>                      <span class="at">min_patch_size =</span> <span class="dv">10</span>,</span>
+<span id="cb306-6"><a href="performing-spatial-analysis.html#cb306-6" tabindex="-1"></a>                      <span class="at">colPairName =</span> <span class="st">&quot;neighborhood&quot;</span>,</span>
+<span id="cb306-7"><a href="performing-spatial-analysis.html#cb306-7" tabindex="-1"></a>                      <span class="at">BPPARAM =</span> <span class="fu">MulticoreParam</span>())</span></code></pre></div>
+<pre><code>## The returned object is ordered by the &#39;sample_id&#39; entry.</code></pre>
+<div class="sourceCode" id="cb308"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb308-1"><a href="performing-spatial-analysis.html#cb308-1" tabindex="-1"></a><span class="fu">plotSpatial</span>(spe, </span>
+<span id="cb308-2"><a href="performing-spatial-analysis.html#cb308-2" tabindex="-1"></a>            <span class="at">node_color_by =</span> <span class="st">&quot;patch_id&quot;</span>, </span>
+<span id="cb308-3"><a href="performing-spatial-analysis.html#cb308-3" tabindex="-1"></a>            <span class="at">img_id =</span> <span class="st">&quot;sample_id&quot;</span>, </span>
+<span id="cb308-4"><a href="performing-spatial-analysis.html#cb308-4" tabindex="-1"></a>            <span class="at">node_size_fix =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb308-5"><a href="performing-spatial-analysis.html#cb308-5" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&quot;none&quot;</span>) <span class="sc">+</span></span>
+<span id="cb308-6"><a href="performing-spatial-analysis.html#cb308-6" tabindex="-1"></a>    <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">rev</span>(<span class="fu">colors</span>()))</span></code></pre></div>
+<p><img src="11-spatial_analysis_files/figure-html/patchDetection-1-1.png" width="1152" /></p>
+<p>We can now calculate the fraction of T cells within each tumor patch to roughly
+estimate T cell infiltration.</p>
+<div class="sourceCode" id="cb309"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb309-1"><a href="performing-spatial-analysis.html#cb309-1" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb309-2"><a href="performing-spatial-analysis.html#cb309-2" tabindex="-1"></a><span class="fu">colData</span>(spe) <span class="sc">%&gt;%</span> <span class="fu">as_tibble</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb309-3"><a href="performing-spatial-analysis.html#cb309-3" tabindex="-1"></a>    <span class="fu">group_by</span>(patch_id, sample_id) <span class="sc">%&gt;%</span></span>
+<span id="cb309-4"><a href="performing-spatial-analysis.html#cb309-4" tabindex="-1"></a>    <span class="fu">summarize</span>(<span class="at">Tcell_count =</span> <span class="fu">sum</span>(celltype <span class="sc">==</span> <span class="st">&quot;CD8&quot;</span> <span class="sc">|</span> celltype <span class="sc">==</span> <span class="st">&quot;CD4&quot;</span>),</span>
+<span id="cb309-5"><a href="performing-spatial-analysis.html#cb309-5" tabindex="-1"></a>              <span class="at">patch_size =</span> <span class="fu">n</span>(),</span>
+<span id="cb309-6"><a href="performing-spatial-analysis.html#cb309-6" tabindex="-1"></a>              <span class="at">Tcell_freq =</span> Tcell_count <span class="sc">/</span> patch_size) <span class="sc">%&gt;%</span></span>
+<span id="cb309-7"><a href="performing-spatial-analysis.html#cb309-7" tabindex="-1"></a>    <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(patch_id)) <span class="sc">%&gt;%</span></span>
+<span id="cb309-8"><a href="performing-spatial-analysis.html#cb309-8" tabindex="-1"></a>    <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb309-9"><a href="performing-spatial-analysis.html#cb309-9" tabindex="-1"></a>        <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="fu">log10</span>(patch_size), Tcell_freq, <span class="at">color =</span> sample_id)) <span class="sc">+</span></span>
+<span id="cb309-10"><a href="performing-spatial-analysis.html#cb309-10" tabindex="-1"></a>    <span class="fu">theme_classic</span>()</span></code></pre></div>
+<p><img src="11-spatial_analysis_files/figure-html/patchDetection-2-1.png" width="672" /></p>
+<p>We can now measure the size of each patch using the
+<a href="https://bodenmillergroup.github.io/imcRtools/reference/patchSize.html">patchSize</a>
+function and visualize tumor patch distribution per patient.</p>
+<div class="sourceCode" id="cb310"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb310-1"><a href="performing-spatial-analysis.html#cb310-1" tabindex="-1"></a>patch_size <span class="ot">&lt;-</span> <span class="fu">patchSize</span>(spe, <span class="st">&quot;patch_id&quot;</span>)</span>
+<span id="cb310-2"><a href="performing-spatial-analysis.html#cb310-2" tabindex="-1"></a></span>
+<span id="cb310-3"><a href="performing-spatial-analysis.html#cb310-3" tabindex="-1"></a>patch_size <span class="ot">&lt;-</span> <span class="fu">merge</span>(patch_size, </span>
+<span id="cb310-4"><a href="performing-spatial-analysis.html#cb310-4" tabindex="-1"></a>                    <span class="fu">colData</span>(spe)[<span class="fu">match</span>(patch_size<span class="sc">$</span>patch_id, spe<span class="sc">$</span>patch_id),], </span>
+<span id="cb310-5"><a href="performing-spatial-analysis.html#cb310-5" tabindex="-1"></a>                    <span class="at">by =</span> <span class="st">&quot;patch_id&quot;</span>)</span>
+<span id="cb310-6"><a href="performing-spatial-analysis.html#cb310-6" tabindex="-1"></a></span>
+<span id="cb310-7"><a href="performing-spatial-analysis.html#cb310-7" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="fu">as.data.frame</span>(patch_size)) <span class="sc">+</span> </span>
+<span id="cb310-8"><a href="performing-spatial-analysis.html#cb310-8" tabindex="-1"></a>    <span class="fu">geom_boxplot</span>(<span class="fu">aes</span>(patient_id, <span class="fu">log10</span>(size))) <span class="sc">+</span></span>
+<span id="cb310-9"><a href="performing-spatial-analysis.html#cb310-9" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="fu">aes</span>(patient_id, <span class="fu">log10</span>(size)))</span></code></pre></div>
+<p><img src="11-spatial_analysis_files/figure-html/patch-size-1.png" width="672" /></p>
+<p>The
+<a href="https://bodenmillergroup.github.io/imcRtools/reference/minDistToCells.html">minDistToCells</a>
+function can be used to calculate the minimum distance between each cell and a
+cell set of interest. Here, we highlight its use to calculate the minimum
+distance of all cells to the detected tumor patches. Negative values indicate
+the minimum distance of each tumor patch cell to a non-tumor patch cell.</p>
+<div class="sourceCode" id="cb311"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb311-1"><a href="performing-spatial-analysis.html#cb311-1" tabindex="-1"></a>spe <span class="ot">&lt;-</span> <span class="fu">minDistToCells</span>(spe, </span>
+<span id="cb311-2"><a href="performing-spatial-analysis.html#cb311-2" tabindex="-1"></a>                      <span class="at">x_cells =</span> <span class="sc">!</span><span class="fu">is.na</span>(spe<span class="sc">$</span>patch_id), </span>
+<span id="cb311-3"><a href="performing-spatial-analysis.html#cb311-3" tabindex="-1"></a>                      <span class="at">img_id =</span> <span class="st">&quot;sample_id&quot;</span>)</span></code></pre></div>
+<pre><code>## The returned object is ordered by the &#39;sample_id&#39; entry.</code></pre>
+<div class="sourceCode" id="cb313"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb313-1"><a href="performing-spatial-analysis.html#cb313-1" tabindex="-1"></a><span class="fu">plotSpatial</span>(spe, </span>
+<span id="cb313-2"><a href="performing-spatial-analysis.html#cb313-2" tabindex="-1"></a>            <span class="at">node_color_by =</span> <span class="st">&quot;distToCells&quot;</span>, </span>
+<span id="cb313-3"><a href="performing-spatial-analysis.html#cb313-3" tabindex="-1"></a>            <span class="at">img_id =</span> <span class="st">&quot;sample_id&quot;</span>, </span>
+<span id="cb313-4"><a href="performing-spatial-analysis.html#cb313-4" tabindex="-1"></a>            <span class="at">node_size_fix =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb313-5"><a href="performing-spatial-analysis.html#cb313-5" tabindex="-1"></a>    <span class="fu">scale_color_gradient2</span>(<span class="at">low =</span> <span class="st">&quot;dark blue&quot;</span>, <span class="at">mid =</span> <span class="st">&quot;white&quot;</span>, <span class="at">high =</span> <span class="st">&quot;dark red&quot;</span>)</span></code></pre></div>
+<p><img src="11-spatial_analysis_files/figure-html/minDistCells-1.png" width="1152" /></p>
+<p>Finally, we can observe the minimum distances to tumor patches in a cell type
+specific manner.</p>
+<div class="sourceCode" id="cb314"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb314-1"><a href="performing-spatial-analysis.html#cb314-1" tabindex="-1"></a><span class="fu">library</span>(ggridges)</span>
+<span id="cb314-2"><a href="performing-spatial-analysis.html#cb314-2" tabindex="-1"></a></span>
+<span id="cb314-3"><a href="performing-spatial-analysis.html#cb314-3" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="fu">as.data.frame</span>(<span class="fu">colData</span>(spe))) <span class="sc">+</span> </span>
+<span id="cb314-4"><a href="performing-spatial-analysis.html#cb314-4" tabindex="-1"></a>    <span class="fu">geom_density_ridges</span>(<span class="fu">aes</span>(distToCells, celltype, <span class="at">fill =</span> celltype)) <span class="sc">+</span></span>
+<span id="cb314-5"><a href="performing-spatial-analysis.html#cb314-5" tabindex="-1"></a>    <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="dv">0</span>, <span class="at">color =</span> <span class="st">&quot;dark red&quot;</span>, <span class="at">linewidth =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb314-6"><a href="performing-spatial-analysis.html#cb314-6" tabindex="-1"></a>    <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">metadata</span>(spe)<span class="sc">$</span>color_vectors<span class="sc">$</span>celltype)</span></code></pre></div>
+<p><img src="11-spatial_analysis_files/figure-html/celltype-distance-1.png" width="672" /></p>
+</div>
+<div id="interaction-analysis" class="section level2 hasAnchor" number="12.7">
+<h2><span class="header-section-number">12.7</span> Interaction analysis<a href="performing-spatial-analysis.html#interaction-analysis" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p><strong>Bug notice: we discovered and fixed a bug in the <code>testInteractions</code> function in version below 1.5.5 which affected <code>SingleCellExperiment</code> or <code>SpatialExperiment</code> objects in which cells were not grouped by image. Please make sure you have the newest version (&gt;= 1.6.0) installed.</strong></p>
+<p>The next section focuses on statistically testing the pairwise interaction
+between all cell types of the dataset. For this, the <code>imcRtools</code> package
+provides the
+<a href="https://bodenmillergroup.github.io/imcRtools/reference/testInteractions.html">testInteractions</a>
+function which implements the interaction testing strategy proposed by
+<span class="citation">(<a href="#ref-Shapiro2017">Schapiro et al. 2017</a>)</span>.</p>
+<p>Per grouping level (e.g., image), the <code>testInteractions</code> function computes the
+averaged cell type/cell type interaction count and compares this count against
+an empirical null distribution which is generated by permuting all cell labels (while maintaining the tissue structure).</p>
+<p>In the following example, we use the <code>steinbock</code> generated spatial interaction
+graph and estimate the interaction or avoidance between cell types in the
+dataset.</p>
+<div class="sourceCode" id="cb315"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb315-1"><a href="performing-spatial-analysis.html#cb315-1" tabindex="-1"></a><span class="fu">library</span>(scales)</span>
+<span id="cb315-2"><a href="performing-spatial-analysis.html#cb315-2" tabindex="-1"></a>out <span class="ot">&lt;-</span> <span class="fu">testInteractions</span>(spe, </span>
+<span id="cb315-3"><a href="performing-spatial-analysis.html#cb315-3" tabindex="-1"></a>                        <span class="at">group_by =</span> <span class="st">&quot;sample_id&quot;</span>,</span>
+<span id="cb315-4"><a href="performing-spatial-analysis.html#cb315-4" tabindex="-1"></a>                        <span class="at">label =</span> <span class="st">&quot;celltype&quot;</span>, </span>
+<span id="cb315-5"><a href="performing-spatial-analysis.html#cb315-5" tabindex="-1"></a>                        <span class="at">colPairName =</span> <span class="st">&quot;neighborhood&quot;</span>,</span>
+<span id="cb315-6"><a href="performing-spatial-analysis.html#cb315-6" tabindex="-1"></a>                        <span class="at">BPPARAM =</span> <span class="fu">SerialParam</span>(<span class="at">RNGseed =</span> <span class="dv">221029</span>))</span>
+<span id="cb315-7"><a href="performing-spatial-analysis.html#cb315-7" tabindex="-1"></a></span>
+<span id="cb315-8"><a href="performing-spatial-analysis.html#cb315-8" tabindex="-1"></a><span class="fu">head</span>(out)</span></code></pre></div>
+<pre><code>## DataFrame with 6 rows and 10 columns
+##       group_by  from_label    to_label        ct      p_gt      p_lt
+##    &lt;character&gt; &lt;character&gt; &lt;character&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt;
+## 1 Patient1_001       Bcell       Bcell         0  1.000000  1.000000
+## 2 Patient1_001       Bcell     BnTcell         0  1.000000  0.998002
+## 3 Patient1_001       Bcell         CD4         3  0.001998  1.000000
+## 4 Patient1_001       Bcell         CD8         0  1.000000  0.898102
+## 5 Patient1_001       Bcell     Myeloid         0  1.000000  0.804196
+## 6 Patient1_001       Bcell  Neutrophil        NA        NA        NA
+##   interaction         p       sig    sigval
+##     &lt;logical&gt; &lt;numeric&gt; &lt;logical&gt; &lt;numeric&gt;
+## 1       FALSE  1.000000     FALSE         0
+## 2       FALSE  0.998002     FALSE         0
+## 3        TRUE  0.001998      TRUE         1
+## 4       FALSE  0.898102     FALSE         0
+## 5       FALSE  0.804196     FALSE         0
+## 6          NA        NA        NA        NA</code></pre>
+<p>The returned <code>DataFrame</code> contains the test results per grouping level (in this case
+the image ID, <code>group_by</code>), “from” cell type (<code>from_label</code>) and “to” cell type
+(<code>to_label</code>). The <code>sigval</code> entry indicates if a pair of cell types is
+significantly interacting (<code>sigval = 1</code>), if a pair of cell types is
+significantly avoiding (<code>sigval = -1</code>) or if no significant interaction or
+avoidance was detected (<code>sigval = 0</code>).</p>
+<p>These results can be visualized by computing the sum of the <code>sigval</code> entries
+across all images:</p>
+<div class="sourceCode" id="cb317"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb317-1"><a href="performing-spatial-analysis.html#cb317-1" tabindex="-1"></a>out <span class="sc">%&gt;%</span> <span class="fu">as_tibble</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb317-2"><a href="performing-spatial-analysis.html#cb317-2" tabindex="-1"></a>    <span class="fu">group_by</span>(from_label, to_label) <span class="sc">%&gt;%</span></span>
+<span id="cb317-3"><a href="performing-spatial-analysis.html#cb317-3" tabindex="-1"></a>    <span class="fu">summarize</span>(<span class="at">sum_sigval =</span> <span class="fu">sum</span>(sigval, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb317-4"><a href="performing-spatial-analysis.html#cb317-4" tabindex="-1"></a>    <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb317-5"><a href="performing-spatial-analysis.html#cb317-5" tabindex="-1"></a>        <span class="fu">geom_tile</span>(<span class="fu">aes</span>(from_label, to_label, <span class="at">fill =</span> sum_sigval)) <span class="sc">+</span></span>
+<span id="cb317-6"><a href="performing-spatial-analysis.html#cb317-6" tabindex="-1"></a>        <span class="fu">scale_fill_gradient2</span>(<span class="at">low =</span> <span class="fu">muted</span>(<span class="st">&quot;blue&quot;</span>), <span class="at">mid =</span> <span class="st">&quot;white&quot;</span>, <span class="at">high =</span> <span class="fu">muted</span>(<span class="st">&quot;red&quot;</span>)) <span class="sc">+</span></span>
+<span id="cb317-7"><a href="performing-spatial-analysis.html#cb317-7" tabindex="-1"></a>        <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>))</span></code></pre></div>
+<p><img src="11-spatial_analysis_files/figure-html/testInteractions-2-1.png" width="672" /></p>
+<p>In the plot above the red tiles indicate cell type pairs that were detected to
+significantly interact on a large number of images. On the other hand, blue
+tiles show cell type pairs which tend to avoid each other on a large number
+of images.</p>
+<p>Here we can observe that tumor cells are mostly compartmentalized and are in
+avoidance with other cell types. As expected, B cells interact with BnT cells;
+regulatory T cells interact with CD4+ T cells and CD8+ T cells. Most cell types
+show self interactions indicating spatial clustering.</p>
+<p>The <code>imcRtools</code> package further implements an interaction testing strategy
+proposed by <span class="citation">(<a href="#ref-Schulz2018">Schulz et al. 2018</a>)</span> where the hypothesis is tested if at least n cells of
+a certain type are located around a target cell type (<code>from_cell</code>). This type of
+testing can be performed by selecting <code>method = "patch"</code> and specifying the
+number of patch cells via the <code>patch_size</code> parameter.</p>
+<div class="sourceCode" id="cb318"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb318-1"><a href="performing-spatial-analysis.html#cb318-1" tabindex="-1"></a>out <span class="ot">&lt;-</span> <span class="fu">testInteractions</span>(spe, </span>
+<span id="cb318-2"><a href="performing-spatial-analysis.html#cb318-2" tabindex="-1"></a>                        <span class="at">group_by =</span> <span class="st">&quot;sample_id&quot;</span>,</span>
+<span id="cb318-3"><a href="performing-spatial-analysis.html#cb318-3" tabindex="-1"></a>                        <span class="at">label =</span> <span class="st">&quot;celltype&quot;</span>, </span>
+<span id="cb318-4"><a href="performing-spatial-analysis.html#cb318-4" tabindex="-1"></a>                        <span class="at">colPairName =</span> <span class="st">&quot;neighborhood&quot;</span>,</span>
+<span id="cb318-5"><a href="performing-spatial-analysis.html#cb318-5" tabindex="-1"></a>                        <span class="at">method =</span> <span class="st">&quot;patch&quot;</span>, </span>
+<span id="cb318-6"><a href="performing-spatial-analysis.html#cb318-6" tabindex="-1"></a>                        <span class="at">patch_size =</span> <span class="dv">3</span>,</span>
+<span id="cb318-7"><a href="performing-spatial-analysis.html#cb318-7" tabindex="-1"></a>                        <span class="at">BPPARAM =</span> <span class="fu">SerialParam</span>(<span class="at">RNGseed =</span> <span class="dv">221029</span>))</span>
+<span id="cb318-8"><a href="performing-spatial-analysis.html#cb318-8" tabindex="-1"></a></span>
+<span id="cb318-9"><a href="performing-spatial-analysis.html#cb318-9" tabindex="-1"></a>out <span class="sc">%&gt;%</span> <span class="fu">as_tibble</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb318-10"><a href="performing-spatial-analysis.html#cb318-10" tabindex="-1"></a>    <span class="fu">group_by</span>(from_label, to_label) <span class="sc">%&gt;%</span></span>
+<span id="cb318-11"><a href="performing-spatial-analysis.html#cb318-11" tabindex="-1"></a>    <span class="fu">summarize</span>(<span class="at">sum_sigval =</span> <span class="fu">sum</span>(sigval, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb318-12"><a href="performing-spatial-analysis.html#cb318-12" tabindex="-1"></a>    <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb318-13"><a href="performing-spatial-analysis.html#cb318-13" tabindex="-1"></a>        <span class="fu">geom_tile</span>(<span class="fu">aes</span>(from_label, to_label, <span class="at">fill =</span> sum_sigval)) <span class="sc">+</span></span>
+<span id="cb318-14"><a href="performing-spatial-analysis.html#cb318-14" tabindex="-1"></a>        <span class="fu">scale_fill_gradient2</span>(<span class="at">low =</span> <span class="fu">muted</span>(<span class="st">&quot;blue&quot;</span>), <span class="at">mid =</span> <span class="st">&quot;white&quot;</span>, <span class="at">high =</span> <span class="fu">muted</span>(<span class="st">&quot;red&quot;</span>)) <span class="sc">+</span></span>
+<span id="cb318-15"><a href="performing-spatial-analysis.html#cb318-15" tabindex="-1"></a>        <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>))</span></code></pre></div>
+<p><img src="11-spatial_analysis_files/figure-html/testInteractions-3-1.png" width="672" /></p>
+<p>These results are comparable to the interaction testing presented above. The
+main difference comes from the lack of symmetry. We can now for example see that
+3 or more myeloid cells sit around CD4<span class="math inline">\(^+\)</span> T cells while this interaction is not
+as strong when considering CD4<span class="math inline">\(^+\)</span> T cells sitting around myeloid cells.</p>
+<p>Finally, we save the updated <code>SpatialExperiment</code> object.</p>
+<div class="sourceCode" id="cb319"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb319-1"><a href="performing-spatial-analysis.html#cb319-1" tabindex="-1"></a><span class="fu">saveRDS</span>(spe, <span class="st">&quot;data/spe.rds&quot;</span>)</span></code></pre></div>
+</div>
+<div id="session-info-7" class="section level2 hasAnchor" number="12.8">
+<h2><span class="header-section-number">12.8</span> Session Info<a href="performing-spatial-analysis.html#session-info-7" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<details>
+<summary>
+SessionInfo
+</summary>
+<pre><code>## R version 4.3.2 (2023-10-31)
+## Platform: x86_64-pc-linux-gnu (64-bit)
+## Running under: Ubuntu 22.04.3 LTS
+## 
+## Matrix products: default
+## BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
+## LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.20.so;  LAPACK version 3.10.0
+## 
+## locale:
+##  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+##  [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+##  [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+##  [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+##  [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+## [11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+## 
+## time zone: Etc/UTC
+## tzcode source: system (glibc)
+## 
+## attached base packages:
+## [1] stats4    stats     graphics  grDevices utils     datasets  methods  
+## [8] base     
+## 
+## other attached packages:
+##  [1] testthat_3.2.1              scales_1.3.0               
+##  [3] ggridges_0.5.5              lubridate_1.9.3            
+##  [5] forcats_1.0.0               stringr_1.5.1              
+##  [7] dplyr_1.1.4                 purrr_1.0.2                
+##  [9] readr_2.1.4                 tidyr_1.3.0                
+## [11] tibble_3.2.1                tidyverse_2.0.0            
+## [13] patchwork_1.1.3             RColorBrewer_1.1-3         
+## [15] circlize_0.4.15             lisaClust_1.10.1           
+## [17] pheatmap_1.0.12             BiocParallel_1.36.0        
+## [19] viridis_0.6.4               viridisLite_0.4.2          
+## [21] ggplot2_3.4.4               imcRtools_1.8.0            
+## [23] SpatialExperiment_1.12.0    SingleCellExperiment_1.24.0
+## [25] SummarizedExperiment_1.32.0 Biobase_2.62.0             
+## [27] GenomicRanges_1.54.1        GenomeInfoDb_1.38.5        
+## [29] IRanges_2.36.0              S4Vectors_0.40.2           
+## [31] BiocGenerics_0.48.1         MatrixGenerics_1.14.0      
+## [33] matrixStats_1.2.0          
+## 
+## loaded via a namespace (and not attached):
+##   [1] spatstat.sparse_3.0-3       bitops_1.0-7               
+##   [3] sf_1.0-15                   EBImage_4.44.0             
+##   [5] doParallel_1.0.17           numDeriv_2016.8-1.1        
+##   [7] tools_4.3.2                 backports_1.4.1            
+##   [9] utf8_1.2.4                  R6_2.5.1                   
+##  [11] DT_0.31                     HDF5Array_1.30.0           
+##  [13] mgcv_1.9-0                  rhdf5filters_1.14.1        
+##  [15] GetoptLong_1.0.5            withr_2.5.2                
+##  [17] sp_2.1-2                    gridExtra_2.3              
+##  [19] ClassifyR_3.6.2             cli_3.6.2                  
+##  [21] spatstat.explore_3.2-5      sandwich_3.1-0             
+##  [23] labeling_0.4.3              sass_0.4.8                 
+##  [25] nnls_1.5                    mvtnorm_1.2-4              
+##  [27] spatstat.data_3.0-3         proxy_0.4-27               
+##  [29] systemfonts_1.0.5           colorRamps_2.3.1           
+##  [31] svglite_2.1.3               scater_1.30.1              
+##  [33] plotrix_3.8-4               flowCore_2.14.0            
+##  [35] generics_0.1.3              shape_1.4.6                
+##  [37] spatstat.random_3.2-2       gtools_3.9.5               
+##  [39] vroom_1.6.5                 car_3.1-2                  
+##  [41] scam_1.2-14                 Matrix_1.6-4               
+##  [43] RProtoBufLib_2.14.0         ggbeeswarm_0.7.2           
+##  [45] fansi_1.0.6                 abind_1.4-5                
+##  [47] terra_1.7-65                lifecycle_1.0.4            
+##  [49] multcomp_1.4-25             yaml_2.3.8                 
+##  [51] carData_3.0-5               rhdf5_2.46.1               
+##  [53] SparseArray_1.2.3           Rtsne_0.17                 
+##  [55] grid_4.3.2                  promises_1.2.1             
+##  [57] crayon_1.5.2                shinydashboard_0.7.2       
+##  [59] lattice_0.21-9              beachmat_2.18.0            
+##  [61] cowplot_1.1.2               magick_2.8.2               
+##  [63] cytomapper_1.14.0           pillar_1.9.0               
+##  [65] knitr_1.45                  ComplexHeatmap_2.18.0      
+##  [67] RTriangle_1.6-0.12          boot_1.3-28.1              
+##  [69] rjson_0.2.21                codetools_0.2-19           
+##  [71] glue_1.6.2                  V8_4.4.1                   
+##  [73] data.table_1.14.10          MultiAssayExperiment_1.28.0
+##  [75] vctrs_0.6.5                 png_0.1-8                  
+##  [77] gtable_0.3.4                cachem_1.0.8               
+##  [79] xfun_0.41                   S4Arrays_1.2.0             
+##  [81] mime_0.12                   tidygraph_1.3.0            
+##  [83] ConsensusClusterPlus_1.66.0 survival_3.5-7             
+##  [85] iterators_1.0.14            cytolib_2.14.0             
+##  [87] units_0.8-5                 ellipsis_0.3.2             
+##  [89] TH.data_1.1-2               nlme_3.1-163               
+##  [91] bit64_4.0.5                 rprojroot_2.0.4            
+##  [93] bslib_0.6.1                 irlba_2.3.5.1              
+##  [95] svgPanZoom_0.3.4            vipor_0.4.7                
+##  [97] KernSmooth_2.23-22          colorspace_2.1-0           
+##  [99] DBI_1.2.0                   raster_3.6-26              
+## [101] tidyselect_1.2.0            curl_5.2.0                 
+## [103] bit_4.0.5                   compiler_4.3.2             
+## [105] BiocNeighbors_1.20.1        desc_1.4.3                 
+## [107] DelayedArray_0.28.0         bookdown_0.37              
+## [109] classInt_0.4-10             distances_0.1.10           
+## [111] goftest_1.2-3               tiff_0.1-12                
+## [113] digest_0.6.33               minqa_1.2.6                
+## [115] fftwtools_0.9-11            spatstat.utils_3.0-4       
+## [117] rmarkdown_2.25              XVector_0.42.0             
+## [119] CATALYST_1.26.0             htmltools_0.5.7            
+## [121] pkgconfig_2.0.3             jpeg_0.1-10                
+## [123] lme4_1.1-35.1               sparseMatrixStats_1.14.0   
+## [125] highr_0.10                  fastmap_1.1.1              
+## [127] rlang_1.1.2                 GlobalOptions_0.1.2        
+## [129] htmlwidgets_1.6.4           shiny_1.8.0                
+## [131] DelayedMatrixStats_1.24.0   farver_2.1.1               
+## [133] jquerylib_0.1.4             zoo_1.8-12                 
+## [135] jsonlite_1.8.8              spicyR_1.14.2              
+## [137] BiocSingular_1.18.0         RCurl_1.98-1.13            
+## [139] magrittr_2.0.3              scuttle_1.12.0             
+## [141] GenomeInfoDbData_1.2.11     Rhdf5lib_1.24.1            
+## [143] munsell_0.5.0               Rcpp_1.0.11                
+## [145] ggnewscale_0.4.9            stringi_1.8.3              
+## [147] ggraph_2.1.0                brio_1.1.4                 
+## [149] zlibbioc_1.48.0             MASS_7.3-60                
+## [151] plyr_1.8.9                  parallel_4.3.2             
+## [153] ggrepel_0.9.4               deldir_2.0-2               
+## [155] graphlayouts_1.0.2          splines_4.3.2              
+## [157] tensor_1.5                  hms_1.1.3                  
+## [159] locfit_1.5-9.8              igraph_1.6.0               
+## [161] ggpubr_0.6.0                spatstat.geom_3.2-7        
+## [163] ggsignif_0.6.4              pkgload_1.3.3              
+## [165] reshape2_1.4.4              ScaledMatrix_1.10.0        
+## [167] XML_3.99-0.16               drc_3.0-1                  
+## [169] evaluate_0.23               nloptr_2.0.3               
+## [171] tzdb_0.4.0                  foreach_1.5.2              
+## [173] tweenr_2.0.2                httpuv_1.6.13              
+## [175] polyclip_1.10-6             clue_0.3-65                
+## [177] ggforce_0.4.1               rsvd_1.0.5                 
+## [179] broom_1.0.5                 xtable_1.8-4               
+## [181] e1071_1.7-14                rstatix_0.7.2              
+## [183] later_1.3.2                 class_7.3-22               
+## [185] lmerTest_3.1-3              FlowSOM_2.10.0             
+## [187] beeswarm_0.4.0              cluster_2.1.4              
+## [189] timechange_0.2.0            concaveman_1.1.0</code></pre>
+</details>
+
+</div>
+</div>
+<h3>References<a href="references.html#references" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-Bhate2022" class="csl-entry">
+Bhate, Salil S., Graham L. Barlow, Christian M. Schürch, and Garry P. Nolan. 2022. <span>“Tissue Schematics Map the Specialization of Immune Tissue Motifs and Their Appropriation by Tumors.”</span> <em>Cell Systems</em> 13 (2): 109–30.
+</div>
+<div id="ref-Goltsev2018" class="csl-entry">
+Goltsev, Yury, Nikolay Samusik, Julia Kennedy-Darling, Salil Bhate, Matthew Hale, Gustavo Vazquez, Sarah Black, and Garry P. Nolan. 2018. <span>“Deep Profiling of Mouse Splenic Architecture with CODEX Multiplexed Imaging.”</span> <em>Cell</em> 174: 968–81.
+</div>
+<div id="ref-Hoch2022" class="csl-entry">
+Hoch, Tobias, Daniel Schulz, Nils Eling, Julia Martínez Gómez, Mitchell P. Levesque, and Bernd Bodenmiller. 2022. <span>“Multiplexed Imaging Mass Cytometry of the Chemokine Milieus in Melanoma Characterizes Features of the Response to Immunotherapy.”</span> <em>Science Immunology</em> 7 (70): eabk1692.
+</div>
+<div id="ref-Jackson2020" class="csl-entry">
+Jackson, Hartland W., Jana R. Fischer, Vito R. T. Zanotelli, H. Raza Ali, Robert Mechera, Savas D. Soysal, Holger Moch, et al. 2020. <span>“The Single-Cell Pathology Landscape of Breast Cancer.”</span> <em>Nature</em> 578: 615–20.
+</div>
+<div id="ref-Patrick2023" class="csl-entry">
+Patrick, Ellis, Nicolas P. Canete, Sourish S. Iyengar, Andrew N. Harman, Greg T. Sutherland, and Pengyi Yang. 2023. <span>“Spatial Analysis for Highly Multiplexed Imaging Data to Identify Tissue Microenvironments.”</span> <em>Cytometry Part A</em>.
+</div>
+<div id="ref-Shapiro2017" class="csl-entry">
+Schapiro, Denis, Hartland W Jackson, Swetha Raghuraman, Jana R Fischer, Vito RT Zanotelli, Daniel Schulz, Charlotte Giesen, Raúl Catena, Zsuzsanna Varga, and Bernd Bodenmiller. 2017. <span>“histoCAT: Analysis of Cell Phenotypes and Interactions in Multiplex Image Cytometry Data.”</span> <em>Nature Methods</em> 14: 873--876.
+</div>
+<div id="ref-Schulz2018" class="csl-entry">
+Schulz, Daniel, Vito RT Zanotelli, Rana R Fischer, Denis Schapiro, Stefanie Engler, Xiao-Kang Lun, Hartland W Jackson, and Bernd Bodenmiller. 2018. <span>“Simultaneous Multiplexed Imaging of mRNA and Proteins with Subcellular Resolution in Breast Cancer Tissue Samples by Mass Cytometry.”</span> <em>Cell Systems</em> 6: 25–36.e5.
+</div>
+<div id="ref-Schurch2020" class="csl-entry">
+Schürch, Christian M, Salil S Bhate, Graham L Barlow, Darci J Phillips, Luca Noti, Inti Zlobec, Pauline Chu, et al. 2020. <span>“Coordinated Cellular Neighborhoods Orchestrate Antitumoral Immunity at the Colorectal Cancer Invasive Front.”</span> <em>Cell</em> 182: 1341–59.
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="image-visualization.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="references.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": true,
+"facebook": false,
+"twitter": true,
+"linkedin": true,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": "https://github.com/BodenmillerGroup/IMCDataAnalysis/blob/master/11-spatial_analysis.Rmd",
+"text": null
+},
+"download": null,
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "section"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

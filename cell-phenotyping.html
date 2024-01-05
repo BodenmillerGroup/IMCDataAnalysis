@@ -1,0 +1,1548 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>9 Cell phenotyping | Analysis workflow for IMC data</title>
+  <meta name="description" content="This bookdown project highlights possible down-stream analyses performed on imaging mass cytometry data." />
+  <meta name="generator" content="bookdown 0.37 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="9 Cell phenotyping | Analysis workflow for IMC data" />
+  <meta property="og:type" content="book" />
+  
+  <meta property="og:description" content="This bookdown project highlights possible down-stream analyses performed on imaging mass cytometry data." />
+  <meta name="github-repo" content="BodenmillerGroup/IMCDataAnalysis" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="9 Cell phenotyping | Analysis workflow for IMC data" />
+  
+  <meta name="twitter:description" content="This bookdown project highlights possible down-stream analyses performed on imaging mass cytometry data." />
+  
+
+<meta name="author" content="Authors: Nils Eling 1,2,*, Vito Zanotelli 1,2, Michelle Daniel 1,2, Daniel Schulz 1,2, Jonas Windhager 1,2, Lasse Meyer 1,2" />
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="batch-effects.html"/>
+<link rel="next" href="single-cell-visualization.html"/>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+<style type="text/css">
+/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Multiplexed imaging data analysis</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> IMC Data Analysis Workflow</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="index.html"><a href="index.html#disclaimer"><i class="fa fa-check"></i><b>1.1</b> Disclaimer</a></li>
+<li class="chapter" data-level="1.2" data-path="index.html"><a href="index.html#update-freeze"><i class="fa fa-check"></i><b>1.2</b> Update freeze</a></li>
+<li class="chapter" data-level="1.3" data-path="index.html"><a href="index.html#feedback-and-contributing"><i class="fa fa-check"></i><b>1.3</b> Feedback and contributing</a></li>
+<li class="chapter" data-level="1.4" data-path="index.html"><a href="index.html#maintainer"><i class="fa fa-check"></i><b>1.4</b> Maintainer</a></li>
+<li class="chapter" data-level="1.5" data-path="index.html"><a href="index.html#contributors"><i class="fa fa-check"></i><b>1.5</b> Contributors</a></li>
+<li class="chapter" data-level="1.6" data-path="index.html"><a href="index.html#citation"><i class="fa fa-check"></i><b>1.6</b> Citation</a></li>
+<li class="chapter" data-level="1.7" data-path="index.html"><a href="index.html#changelog"><i class="fa fa-check"></i><b>1.7</b> Changelog</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="intro.html"><a href="intro.html"><i class="fa fa-check"></i><b>2</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="intro.html"><a href="intro.html#technical-details-of-imc"><i class="fa fa-check"></i><b>2.1</b> Technical details of IMC</a>
+<ul>
+<li class="chapter" data-level="2.1.1" data-path="intro.html"><a href="intro.html#metal-conjugated-antobodies-and-staining"><i class="fa fa-check"></i><b>2.1.1</b> Metal-conjugated antobodies and staining</a></li>
+<li class="chapter" data-level="2.1.2" data-path="intro.html"><a href="intro.html#data-acquisition"><i class="fa fa-check"></i><b>2.1.2</b> Data acquisition</a></li>
+</ul></li>
+<li class="chapter" data-level="2.2" data-path="intro.html"><a href="intro.html#data-format"><i class="fa fa-check"></i><b>2.2</b> IMC data format</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="processing.html"><a href="processing.html"><i class="fa fa-check"></i><b>3</b> Multi-channel image processing</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="processing.html"><a href="processing.html#image-pre-processing-imc-specific"><i class="fa fa-check"></i><b>3.1</b> Image pre-processing (IMC specific)</a></li>
+<li class="chapter" data-level="3.2" data-path="processing.html"><a href="processing.html#image-segmentation"><i class="fa fa-check"></i><b>3.2</b> Image segmentation</a></li>
+<li class="chapter" data-level="3.3" data-path="processing.html"><a href="processing.html#feature-extraction"><i class="fa fa-check"></i><b>3.3</b> Feature extraction</a></li>
+<li class="chapter" data-level="3.4" data-path="processing.html"><a href="processing.html#data-export"><i class="fa fa-check"></i><b>3.4</b> Data export</a></li>
+<li class="chapter" data-level="3.5" data-path="processing.html"><a href="processing.html#data-import-into-r"><i class="fa fa-check"></i><b>3.5</b> Data import into R</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="prerequisites.html"><a href="prerequisites.html"><i class="fa fa-check"></i><b>4</b> Prerequisites</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="prerequisites.html"><a href="prerequisites.html#obtain-the-code"><i class="fa fa-check"></i><b>4.1</b> Obtain the code</a></li>
+<li class="chapter" data-level="4.2" data-path="prerequisites.html"><a href="prerequisites.html#software-requirements"><i class="fa fa-check"></i><b>4.2</b> Software requirements</a>
+<ul>
+<li class="chapter" data-level="4.2.1" data-path="prerequisites.html"><a href="prerequisites.html#docker"><i class="fa fa-check"></i><b>4.2.1</b> Using Docker</a></li>
+<li class="chapter" data-level="4.2.2" data-path="prerequisites.html"><a href="prerequisites.html#manual-install"><i class="fa fa-check"></i><b>4.2.2</b> Manual installation</a></li>
+<li class="chapter" data-level="4.2.3" data-path="prerequisites.html"><a href="prerequisites.html#major-package-versions"><i class="fa fa-check"></i><b>4.2.3</b> Major package versions</a></li>
+</ul></li>
+<li class="chapter" data-level="4.3" data-path="prerequisites.html"><a href="prerequisites.html#image-processing"><i class="fa fa-check"></i><b>4.3</b> Image processing</a></li>
+<li class="chapter" data-level="4.4" data-path="prerequisites.html"><a href="prerequisites.html#download-data"><i class="fa fa-check"></i><b>4.4</b> Download example data</a>
+<ul>
+<li class="chapter" data-level="4.4.1" data-path="prerequisites.html"><a href="prerequisites.html#processed-multiplexed-imaging-data"><i class="fa fa-check"></i><b>4.4.1</b> Processed multiplexed imaging data</a></li>
+<li class="chapter" data-level="4.4.2" data-path="prerequisites.html"><a href="prerequisites.html#files-for-spillover-matrix-estimation"><i class="fa fa-check"></i><b>4.4.2</b> Files for spillover matrix estimation</a></li>
+<li class="chapter" data-level="4.4.3" data-path="prerequisites.html"><a href="prerequisites.html#gated-cells"><i class="fa fa-check"></i><b>4.4.3</b> Gated cells</a></li>
+</ul></li>
+<li class="chapter" data-level="4.5" data-path="prerequisites.html"><a href="prerequisites.html#sessionInfo"><i class="fa fa-check"></i><b>4.5</b> Software versions</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="read-data.html"><a href="read-data.html"><i class="fa fa-check"></i><b>5</b> Read in the data</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="read-data.html"><a href="read-data.html#read-in-single-cell-information"><i class="fa fa-check"></i><b>5.1</b> Read in single-cell information</a>
+<ul>
+<li class="chapter" data-level="5.1.1" data-path="read-data.html"><a href="read-data.html#steinbock-generated-data"><i class="fa fa-check"></i><b>5.1.1</b> steinbock generated data</a></li>
+<li class="chapter" data-level="5.1.2" data-path="read-data.html"><a href="read-data.html#imc-segmentation-pipeline-generated-data"><i class="fa fa-check"></i><b>5.1.2</b> IMC Segmentation Pipeline generated data</a></li>
+<li class="chapter" data-level="5.1.3" data-path="read-data.html"><a href="read-data.html#reading-custom-files"><i class="fa fa-check"></i><b>5.1.3</b> Reading custom files</a></li>
+</ul></li>
+<li class="chapter" data-level="5.2" data-path="read-data.html"><a href="read-data.html#cell-processing"><i class="fa fa-check"></i><b>5.2</b> Single-cell processing</a></li>
+<li class="chapter" data-level="5.3" data-path="read-data.html"><a href="read-data.html#read-images"><i class="fa fa-check"></i><b>5.3</b> Read in images</a></li>
+<li class="chapter" data-level="5.4" data-path="read-data.html"><a href="read-data.html#generate-single-cell-data-from-images"><i class="fa fa-check"></i><b>5.4</b> Generate single-cell data from images</a></li>
+<li class="chapter" data-level="5.5" data-path="read-data.html"><a href="read-data.html#accessing-publicly-available-imc-datasets"><i class="fa fa-check"></i><b>5.5</b> Accessing publicly available IMC datasets</a></li>
+<li class="chapter" data-level="5.6" data-path="read-data.html"><a href="read-data.html#save-objects"><i class="fa fa-check"></i><b>5.6</b> Save objects</a></li>
+<li class="chapter" data-level="5.7" data-path="read-data.html"><a href="read-data.html#session-info"><i class="fa fa-check"></i><b>5.7</b> Session Info</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="spillover-correction.html"><a href="spillover-correction.html"><i class="fa fa-check"></i><b>6</b> Spillover correction</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="spillover-correction.html"><a href="spillover-correction.html#generate-the-spillover-matrix"><i class="fa fa-check"></i><b>6.1</b> Generate the spillover matrix</a>
+<ul>
+<li class="chapter" data-level="6.1.1" data-path="spillover-correction.html"><a href="spillover-correction.html#read-in-the-data"><i class="fa fa-check"></i><b>6.1.1</b> Read in the data</a></li>
+<li class="chapter" data-level="6.1.2" data-path="spillover-correction.html"><a href="spillover-correction.html#quality-control"><i class="fa fa-check"></i><b>6.1.2</b> Quality control</a></li>
+<li class="chapter" data-level="6.1.3" data-path="spillover-correction.html"><a href="spillover-correction.html#pixel_binning"><i class="fa fa-check"></i><b>6.1.3</b> Optional pixel binning</a></li>
+<li class="chapter" data-level="6.1.4" data-path="spillover-correction.html"><a href="spillover-correction.html#filtering-incorrectly-assigned-pixels"><i class="fa fa-check"></i><b>6.1.4</b> Filtering incorrectly assigned pixels</a></li>
+<li class="chapter" data-level="6.1.5" data-path="spillover-correction.html"><a href="spillover-correction.html#compute-spillover-matrix"><i class="fa fa-check"></i><b>6.1.5</b> Compute spillover matrix</a></li>
+</ul></li>
+<li class="chapter" data-level="6.2" data-path="spillover-correction.html"><a href="spillover-correction.html#single-cell-data-compensation"><i class="fa fa-check"></i><b>6.2</b> Single-cell data compensation</a></li>
+<li class="chapter" data-level="6.3" data-path="spillover-correction.html"><a href="spillover-correction.html#image-compensation"><i class="fa fa-check"></i><b>6.3</b> Image compensation</a></li>
+<li class="chapter" data-level="6.4" data-path="spillover-correction.html"><a href="spillover-correction.html#write-out-compensated-images"><i class="fa fa-check"></i><b>6.4</b> Write out compensated images</a></li>
+<li class="chapter" data-level="6.5" data-path="spillover-correction.html"><a href="spillover-correction.html#save-objects-1"><i class="fa fa-check"></i><b>6.5</b> Save objects</a></li>
+<li class="chapter" data-level="6.6" data-path="spillover-correction.html"><a href="spillover-correction.html#session-info-1"><i class="fa fa-check"></i><b>6.6</b> Session Info</a></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="image-and-cell-level-quality-control.html"><a href="image-and-cell-level-quality-control.html"><i class="fa fa-check"></i><b>7</b> Image and cell-level quality control</a>
+<ul>
+<li class="chapter" data-level="7.1" data-path="image-and-cell-level-quality-control.html"><a href="image-and-cell-level-quality-control.html#read-in-the-data-1"><i class="fa fa-check"></i><b>7.1</b> Read in the data</a></li>
+<li class="chapter" data-level="7.2" data-path="image-and-cell-level-quality-control.html"><a href="image-and-cell-level-quality-control.html#seg-quality"><i class="fa fa-check"></i><b>7.2</b> Segmentation quality control</a></li>
+<li class="chapter" data-level="7.3" data-path="image-and-cell-level-quality-control.html"><a href="image-and-cell-level-quality-control.html#image-quality"><i class="fa fa-check"></i><b>7.3</b> Image-level quality control</a></li>
+<li class="chapter" data-level="7.4" data-path="image-and-cell-level-quality-control.html"><a href="image-and-cell-level-quality-control.html#cell-quality"><i class="fa fa-check"></i><b>7.4</b> Cell-level quality control</a></li>
+<li class="chapter" data-level="7.5" data-path="image-and-cell-level-quality-control.html"><a href="image-and-cell-level-quality-control.html#save-objects-2"><i class="fa fa-check"></i><b>7.5</b> Save objects</a></li>
+<li class="chapter" data-level="7.6" data-path="image-and-cell-level-quality-control.html"><a href="image-and-cell-level-quality-control.html#session-info-2"><i class="fa fa-check"></i><b>7.6</b> Session Info</a></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="batch-effects.html"><a href="batch-effects.html"><i class="fa fa-check"></i><b>8</b> Batch effect correction</a>
+<ul>
+<li class="chapter" data-level="8.1" data-path="batch-effects.html"><a href="batch-effects.html#fastmnn-correction"><i class="fa fa-check"></i><b>8.1</b> fastMNN correction</a>
+<ul>
+<li class="chapter" data-level="8.1.1" data-path="batch-effects.html"><a href="batch-effects.html#perform-sample-correction"><i class="fa fa-check"></i><b>8.1.1</b> Perform sample correction</a></li>
+<li class="chapter" data-level="8.1.2" data-path="batch-effects.html"><a href="batch-effects.html#quality-control-of-correction-results"><i class="fa fa-check"></i><b>8.1.2</b> Quality control of correction results</a></li>
+<li class="chapter" data-level="8.1.3" data-path="batch-effects.html"><a href="batch-effects.html#visualization"><i class="fa fa-check"></i><b>8.1.3</b> Visualization</a></li>
+</ul></li>
+<li class="chapter" data-level="8.2" data-path="batch-effects.html"><a href="batch-effects.html#harmony-correction"><i class="fa fa-check"></i><b>8.2</b> harmony correction</a>
+<ul>
+<li class="chapter" data-level="8.2.1" data-path="batch-effects.html"><a href="batch-effects.html#visualization-1"><i class="fa fa-check"></i><b>8.2.1</b> Visualization</a></li>
+</ul></li>
+<li class="chapter" data-level="8.3" data-path="batch-effects.html"><a href="batch-effects.html#seurat-correction"><i class="fa fa-check"></i><b>8.3</b> Seurat correction</a>
+<ul>
+<li class="chapter" data-level="8.3.1" data-path="batch-effects.html"><a href="batch-effects.html#visualization-2"><i class="fa fa-check"></i><b>8.3.1</b> Visualization</a></li>
+</ul></li>
+<li class="chapter" data-level="8.4" data-path="batch-effects.html"><a href="batch-effects.html#save-objects-3"><i class="fa fa-check"></i><b>8.4</b> Save objects</a></li>
+<li class="chapter" data-level="8.5" data-path="batch-effects.html"><a href="batch-effects.html#session-info-3"><i class="fa fa-check"></i><b>8.5</b> Session Info</a></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html"><i class="fa fa-check"></i><b>9</b> Cell phenotyping</a>
+<ul>
+<li class="chapter" data-level="9.1" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#load-data"><i class="fa fa-check"></i><b>9.1</b> Load data</a></li>
+<li class="chapter" data-level="9.2" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#clustering"><i class="fa fa-check"></i><b>9.2</b> Clustering approaches</a>
+<ul>
+<li class="chapter" data-level="9.2.1" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#rphenograph"><i class="fa fa-check"></i><b>9.2.1</b> Rphenograph</a></li>
+<li class="chapter" data-level="9.2.2" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#snn-graph"><i class="fa fa-check"></i><b>9.2.2</b> Shared nearest neighbour graph</a></li>
+<li class="chapter" data-level="9.2.3" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#self-organizing-maps"><i class="fa fa-check"></i><b>9.2.3</b> Self organizing maps</a></li>
+<li class="chapter" data-level="9.2.4" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#compare-between-clustering-approaches"><i class="fa fa-check"></i><b>9.2.4</b> Compare between clustering approaches</a></li>
+<li class="chapter" data-level="9.2.5" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#clustering-notes"><i class="fa fa-check"></i><b>9.2.5</b> Further clustering notes</a></li>
+</ul></li>
+<li class="chapter" data-level="9.3" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#classification"><i class="fa fa-check"></i><b>9.3</b> Classification approach</a>
+<ul>
+<li class="chapter" data-level="9.3.1" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#manual-labeling-of-cells"><i class="fa fa-check"></i><b>9.3.1</b> Manual labeling of cells</a></li>
+<li class="chapter" data-level="9.3.2" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#define-color-vectors"><i class="fa fa-check"></i><b>9.3.2</b> Define color vectors</a></li>
+<li class="chapter" data-level="9.3.3" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#read-in-and-consolidate-labeled-data"><i class="fa fa-check"></i><b>9.3.3</b> Read in and consolidate labeled data</a></li>
+<li class="chapter" data-level="9.3.4" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#train-classifier"><i class="fa fa-check"></i><b>9.3.4</b> Train classifier</a></li>
+<li class="chapter" data-level="9.3.5" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#classifier-performance"><i class="fa fa-check"></i><b>9.3.5</b> Classifier performance</a></li>
+<li class="chapter" data-level="9.3.6" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#classification-of-new-data"><i class="fa fa-check"></i><b>9.3.6</b> Classification of new data</a></li>
+</ul></li>
+<li class="chapter" data-level="9.4" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#session-info-4"><i class="fa fa-check"></i><b>9.4</b> Session Info</a></li>
+</ul></li>
+<li class="chapter" data-level="10" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html"><i class="fa fa-check"></i><b>10</b> Single cell visualization</a>
+<ul>
+<li class="chapter" data-level="10.1" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#load-data-1"><i class="fa fa-check"></i><b>10.1</b> Load data</a></li>
+<li class="chapter" data-level="10.2" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#cell-type-level"><i class="fa fa-check"></i><b>10.2</b> Cell-type level</a>
+<ul>
+<li class="chapter" data-level="10.2.1" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#dimensionality-reduction-visualization"><i class="fa fa-check"></i><b>10.2.1</b> Dimensionality reduction visualization</a></li>
+<li class="chapter" data-level="10.2.2" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#heatmap-visualization"><i class="fa fa-check"></i><b>10.2.2</b> Heatmap visualization</a></li>
+<li class="chapter" data-level="10.2.3" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#violin-plot-visualization"><i class="fa fa-check"></i><b>10.2.3</b> Violin plot visualization</a></li>
+<li class="chapter" data-level="10.2.4" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#scatter-plot-visualization"><i class="fa fa-check"></i><b>10.2.4</b> Scatter plot visualization</a></li>
+<li class="chapter" data-level="10.2.5" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#barplot-visualization"><i class="fa fa-check"></i><b>10.2.5</b> Barplot visualization</a></li>
+<li class="chapter" data-level="10.2.6" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#catalyst-based-visualization"><i class="fa fa-check"></i><b>10.2.6</b> CATALYST-based visualization</a></li>
+</ul></li>
+<li class="chapter" data-level="10.3" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#sample-level"><i class="fa fa-check"></i><b>10.3</b> Sample-level</a>
+<ul>
+<li class="chapter" data-level="10.3.1" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#dimensionality-reduction-visualization-1"><i class="fa fa-check"></i><b>10.3.1</b> Dimensionality reduction visualization</a></li>
+<li class="chapter" data-level="10.3.2" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#heatmap-visualization-1"><i class="fa fa-check"></i><b>10.3.2</b> Heatmap visualization</a></li>
+<li class="chapter" data-level="10.3.3" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#barplot-visualization-1"><i class="fa fa-check"></i><b>10.3.3</b> Barplot visualization</a></li>
+<li class="chapter" data-level="10.3.4" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#catalyst-based-visualization-1"><i class="fa fa-check"></i><b>10.3.4</b> CATALYST-based visualization</a></li>
+</ul></li>
+<li class="chapter" data-level="10.4" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#rich-example"><i class="fa fa-check"></i><b>10.4</b> Further examples</a>
+<ul>
+<li class="chapter" data-level="10.4.1" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#publication-ready-complexheatmap"><i class="fa fa-check"></i><b>10.4.1</b> Publication-ready ComplexHeatmap</a></li>
+<li class="chapter" data-level="10.4.2" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#interactive-visualization"><i class="fa fa-check"></i><b>10.4.2</b> Interactive visualization</a></li>
+</ul></li>
+<li class="chapter" data-level="10.5" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#session-info-5"><i class="fa fa-check"></i><b>10.5</b> Session Info</a></li>
+</ul></li>
+<li class="chapter" data-level="11" data-path="image-visualization.html"><a href="image-visualization.html"><i class="fa fa-check"></i><b>11</b> Image visualization</a>
+<ul>
+<li class="chapter" data-level="11.1" data-path="image-visualization.html"><a href="image-visualization.html#pixel-visualization"><i class="fa fa-check"></i><b>11.1</b> Pixel visualization</a>
+<ul>
+<li class="chapter" data-level="11.1.1" data-path="image-visualization.html"><a href="image-visualization.html#adjusting-colors"><i class="fa fa-check"></i><b>11.1.1</b> Adjusting colors</a></li>
+<li class="chapter" data-level="11.1.2" data-path="image-visualization.html"><a href="image-visualization.html#image-normalization"><i class="fa fa-check"></i><b>11.1.2</b> Image normalization</a></li>
+</ul></li>
+<li class="chapter" data-level="11.2" data-path="image-visualization.html"><a href="image-visualization.html#mask-visualization"><i class="fa fa-check"></i><b>11.2</b> Cell visualization</a>
+<ul>
+<li class="chapter" data-level="11.2.1" data-path="image-visualization.html"><a href="image-visualization.html#visualzing-metadata"><i class="fa fa-check"></i><b>11.2.1</b> Visualzing metadata</a></li>
+<li class="chapter" data-level="11.2.2" data-path="image-visualization.html"><a href="image-visualization.html#visualizating-expression"><i class="fa fa-check"></i><b>11.2.2</b> Visualizating expression</a></li>
+<li class="chapter" data-level="11.2.3" data-path="image-visualization.html"><a href="image-visualization.html#outline-cells"><i class="fa fa-check"></i><b>11.2.3</b> Outlining cells on images</a></li>
+</ul></li>
+<li class="chapter" data-level="11.3" data-path="image-visualization.html"><a href="image-visualization.html#adjusting-plot-annotations"><i class="fa fa-check"></i><b>11.3</b> Adjusting plot annotations</a></li>
+<li class="chapter" data-level="11.4" data-path="image-visualization.html"><a href="image-visualization.html#displaying-individual-images"><i class="fa fa-check"></i><b>11.4</b> Displaying individual images</a></li>
+<li class="chapter" data-level="11.5" data-path="image-visualization.html"><a href="image-visualization.html#saving-and-returning-images"><i class="fa fa-check"></i><b>11.5</b> Saving and returning images</a></li>
+<li class="chapter" data-level="11.6" data-path="image-visualization.html"><a href="image-visualization.html#cytoviewer"><i class="fa fa-check"></i><b>11.6</b> Interactive image visualization</a></li>
+<li class="chapter" data-level="11.7" data-path="image-visualization.html"><a href="image-visualization.html#session-info-6"><i class="fa fa-check"></i><b>11.7</b> Session Info</a></li>
+</ul></li>
+<li class="chapter" data-level="12" data-path="performing-spatial-analysis.html"><a href="performing-spatial-analysis.html"><i class="fa fa-check"></i><b>12</b> Performing spatial analysis</a>
+<ul>
+<li class="chapter" data-level="12.1" data-path="performing-spatial-analysis.html"><a href="performing-spatial-analysis.html#spatial-interaction-graphs"><i class="fa fa-check"></i><b>12.1</b> Spatial interaction graphs</a></li>
+<li class="chapter" data-level="12.2" data-path="performing-spatial-analysis.html"><a href="performing-spatial-analysis.html#spatial-viz"><i class="fa fa-check"></i><b>12.2</b> Spatial visualization</a></li>
+<li class="chapter" data-level="12.3" data-path="performing-spatial-analysis.html"><a href="performing-spatial-analysis.html#spatial-community-analysis"><i class="fa fa-check"></i><b>12.3</b> Spatial community analysis</a></li>
+<li class="chapter" data-level="12.4" data-path="performing-spatial-analysis.html"><a href="performing-spatial-analysis.html#cellular-neighborhood-analysis"><i class="fa fa-check"></i><b>12.4</b> Cellular neighborhood analysis</a></li>
+<li class="chapter" data-level="12.5" data-path="performing-spatial-analysis.html"><a href="performing-spatial-analysis.html#spatial-context-analysis"><i class="fa fa-check"></i><b>12.5</b> Spatial context analysis</a></li>
+<li class="chapter" data-level="12.6" data-path="performing-spatial-analysis.html"><a href="performing-spatial-analysis.html#patch-detection"><i class="fa fa-check"></i><b>12.6</b> Patch detection</a></li>
+<li class="chapter" data-level="12.7" data-path="performing-spatial-analysis.html"><a href="performing-spatial-analysis.html#interaction-analysis"><i class="fa fa-check"></i><b>12.7</b> Interaction analysis</a></li>
+<li class="chapter" data-level="12.8" data-path="performing-spatial-analysis.html"><a href="performing-spatial-analysis.html#session-info-7"><i class="fa fa-check"></i><b>12.8</b> Session Info</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
+<li class="divider"></li>
+<li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Analysis workflow for IMC data</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="cell-phenotyping" class="section level1 hasAnchor" number="9">
+<h1><span class="header-section-number">9</span> Cell phenotyping<a href="cell-phenotyping.html#cell-phenotyping" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p>A common step during single-cell data analysis is the annotation of cells based
+on their phenotype. Defining cell phenotypes is often subjective and relies
+on previous biological knowledge. The <a href="https://bioconductor.org/books/release/OSCA.basic/cell-type-annotation.html">Orchestrating Single Cell Analysis with Bioconductor</a> book
+presents a number of approaches to phenotype cells detected by single-cell RNA
+sequencing based on reference datasets or gene set analysis.</p>
+<p>In highly-multiplexed imaging, target proteins or molecules are manually
+selected based on the biological question at hand. It narrows down the feature
+space and facilitates the manual annotation of clusters to derive cell
+phenotypes. We will therefore discuss and compare a number of clustering
+approaches to group cells based on their similarity in marker expression in
+Section <a href="cell-phenotyping.html#clustering">9.2</a>.</p>
+<p>Unlike single-cell RNA sequencing or CyTOF data, single-cell data derived from
+highly-multiplexed imaging data often suffers from “lateral spillover” between
+neighboring cells. This spillover caused by imperfect segmentation often hinders
+accurate clustering to define specific cell phenotypes in multiplexed imaging
+data. Tools have been developed to correct lateral spillover between cells
+<span class="citation">(<a href="#ref-Bai2021">Bai et al. 2021</a>)</span> but the approach requires careful selection of the markers to
+correct. In Section <a href="cell-phenotyping.html#classification">9.3</a> we will train and apply a random
+forest classifier to classify cell phenotypes in the dataset as alternative
+approach to clustering-based cell phenotyping. This approach has been previously used to
+identify major cell phenotypes in metastatic melanoma and avoids clustering of
+cells <span class="citation">(<a href="#ref-Hoch2022">Hoch et al. 2022</a>)</span>.</p>
+<div id="load-data" class="section level2 hasAnchor" number="9.1">
+<h2><span class="header-section-number">9.1</span> Load data<a href="cell-phenotyping.html#load-data" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>We will first read in the previously generated <code>SpatialExperiment</code> object and
+sample 2000 cells to visualize cluster membership.</p>
+<div class="sourceCode" id="cb152"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb152-1"><a href="cell-phenotyping.html#cb152-1" tabindex="-1"></a><span class="fu">library</span>(SpatialExperiment)</span>
+<span id="cb152-2"><a href="cell-phenotyping.html#cb152-2" tabindex="-1"></a>spe <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">&quot;data/spe.rds&quot;</span>)</span>
+<span id="cb152-3"><a href="cell-phenotyping.html#cb152-3" tabindex="-1"></a></span>
+<span id="cb152-4"><a href="cell-phenotyping.html#cb152-4" tabindex="-1"></a><span class="co"># Sample cells</span></span>
+<span id="cb152-5"><a href="cell-phenotyping.html#cb152-5" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">220619</span>)</span>
+<span id="cb152-6"><a href="cell-phenotyping.html#cb152-6" tabindex="-1"></a>cur_cells <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="fu">seq_len</span>(<span class="fu">ncol</span>(spe)), <span class="dv">2000</span>)</span></code></pre></div>
+</div>
+<div id="clustering" class="section level2 hasAnchor" number="9.2">
+<h2><span class="header-section-number">9.2</span> Clustering approaches<a href="cell-phenotyping.html#clustering" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>In the first section, we will present clustering approaches to identify cellular
+phenotypes in the dataset. These methods group cells based on their similarity
+in marker expression or by their proximity in low dimensional space. A number of
+approaches have been developed to cluster data derived from single-cell RNA
+sequencing technologies <span class="citation">(<a href="#ref-Yu2022">Yu et al. 2022</a>)</span> or CyTOF <span class="citation">(<a href="#ref-Weber2016">Weber and Robinson 2016</a>)</span>. For demonstration
+purposes, we will highlight common clustering approaches that are available in R
+and have been used for clustering cells obtained from IMC. Two approaches rely
+on graph-based clustering and one approach uses self organizing maps (SOM).</p>
+<div id="rphenograph" class="section level3 hasAnchor" number="9.2.1">
+<h3><span class="header-section-number">9.2.1</span> Rphenograph<a href="cell-phenotyping.html#rphenograph" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>The PhenoGraph clustering approach was first described to group cells of a CyTOF
+dataset <span class="citation">(<a href="#ref-Levine2015">Levine et al. 2015</a>)</span>. The algorithm first constructs a graph by detecting the
+<code>k</code> nearest neighbours based on euclidean distance in expression space. In the
+next step, edges between nodes (cells) are weighted by their overlap in nearest
+neighbor sets. To quantify the overlap in shared nearest neighbor sets, the
+jaccard index is used. The Louvain modularity optimization approach is used to
+detect connected communities and partition the graph into clusters of cells.
+This clustering strategy was used by Jackson, Fischer <em>et al.</em> and Schulz <em>et
+al.</em> to cluster IMC data <span class="citation">(<a href="#ref-Jackson2020">Jackson et al. 2020</a>; <a href="#ref-Schulz2018">Schulz et al. 2018</a>)</span>.</p>
+<p>There are several different PhenoGraph implementations available in R. Here, we
+use the one available at
+<a href="https://github.com/i-cyto/Rphenograph">https://github.com/i-cyto/Rphenograph</a>.
+For large datasets,
+<a href="https://github.com/stuchly/Rphenoannoy">https://github.com/stuchly/Rphenoannoy</a>
+offers a more performant implementation of the algorithm.</p>
+<p>In the following code chunk, we select the asinh-transformed mean pixel
+intensities per cell and channel and subset the channels to the ones containing
+biological variation. This matrix is transposed to store cells in rows. Within
+the <code>Rphenograph</code> function, we select the 45 nearest neighbors for graph
+building and louvain community detection (default). The function returns a list
+of length 2, the first entry being the graph and the second entry containing the
+community object. Calling <code>membership</code> on the community object will return
+cluster IDs for each cell. These cluster IDs are then stored within the
+<code>colData</code> of the <code>SpatialExperiment</code> object. Cluster IDs are mapped on top of
+the UMAP embedding and single-cell marker expression within each cluster are
+visualized in form of a heatmap.</p>
+<p>It is recommended to test different inputs to <code>k</code> as shown in the next section.
+Selecting larger values for <code>k</code> results in larger clusters.</p>
+<div class="sourceCode" id="cb153"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb153-1"><a href="cell-phenotyping.html#cb153-1" tabindex="-1"></a><span class="fu">library</span>(Rphenograph)</span>
+<span id="cb153-2"><a href="cell-phenotyping.html#cb153-2" tabindex="-1"></a><span class="fu">library</span>(igraph)</span>
+<span id="cb153-3"><a href="cell-phenotyping.html#cb153-3" tabindex="-1"></a><span class="fu">library</span>(dittoSeq)</span>
+<span id="cb153-4"><a href="cell-phenotyping.html#cb153-4" tabindex="-1"></a><span class="fu">library</span>(viridis)</span>
+<span id="cb153-5"><a href="cell-phenotyping.html#cb153-5" tabindex="-1"></a></span>
+<span id="cb153-6"><a href="cell-phenotyping.html#cb153-6" tabindex="-1"></a>mat <span class="ot">&lt;-</span> <span class="fu">t</span>(<span class="fu">assay</span>(spe, <span class="st">&quot;exprs&quot;</span>)[<span class="fu">rowData</span>(spe)<span class="sc">$</span>use_channel,])</span>
+<span id="cb153-7"><a href="cell-phenotyping.html#cb153-7" tabindex="-1"></a></span>
+<span id="cb153-8"><a href="cell-phenotyping.html#cb153-8" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">230619</span>)</span>
+<span id="cb153-9"><a href="cell-phenotyping.html#cb153-9" tabindex="-1"></a>out <span class="ot">&lt;-</span> <span class="fu">Rphenograph</span>(mat, <span class="at">k =</span> <span class="dv">45</span>)</span>
+<span id="cb153-10"><a href="cell-phenotyping.html#cb153-10" tabindex="-1"></a></span>
+<span id="cb153-11"><a href="cell-phenotyping.html#cb153-11" tabindex="-1"></a>clusters <span class="ot">&lt;-</span> <span class="fu">factor</span>(<span class="fu">membership</span>(out[[<span class="dv">2</span>]]))</span>
+<span id="cb153-12"><a href="cell-phenotyping.html#cb153-12" tabindex="-1"></a></span>
+<span id="cb153-13"><a href="cell-phenotyping.html#cb153-13" tabindex="-1"></a>spe<span class="sc">$</span>pg_clusters <span class="ot">&lt;-</span> clusters</span>
+<span id="cb153-14"><a href="cell-phenotyping.html#cb153-14" tabindex="-1"></a></span>
+<span id="cb153-15"><a href="cell-phenotyping.html#cb153-15" tabindex="-1"></a><span class="fu">dittoDimPlot</span>(spe, <span class="at">var =</span> <span class="st">&quot;pg_clusters&quot;</span>, </span>
+<span id="cb153-16"><a href="cell-phenotyping.html#cb153-16" tabindex="-1"></a>             <span class="at">reduction.use =</span> <span class="st">&quot;UMAP&quot;</span>, <span class="at">size =</span> <span class="fl">0.2</span>,</span>
+<span id="cb153-17"><a href="cell-phenotyping.html#cb153-17" tabindex="-1"></a>             <span class="at">do.label =</span> <span class="cn">TRUE</span>) <span class="sc">+</span></span>
+<span id="cb153-18"><a href="cell-phenotyping.html#cb153-18" tabindex="-1"></a>    <span class="fu">ggtitle</span>(<span class="st">&quot;Phenograph clusters on UMAP&quot;</span>)</span></code></pre></div>
+<p><img src="08-phenotyping_files/figure-html/rphenograph-1-1.png" width="672" /></p>
+<div class="sourceCode" id="cb154"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb154-1"><a href="cell-phenotyping.html#cb154-1" tabindex="-1"></a><span class="fu">dittoHeatmap</span>(spe[,cur_cells], </span>
+<span id="cb154-2"><a href="cell-phenotyping.html#cb154-2" tabindex="-1"></a>             <span class="at">genes =</span> <span class="fu">rownames</span>(spe)[<span class="fu">rowData</span>(spe)<span class="sc">$</span>use_channel],</span>
+<span id="cb154-3"><a href="cell-phenotyping.html#cb154-3" tabindex="-1"></a>             <span class="at">assay =</span> <span class="st">&quot;exprs&quot;</span>, <span class="at">scale =</span> <span class="st">&quot;none&quot;</span>,</span>
+<span id="cb154-4"><a href="cell-phenotyping.html#cb154-4" tabindex="-1"></a>             <span class="at">heatmap.colors =</span> <span class="fu">viridis</span>(<span class="dv">100</span>), </span>
+<span id="cb154-5"><a href="cell-phenotyping.html#cb154-5" tabindex="-1"></a>             <span class="at">annot.by =</span> <span class="fu">c</span>(<span class="st">&quot;pg_clusters&quot;</span>, <span class="st">&quot;patient_id&quot;</span>),</span>
+<span id="cb154-6"><a href="cell-phenotyping.html#cb154-6" tabindex="-1"></a>             <span class="at">annot.colors =</span> <span class="fu">c</span>(<span class="fu">dittoColors</span>(<span class="dv">1</span>)[<span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(<span class="fu">unique</span>(spe<span class="sc">$</span>pg_clusters))],</span>
+<span id="cb154-7"><a href="cell-phenotyping.html#cb154-7" tabindex="-1"></a>                              <span class="fu">metadata</span>(spe)<span class="sc">$</span>color_vectors<span class="sc">$</span>patient_id))</span></code></pre></div>
+<p><img src="08-phenotyping_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<p>The <code>Rphenograph</code> function call took
+1.41 minutes.</p>
+<p>We can observe that some of the clusters only contain cells of a single patient.
+This can often be observed in the tumor compartment. In the next step, we
+use the integrated cells (see Section <a href="batch-effects.html#batch-effects">8</a>) in low dimensional
+embedding for clustering. Here, the low dimensional embedding can
+be directly accessed from the <code>reducedDim</code> slot.</p>
+<div class="sourceCode" id="cb155"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb155-1"><a href="cell-phenotyping.html#cb155-1" tabindex="-1"></a>mat <span class="ot">&lt;-</span> <span class="fu">reducedDim</span>(spe, <span class="st">&quot;fastMNN&quot;</span>)</span>
+<span id="cb155-2"><a href="cell-phenotyping.html#cb155-2" tabindex="-1"></a></span>
+<span id="cb155-3"><a href="cell-phenotyping.html#cb155-3" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">230619</span>)</span>
+<span id="cb155-4"><a href="cell-phenotyping.html#cb155-4" tabindex="-1"></a>out <span class="ot">&lt;-</span> <span class="fu">Rphenograph</span>(mat, <span class="at">k =</span> <span class="dv">45</span>)</span>
+<span id="cb155-5"><a href="cell-phenotyping.html#cb155-5" tabindex="-1"></a></span>
+<span id="cb155-6"><a href="cell-phenotyping.html#cb155-6" tabindex="-1"></a>clusters <span class="ot">&lt;-</span> <span class="fu">factor</span>(<span class="fu">membership</span>(out[[<span class="dv">2</span>]]))</span>
+<span id="cb155-7"><a href="cell-phenotyping.html#cb155-7" tabindex="-1"></a></span>
+<span id="cb155-8"><a href="cell-phenotyping.html#cb155-8" tabindex="-1"></a>spe<span class="sc">$</span>pg_clusters_corrected <span class="ot">&lt;-</span> clusters</span>
+<span id="cb155-9"><a href="cell-phenotyping.html#cb155-9" tabindex="-1"></a></span>
+<span id="cb155-10"><a href="cell-phenotyping.html#cb155-10" tabindex="-1"></a><span class="fu">dittoDimPlot</span>(spe, <span class="at">var =</span> <span class="st">&quot;pg_clusters_corrected&quot;</span>, </span>
+<span id="cb155-11"><a href="cell-phenotyping.html#cb155-11" tabindex="-1"></a>             <span class="at">reduction.use =</span> <span class="st">&quot;UMAP_mnnCorrected&quot;</span>, <span class="at">size =</span> <span class="fl">0.2</span>,</span>
+<span id="cb155-12"><a href="cell-phenotyping.html#cb155-12" tabindex="-1"></a>             <span class="at">do.label =</span> <span class="cn">TRUE</span>) <span class="sc">+</span></span>
+<span id="cb155-13"><a href="cell-phenotyping.html#cb155-13" tabindex="-1"></a>    <span class="fu">ggtitle</span>(<span class="st">&quot;Phenograph clusters on UMAP, integrated cells&quot;</span>)</span></code></pre></div>
+<p><img src="08-phenotyping_files/figure-html/rphenograph-2-1.png" width="672" /></p>
+<div class="sourceCode" id="cb156"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb156-1"><a href="cell-phenotyping.html#cb156-1" tabindex="-1"></a><span class="fu">dittoHeatmap</span>(spe[,cur_cells], </span>
+<span id="cb156-2"><a href="cell-phenotyping.html#cb156-2" tabindex="-1"></a>             <span class="at">genes =</span> <span class="fu">rownames</span>(spe)[<span class="fu">rowData</span>(spe)<span class="sc">$</span>use_channel],</span>
+<span id="cb156-3"><a href="cell-phenotyping.html#cb156-3" tabindex="-1"></a>             <span class="at">assay =</span> <span class="st">&quot;exprs&quot;</span>, <span class="at">scale =</span> <span class="st">&quot;none&quot;</span>,</span>
+<span id="cb156-4"><a href="cell-phenotyping.html#cb156-4" tabindex="-1"></a>             <span class="at">heatmap.colors =</span> <span class="fu">viridis</span>(<span class="dv">100</span>), </span>
+<span id="cb156-5"><a href="cell-phenotyping.html#cb156-5" tabindex="-1"></a>             <span class="at">annot.by =</span> <span class="fu">c</span>(<span class="st">&quot;pg_clusters_corrected&quot;</span>,<span class="st">&quot;patient_id&quot;</span>),</span>
+<span id="cb156-6"><a href="cell-phenotyping.html#cb156-6" tabindex="-1"></a>             <span class="at">annot.colors =</span> <span class="fu">c</span>(<span class="fu">dittoColors</span>(<span class="dv">1</span>)[<span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(<span class="fu">unique</span>(spe<span class="sc">$</span>pg_clusters_corrected))],</span>
+<span id="cb156-7"><a href="cell-phenotyping.html#cb156-7" tabindex="-1"></a>                              <span class="fu">metadata</span>(spe)<span class="sc">$</span>color_vectors<span class="sc">$</span>patient_id))</span></code></pre></div>
+<p><img src="08-phenotyping_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p>Clustering using the integrated embedding leads to clusters that contain cells
+of different patients. Cluster annotation can now be performed by manually
+labeling cells based on their marker expression (see Notes in Section
+<a href="cell-phenotyping.html#clustering-notes">9.2.5</a>).</p>
+</div>
+<div id="snn-graph" class="section level3 hasAnchor" number="9.2.2">
+<h3><span class="header-section-number">9.2.2</span> Shared nearest neighbour graph<a href="cell-phenotyping.html#snn-graph" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>The <a href="https://www.bioconductor.org/packages/release/bioc/html/bluster.html">bluster</a>
+package provides a simple interface to cluster cells using a number of different
+<a href="https://www.bioconductor.org/packages/release/bioc/vignettes/bluster/inst/doc/clusterRows.html">clustering approaches</a> and different metrics to <a href="https://www.bioconductor.org/packages/release/bioc/vignettes/bluster/inst/doc/diagnostics.html">access cluster stability</a>.</p>
+<p>For simplicity, we will focus on graph based clustering as this is the most
+popular and a fast method for single-cell clustering. The <code>bluster</code> package
+provides functionalities to build k-nearest neighbor (KNN) graphs and its weighted
+version, shared nearest neighbor (SNN) graphs where nodes represent cells.
+The user can chose the number of neighbors to consider (parameter <code>k</code>),
+the edge weighting method (parameter <code>type</code>) and the community detection
+function to use (parameter <code>cluster.fun</code>). As all parameters affect the clustering
+results, the <code>bluster</code> package provides the <code>clusterSweep</code> function to test
+a number of parameter settings in parallel. In the following code chunk,
+we select the asinh-transformed mean pixel intensities and subset the markers
+of interest. The resulting matrix is transposed to fit to the requirements of
+the bluster package (cells in rows).</p>
+<p>We test two different settings for <code>k</code>, two for <code>type</code> and fix the <code>cluster.fun</code>
+to <code>louvain</code> as this is one of the most common approaches for community detection.
+This function call is parallelized by setting the <code>BPPARAM</code> parameter.</p>
+<div class="sourceCode" id="cb157"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb157-1"><a href="cell-phenotyping.html#cb157-1" tabindex="-1"></a><span class="fu">library</span>(bluster)</span>
+<span id="cb157-2"><a href="cell-phenotyping.html#cb157-2" tabindex="-1"></a><span class="fu">library</span>(BiocParallel)</span>
+<span id="cb157-3"><a href="cell-phenotyping.html#cb157-3" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb157-4"><a href="cell-phenotyping.html#cb157-4" tabindex="-1"></a></span>
+<span id="cb157-5"><a href="cell-phenotyping.html#cb157-5" tabindex="-1"></a>mat <span class="ot">&lt;-</span> <span class="fu">t</span>(<span class="fu">assay</span>(spe, <span class="st">&quot;exprs&quot;</span>)[<span class="fu">rowData</span>(spe)<span class="sc">$</span>use_channel,])</span>
+<span id="cb157-6"><a href="cell-phenotyping.html#cb157-6" tabindex="-1"></a></span>
+<span id="cb157-7"><a href="cell-phenotyping.html#cb157-7" tabindex="-1"></a>combinations <span class="ot">&lt;-</span> <span class="fu">clusterSweep</span>(mat, </span>
+<span id="cb157-8"><a href="cell-phenotyping.html#cb157-8" tabindex="-1"></a>                             <span class="at">BLUSPARAM=</span><span class="fu">SNNGraphParam</span>(),</span>
+<span id="cb157-9"><a href="cell-phenotyping.html#cb157-9" tabindex="-1"></a>                             <span class="at">k=</span><span class="fu">c</span>(10L, 20L), </span>
+<span id="cb157-10"><a href="cell-phenotyping.html#cb157-10" tabindex="-1"></a>                             <span class="at">type =</span> <span class="fu">c</span>(<span class="st">&quot;rank&quot;</span>, <span class="st">&quot;jaccard&quot;</span>), </span>
+<span id="cb157-11"><a href="cell-phenotyping.html#cb157-11" tabindex="-1"></a>                             <span class="at">cluster.fun =</span> <span class="st">&quot;louvain&quot;</span>,</span>
+<span id="cb157-12"><a href="cell-phenotyping.html#cb157-12" tabindex="-1"></a>                             <span class="at">BPPARAM =</span> <span class="fu">MulticoreParam</span>(<span class="at">RNGseed =</span> <span class="dv">220427</span>))</span></code></pre></div>
+<p>We next calculate two metrics to estimate cluster stability: the average
+silhouette width and the neighborhood purity.</p>
+<p>We use the <code>approxSilhouette</code> function to compute the silhouette width for each
+cell and compute the average across all cells per parameter setting. Please see
+<code>?silhouette</code> for more information on how the silhouette width is computed for
+each cell. A large average silhouette width indicates a cluster parameter
+setting for which cells that are well clustered.</p>
+<p>The <code>neighborPurity</code> function computes the fraction of cells around each cell
+with the same cluster ID. Per parameter setting, we compute the average
+neighborhood purity across all cells. A large average neighborhood purity
+indicates a cluster parameter setting for which cells that are well clustered.</p>
+<div class="sourceCode" id="cb158"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb158-1"><a href="cell-phenotyping.html#cb158-1" tabindex="-1"></a>sil <span class="ot">&lt;-</span> <span class="fu">vapply</span>(<span class="fu">as.list</span>(combinations<span class="sc">$</span>clusters), </span>
+<span id="cb158-2"><a href="cell-phenotyping.html#cb158-2" tabindex="-1"></a>              <span class="cf">function</span>(x) <span class="fu">mean</span>(<span class="fu">approxSilhouette</span>(mat, x)<span class="sc">$</span>width), </span>
+<span id="cb158-3"><a href="cell-phenotyping.html#cb158-3" tabindex="-1"></a>              <span class="dv">0</span>)</span>
+<span id="cb158-4"><a href="cell-phenotyping.html#cb158-4" tabindex="-1"></a></span>
+<span id="cb158-5"><a href="cell-phenotyping.html#cb158-5" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="fu">data.frame</span>(<span class="at">method =</span> <span class="fu">names</span>(sil),</span>
+<span id="cb158-6"><a href="cell-phenotyping.html#cb158-6" tabindex="-1"></a>                  <span class="at">sil =</span> sil)) <span class="sc">+</span></span>
+<span id="cb158-7"><a href="cell-phenotyping.html#cb158-7" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="fu">aes</span>(method, sil)) <span class="sc">+</span></span>
+<span id="cb158-8"><a href="cell-phenotyping.html#cb158-8" tabindex="-1"></a>    <span class="fu">theme_classic</span>(<span class="at">base_size =</span> <span class="dv">15</span>) <span class="sc">+</span></span>
+<span id="cb158-9"><a href="cell-phenotyping.html#cb158-9" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">90</span>, <span class="at">hjust =</span> <span class="dv">1</span>)) <span class="sc">+</span></span>
+<span id="cb158-10"><a href="cell-phenotyping.html#cb158-10" tabindex="-1"></a>    <span class="fu">xlab</span>(<span class="st">&quot;Cluster parameter combination&quot;</span>) <span class="sc">+</span></span>
+<span id="cb158-11"><a href="cell-phenotyping.html#cb158-11" tabindex="-1"></a>    <span class="fu">ylab</span>(<span class="st">&quot;Average silhouette width&quot;</span>)</span></code></pre></div>
+<p><img src="08-phenotyping_files/figure-html/cluster-diagnostics-1.png" width="672" /></p>
+<div class="sourceCode" id="cb159"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb159-1"><a href="cell-phenotyping.html#cb159-1" tabindex="-1"></a>pur <span class="ot">&lt;-</span> <span class="fu">vapply</span>(<span class="fu">as.list</span>(combinations<span class="sc">$</span>clusters), </span>
+<span id="cb159-2"><a href="cell-phenotyping.html#cb159-2" tabindex="-1"></a>              <span class="cf">function</span>(x) <span class="fu">mean</span>(<span class="fu">neighborPurity</span>(mat, x)<span class="sc">$</span>purity), </span>
+<span id="cb159-3"><a href="cell-phenotyping.html#cb159-3" tabindex="-1"></a>              <span class="dv">0</span>)</span>
+<span id="cb159-4"><a href="cell-phenotyping.html#cb159-4" tabindex="-1"></a></span>
+<span id="cb159-5"><a href="cell-phenotyping.html#cb159-5" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="fu">data.frame</span>(<span class="at">method =</span> <span class="fu">names</span>(pur),</span>
+<span id="cb159-6"><a href="cell-phenotyping.html#cb159-6" tabindex="-1"></a>                  <span class="at">pur =</span> pur)) <span class="sc">+</span></span>
+<span id="cb159-7"><a href="cell-phenotyping.html#cb159-7" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="fu">aes</span>(method, pur)) <span class="sc">+</span></span>
+<span id="cb159-8"><a href="cell-phenotyping.html#cb159-8" tabindex="-1"></a>    <span class="fu">theme_classic</span>(<span class="at">base_size =</span> <span class="dv">15</span>) <span class="sc">+</span></span>
+<span id="cb159-9"><a href="cell-phenotyping.html#cb159-9" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">90</span>, <span class="at">hjust =</span> <span class="dv">1</span>)) <span class="sc">+</span></span>
+<span id="cb159-10"><a href="cell-phenotyping.html#cb159-10" tabindex="-1"></a>    <span class="fu">xlab</span>(<span class="st">&quot;Cluster parameter combination&quot;</span>) <span class="sc">+</span></span>
+<span id="cb159-11"><a href="cell-phenotyping.html#cb159-11" tabindex="-1"></a>    <span class="fu">ylab</span>(<span class="st">&quot;Average neighborhood purity&quot;</span>)</span></code></pre></div>
+<p><img src="08-phenotyping_files/figure-html/cluster-diagnostics-2.png" width="672" /></p>
+<p>The cluster parameter sweep took
+4.13 minutes.</p>
+<p>Performing a cluster sweep takes some time as multiple function calls are run in parallel.
+We do however recommend testing a number of different parameter settings to
+assess clustering performance.</p>
+<p>Once parameter settings are known, we can either use the <code>clusterRows</code> function
+of the <code>bluster</code> package to cluster cells or its convenient wrapper function
+exported by the
+<a href="https://bioconductor.org/packages/release/bioc/html/scran.html">scran</a> package.
+The <code>scran::clusterCells</code> function accepts a <code>SpatialExperiment</code> (or
+<code>SingleCellExperiment</code>) object which stores cells in columns. By default, the
+function detects the 10 nearest neighbours for each cell, performs rank-based
+weighting of edges (see <code>?makeSNNGraph</code> for more information) and uses the
+<code>cluster_walktrap</code> function to detect communities in the graph.</p>
+<p>As we can see above, the clustering approach in this dataset with <code>k</code> being 20
+and rank-based edge weighting leads to the highest silhouette width and highest
+neighborhood purity.</p>
+<div class="sourceCode" id="cb160"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb160-1"><a href="cell-phenotyping.html#cb160-1" tabindex="-1"></a><span class="fu">library</span>(scran)</span>
+<span id="cb160-2"><a href="cell-phenotyping.html#cb160-2" tabindex="-1"></a></span>
+<span id="cb160-3"><a href="cell-phenotyping.html#cb160-3" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">220620</span>)</span>
+<span id="cb160-4"><a href="cell-phenotyping.html#cb160-4" tabindex="-1"></a>clusters <span class="ot">&lt;-</span> <span class="fu">clusterCells</span>(spe[<span class="fu">rowData</span>(spe)<span class="sc">$</span>use_channel,], </span>
+<span id="cb160-5"><a href="cell-phenotyping.html#cb160-5" tabindex="-1"></a>                         <span class="at">assay.type =</span> <span class="st">&quot;exprs&quot;</span>, </span>
+<span id="cb160-6"><a href="cell-phenotyping.html#cb160-6" tabindex="-1"></a>                         <span class="at">BLUSPARAM =</span> <span class="fu">SNNGraphParam</span>(<span class="at">k=</span><span class="dv">20</span>, </span>
+<span id="cb160-7"><a href="cell-phenotyping.html#cb160-7" tabindex="-1"></a>                                                  <span class="at">cluster.fun =</span> <span class="st">&quot;louvain&quot;</span>,</span>
+<span id="cb160-8"><a href="cell-phenotyping.html#cb160-8" tabindex="-1"></a>                                                  <span class="at">type =</span> <span class="st">&quot;rank&quot;</span>))</span>
+<span id="cb160-9"><a href="cell-phenotyping.html#cb160-9" tabindex="-1"></a></span>
+<span id="cb160-10"><a href="cell-phenotyping.html#cb160-10" tabindex="-1"></a>spe<span class="sc">$</span>nn_clusters <span class="ot">&lt;-</span> clusters</span>
+<span id="cb160-11"><a href="cell-phenotyping.html#cb160-11" tabindex="-1"></a></span>
+<span id="cb160-12"><a href="cell-phenotyping.html#cb160-12" tabindex="-1"></a><span class="fu">dittoDimPlot</span>(spe, <span class="at">var =</span> <span class="st">&quot;nn_clusters&quot;</span>, </span>
+<span id="cb160-13"><a href="cell-phenotyping.html#cb160-13" tabindex="-1"></a>             <span class="at">reduction.use =</span> <span class="st">&quot;UMAP&quot;</span>, <span class="at">size =</span> <span class="fl">0.2</span>,</span>
+<span id="cb160-14"><a href="cell-phenotyping.html#cb160-14" tabindex="-1"></a>             <span class="at">do.label =</span> <span class="cn">TRUE</span>) <span class="sc">+</span></span>
+<span id="cb160-15"><a href="cell-phenotyping.html#cb160-15" tabindex="-1"></a>    <span class="fu">ggtitle</span>(<span class="st">&quot;SNN clusters on UMAP&quot;</span>)</span></code></pre></div>
+<p><img src="08-phenotyping_files/figure-html/snn-1-1.png" width="672" /></p>
+<div class="sourceCode" id="cb161"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb161-1"><a href="cell-phenotyping.html#cb161-1" tabindex="-1"></a><span class="fu">dittoHeatmap</span>(spe[,cur_cells], </span>
+<span id="cb161-2"><a href="cell-phenotyping.html#cb161-2" tabindex="-1"></a>             <span class="at">genes =</span> <span class="fu">rownames</span>(spe)[<span class="fu">rowData</span>(spe)<span class="sc">$</span>use_channel],</span>
+<span id="cb161-3"><a href="cell-phenotyping.html#cb161-3" tabindex="-1"></a>             <span class="at">assay =</span> <span class="st">&quot;exprs&quot;</span>, <span class="at">scale =</span> <span class="st">&quot;none&quot;</span>,</span>
+<span id="cb161-4"><a href="cell-phenotyping.html#cb161-4" tabindex="-1"></a>             <span class="at">heatmap.colors =</span> <span class="fu">viridis</span>(<span class="dv">100</span>), </span>
+<span id="cb161-5"><a href="cell-phenotyping.html#cb161-5" tabindex="-1"></a>             <span class="at">annot.by =</span> <span class="fu">c</span>(<span class="st">&quot;nn_clusters&quot;</span>, <span class="st">&quot;patient_id&quot;</span>),</span>
+<span id="cb161-6"><a href="cell-phenotyping.html#cb161-6" tabindex="-1"></a>             <span class="at">annot.colors =</span> <span class="fu">c</span>(<span class="fu">dittoColors</span>(<span class="dv">1</span>)[<span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(<span class="fu">unique</span>(spe<span class="sc">$</span>nn_clusters))],</span>
+<span id="cb161-7"><a href="cell-phenotyping.html#cb161-7" tabindex="-1"></a>                              <span class="fu">metadata</span>(spe)<span class="sc">$</span>color_vectors<span class="sc">$</span>patient_id))</span></code></pre></div>
+<p><img src="08-phenotyping_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<p>The shared nearest neighbor graph clustering approach took
+0.99 minutes.</p>
+<p>This function was used by <span class="citation">(<a href="#ref-Tietscher2022">Tietscher et al. 2022</a>)</span> to cluster cells obtained by IMC. Setting
+<code>type = "jaccard"</code> performs clustering similar to <code>Rphenograph</code> above and <a href="https://satijalab.org/seurat/articles/pbmc3k_tutorial.html#cluster-the-cells-1">Seurat</a>.</p>
+<p>Similar to the results obtained by <code>Rphenograph</code>, some of the clusters are
+patient-specific. We can now perform clustering of the integrated cells
+by directly specifying which low-dimensional embedding to use:</p>
+<div class="sourceCode" id="cb162"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb162-1"><a href="cell-phenotyping.html#cb162-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">220621</span>)</span>
+<span id="cb162-2"><a href="cell-phenotyping.html#cb162-2" tabindex="-1"></a>clusters <span class="ot">&lt;-</span> <span class="fu">clusterCells</span>(spe, </span>
+<span id="cb162-3"><a href="cell-phenotyping.html#cb162-3" tabindex="-1"></a>                         <span class="at">use.dimred =</span> <span class="st">&quot;fastMNN&quot;</span>, </span>
+<span id="cb162-4"><a href="cell-phenotyping.html#cb162-4" tabindex="-1"></a>                         <span class="at">BLUSPARAM =</span> <span class="fu">SNNGraphParam</span>(<span class="at">k =</span> <span class="dv">20</span>, </span>
+<span id="cb162-5"><a href="cell-phenotyping.html#cb162-5" tabindex="-1"></a>                                        <span class="at">cluster.fun =</span> <span class="st">&quot;louvain&quot;</span>,</span>
+<span id="cb162-6"><a href="cell-phenotyping.html#cb162-6" tabindex="-1"></a>                                        <span class="at">type =</span> <span class="st">&quot;rank&quot;</span>))</span>
+<span id="cb162-7"><a href="cell-phenotyping.html#cb162-7" tabindex="-1"></a></span>
+<span id="cb162-8"><a href="cell-phenotyping.html#cb162-8" tabindex="-1"></a>spe<span class="sc">$</span>nn_clusters_corrected <span class="ot">&lt;-</span> clusters</span>
+<span id="cb162-9"><a href="cell-phenotyping.html#cb162-9" tabindex="-1"></a></span>
+<span id="cb162-10"><a href="cell-phenotyping.html#cb162-10" tabindex="-1"></a><span class="fu">dittoDimPlot</span>(spe, <span class="at">var =</span> <span class="st">&quot;nn_clusters_corrected&quot;</span>, </span>
+<span id="cb162-11"><a href="cell-phenotyping.html#cb162-11" tabindex="-1"></a>             <span class="at">reduction.use =</span> <span class="st">&quot;UMAP_mnnCorrected&quot;</span>, <span class="at">size =</span> <span class="fl">0.2</span>,</span>
+<span id="cb162-12"><a href="cell-phenotyping.html#cb162-12" tabindex="-1"></a>             <span class="at">do.label =</span> <span class="cn">TRUE</span>) <span class="sc">+</span></span>
+<span id="cb162-13"><a href="cell-phenotyping.html#cb162-13" tabindex="-1"></a>    <span class="fu">ggtitle</span>(<span class="st">&quot;SNN clusters on UMAP, integrated cells&quot;</span>)</span></code></pre></div>
+<p><img src="08-phenotyping_files/figure-html/snn-2-1.png" width="672" /></p>
+<div class="sourceCode" id="cb163"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb163-1"><a href="cell-phenotyping.html#cb163-1" tabindex="-1"></a><span class="fu">dittoHeatmap</span>(spe[,cur_cells], </span>
+<span id="cb163-2"><a href="cell-phenotyping.html#cb163-2" tabindex="-1"></a>             <span class="at">genes =</span> <span class="fu">rownames</span>(spe)[<span class="fu">rowData</span>(spe)<span class="sc">$</span>use_channel],</span>
+<span id="cb163-3"><a href="cell-phenotyping.html#cb163-3" tabindex="-1"></a>             <span class="at">assay =</span> <span class="st">&quot;exprs&quot;</span>, <span class="at">scale =</span> <span class="st">&quot;none&quot;</span>,</span>
+<span id="cb163-4"><a href="cell-phenotyping.html#cb163-4" tabindex="-1"></a>             <span class="at">heatmap.colors =</span> <span class="fu">viridis</span>(<span class="dv">100</span>), </span>
+<span id="cb163-5"><a href="cell-phenotyping.html#cb163-5" tabindex="-1"></a>             <span class="at">annot.by =</span> <span class="fu">c</span>(<span class="st">&quot;nn_clusters_corrected&quot;</span>,<span class="st">&quot;patient_id&quot;</span>),</span>
+<span id="cb163-6"><a href="cell-phenotyping.html#cb163-6" tabindex="-1"></a>             <span class="at">annot.colors =</span> <span class="fu">c</span>(<span class="fu">dittoColors</span>(<span class="dv">1</span>)[<span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(<span class="fu">unique</span>(spe<span class="sc">$</span>nn_clusters_corrected))],</span>
+<span id="cb163-7"><a href="cell-phenotyping.html#cb163-7" tabindex="-1"></a>                              <span class="fu">metadata</span>(spe)<span class="sc">$</span>color_vectors<span class="sc">$</span>patient_id))</span></code></pre></div>
+<p><img src="08-phenotyping_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+</div>
+<div id="self-organizing-maps" class="section level3 hasAnchor" number="9.2.3">
+<h3><span class="header-section-number">9.2.3</span> Self organizing maps<a href="cell-phenotyping.html#self-organizing-maps" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>An alternative to graph-based clustering is offered by the
+<a href="https://bioconductor.org/packages/release/bioc/html/CATALYST.html">CATALYST</a>
+package. The <code>cluster</code> function internally uses the
+<a href="https://bioconductor.org/packages/release/bioc/html/FlowSOM.html">FlowSOM</a>
+package to group cells into 100 (default) clusters based on self organizing maps
+(SOM). In the next step, the
+<a href="https://bioconductor.org/packages/release/bioc/html/ConsensusClusterPlus.html">ConsensusClusterPlus</a>
+package is used to perform hierarchical consensus clustering of the previously
+detected 100 SOM nodes into 2 to <code>maxK</code> clusters. Cluster stability for each <code>k</code>
+can be assessed by plotting the <code>delta_area(spe)</code>. The optimal number
+of clusters can be found by selecting the <code>k</code> at which a plateau is reached.
+In the example below, an optimal <code>k</code> lies somewhere around 13.</p>
+<div class="sourceCode" id="cb164"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb164-1"><a href="cell-phenotyping.html#cb164-1" tabindex="-1"></a><span class="fu">library</span>(CATALYST)</span>
+<span id="cb164-2"><a href="cell-phenotyping.html#cb164-2" tabindex="-1"></a></span>
+<span id="cb164-3"><a href="cell-phenotyping.html#cb164-3" tabindex="-1"></a><span class="co"># Run FlowSOM and ConsensusClusterPlus clustering</span></span>
+<span id="cb164-4"><a href="cell-phenotyping.html#cb164-4" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">220410</span>)</span>
+<span id="cb164-5"><a href="cell-phenotyping.html#cb164-5" tabindex="-1"></a>spe <span class="ot">&lt;-</span> <span class="fu">cluster</span>(spe, </span>
+<span id="cb164-6"><a href="cell-phenotyping.html#cb164-6" tabindex="-1"></a>               <span class="at">features =</span> <span class="fu">rownames</span>(spe)[<span class="fu">rowData</span>(spe)<span class="sc">$</span>use_channel],</span>
+<span id="cb164-7"><a href="cell-phenotyping.html#cb164-7" tabindex="-1"></a>               <span class="at">maxK =</span> <span class="dv">30</span>)</span>
+<span id="cb164-8"><a href="cell-phenotyping.html#cb164-8" tabindex="-1"></a></span>
+<span id="cb164-9"><a href="cell-phenotyping.html#cb164-9" tabindex="-1"></a><span class="co"># Assess cluster stability</span></span>
+<span id="cb164-10"><a href="cell-phenotyping.html#cb164-10" tabindex="-1"></a><span class="fu">delta_area</span>(spe)</span></code></pre></div>
+<p><img src="08-phenotyping_files/figure-html/flowSOM-1-1.png" width="672" /></p>
+<div class="sourceCode" id="cb165"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb165-1"><a href="cell-phenotyping.html#cb165-1" tabindex="-1"></a>spe<span class="sc">$</span>som_clusters <span class="ot">&lt;-</span> <span class="fu">cluster_ids</span>(spe, <span class="st">&quot;meta13&quot;</span>)</span>
+<span id="cb165-2"><a href="cell-phenotyping.html#cb165-2" tabindex="-1"></a></span>
+<span id="cb165-3"><a href="cell-phenotyping.html#cb165-3" tabindex="-1"></a><span class="fu">dittoDimPlot</span>(spe, <span class="at">var =</span> <span class="st">&quot;som_clusters&quot;</span>, </span>
+<span id="cb165-4"><a href="cell-phenotyping.html#cb165-4" tabindex="-1"></a>             <span class="at">reduction.use =</span> <span class="st">&quot;UMAP&quot;</span>, <span class="at">size =</span> <span class="fl">0.2</span>,</span>
+<span id="cb165-5"><a href="cell-phenotyping.html#cb165-5" tabindex="-1"></a>             <span class="at">do.label =</span> <span class="cn">TRUE</span>) <span class="sc">+</span></span>
+<span id="cb165-6"><a href="cell-phenotyping.html#cb165-6" tabindex="-1"></a>    <span class="fu">ggtitle</span>(<span class="st">&quot;SOM clusters on UMAP&quot;</span>)</span></code></pre></div>
+<p><img src="08-phenotyping_files/figure-html/flowSOM-1-2.png" width="672" /></p>
+<div class="sourceCode" id="cb166"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb166-1"><a href="cell-phenotyping.html#cb166-1" tabindex="-1"></a><span class="fu">dittoHeatmap</span>(spe[,cur_cells], </span>
+<span id="cb166-2"><a href="cell-phenotyping.html#cb166-2" tabindex="-1"></a>             <span class="at">genes =</span> <span class="fu">rownames</span>(spe)[<span class="fu">rowData</span>(spe)<span class="sc">$</span>use_channel],</span>
+<span id="cb166-3"><a href="cell-phenotyping.html#cb166-3" tabindex="-1"></a>             <span class="at">assay =</span> <span class="st">&quot;exprs&quot;</span>, <span class="at">scale =</span> <span class="st">&quot;none&quot;</span>,</span>
+<span id="cb166-4"><a href="cell-phenotyping.html#cb166-4" tabindex="-1"></a>             <span class="at">heatmap.colors =</span> <span class="fu">viridis</span>(<span class="dv">100</span>), </span>
+<span id="cb166-5"><a href="cell-phenotyping.html#cb166-5" tabindex="-1"></a>             <span class="at">annot.by =</span> <span class="fu">c</span>(<span class="st">&quot;som_clusters&quot;</span>, <span class="st">&quot;patient_id&quot;</span>),</span>
+<span id="cb166-6"><a href="cell-phenotyping.html#cb166-6" tabindex="-1"></a>             <span class="at">annot.colors =</span> <span class="fu">c</span>(<span class="fu">dittoColors</span>(<span class="dv">1</span>)[<span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(<span class="fu">unique</span>(spe<span class="sc">$</span>som_clusters))],</span>
+<span id="cb166-7"><a href="cell-phenotyping.html#cb166-7" tabindex="-1"></a>                              <span class="fu">metadata</span>(spe)<span class="sc">$</span>color_vectors<span class="sc">$</span>patient_id))</span></code></pre></div>
+<p><img src="08-phenotyping_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+<p>Running FlowSOM clustering took 0.16 minutes.</p>
+<p>The <code>CATALYST</code> package does not provide functionality to perform <code>FlowSOM</code> and
+<code>ConsensusClusterPlus</code> clustering directly on the batch-corrected, integrated cells. As an
+alternative to the <code>CATALYST</code> package, the <code>bluster</code> package provides SOM
+clustering when specifying the <code>SomParam()</code> parameter. Similar to the <code>CATALYST</code>
+approach, we will first cluster the dataset into 100 clusters (also called
+“codes”). These codes are then further clustered into a maximum of 30 clusters
+using <code>ConsensusClusterPlus</code> (using hierarchical clustering and euclidean
+distance). The delta area plot can be accessed using the (not exported)
+<code>.plot_delta_area</code> function from <code>CATALYST</code>. Here, it seems that the plateau is
+reached at a <code>k</code> of 16 and we will store the final cluster IDs within the
+<code>SpatialExperiment</code> object.</p>
+<div class="sourceCode" id="cb167"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb167-1"><a href="cell-phenotyping.html#cb167-1" tabindex="-1"></a><span class="fu">library</span>(kohonen)</span>
+<span id="cb167-2"><a href="cell-phenotyping.html#cb167-2" tabindex="-1"></a><span class="fu">library</span>(ConsensusClusterPlus)</span>
+<span id="cb167-3"><a href="cell-phenotyping.html#cb167-3" tabindex="-1"></a></span>
+<span id="cb167-4"><a href="cell-phenotyping.html#cb167-4" tabindex="-1"></a><span class="co"># Select integrated cells</span></span>
+<span id="cb167-5"><a href="cell-phenotyping.html#cb167-5" tabindex="-1"></a>mat <span class="ot">&lt;-</span> <span class="fu">reducedDim</span>(spe, <span class="st">&quot;fastMNN&quot;</span>)</span>
+<span id="cb167-6"><a href="cell-phenotyping.html#cb167-6" tabindex="-1"></a></span>
+<span id="cb167-7"><a href="cell-phenotyping.html#cb167-7" tabindex="-1"></a><span class="co"># Perform SOM clustering</span></span>
+<span id="cb167-8"><a href="cell-phenotyping.html#cb167-8" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">220410</span>)</span>
+<span id="cb167-9"><a href="cell-phenotyping.html#cb167-9" tabindex="-1"></a>som.out <span class="ot">&lt;-</span> <span class="fu">clusterRows</span>(mat, <span class="fu">SomParam</span>(<span class="dv">100</span>), <span class="at">full =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb167-10"><a href="cell-phenotyping.html#cb167-10" tabindex="-1"></a></span>
+<span id="cb167-11"><a href="cell-phenotyping.html#cb167-11" tabindex="-1"></a><span class="co"># Cluster the 100 SOM codes into larger clusters</span></span>
+<span id="cb167-12"><a href="cell-phenotyping.html#cb167-12" tabindex="-1"></a>ccp <span class="ot">&lt;-</span> <span class="fu">ConsensusClusterPlus</span>(<span class="fu">t</span>(som.out<span class="sc">$</span>objects<span class="sc">$</span>som<span class="sc">$</span>codes[[<span class="dv">1</span>]]),</span>
+<span id="cb167-13"><a href="cell-phenotyping.html#cb167-13" tabindex="-1"></a>                            <span class="at">maxK =</span> <span class="dv">30</span>,</span>
+<span id="cb167-14"><a href="cell-phenotyping.html#cb167-14" tabindex="-1"></a>                            <span class="at">reps =</span> <span class="dv">100</span>, </span>
+<span id="cb167-15"><a href="cell-phenotyping.html#cb167-15" tabindex="-1"></a>                            <span class="at">distance =</span> <span class="st">&quot;euclidean&quot;</span>, </span>
+<span id="cb167-16"><a href="cell-phenotyping.html#cb167-16" tabindex="-1"></a>                            <span class="at">seed =</span> <span class="dv">220410</span>, </span>
+<span id="cb167-17"><a href="cell-phenotyping.html#cb167-17" tabindex="-1"></a>                            <span class="at">plot =</span> <span class="cn">NULL</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb168"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb168-1"><a href="cell-phenotyping.html#cb168-1" tabindex="-1"></a><span class="co"># Visualize delta area plot</span></span>
+<span id="cb168-2"><a href="cell-phenotyping.html#cb168-2" tabindex="-1"></a>CATALYST<span class="sc">:::</span><span class="fu">.plot_delta_area</span>(ccp)</span></code></pre></div>
+<p><img src="08-phenotyping_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+<div class="sourceCode" id="cb169"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb169-1"><a href="cell-phenotyping.html#cb169-1" tabindex="-1"></a><span class="co"># Link ConsensusClusterPlus clusters with SOM codes and save in object</span></span>
+<span id="cb169-2"><a href="cell-phenotyping.html#cb169-2" tabindex="-1"></a>som.cluster <span class="ot">&lt;-</span> ccp[[<span class="dv">16</span>]][[<span class="st">&quot;consensusClass&quot;</span>]][som.out<span class="sc">$</span>clusters]</span>
+<span id="cb169-3"><a href="cell-phenotyping.html#cb169-3" tabindex="-1"></a>spe<span class="sc">$</span>som_clusters_corrected <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(som.cluster)</span>
+<span id="cb169-4"><a href="cell-phenotyping.html#cb169-4" tabindex="-1"></a></span>
+<span id="cb169-5"><a href="cell-phenotyping.html#cb169-5" tabindex="-1"></a><span class="fu">dittoDimPlot</span>(spe, <span class="at">var =</span> <span class="st">&quot;som_clusters_corrected&quot;</span>, </span>
+<span id="cb169-6"><a href="cell-phenotyping.html#cb169-6" tabindex="-1"></a>             <span class="at">reduction.use =</span> <span class="st">&quot;UMAP_mnnCorrected&quot;</span>, <span class="at">size =</span> <span class="fl">0.2</span>,</span>
+<span id="cb169-7"><a href="cell-phenotyping.html#cb169-7" tabindex="-1"></a>             <span class="at">do.label =</span> <span class="cn">TRUE</span>) <span class="sc">+</span></span>
+<span id="cb169-8"><a href="cell-phenotyping.html#cb169-8" tabindex="-1"></a>    <span class="fu">ggtitle</span>(<span class="st">&quot;SOM clusters on UMAP, integrated cells&quot;</span>)</span></code></pre></div>
+<p><img src="08-phenotyping_files/figure-html/unnamed-chunk-14-2.png" width="672" /></p>
+<div class="sourceCode" id="cb170"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb170-1"><a href="cell-phenotyping.html#cb170-1" tabindex="-1"></a><span class="fu">dittoHeatmap</span>(spe[,cur_cells], </span>
+<span id="cb170-2"><a href="cell-phenotyping.html#cb170-2" tabindex="-1"></a>             <span class="at">genes =</span> <span class="fu">rownames</span>(spe)[<span class="fu">rowData</span>(spe)<span class="sc">$</span>use_channel],</span>
+<span id="cb170-3"><a href="cell-phenotyping.html#cb170-3" tabindex="-1"></a>             <span class="at">assay =</span> <span class="st">&quot;exprs&quot;</span>, <span class="at">scale =</span> <span class="st">&quot;none&quot;</span>,</span>
+<span id="cb170-4"><a href="cell-phenotyping.html#cb170-4" tabindex="-1"></a>             <span class="at">heatmap.colors =</span> <span class="fu">viridis</span>(<span class="dv">100</span>), </span>
+<span id="cb170-5"><a href="cell-phenotyping.html#cb170-5" tabindex="-1"></a>             <span class="at">annot.by =</span> <span class="fu">c</span>(<span class="st">&quot;som_clusters_corrected&quot;</span>,<span class="st">&quot;patient_id&quot;</span>),</span>
+<span id="cb170-6"><a href="cell-phenotyping.html#cb170-6" tabindex="-1"></a>             <span class="at">annot.colors =</span> <span class="fu">c</span>(<span class="fu">dittoColors</span>(<span class="dv">1</span>)[<span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(<span class="fu">unique</span>(spe<span class="sc">$</span>som_clusters_corrected))],</span>
+<span id="cb170-7"><a href="cell-phenotyping.html#cb170-7" tabindex="-1"></a>                              <span class="fu">metadata</span>(spe)<span class="sc">$</span>color_vectors<span class="sc">$</span>patient_id))</span></code></pre></div>
+<p><img src="08-phenotyping_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+<p>The <code>FlowSOM</code> clustering approach has been used by <span class="citation">(<a href="#ref-Hoch2022">Hoch et al. 2022</a>)</span> to sub-cluster tumor
+cells as measured by IMC.</p>
+</div>
+<div id="compare-between-clustering-approaches" class="section level3 hasAnchor" number="9.2.4">
+<h3><span class="header-section-number">9.2.4</span> Compare between clustering approaches<a href="cell-phenotyping.html#compare-between-clustering-approaches" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Finally, we can compare the results of different clustering approaches. For
+this, we visualize the number of cells that are shared between different
+clustering results in a pairwise fashion. In the following heatmaps a high match
+between clustering results can be seen for those clusters that are uniquely
+detected in both approaches.</p>
+<p>First, we will visualize the match between the three different approaches
+applied to the asinh-transformed counts.</p>
+<div class="sourceCode" id="cb171"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb171-1"><a href="cell-phenotyping.html#cb171-1" tabindex="-1"></a><span class="fu">library</span>(patchwork)</span>
+<span id="cb171-2"><a href="cell-phenotyping.html#cb171-2" tabindex="-1"></a><span class="fu">library</span>(pheatmap)</span>
+<span id="cb171-3"><a href="cell-phenotyping.html#cb171-3" tabindex="-1"></a><span class="fu">library</span>(gridExtra)</span>
+<span id="cb171-4"><a href="cell-phenotyping.html#cb171-4" tabindex="-1"></a></span>
+<span id="cb171-5"><a href="cell-phenotyping.html#cb171-5" tabindex="-1"></a>tab1 <span class="ot">&lt;-</span> <span class="fu">table</span>(<span class="fu">paste</span>(<span class="st">&quot;Rphenograph&quot;</span>, spe<span class="sc">$</span>pg_clusters), </span>
+<span id="cb171-6"><a href="cell-phenotyping.html#cb171-6" tabindex="-1"></a>              <span class="fu">paste</span>(<span class="st">&quot;SNN&quot;</span>, spe<span class="sc">$</span>nn_clusters))</span>
+<span id="cb171-7"><a href="cell-phenotyping.html#cb171-7" tabindex="-1"></a>tab2 <span class="ot">&lt;-</span> <span class="fu">table</span>(<span class="fu">paste</span>(<span class="st">&quot;Rphenograph&quot;</span>, spe<span class="sc">$</span>pg_clusters), </span>
+<span id="cb171-8"><a href="cell-phenotyping.html#cb171-8" tabindex="-1"></a>              <span class="fu">paste</span>(<span class="st">&quot;SOM&quot;</span>, spe<span class="sc">$</span>som_clusters))</span>
+<span id="cb171-9"><a href="cell-phenotyping.html#cb171-9" tabindex="-1"></a>tab3 <span class="ot">&lt;-</span> <span class="fu">table</span>(<span class="fu">paste</span>(<span class="st">&quot;SNN&quot;</span>, spe<span class="sc">$</span>nn_clusters), </span>
+<span id="cb171-10"><a href="cell-phenotyping.html#cb171-10" tabindex="-1"></a>              <span class="fu">paste</span>(<span class="st">&quot;SOM&quot;</span>, spe<span class="sc">$</span>som_clusters))</span>
+<span id="cb171-11"><a href="cell-phenotyping.html#cb171-11" tabindex="-1"></a></span>
+<span id="cb171-12"><a href="cell-phenotyping.html#cb171-12" tabindex="-1"></a><span class="fu">pheatmap</span>(<span class="fu">log10</span>(tab1 <span class="sc">+</span> <span class="dv">10</span>), <span class="at">color =</span> <span class="fu">viridis</span>(<span class="dv">100</span>))</span></code></pre></div>
+<p><img src="08-phenotyping_files/figure-html/raw-counts-1.png" width="672" /></p>
+<div class="sourceCode" id="cb172"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb172-1"><a href="cell-phenotyping.html#cb172-1" tabindex="-1"></a><span class="fu">pheatmap</span>(<span class="fu">log10</span>(tab2 <span class="sc">+</span> <span class="dv">10</span>), <span class="at">color =</span> <span class="fu">viridis</span>(<span class="dv">100</span>))</span></code></pre></div>
+<p><img src="08-phenotyping_files/figure-html/raw-counts-2.png" width="672" /></p>
+<div class="sourceCode" id="cb173"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb173-1"><a href="cell-phenotyping.html#cb173-1" tabindex="-1"></a><span class="fu">pheatmap</span>(<span class="fu">log10</span>(tab3 <span class="sc">+</span> <span class="dv">10</span>), <span class="at">color =</span> <span class="fu">viridis</span>(<span class="dv">100</span>))</span></code></pre></div>
+<p><img src="08-phenotyping_files/figure-html/raw-counts-3.png" width="672" /></p>
+<p>We observe that <code>Rphenograph</code> and the shared nearest neighbor (SNN) approach by
+<code>scran</code> show similar results (first heatmap above). For example, Rphenograph
+cluster 20 (a tumor cluster) is perfectly captured by SNN cluster 12. On the
+other hand, the Neutrophil cluster (SNN cluster 6) is split into Rphenograph
+cluster 2 and Rphenograph cluster 6. A common approach
+is to now merge clusters that contain similar cell types and annotate them by
+hand (see below).</p>
+<p>Below, a comparison between the clustering results of the integrated cells
+is shown.</p>
+<div class="sourceCode" id="cb174"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb174-1"><a href="cell-phenotyping.html#cb174-1" tabindex="-1"></a>tab1 <span class="ot">&lt;-</span> <span class="fu">table</span>(<span class="fu">paste</span>(<span class="st">&quot;Rphenograph&quot;</span>, spe<span class="sc">$</span>pg_clusters_corrected), </span>
+<span id="cb174-2"><a href="cell-phenotyping.html#cb174-2" tabindex="-1"></a>              <span class="fu">paste</span>(<span class="st">&quot;SNN&quot;</span>, spe<span class="sc">$</span>nn_clusters_corrected))</span>
+<span id="cb174-3"><a href="cell-phenotyping.html#cb174-3" tabindex="-1"></a>tab2 <span class="ot">&lt;-</span> <span class="fu">table</span>(<span class="fu">paste</span>(<span class="st">&quot;Rphenograph&quot;</span>, spe<span class="sc">$</span>pg_clusters_corrected), </span>
+<span id="cb174-4"><a href="cell-phenotyping.html#cb174-4" tabindex="-1"></a>              <span class="fu">paste</span>(<span class="st">&quot;SOM&quot;</span>, spe<span class="sc">$</span>som_clusters_corrected))</span>
+<span id="cb174-5"><a href="cell-phenotyping.html#cb174-5" tabindex="-1"></a>tab3 <span class="ot">&lt;-</span> <span class="fu">table</span>(<span class="fu">paste</span>(<span class="st">&quot;SNN&quot;</span>, spe<span class="sc">$</span>nn_clusters_corrected), </span>
+<span id="cb174-6"><a href="cell-phenotyping.html#cb174-6" tabindex="-1"></a>              <span class="fu">paste</span>(<span class="st">&quot;SOM&quot;</span>, spe<span class="sc">$</span>som_clusters_corrected))</span>
+<span id="cb174-7"><a href="cell-phenotyping.html#cb174-7" tabindex="-1"></a></span>
+<span id="cb174-8"><a href="cell-phenotyping.html#cb174-8" tabindex="-1"></a><span class="fu">pheatmap</span>(<span class="fu">log10</span>(tab1 <span class="sc">+</span> <span class="dv">10</span>), <span class="at">color =</span> <span class="fu">viridis</span>(<span class="dv">100</span>))</span></code></pre></div>
+<p><img src="08-phenotyping_files/figure-html/corrected-1.png" width="672" /></p>
+<div class="sourceCode" id="cb175"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb175-1"><a href="cell-phenotyping.html#cb175-1" tabindex="-1"></a><span class="fu">pheatmap</span>(<span class="fu">log10</span>(tab2 <span class="sc">+</span> <span class="dv">10</span>), <span class="at">color =</span> <span class="fu">viridis</span>(<span class="dv">100</span>))</span></code></pre></div>
+<p><img src="08-phenotyping_files/figure-html/corrected-2.png" width="672" /></p>
+<div class="sourceCode" id="cb176"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb176-1"><a href="cell-phenotyping.html#cb176-1" tabindex="-1"></a><span class="fu">pheatmap</span>(<span class="fu">log10</span>(tab3 <span class="sc">+</span> <span class="dv">10</span>), <span class="at">color =</span> <span class="fu">viridis</span>(<span class="dv">100</span>))</span></code></pre></div>
+<p><img src="08-phenotyping_files/figure-html/corrected-3.png" width="672" /></p>
+<p>In comparison to clustering on the non-integrated cells, the clustering results
+of the integrated cells show higher overlap. The SNN approach resulted in fewer
+clusters and therefore matches better with the SOM clustering approach.</p>
+</div>
+<div id="clustering-notes" class="section level3 hasAnchor" number="9.2.5">
+<h3><span class="header-section-number">9.2.5</span> Further clustering notes<a href="cell-phenotyping.html#clustering-notes" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>The <code>bluster</code> package provides a number of metrics to assess cluster stability
+<a href="https://www.bioconductor.org/packages/release/bioc/vignettes/bluster/inst/doc/diagnostics.html">here</a>.
+For brevity we only highlighted the use of the silhouette width and the
+neighborhood purity but different metrics should be tested to assess cluster
+stability.</p>
+<p>To assign cell types to clusters, we manually annotate clusters based on their
+marker expression. For example, SNN cluster 12 (clustering of the integrated
+cells) shows high, homogeneous expression of CD20 and we might therefore label
+this cluster as B cells. The next chapter <a href="single-cell-visualization.html#single-cell-visualization">10</a> will
+highlight single-cell visualization methods that can be helpful for manual
+cluster annotations.</p>
+<p>An example how to label clusters can be seen below:</p>
+<div class="sourceCode" id="cb177"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb177-1"><a href="cell-phenotyping.html#cb177-1" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb177-2"><a href="cell-phenotyping.html#cb177-2" tabindex="-1"></a>cluster_celltype <span class="ot">&lt;-</span> <span class="fu">recode</span>(spe<span class="sc">$</span>nn_clusters_corrected,</span>
+<span id="cb177-3"><a href="cell-phenotyping.html#cb177-3" tabindex="-1"></a>                            <span class="st">&quot;1&quot;</span> <span class="ot">=</span> <span class="st">&quot;Tumor_proliferating&quot;</span>,</span>
+<span id="cb177-4"><a href="cell-phenotyping.html#cb177-4" tabindex="-1"></a>                            <span class="st">&quot;2&quot;</span> <span class="ot">=</span> <span class="st">&quot;Myeloid&quot;</span>,</span>
+<span id="cb177-5"><a href="cell-phenotyping.html#cb177-5" tabindex="-1"></a>                            <span class="st">&quot;3&quot;</span> <span class="ot">=</span> <span class="st">&quot;Tumor&quot;</span>,</span>
+<span id="cb177-6"><a href="cell-phenotyping.html#cb177-6" tabindex="-1"></a>                            <span class="st">&quot;4&quot;</span> <span class="ot">=</span> <span class="st">&quot;Tumor&quot;</span>,</span>
+<span id="cb177-7"><a href="cell-phenotyping.html#cb177-7" tabindex="-1"></a>                            <span class="st">&quot;5&quot;</span> <span class="ot">=</span> <span class="st">&quot;Stroma&quot;</span>,</span>
+<span id="cb177-8"><a href="cell-phenotyping.html#cb177-8" tabindex="-1"></a>                            <span class="st">&quot;6&quot;</span> <span class="ot">=</span> <span class="st">&quot;Proliferating&quot;</span>,</span>
+<span id="cb177-9"><a href="cell-phenotyping.html#cb177-9" tabindex="-1"></a>                            <span class="st">&quot;7&quot;</span> <span class="ot">=</span> <span class="st">&quot;Myeloid&quot;</span>,</span>
+<span id="cb177-10"><a href="cell-phenotyping.html#cb177-10" tabindex="-1"></a>                            <span class="st">&quot;8&quot;</span> <span class="ot">=</span> <span class="st">&quot;Plasma_cell&quot;</span>,</span>
+<span id="cb177-11"><a href="cell-phenotyping.html#cb177-11" tabindex="-1"></a>                            <span class="st">&quot;9&quot;</span> <span class="ot">=</span> <span class="st">&quot;CD8&quot;</span>,</span>
+<span id="cb177-12"><a href="cell-phenotyping.html#cb177-12" tabindex="-1"></a>                            <span class="st">&quot;10&quot;</span> <span class="ot">=</span> <span class="st">&quot;CD4&quot;</span>,</span>
+<span id="cb177-13"><a href="cell-phenotyping.html#cb177-13" tabindex="-1"></a>                            <span class="st">&quot;11&quot;</span> <span class="ot">=</span> <span class="st">&quot;Neutrophil&quot;</span>,</span>
+<span id="cb177-14"><a href="cell-phenotyping.html#cb177-14" tabindex="-1"></a>                            <span class="st">&quot;12&quot;</span> <span class="ot">=</span> <span class="st">&quot;Bcell&quot;</span>,</span>
+<span id="cb177-15"><a href="cell-phenotyping.html#cb177-15" tabindex="-1"></a>                            <span class="st">&quot;13&quot;</span> <span class="ot">=</span> <span class="st">&quot;Stroma&quot;</span>)</span>
+<span id="cb177-16"><a href="cell-phenotyping.html#cb177-16" tabindex="-1"></a></span>
+<span id="cb177-17"><a href="cell-phenotyping.html#cb177-17" tabindex="-1"></a>spe<span class="sc">$</span>cluster_celltype <span class="ot">&lt;-</span> cluster_celltype</span></code></pre></div>
+</div>
+</div>
+<div id="classification" class="section level2 hasAnchor" number="9.3">
+<h2><span class="header-section-number">9.3</span> Classification approach<a href="cell-phenotyping.html#classification" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>In this section, we will highlight a cell type classification approach based
+on ground truth labeling and random forest classification. The rational for
+this supervised cell phenotyping approach is to use the information contained
+in the pre-defined markers to detect cells of interest. This approach was
+used by Hoch <em>et al.</em> to classify cell types in a metastatic melanoma IMC
+dataset <span class="citation">(<a href="#ref-Hoch2022">Hoch et al. 2022</a>)</span>.</p>
+<p>The antibody panel used in the example data set mainly focuses on immune cell
+types and little on tumor cell phenotypes. Therefore we will label the following
+cell types:</p>
+<ul>
+<li>Tumor (E-cadherin positive)</li>
+<li>Stroma (SMA, PDGFRb positive)</li>
+<li>Plasma cells (CD38 positive)</li>
+<li>Neutrophil (MPO, CD15 positive)</li>
+<li>Myeloid cells (HLADR positive)</li>
+<li>B cells (CD20 positive)</li>
+<li>B next to T cells (CD20, CD3 positive)</li>
+<li>Regulatory T cells (FOXP3 positive)</li>
+<li>CD8+ T cells (CD3, CD8 positive)</li>
+<li>CD4+ T cells (CD3, CD4 positive)</li>
+</ul>
+<p>The “B next to T cell” phenotype (<code>BnTcell</code>) is commonly observed in immune
+infiltrated regions measured by IMC. We include this phenotype to account for B
+cell/T cell interactions where precise classification into B cells or T cells is
+not possible. The exact gating scheme can be seen at
+<a href="img/Gating_scheme.pdf">img/Gating_scheme.pdf</a>.</p>
+<p>As related approaches, <a href="https://github.com/camlab-bioml/astir">Astir</a> and
+<a href="https://cole-trapnell-lab.github.io/garnett/">Garnett</a> use pre-defined panel
+information to classify cell phenotypes based on their marker expression.</p>
+<div id="manual-labeling-of-cells" class="section level3 hasAnchor" number="9.3.1">
+<h3><span class="header-section-number">9.3.1</span> Manual labeling of cells<a href="cell-phenotyping.html#manual-labeling-of-cells" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>The <a href="https://www.bioconductor.org/packages/release/bioc/html/cytomapper.html">cytomapper</a>
+package provides the <code>cytomapperShiny</code> function that allows gating of cells
+based on their marker expression and visualization of selected cells directly
+on the images.</p>
+<div class="sourceCode" id="cb178"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb178-1"><a href="cell-phenotyping.html#cb178-1" tabindex="-1"></a><span class="fu">library</span>(cytomapper)</span>
+<span id="cb178-2"><a href="cell-phenotyping.html#cb178-2" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">interactive</span>()) {</span>
+<span id="cb178-3"><a href="cell-phenotyping.html#cb178-3" tabindex="-1"></a>    </span>
+<span id="cb178-4"><a href="cell-phenotyping.html#cb178-4" tabindex="-1"></a>    images <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">&quot;data/images.rds&quot;</span>)</span>
+<span id="cb178-5"><a href="cell-phenotyping.html#cb178-5" tabindex="-1"></a>    masks <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">&quot;data/masks.rds&quot;</span>)</span>
+<span id="cb178-6"><a href="cell-phenotyping.html#cb178-6" tabindex="-1"></a>    </span>
+<span id="cb178-7"><a href="cell-phenotyping.html#cb178-7" tabindex="-1"></a>    <span class="fu">cytomapperShiny</span>(<span class="at">object =</span> spe, <span class="at">mask =</span> masks, <span class="at">image =</span> images, </span>
+<span id="cb178-8"><a href="cell-phenotyping.html#cb178-8" tabindex="-1"></a>                    <span class="at">cell_id =</span> <span class="st">&quot;ObjectNumber&quot;</span>, <span class="at">img_id =</span> <span class="st">&quot;sample_id&quot;</span>)</span>
+<span id="cb178-9"><a href="cell-phenotyping.html#cb178-9" tabindex="-1"></a>}</span></code></pre></div>
+<p>The labeled cells for this data set can be accessed at
+<a href="https://zenodo.org/record/6554544">10.5281/zenodo.6554544</a> and were downloaded
+in Section <a href="prerequisites.html#prerequisites">4</a>. Gating is performed per image and the
+<code>cytomapperShiny</code> function allows the export of gated cells in form of a
+<code>SingleCellExperiment</code> or <code>SpatialExperiment</code> object. The cell label is stored
+in <code>colData(object)$cytomapper_CellLabel</code> and the gates are stored in
+<code>metadata(object)</code>. In the next section, we will read in and consolidate the
+labeled data.</p>
+</div>
+<div id="define-color-vectors" class="section level3 hasAnchor" number="9.3.2">
+<h3><span class="header-section-number">9.3.2</span> Define color vectors<a href="cell-phenotyping.html#define-color-vectors" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>For consistent visualization of cell types, we will now pre-define their colors:</p>
+<div class="sourceCode" id="cb179"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb179-1"><a href="cell-phenotyping.html#cb179-1" tabindex="-1"></a>celltype <span class="ot">&lt;-</span> <span class="fu">setNames</span>(<span class="fu">c</span>(<span class="st">&quot;#3F1B03&quot;</span>, <span class="st">&quot;#F4AD31&quot;</span>, <span class="st">&quot;#894F36&quot;</span>, <span class="st">&quot;#1C750C&quot;</span>, <span class="st">&quot;#EF8ECC&quot;</span>, </span>
+<span id="cb179-2"><a href="cell-phenotyping.html#cb179-2" tabindex="-1"></a>                       <span class="st">&quot;#6471E2&quot;</span>, <span class="st">&quot;#4DB23B&quot;</span>, <span class="st">&quot;grey&quot;</span>, <span class="st">&quot;#F4800C&quot;</span>, <span class="st">&quot;#BF0A3D&quot;</span>, <span class="st">&quot;#066970&quot;</span>),</span>
+<span id="cb179-3"><a href="cell-phenotyping.html#cb179-3" tabindex="-1"></a>                     <span class="fu">c</span>(<span class="st">&quot;Tumor&quot;</span>, <span class="st">&quot;Stroma&quot;</span>, <span class="st">&quot;Myeloid&quot;</span>, <span class="st">&quot;CD8&quot;</span>, <span class="st">&quot;Plasma_cell&quot;</span>, </span>
+<span id="cb179-4"><a href="cell-phenotyping.html#cb179-4" tabindex="-1"></a>                       <span class="st">&quot;Treg&quot;</span>, <span class="st">&quot;CD4&quot;</span>, <span class="st">&quot;undefined&quot;</span>, <span class="st">&quot;BnTcell&quot;</span>, <span class="st">&quot;Bcell&quot;</span>, <span class="st">&quot;Neutrophil&quot;</span>))</span>
+<span id="cb179-5"><a href="cell-phenotyping.html#cb179-5" tabindex="-1"></a></span>
+<span id="cb179-6"><a href="cell-phenotyping.html#cb179-6" tabindex="-1"></a><span class="fu">metadata</span>(spe)<span class="sc">$</span>color_vectors<span class="sc">$</span>celltype <span class="ot">&lt;-</span> celltype</span></code></pre></div>
+</div>
+<div id="read-in-and-consolidate-labeled-data" class="section level3 hasAnchor" number="9.3.3">
+<h3><span class="header-section-number">9.3.3</span> Read in and consolidate labeled data<a href="cell-phenotyping.html#read-in-and-consolidate-labeled-data" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Here, we will read in the individual <code>SpatialExperiment</code> objects containing the
+labeled cells and concatenate them. In the process of concatenating the
+<code>SpatialExperiment</code> objects along their columns, the <code>sample_id</code> entry is
+appended by <code>.1, .2, .3, ...</code> due to replicated entries.</p>
+<div class="sourceCode" id="cb180"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb180-1"><a href="cell-phenotyping.html#cb180-1" tabindex="-1"></a><span class="fu">library</span>(SingleCellExperiment)</span>
+<span id="cb180-2"><a href="cell-phenotyping.html#cb180-2" tabindex="-1"></a>label_files <span class="ot">&lt;-</span> <span class="fu">list.files</span>(<span class="st">&quot;data/gated_cells&quot;</span>, </span>
+<span id="cb180-3"><a href="cell-phenotyping.html#cb180-3" tabindex="-1"></a>                          <span class="at">full.names =</span> <span class="cn">TRUE</span>, <span class="at">pattern =</span> <span class="st">&quot;.rds$&quot;</span>)</span>
+<span id="cb180-4"><a href="cell-phenotyping.html#cb180-4" tabindex="-1"></a></span>
+<span id="cb180-5"><a href="cell-phenotyping.html#cb180-5" tabindex="-1"></a><span class="co"># Read in SPE objects</span></span>
+<span id="cb180-6"><a href="cell-phenotyping.html#cb180-6" tabindex="-1"></a>spes <span class="ot">&lt;-</span> <span class="fu">lapply</span>(label_files, readRDS)</span>
+<span id="cb180-7"><a href="cell-phenotyping.html#cb180-7" tabindex="-1"></a></span>
+<span id="cb180-8"><a href="cell-phenotyping.html#cb180-8" tabindex="-1"></a><span class="co"># Merge SPE objects</span></span>
+<span id="cb180-9"><a href="cell-phenotyping.html#cb180-9" tabindex="-1"></a>concat_spe <span class="ot">&lt;-</span> <span class="fu">do.call</span>(<span class="st">&quot;cbind&quot;</span>, spes)</span></code></pre></div>
+<p>In the following code chunk we will identify cells that were labeled multiple
+times. This occurs when different cell phenotypes are gated per image and can
+affect immune cells that are located inside the tumor compartment.</p>
+<p>We will first identify those cells that were uniquely labeled. In the next step,
+we will identify those cells that were labeled twice AND were labeled as Tumor
+cells. These cells will be assigned their immune cell label. Finally, we will
+save the unique labels within the original <code>SpatialExperiment</code> object.</p>
+<p><strong>Of note:</strong> this concatenation strategy is specific for cell phenotypes contained in this
+example dataset. The gated cell labels might need to be processed in a slightly
+different way when working with other samples.</p>
+<p>For these tasks, we will define a filter function:</p>
+<div class="sourceCode" id="cb181"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb181-1"><a href="cell-phenotyping.html#cb181-1" tabindex="-1"></a>filter_labels <span class="ot">&lt;-</span> <span class="cf">function</span>(object, </span>
+<span id="cb181-2"><a href="cell-phenotyping.html#cb181-2" tabindex="-1"></a>                          <span class="at">label =</span> <span class="st">&quot;cytomapper_CellLabel&quot;</span>) {</span>
+<span id="cb181-3"><a href="cell-phenotyping.html#cb181-3" tabindex="-1"></a>    cur_tab <span class="ot">&lt;-</span> <span class="fu">unclass</span>(<span class="fu">table</span>(<span class="fu">colnames</span>(object), object[[label]]))</span>
+<span id="cb181-4"><a href="cell-phenotyping.html#cb181-4" tabindex="-1"></a>    </span>
+<span id="cb181-5"><a href="cell-phenotyping.html#cb181-5" tabindex="-1"></a>    cur_labels <span class="ot">&lt;-</span> <span class="fu">colnames</span>(cur_tab)[<span class="fu">apply</span>(cur_tab, <span class="dv">1</span>, which.max)]</span>
+<span id="cb181-6"><a href="cell-phenotyping.html#cb181-6" tabindex="-1"></a>    <span class="fu">names</span>(cur_labels) <span class="ot">&lt;-</span> <span class="fu">rownames</span>(cur_tab)</span>
+<span id="cb181-7"><a href="cell-phenotyping.html#cb181-7" tabindex="-1"></a>    </span>
+<span id="cb181-8"><a href="cell-phenotyping.html#cb181-8" tabindex="-1"></a>    cur_labels <span class="ot">&lt;-</span> cur_labels[<span class="fu">rowSums</span>(cur_tab) <span class="sc">==</span> <span class="dv">1</span>]</span>
+<span id="cb181-9"><a href="cell-phenotyping.html#cb181-9" tabindex="-1"></a>    </span>
+<span id="cb181-10"><a href="cell-phenotyping.html#cb181-10" tabindex="-1"></a>    <span class="fu">return</span>(cur_labels)</span>
+<span id="cb181-11"><a href="cell-phenotyping.html#cb181-11" tabindex="-1"></a>}</span></code></pre></div>
+<p>This function is now applied to all cells and then only non-tumor cells.</p>
+<div class="sourceCode" id="cb182"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb182-1"><a href="cell-phenotyping.html#cb182-1" tabindex="-1"></a>labels <span class="ot">&lt;-</span> <span class="fu">filter_labels</span>(concat_spe)</span>
+<span id="cb182-2"><a href="cell-phenotyping.html#cb182-2" tabindex="-1"></a></span>
+<span id="cb182-3"><a href="cell-phenotyping.html#cb182-3" tabindex="-1"></a>cur_spe <span class="ot">&lt;-</span> concat_spe[,concat_spe<span class="sc">$</span>cytomapper_CellLabel <span class="sc">!=</span> <span class="st">&quot;Tumor&quot;</span>]</span>
+<span id="cb182-4"><a href="cell-phenotyping.html#cb182-4" tabindex="-1"></a></span>
+<span id="cb182-5"><a href="cell-phenotyping.html#cb182-5" tabindex="-1"></a>non_tumor_labels <span class="ot">&lt;-</span> <span class="fu">filter_labels</span>(cur_spe)</span>
+<span id="cb182-6"><a href="cell-phenotyping.html#cb182-6" tabindex="-1"></a></span>
+<span id="cb182-7"><a href="cell-phenotyping.html#cb182-7" tabindex="-1"></a>additional_cells <span class="ot">&lt;-</span> <span class="fu">setdiff</span>(<span class="fu">names</span>(non_tumor_labels), <span class="fu">names</span>(labels))</span>
+<span id="cb182-8"><a href="cell-phenotyping.html#cb182-8" tabindex="-1"></a></span>
+<span id="cb182-9"><a href="cell-phenotyping.html#cb182-9" tabindex="-1"></a>final_labels <span class="ot">&lt;-</span> <span class="fu">c</span>(labels, non_tumor_labels[additional_cells])</span>
+<span id="cb182-10"><a href="cell-phenotyping.html#cb182-10" tabindex="-1"></a></span>
+<span id="cb182-11"><a href="cell-phenotyping.html#cb182-11" tabindex="-1"></a><span class="co"># Transfer labels to SPE object</span></span>
+<span id="cb182-12"><a href="cell-phenotyping.html#cb182-12" tabindex="-1"></a>spe_labels <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="st">&quot;unlabeled&quot;</span>, <span class="fu">ncol</span>(spe))</span>
+<span id="cb182-13"><a href="cell-phenotyping.html#cb182-13" tabindex="-1"></a><span class="fu">names</span>(spe_labels) <span class="ot">&lt;-</span> <span class="fu">colnames</span>(spe)</span>
+<span id="cb182-14"><a href="cell-phenotyping.html#cb182-14" tabindex="-1"></a>spe_labels[<span class="fu">names</span>(final_labels)] <span class="ot">&lt;-</span> final_labels</span>
+<span id="cb182-15"><a href="cell-phenotyping.html#cb182-15" tabindex="-1"></a>spe<span class="sc">$</span>cell_labels <span class="ot">&lt;-</span> spe_labels</span>
+<span id="cb182-16"><a href="cell-phenotyping.html#cb182-16" tabindex="-1"></a></span>
+<span id="cb182-17"><a href="cell-phenotyping.html#cb182-17" tabindex="-1"></a><span class="co"># Number of cells labeled per patient</span></span>
+<span id="cb182-18"><a href="cell-phenotyping.html#cb182-18" tabindex="-1"></a><span class="fu">table</span>(spe<span class="sc">$</span>cell_labels, spe<span class="sc">$</span>patient_id)</span></code></pre></div>
+<pre><code>##              
+##               Patient1 Patient2 Patient3 Patient4
+##   Bcell            152      131      234      263
+##   BnTcell          396       37      240     1029
+##   CD4               45      342      167      134
+##   CD8               60      497      137      128
+##   Myeloid          183      378      672      517
+##   Neutrophil        97        4       17       16
+##   Plasma_cell       34      536       87       59
+##   Stroma            84       37       85      236
+##   Treg             139      149       49       24
+##   Tumor           2342      906     1618     1133
+##   unlabeled       7214     9780     7826     9580</code></pre>
+<p>Based on these labels, we can now train a random forest classifier to classify
+all remaining, unlabeled cells.</p>
+</div>
+<div id="train-classifier" class="section level3 hasAnchor" number="9.3.4">
+<h3><span class="header-section-number">9.3.4</span> Train classifier<a href="cell-phenotyping.html#train-classifier" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>In this section, we will use the
+<a href="https://topepo.github.io/caret/index.html">caret</a> framework for machine
+learning in R. This package provides an interface to train a number of
+regression and classification models in a coherent fashion. We use a random
+forest classifier due to low number of parameters, high speed and an observed
+high performance for cell type classification <span class="citation">(<a href="#ref-Hoch2022">Hoch et al. 2022</a>)</span>.</p>
+<p>In the following section, we will first split the <code>SpatialExperiment</code> object
+into labeled and unlabeled cells. Based on the labeled cells, we split
+the data into a train (75% of the data) and test (25% of the data) dataset.
+We currently do not provide an independently labeled validation dataset.</p>
+<p>The <code>caret</code> package provides the <code>trainControl</code> function, which specifies model
+training parameters and the <code>train</code> function, which performs the actual model
+training. While training the model, we also want to estimate the best model
+parameters. In the case of the chosen random forest model (<code>method = "rf"</code>), we
+only need to estimate a single parameters (<code>mtry</code>) which corresponds to the
+number of variables randomly sampled as candidates at each split. To estimate
+the best parameter, we will perform a 5-fold cross validation (set within
+<code>trainControl</code>) over a tune length of 5 entries to <code>mtry</code>. In the following
+code chunk, the <code>createDataPartition</code> and the <code>train</code> function are not deterministic,
+meaning they return different results across different runs. We therefore set
+a <code>seed</code> here for both functions.</p>
+<div class="sourceCode" id="cb184"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb184-1"><a href="cell-phenotyping.html#cb184-1" tabindex="-1"></a><span class="fu">library</span>(caret)</span>
+<span id="cb184-2"><a href="cell-phenotyping.html#cb184-2" tabindex="-1"></a></span>
+<span id="cb184-3"><a href="cell-phenotyping.html#cb184-3" tabindex="-1"></a><span class="co"># Split between labeled and unlabeled cells</span></span>
+<span id="cb184-4"><a href="cell-phenotyping.html#cb184-4" tabindex="-1"></a>lab_spe <span class="ot">&lt;-</span> spe[,spe<span class="sc">$</span>cell_labels <span class="sc">!=</span> <span class="st">&quot;unlabeled&quot;</span>]</span>
+<span id="cb184-5"><a href="cell-phenotyping.html#cb184-5" tabindex="-1"></a>unlab_spe <span class="ot">&lt;-</span> spe[,spe<span class="sc">$</span>cell_labels <span class="sc">==</span> <span class="st">&quot;unlabeled&quot;</span>]</span>
+<span id="cb184-6"><a href="cell-phenotyping.html#cb184-6" tabindex="-1"></a></span>
+<span id="cb184-7"><a href="cell-phenotyping.html#cb184-7" tabindex="-1"></a><span class="co"># Randomly split into train and test data</span></span>
+<span id="cb184-8"><a href="cell-phenotyping.html#cb184-8" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">221029</span>)</span>
+<span id="cb184-9"><a href="cell-phenotyping.html#cb184-9" tabindex="-1"></a>trainIndex <span class="ot">&lt;-</span> <span class="fu">createDataPartition</span>(<span class="fu">factor</span>(lab_spe<span class="sc">$</span>cell_labels), <span class="at">p =</span> <span class="fl">0.75</span>)</span>
+<span id="cb184-10"><a href="cell-phenotyping.html#cb184-10" tabindex="-1"></a></span>
+<span id="cb184-11"><a href="cell-phenotyping.html#cb184-11" tabindex="-1"></a>train_spe <span class="ot">&lt;-</span> lab_spe[,trainIndex<span class="sc">$</span>Resample1]</span>
+<span id="cb184-12"><a href="cell-phenotyping.html#cb184-12" tabindex="-1"></a>test_spe <span class="ot">&lt;-</span> lab_spe[,<span class="sc">-</span>trainIndex<span class="sc">$</span>Resample1]</span>
+<span id="cb184-13"><a href="cell-phenotyping.html#cb184-13" tabindex="-1"></a></span>
+<span id="cb184-14"><a href="cell-phenotyping.html#cb184-14" tabindex="-1"></a><span class="co"># Define fit parameters for 5-fold cross validation</span></span>
+<span id="cb184-15"><a href="cell-phenotyping.html#cb184-15" tabindex="-1"></a>fitControl <span class="ot">&lt;-</span> <span class="fu">trainControl</span>(<span class="at">method =</span> <span class="st">&quot;cv&quot;</span>,</span>
+<span id="cb184-16"><a href="cell-phenotyping.html#cb184-16" tabindex="-1"></a>                           <span class="at">number =</span> <span class="dv">5</span>)</span>
+<span id="cb184-17"><a href="cell-phenotyping.html#cb184-17" tabindex="-1"></a></span>
+<span id="cb184-18"><a href="cell-phenotyping.html#cb184-18" tabindex="-1"></a><span class="co"># Select the arsinh-transformed counts for training</span></span>
+<span id="cb184-19"><a href="cell-phenotyping.html#cb184-19" tabindex="-1"></a>cur_mat <span class="ot">&lt;-</span> <span class="fu">t</span>(<span class="fu">assay</span>(train_spe, <span class="st">&quot;exprs&quot;</span>)[<span class="fu">rowData</span>(train_spe)<span class="sc">$</span>use_channel,])</span>
+<span id="cb184-20"><a href="cell-phenotyping.html#cb184-20" tabindex="-1"></a></span>
+<span id="cb184-21"><a href="cell-phenotyping.html#cb184-21" tabindex="-1"></a><span class="co"># Train a random forest classifier</span></span>
+<span id="cb184-22"><a href="cell-phenotyping.html#cb184-22" tabindex="-1"></a>rffit <span class="ot">&lt;-</span> <span class="fu">train</span>(<span class="at">x =</span> cur_mat, </span>
+<span id="cb184-23"><a href="cell-phenotyping.html#cb184-23" tabindex="-1"></a>               <span class="at">y =</span> <span class="fu">factor</span>(train_spe<span class="sc">$</span>cell_labels),</span>
+<span id="cb184-24"><a href="cell-phenotyping.html#cb184-24" tabindex="-1"></a>               <span class="at">method =</span> <span class="st">&quot;rf&quot;</span>, <span class="at">ntree =</span> <span class="dv">1000</span>,</span>
+<span id="cb184-25"><a href="cell-phenotyping.html#cb184-25" tabindex="-1"></a>               <span class="at">tuneLength =</span> <span class="dv">5</span>,</span>
+<span id="cb184-26"><a href="cell-phenotyping.html#cb184-26" tabindex="-1"></a>               <span class="at">trControl =</span> fitControl)</span>
+<span id="cb184-27"><a href="cell-phenotyping.html#cb184-27" tabindex="-1"></a></span>
+<span id="cb184-28"><a href="cell-phenotyping.html#cb184-28" tabindex="-1"></a>rffit</span></code></pre></div>
+<pre><code>## Random Forest 
+## 
+## 10049 samples
+##    37 predictor
+##    10 classes: &#39;Bcell&#39;, &#39;BnTcell&#39;, &#39;CD4&#39;, &#39;CD8&#39;, &#39;Myeloid&#39;, &#39;Neutrophil&#39;, &#39;Plasma_cell&#39;, &#39;Stroma&#39;, &#39;Treg&#39;, &#39;Tumor&#39; 
+## 
+## No pre-processing
+## Resampling: Cross-Validated (5 fold) 
+## Summary of sample sizes: 8040, 8039, 8038, 8038, 8041 
+## Resampling results across tuning parameters:
+## 
+##   mtry  Accuracy   Kappa    
+##    2    0.9643726  0.9524051
+##   10    0.9780071  0.9707483
+##   19    0.9801973  0.9736577
+##   28    0.9787052  0.9716635
+##   37    0.9779095  0.9705890
+## 
+## Accuracy was used to select the optimal model using the largest value.
+## The final value used for the model was mtry = 19.</code></pre>
+<p>Training the classifier took
+8.46 minutes.</p>
+</div>
+<div id="classifier-performance" class="section level3 hasAnchor" number="9.3.5">
+<h3><span class="header-section-number">9.3.5</span> Classifier performance<a href="cell-phenotyping.html#classifier-performance" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>We next observe the accuracy of the classifer when predicting cell phenotypes
+across the cross-validation and when applying the classifier to the test
+dataset.</p>
+<p>First, we can visualize the classification accuracy during parameter
+tuning:</p>
+<div class="sourceCode" id="cb186"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb186-1"><a href="cell-phenotyping.html#cb186-1" tabindex="-1"></a><span class="fu">ggplot</span>(rffit) <span class="sc">+</span> </span>
+<span id="cb186-2"><a href="cell-phenotyping.html#cb186-2" tabindex="-1"></a>  <span class="fu">geom_errorbar</span>(<span class="at">data =</span> rffit<span class="sc">$</span>results,</span>
+<span id="cb186-3"><a href="cell-phenotyping.html#cb186-3" tabindex="-1"></a>                <span class="fu">aes</span>(<span class="at">ymin =</span> Accuracy <span class="sc">-</span> AccuracySD,</span>
+<span id="cb186-4"><a href="cell-phenotyping.html#cb186-4" tabindex="-1"></a>                    <span class="at">ymax =</span> Accuracy <span class="sc">+</span> AccuracySD),</span>
+<span id="cb186-5"><a href="cell-phenotyping.html#cb186-5" tabindex="-1"></a>                <span class="at">width =</span> <span class="fl">0.4</span>) <span class="sc">+</span></span>
+<span id="cb186-6"><a href="cell-phenotyping.html#cb186-6" tabindex="-1"></a>    <span class="fu">theme_classic</span>(<span class="at">base_size =</span> <span class="dv">15</span>)</span></code></pre></div>
+<p><img src="08-phenotyping_files/figure-html/accuracy-tuning-1.png" width="672" /></p>
+<p>The best value for <code>mtry</code> is 19 and is used when predicting new data.</p>
+<p>It is often recommended to visualize the variable importance of the
+classifier. The following plot specifies which variables (markers) are
+most important for classifying the data.</p>
+<div class="sourceCode" id="cb187"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb187-1"><a href="cell-phenotyping.html#cb187-1" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">varImp</span>(rffit))</span></code></pre></div>
+<p><img src="08-phenotyping_files/figure-html/variable-importance-1.png" width="672" /></p>
+<p>As expected, the markers that were used for gating (Ecad, CD3, CD20, HLADR,
+CD8a, CD38, FOXP3) were important for classification.</p>
+<p>To assess the accuracy, sensitivity, specificity, among other quality measures of
+the classifier, we will now predict cell phenotypes in the test data.</p>
+<div class="sourceCode" id="cb188"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb188-1"><a href="cell-phenotyping.html#cb188-1" tabindex="-1"></a><span class="co"># Select the arsinh-transformed counts of the test data</span></span>
+<span id="cb188-2"><a href="cell-phenotyping.html#cb188-2" tabindex="-1"></a>cur_mat <span class="ot">&lt;-</span> <span class="fu">t</span>(<span class="fu">assay</span>(test_spe, <span class="st">&quot;exprs&quot;</span>)[<span class="fu">rowData</span>(test_spe)<span class="sc">$</span>use_channel,])</span>
+<span id="cb188-3"><a href="cell-phenotyping.html#cb188-3" tabindex="-1"></a></span>
+<span id="cb188-4"><a href="cell-phenotyping.html#cb188-4" tabindex="-1"></a><span class="co"># Predict the cell phenotype labels of the test data</span></span>
+<span id="cb188-5"><a href="cell-phenotyping.html#cb188-5" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">231019</span>)</span>
+<span id="cb188-6"><a href="cell-phenotyping.html#cb188-6" tabindex="-1"></a>cur_pred <span class="ot">&lt;-</span> <span class="fu">predict</span>(rffit, <span class="at">newdata =</span> cur_mat)</span></code></pre></div>
+<p>While the overall classification accuracy can appear high, we also want
+to check if each cell phenotype class is correctly predicted.
+For this, we will calculate the confusion matrix between predicted and actual
+cell labels. This measure may highlight individual cell phenotype classes that
+were not correctly predicted by the classifier. When setting <code>mode = "everything"</code>,
+the <code>confusionMatrix</code> function returns all available prediction measures including
+sensitivity, specificity, precision, recall and the F1 score per cell
+phenotype class.</p>
+<div class="sourceCode" id="cb189"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb189-1"><a href="cell-phenotyping.html#cb189-1" tabindex="-1"></a>cm <span class="ot">&lt;-</span> <span class="fu">confusionMatrix</span>(<span class="at">data =</span> cur_pred, </span>
+<span id="cb189-2"><a href="cell-phenotyping.html#cb189-2" tabindex="-1"></a>                      <span class="at">reference =</span> <span class="fu">factor</span>(test_spe<span class="sc">$</span>cell_labels), </span>
+<span id="cb189-3"><a href="cell-phenotyping.html#cb189-3" tabindex="-1"></a>                      <span class="at">mode =</span> <span class="st">&quot;everything&quot;</span>)</span>
+<span id="cb189-4"><a href="cell-phenotyping.html#cb189-4" tabindex="-1"></a></span>
+<span id="cb189-5"><a href="cell-phenotyping.html#cb189-5" tabindex="-1"></a>cm</span></code></pre></div>
+<pre><code>## Confusion Matrix and Statistics
+## 
+##              Reference
+## Prediction    Bcell BnTcell  CD4  CD8 Myeloid Neutrophil Plasma_cell Stroma
+##   Bcell         186       2    0    0       0          0           6      0
+##   BnTcell         4     423    1    0       0          0           0      0
+##   CD4             0       0  163    0       0          2           3      2
+##   CD8             0       0    0  199       0          0           8      0
+##   Myeloid         0       0    2    1     437          0           0      0
+##   Neutrophil      0       0    0    0       0         30           0      0
+##   Plasma_cell     1       0    3    2       0          0         158      0
+##   Stroma          0       0    2    0       0          0           0    108
+##   Treg            0       0    0    0       0          0           3      0
+##   Tumor           4       0    1    3       0          1           1      0
+##              Reference
+## Prediction    Treg Tumor
+##   Bcell          0     1
+##   BnTcell        0     1
+##   CD4            0     5
+##   CD8            0     3
+##   Myeloid        0     0
+##   Neutrophil     0     0
+##   Plasma_cell    1     0
+##   Stroma         0     0
+##   Treg          89     2
+##   Tumor          0  1487
+## 
+## Overall Statistics
+##                                          
+##                Accuracy : 0.9806         
+##                  95% CI : (0.9753, 0.985)
+##     No Information Rate : 0.4481         
+##     P-Value [Acc &gt; NIR] : &lt; 2.2e-16      
+##                                          
+##                   Kappa : 0.9741         
+##                                          
+##  Mcnemar&#39;s Test P-Value : NA             
+## 
+## Statistics by Class:
+## 
+##                      Class: Bcell Class: BnTcell Class: CD4 Class: CD8
+## Sensitivity               0.95385         0.9953    0.94767    0.97073
+## Specificity               0.99714         0.9979    0.99622    0.99650
+## Pos Pred Value            0.95385         0.9860    0.93143    0.94762
+## Neg Pred Value            0.99714         0.9993    0.99716    0.99809
+## Precision                 0.95385         0.9860    0.93143    0.94762
+## Recall                    0.95385         0.9953    0.94767    0.97073
+## F1                        0.95385         0.9906    0.93948    0.95904
+## Prevalence                0.05830         0.1271    0.05142    0.06129
+## Detection Rate            0.05561         0.1265    0.04873    0.05949
+## Detection Prevalence      0.05830         0.1283    0.05232    0.06278
+## Balanced Accuracy         0.97549         0.9966    0.97195    0.98361
+##                      Class: Myeloid Class: Neutrophil Class: Plasma_cell
+## Sensitivity                  1.0000          0.909091            0.88268
+## Specificity                  0.9990          1.000000            0.99779
+## Pos Pred Value               0.9932          1.000000            0.95758
+## Neg Pred Value               1.0000          0.999095            0.99340
+## Precision                    0.9932          1.000000            0.95758
+## Recall                       1.0000          0.909091            0.88268
+## F1                           0.9966          0.952381            0.91860
+## Prevalence                   0.1306          0.009865            0.05351
+## Detection Rate               0.1306          0.008969            0.04723
+## Detection Prevalence         0.1315          0.008969            0.04933
+## Balanced Accuracy            0.9995          0.954545            0.94024
+##                      Class: Stroma Class: Treg Class: Tumor
+## Sensitivity                0.98182     0.98889       0.9920
+## Specificity                0.99938     0.99846       0.9946
+## Pos Pred Value             0.98182     0.94681       0.9933
+## Neg Pred Value             0.99938     0.99969       0.9935
+## Precision                  0.98182     0.94681       0.9933
+## Recall                     0.98182     0.98889       0.9920
+## F1                         0.98182     0.96739       0.9927
+## Prevalence                 0.03288     0.02691       0.4481
+## Detection Rate             0.03229     0.02661       0.4445
+## Detection Prevalence       0.03288     0.02810       0.4475
+## Balanced Accuracy          0.99060     0.99368       0.9933</code></pre>
+<p>To easily visualize these results, we can now plot the true positive rate
+(sensitivity) versus the false positive rate (1 - specificity). The size of the
+point is determined by the number of true positives divided by the total number
+of cells.</p>
+<div class="sourceCode" id="cb191"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb191-1"><a href="cell-phenotyping.html#cb191-1" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb191-2"><a href="cell-phenotyping.html#cb191-2" tabindex="-1"></a></span>
+<span id="cb191-3"><a href="cell-phenotyping.html#cb191-3" tabindex="-1"></a><span class="fu">data.frame</span>(cm<span class="sc">$</span>byClass) <span class="sc">%&gt;%</span></span>
+<span id="cb191-4"><a href="cell-phenotyping.html#cb191-4" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">class =</span> <span class="fu">sub</span>(<span class="st">&quot;Class: &quot;</span>, <span class="st">&quot;&quot;</span>, <span class="fu">rownames</span>(cm<span class="sc">$</span>byClass))) <span class="sc">%&gt;%</span></span>
+<span id="cb191-5"><a href="cell-phenotyping.html#cb191-5" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span> </span>
+<span id="cb191-6"><a href="cell-phenotyping.html#cb191-6" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="dv">1</span> <span class="sc">-</span> Specificity, Sensitivity, </span>
+<span id="cb191-7"><a href="cell-phenotyping.html#cb191-7" tabindex="-1"></a>                 <span class="at">size =</span> Detection.Rate,</span>
+<span id="cb191-8"><a href="cell-phenotyping.html#cb191-8" tabindex="-1"></a>                 <span class="at">fill =</span> class),</span>
+<span id="cb191-9"><a href="cell-phenotyping.html#cb191-9" tabindex="-1"></a>             <span class="at">shape =</span> <span class="dv">21</span>) <span class="sc">+</span> </span>
+<span id="cb191-10"><a href="cell-phenotyping.html#cb191-10" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">metadata</span>(spe)<span class="sc">$</span>color_vectors<span class="sc">$</span>celltype) <span class="sc">+</span></span>
+<span id="cb191-11"><a href="cell-phenotyping.html#cb191-11" tabindex="-1"></a>  <span class="fu">theme_classic</span>(<span class="at">base_size =</span> <span class="dv">15</span>) <span class="sc">+</span> </span>
+<span id="cb191-12"><a href="cell-phenotyping.html#cb191-12" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="st">&quot;Sensitivity (TPR)&quot;</span>) <span class="sc">+</span></span>
+<span id="cb191-13"><a href="cell-phenotyping.html#cb191-13" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">&quot;1 - Specificity (FPR)&quot;</span>)</span></code></pre></div>
+<p><img src="08-phenotyping_files/figure-html/specificity-sensitivity-1.png" width="672" /></p>
+<p>We observe high sensitivity and specificity for most cell types. Plasma cells
+show the lowest true positive rate with 88% being sufficiently high.</p>
+<p>Finally, to observe which cell phenotypes were wrongly classified, we can visualize
+the distribution of classification probabilities per cell phenotype class:</p>
+<div class="sourceCode" id="cb192"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb192-1"><a href="cell-phenotyping.html#cb192-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">231019</span>)</span>
+<span id="cb192-2"><a href="cell-phenotyping.html#cb192-2" tabindex="-1"></a>cur_pred <span class="ot">&lt;-</span> <span class="fu">predict</span>(rffit, </span>
+<span id="cb192-3"><a href="cell-phenotyping.html#cb192-3" tabindex="-1"></a>                    <span class="at">newdata =</span> cur_mat, </span>
+<span id="cb192-4"><a href="cell-phenotyping.html#cb192-4" tabindex="-1"></a>                    <span class="at">type =</span> <span class="st">&quot;prob&quot;</span>)</span>
+<span id="cb192-5"><a href="cell-phenotyping.html#cb192-5" tabindex="-1"></a>cur_pred<span class="sc">$</span>truth <span class="ot">&lt;-</span> <span class="fu">factor</span>(test_spe<span class="sc">$</span>cell_labels)</span>
+<span id="cb192-6"><a href="cell-phenotyping.html#cb192-6" tabindex="-1"></a></span>
+<span id="cb192-7"><a href="cell-phenotyping.html#cb192-7" tabindex="-1"></a>cur_pred <span class="sc">%&gt;%</span></span>
+<span id="cb192-8"><a href="cell-phenotyping.html#cb192-8" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> Bcell<span class="sc">:</span>Tumor) <span class="sc">%&gt;%</span></span>
+<span id="cb192-9"><a href="cell-phenotyping.html#cb192-9" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb192-10"><a href="cell-phenotyping.html#cb192-10" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> name, <span class="at">y =</span> value, <span class="at">fill =</span> name), <span class="at">outlier.size =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb192-11"><a href="cell-phenotyping.html#cb192-11" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(. <span class="sc">~</span> truth, <span class="at">ncol =</span> <span class="dv">1</span>) <span class="sc">+</span> </span>
+<span id="cb192-12"><a href="cell-phenotyping.html#cb192-12" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">metadata</span>(spe)<span class="sc">$</span>color_vectors<span class="sc">$</span>celltype)  <span class="sc">+</span></span>
+<span id="cb192-13"><a href="cell-phenotyping.html#cb192-13" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">panel.background =</span> <span class="fu">element_blank</span>(), </span>
+<span id="cb192-14"><a href="cell-phenotyping.html#cb192-14" tabindex="-1"></a>        <span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>))</span></code></pre></div>
+<p><img src="08-phenotyping_files/figure-html/prediciton-probability-1.png" width="672" /></p>
+<p>The boxplots indicate the classification probabilities per class. The classifier
+is well trained if classification probabilities are only high for the one
+specific class.</p>
+</div>
+<div id="classification-of-new-data" class="section level3 hasAnchor" number="9.3.6">
+<h3><span class="header-section-number">9.3.6</span> Classification of new data<a href="cell-phenotyping.html#classification-of-new-data" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>In the final section, we will now use the tuned and tested random forest
+classifier to predict the cell phenotypes of the unlabeled data.</p>
+<p>First, we predict the cell phenotypes and extract their classification
+probabilities.</p>
+<div class="sourceCode" id="cb193"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb193-1"><a href="cell-phenotyping.html#cb193-1" tabindex="-1"></a><span class="co"># Select the arsinh-transformed counts of the unlabeled data for prediction</span></span>
+<span id="cb193-2"><a href="cell-phenotyping.html#cb193-2" tabindex="-1"></a>cur_mat <span class="ot">&lt;-</span> <span class="fu">t</span>(<span class="fu">assay</span>(unlab_spe, <span class="st">&quot;exprs&quot;</span>)[<span class="fu">rowData</span>(unlab_spe)<span class="sc">$</span>use_channel,])</span>
+<span id="cb193-3"><a href="cell-phenotyping.html#cb193-3" tabindex="-1"></a></span>
+<span id="cb193-4"><a href="cell-phenotyping.html#cb193-4" tabindex="-1"></a><span class="co"># Predict the cell phenotype labels of the unlabeled data</span></span>
+<span id="cb193-5"><a href="cell-phenotyping.html#cb193-5" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">231014</span>)</span>
+<span id="cb193-6"><a href="cell-phenotyping.html#cb193-6" tabindex="-1"></a>cell_class <span class="ot">&lt;-</span> <span class="fu">as.character</span>(<span class="fu">predict</span>(rffit, </span>
+<span id="cb193-7"><a href="cell-phenotyping.html#cb193-7" tabindex="-1"></a>                                   <span class="at">newdata =</span> cur_mat, </span>
+<span id="cb193-8"><a href="cell-phenotyping.html#cb193-8" tabindex="-1"></a>                                   <span class="at">type =</span> <span class="st">&quot;raw&quot;</span>))</span>
+<span id="cb193-9"><a href="cell-phenotyping.html#cb193-9" tabindex="-1"></a><span class="fu">names</span>(cell_class) <span class="ot">&lt;-</span> <span class="fu">rownames</span>(cur_mat)</span>
+<span id="cb193-10"><a href="cell-phenotyping.html#cb193-10" tabindex="-1"></a></span>
+<span id="cb193-11"><a href="cell-phenotyping.html#cb193-11" tabindex="-1"></a><span class="fu">table</span>(cell_class)</span></code></pre></div>
+<pre><code>## cell_class
+##       Bcell     BnTcell         CD4         CD8     Myeloid  Neutrophil 
+##         817         979        3620        2716        6302         559 
+## Plasma_cell      Stroma        Treg       Tumor 
+##        2692        4904        1170       10641</code></pre>
+<div class="sourceCode" id="cb195"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb195-1"><a href="cell-phenotyping.html#cb195-1" tabindex="-1"></a><span class="co"># Extract prediction probabilities for each cell</span></span>
+<span id="cb195-2"><a href="cell-phenotyping.html#cb195-2" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">231014</span>)</span>
+<span id="cb195-3"><a href="cell-phenotyping.html#cb195-3" tabindex="-1"></a>cell_prob <span class="ot">&lt;-</span> <span class="fu">predict</span>(rffit, </span>
+<span id="cb195-4"><a href="cell-phenotyping.html#cb195-4" tabindex="-1"></a>                     <span class="at">newdata =</span> cur_mat, </span>
+<span id="cb195-5"><a href="cell-phenotyping.html#cb195-5" tabindex="-1"></a>                     <span class="at">type =</span> <span class="st">&quot;prob&quot;</span>)</span></code></pre></div>
+<p>Each cell is assigned to the class with highest probability. There are however
+cases, where the highest probability is low meaning the cell can not be uniquely
+assigned to a class. We next want to identify these cells and label them as
+“undefined”. Here, we select a maximum classification probability threshold
+of 40% but this threshold needs to be adjusted for other datasets. The adjusted
+cell labels are then stored in the <code>SpatialExperiment</code> object.</p>
+<div class="sourceCode" id="cb196"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb196-1"><a href="cell-phenotyping.html#cb196-1" tabindex="-1"></a><span class="fu">library</span>(ggridges)</span>
+<span id="cb196-2"><a href="cell-phenotyping.html#cb196-2" tabindex="-1"></a></span>
+<span id="cb196-3"><a href="cell-phenotyping.html#cb196-3" tabindex="-1"></a><span class="co"># Distribution of maximum probabilities</span></span>
+<span id="cb196-4"><a href="cell-phenotyping.html#cb196-4" tabindex="-1"></a><span class="fu">tibble</span>(<span class="at">max_prob =</span> <span class="fu">rowMax</span>(<span class="fu">as.matrix</span>(cell_prob)),</span>
+<span id="cb196-5"><a href="cell-phenotyping.html#cb196-5" tabindex="-1"></a>       <span class="at">type =</span> cell_class) <span class="sc">%&gt;%</span></span>
+<span id="cb196-6"><a href="cell-phenotyping.html#cb196-6" tabindex="-1"></a>    <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb196-7"><a href="cell-phenotyping.html#cb196-7" tabindex="-1"></a>        <span class="fu">geom_density_ridges</span>(<span class="fu">aes</span>(<span class="at">x =</span> max_prob, <span class="at">y =</span> cell_class, <span class="at">fill =</span> cell_class)) <span class="sc">+</span></span>
+<span id="cb196-8"><a href="cell-phenotyping.html#cb196-8" tabindex="-1"></a>        <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">metadata</span>(spe)<span class="sc">$</span>color_vectors<span class="sc">$</span>celltype) <span class="sc">+</span></span>
+<span id="cb196-9"><a href="cell-phenotyping.html#cb196-9" tabindex="-1"></a>        <span class="fu">theme_classic</span>(<span class="at">base_size =</span> <span class="dv">15</span>) <span class="sc">+</span></span>
+<span id="cb196-10"><a href="cell-phenotyping.html#cb196-10" tabindex="-1"></a>        <span class="fu">xlab</span>(<span class="st">&quot;Maximum probability&quot;</span>) <span class="sc">+</span></span>
+<span id="cb196-11"><a href="cell-phenotyping.html#cb196-11" tabindex="-1"></a>        <span class="fu">ylab</span>(<span class="st">&quot;Cell type&quot;</span>) <span class="sc">+</span> </span>
+<span id="cb196-12"><a href="cell-phenotyping.html#cb196-12" tabindex="-1"></a>        <span class="fu">xlim</span>(<span class="fu">c</span>(<span class="dv">0</span>,<span class="fl">1.2</span>))</span></code></pre></div>
+<pre><code>## Picking joint bandwidth of 0.0238</code></pre>
+<p><img src="08-phenotyping_files/figure-html/undefined-cells-1.png" width="672" /></p>
+<div class="sourceCode" id="cb198"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb198-1"><a href="cell-phenotyping.html#cb198-1" tabindex="-1"></a><span class="co"># Label undefined cells</span></span>
+<span id="cb198-2"><a href="cell-phenotyping.html#cb198-2" tabindex="-1"></a>cell_class[<span class="fu">rowMax</span>(<span class="fu">as.matrix</span>(cell_prob)) <span class="sc">&lt;</span> <span class="fl">0.4</span>] <span class="ot">&lt;-</span> <span class="st">&quot;undefined&quot;</span></span>
+<span id="cb198-3"><a href="cell-phenotyping.html#cb198-3" tabindex="-1"></a></span>
+<span id="cb198-4"><a href="cell-phenotyping.html#cb198-4" tabindex="-1"></a><span class="co"># Store labels in SpatialExperiment onject</span></span>
+<span id="cb198-5"><a href="cell-phenotyping.html#cb198-5" tabindex="-1"></a>cell_labels <span class="ot">&lt;-</span> spe<span class="sc">$</span>cell_labels</span>
+<span id="cb198-6"><a href="cell-phenotyping.html#cb198-6" tabindex="-1"></a>cell_labels[<span class="fu">colnames</span>(unlab_spe)] <span class="ot">&lt;-</span> cell_class</span>
+<span id="cb198-7"><a href="cell-phenotyping.html#cb198-7" tabindex="-1"></a>spe<span class="sc">$</span>celltype <span class="ot">&lt;-</span> cell_labels </span>
+<span id="cb198-8"><a href="cell-phenotyping.html#cb198-8" tabindex="-1"></a></span>
+<span id="cb198-9"><a href="cell-phenotyping.html#cb198-9" tabindex="-1"></a><span class="fu">table</span>(spe<span class="sc">$</span>celltype, spe<span class="sc">$</span>patient_id)</span></code></pre></div>
+<pre><code>##              
+##               Patient1 Patient2 Patient3 Patient4
+##   Bcell            179      527      431      458
+##   BnTcell          416      586      594     1078
+##   CD4              391     1370      699     1385
+##   CD8              518     1365      479     1142
+##   Myeloid         1369     2197     1723     2731
+##   Neutrophil       348        9      148      176
+##   Plasma_cell      650     2122      351      274
+##   Stroma           633      676      736     3261
+##   Treg             553      409      243      310
+##   Tumor           5560     3334     5648     2083
+##   undefined        129      202       80      221</code></pre>
+<p>We can now compare the cell labels derived by classification to the different
+clustering strategies. The first comparison is against the clustering results
+using the asinh-transformed counts.</p>
+<div class="sourceCode" id="cb200"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb200-1"><a href="cell-phenotyping.html#cb200-1" tabindex="-1"></a>tab1 <span class="ot">&lt;-</span> <span class="fu">table</span>(spe<span class="sc">$</span>celltype, </span>
+<span id="cb200-2"><a href="cell-phenotyping.html#cb200-2" tabindex="-1"></a>              <span class="fu">paste</span>(<span class="st">&quot;Rphenograph&quot;</span>, spe<span class="sc">$</span>pg_clusters))</span>
+<span id="cb200-3"><a href="cell-phenotyping.html#cb200-3" tabindex="-1"></a>tab2 <span class="ot">&lt;-</span> <span class="fu">table</span>(spe<span class="sc">$</span>celltype, </span>
+<span id="cb200-4"><a href="cell-phenotyping.html#cb200-4" tabindex="-1"></a>              <span class="fu">paste</span>(<span class="st">&quot;SNN&quot;</span>, spe<span class="sc">$</span>nn_clusters))</span>
+<span id="cb200-5"><a href="cell-phenotyping.html#cb200-5" tabindex="-1"></a>tab3 <span class="ot">&lt;-</span> <span class="fu">table</span>(spe<span class="sc">$</span>celltype, </span>
+<span id="cb200-6"><a href="cell-phenotyping.html#cb200-6" tabindex="-1"></a>              <span class="fu">paste</span>(<span class="st">&quot;SOM&quot;</span>, spe<span class="sc">$</span>som_clusters))</span>
+<span id="cb200-7"><a href="cell-phenotyping.html#cb200-7" tabindex="-1"></a></span>
+<span id="cb200-8"><a href="cell-phenotyping.html#cb200-8" tabindex="-1"></a><span class="fu">pheatmap</span>(<span class="fu">log10</span>(tab1 <span class="sc">+</span> <span class="dv">10</span>), <span class="at">color =</span> <span class="fu">viridis</span>(<span class="dv">100</span>))</span></code></pre></div>
+<p><img src="08-phenotyping_files/figure-html/compare-raw-1.png" width="672" /></p>
+<div class="sourceCode" id="cb201"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb201-1"><a href="cell-phenotyping.html#cb201-1" tabindex="-1"></a><span class="fu">pheatmap</span>(<span class="fu">log10</span>(tab2 <span class="sc">+</span> <span class="dv">10</span>), <span class="at">color =</span> <span class="fu">viridis</span>(<span class="dv">100</span>))</span></code></pre></div>
+<p><img src="08-phenotyping_files/figure-html/compare-raw-2.png" width="672" /></p>
+<div class="sourceCode" id="cb202"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb202-1"><a href="cell-phenotyping.html#cb202-1" tabindex="-1"></a><span class="fu">pheatmap</span>(<span class="fu">log10</span>(tab3 <span class="sc">+</span> <span class="dv">10</span>), <span class="at">color =</span> <span class="fu">viridis</span>(<span class="dv">100</span>))</span></code></pre></div>
+<p><img src="08-phenotyping_files/figure-html/compare-raw-3.png" width="672" /></p>
+<p>We can see that Tumor and Myeloid cells span multiple clusters while
+Neutrophiles are detected as an individual cluster by all clustering approaches.</p>
+<p>We next compare the cell classification against clustering results using the
+integrated cells.</p>
+<div class="sourceCode" id="cb203"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb203-1"><a href="cell-phenotyping.html#cb203-1" tabindex="-1"></a>tab1 <span class="ot">&lt;-</span> <span class="fu">table</span>(spe<span class="sc">$</span>celltype, </span>
+<span id="cb203-2"><a href="cell-phenotyping.html#cb203-2" tabindex="-1"></a>              <span class="fu">paste</span>(<span class="st">&quot;Rphenograph&quot;</span>, spe<span class="sc">$</span>pg_clusters_corrected))</span>
+<span id="cb203-3"><a href="cell-phenotyping.html#cb203-3" tabindex="-1"></a>tab2 <span class="ot">&lt;-</span> <span class="fu">table</span>(spe<span class="sc">$</span>celltype, </span>
+<span id="cb203-4"><a href="cell-phenotyping.html#cb203-4" tabindex="-1"></a>              <span class="fu">paste</span>(<span class="st">&quot;SNN&quot;</span>, spe<span class="sc">$</span>nn_clusters_corrected))</span>
+<span id="cb203-5"><a href="cell-phenotyping.html#cb203-5" tabindex="-1"></a>tab3 <span class="ot">&lt;-</span> <span class="fu">table</span>(spe<span class="sc">$</span>celltype, </span>
+<span id="cb203-6"><a href="cell-phenotyping.html#cb203-6" tabindex="-1"></a>              <span class="fu">paste</span>(<span class="st">&quot;SOM&quot;</span>, spe<span class="sc">$</span>som_clusters_corrected))</span>
+<span id="cb203-7"><a href="cell-phenotyping.html#cb203-7" tabindex="-1"></a></span>
+<span id="cb203-8"><a href="cell-phenotyping.html#cb203-8" tabindex="-1"></a><span class="fu">pheatmap</span>(<span class="fu">log10</span>(tab1 <span class="sc">+</span> <span class="dv">10</span>), <span class="at">color =</span> <span class="fu">viridis</span>(<span class="dv">100</span>))</span></code></pre></div>
+<p><img src="08-phenotyping_files/figure-html/compare-corrected-1.png" width="672" /></p>
+<div class="sourceCode" id="cb204"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb204-1"><a href="cell-phenotyping.html#cb204-1" tabindex="-1"></a><span class="fu">pheatmap</span>(<span class="fu">log10</span>(tab2 <span class="sc">+</span> <span class="dv">10</span>), <span class="at">color =</span> <span class="fu">viridis</span>(<span class="dv">100</span>))</span></code></pre></div>
+<p><img src="08-phenotyping_files/figure-html/compare-corrected-2.png" width="672" /></p>
+<div class="sourceCode" id="cb205"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb205-1"><a href="cell-phenotyping.html#cb205-1" tabindex="-1"></a><span class="fu">pheatmap</span>(<span class="fu">log10</span>(tab3 <span class="sc">+</span> <span class="dv">10</span>), <span class="at">color =</span> <span class="fu">viridis</span>(<span class="dv">100</span>))</span></code></pre></div>
+<p><img src="08-phenotyping_files/figure-html/compare-corrected-3.png" width="672" /></p>
+<p>We observe a high agreement between the shared nearest neighbor clustering
+approach using the integrated cells and the cell phenotypes derived by
+classification.</p>
+<p>In the next sections, we will highlight visualization strategies to verify the
+correctness of the phenotyping approach. Specifically, Section
+<a href="image-visualization.html#outline-cells">11.2.3</a> shows how to outline identified cell phenotypes on
+composite images.</p>
+<p>Finally, we save the updated <code>SpatialExperiment</code> object.</p>
+<div class="sourceCode" id="cb206"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb206-1"><a href="cell-phenotyping.html#cb206-1" tabindex="-1"></a><span class="fu">saveRDS</span>(spe, <span class="st">&quot;data/spe.rds&quot;</span>)</span></code></pre></div>
+</div>
+</div>
+<div id="session-info-4" class="section level2 hasAnchor" number="9.4">
+<h2><span class="header-section-number">9.4</span> Session Info<a href="cell-phenotyping.html#session-info-4" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<details>
+<summary>
+SessionInfo
+</summary>
+<pre><code>## R version 4.3.2 (2023-10-31)
+## Platform: x86_64-pc-linux-gnu (64-bit)
+## Running under: Ubuntu 22.04.3 LTS
+## 
+## Matrix products: default
+## BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
+## LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.20.so;  LAPACK version 3.10.0
+## 
+## locale:
+##  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+##  [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+##  [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+##  [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+##  [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+## [11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+## 
+## time zone: Etc/UTC
+## tzcode source: system (glibc)
+## 
+## attached base packages:
+## [1] stats4    stats     graphics  grDevices utils     datasets  methods  
+## [8] base     
+## 
+## other attached packages:
+##  [1] testthat_3.2.1              ggridges_0.5.5             
+##  [3] lubridate_1.9.3             forcats_1.0.0              
+##  [5] stringr_1.5.1               purrr_1.0.2                
+##  [7] readr_2.1.4                 tidyr_1.3.0                
+##  [9] tibble_3.2.1                tidyverse_2.0.0            
+## [11] caret_6.0-94                lattice_0.21-9             
+## [13] cytomapper_1.14.0           EBImage_4.44.0             
+## [15] dplyr_1.1.4                 gridExtra_2.3              
+## [17] pheatmap_1.0.12             patchwork_1.1.3            
+## [19] ConsensusClusterPlus_1.66.0 kohonen_3.0.12             
+## [21] CATALYST_1.26.0             scran_1.30.0               
+## [23] scuttle_1.12.0              BiocParallel_1.36.0        
+## [25] bluster_1.12.0              viridis_0.6.4              
+## [27] viridisLite_0.4.2           dittoSeq_1.14.0            
+## [29] ggplot2_3.4.4               igraph_1.6.0               
+## [31] Rphenograph_0.99.1.9003     SpatialExperiment_1.12.0   
+## [33] SingleCellExperiment_1.24.0 SummarizedExperiment_1.32.0
+## [35] Biobase_2.62.0              GenomicRanges_1.54.1       
+## [37] GenomeInfoDb_1.38.5         IRanges_2.36.0             
+## [39] S4Vectors_0.40.2            BiocGenerics_0.48.1        
+## [41] MatrixGenerics_1.14.0       matrixStats_1.2.0          
+## 
+## loaded via a namespace (and not attached):
+##   [1] bitops_1.0-7              RColorBrewer_1.1-3       
+##   [3] doParallel_1.0.17         tools_4.3.2              
+##   [5] backports_1.4.1           utf8_1.2.4               
+##   [7] R6_2.5.1                  HDF5Array_1.30.0         
+##   [9] rhdf5filters_1.14.1       GetoptLong_1.0.5         
+##  [11] withr_2.5.2               sp_2.1-2                 
+##  [13] cli_3.6.2                 sandwich_3.1-0           
+##  [15] labeling_0.4.3            sass_0.4.8               
+##  [17] nnls_1.5                  mvtnorm_1.2-4            
+##  [19] randomForest_4.7-1.1      proxy_0.4-27             
+##  [21] systemfonts_1.0.5         colorRamps_2.3.1         
+##  [23] svglite_2.1.3             scater_1.30.1            
+##  [25] parallelly_1.36.0         plotrix_3.8-4            
+##  [27] limma_3.58.1              flowCore_2.14.0          
+##  [29] generics_0.1.3            shape_1.4.6              
+##  [31] gtools_3.9.5              car_3.1-2                
+##  [33] Matrix_1.6-4              RProtoBufLib_2.14.0      
+##  [35] waldo_0.5.2               ggbeeswarm_0.7.2         
+##  [37] fansi_1.0.6               abind_1.4-5              
+##  [39] terra_1.7-65              lifecycle_1.0.4          
+##  [41] multcomp_1.4-25           yaml_2.3.8               
+##  [43] edgeR_4.0.3               carData_3.0-5            
+##  [45] rhdf5_2.46.1              recipes_1.0.9            
+##  [47] SparseArray_1.2.3         Rtsne_0.17               
+##  [49] grid_4.3.2                promises_1.2.1           
+##  [51] dqrng_0.3.2               crayon_1.5.2             
+##  [53] shinydashboard_0.7.2      beachmat_2.18.0          
+##  [55] cowplot_1.1.2             magick_2.8.2             
+##  [57] pillar_1.9.0              knitr_1.45               
+##  [59] ComplexHeatmap_2.18.0     metapod_1.10.1           
+##  [61] rjson_0.2.21              future.apply_1.11.1      
+##  [63] codetools_0.2-19          glue_1.6.2               
+##  [65] data.table_1.14.10        vctrs_0.6.5              
+##  [67] png_0.1-8                 gtable_0.3.4             
+##  [69] cachem_1.0.8              gower_1.0.1              
+##  [71] xfun_0.41                 S4Arrays_1.2.0           
+##  [73] mime_0.12                 prodlim_2023.08.28       
+##  [75] survival_3.5-7            timeDate_4032.109        
+##  [77] iterators_1.0.14          cytolib_2.14.0           
+##  [79] hardhat_1.3.0             lava_1.7.3               
+##  [81] statmod_1.5.0             ellipsis_0.3.2           
+##  [83] TH.data_1.1-2             ipred_0.9-14             
+##  [85] nlme_3.1-163              rprojroot_2.0.4          
+##  [87] bslib_0.6.1               irlba_2.3.5.1            
+##  [89] svgPanZoom_0.3.4          vipor_0.4.7              
+##  [91] rpart_4.1.21              colorspace_2.1-0         
+##  [93] raster_3.6-26             nnet_7.3-19              
+##  [95] tidyselect_1.2.0          compiler_4.3.2           
+##  [97] BiocNeighbors_1.20.1      desc_1.4.3               
+##  [99] DelayedArray_0.28.0       bookdown_0.37            
+## [101] scales_1.3.0              tiff_0.1-12              
+## [103] digest_0.6.33             fftwtools_0.9-11         
+## [105] rmarkdown_2.25            XVector_0.42.0           
+## [107] htmltools_0.5.7           pkgconfig_2.0.3          
+## [109] jpeg_0.1-10               sparseMatrixStats_1.14.0 
+## [111] highr_0.10                fastmap_1.1.1            
+## [113] rlang_1.1.2               GlobalOptions_0.1.2      
+## [115] htmlwidgets_1.6.4         shiny_1.8.0              
+## [117] DelayedMatrixStats_1.24.0 farver_2.1.1             
+## [119] jquerylib_0.1.4           zoo_1.8-12               
+## [121] jsonlite_1.8.8            ModelMetrics_1.2.2.2     
+## [123] BiocSingular_1.18.0       RCurl_1.98-1.13          
+## [125] magrittr_2.0.3            GenomeInfoDbData_1.2.11  
+## [127] Rhdf5lib_1.24.1           munsell_0.5.0            
+## [129] Rcpp_1.0.11               ggnewscale_0.4.9         
+## [131] pROC_1.18.5               stringi_1.8.3            
+## [133] brio_1.1.4                zlibbioc_1.48.0          
+## [135] MASS_7.3-60               plyr_1.8.9               
+## [137] listenv_0.9.0             parallel_4.3.2           
+## [139] ggrepel_0.9.4             splines_4.3.2            
+## [141] hms_1.1.3                 circlize_0.4.15          
+## [143] locfit_1.5-9.8            ggpubr_0.6.0             
+## [145] ggsignif_0.6.4            pkgload_1.3.3            
+## [147] reshape2_1.4.4            ScaledMatrix_1.10.0      
+## [149] XML_3.99-0.16             drc_3.0-1                
+## [151] evaluate_0.23             tzdb_0.4.0               
+## [153] foreach_1.5.2             tweenr_2.0.2             
+## [155] httpuv_1.6.13             RANN_2.6.1               
+## [157] polyclip_1.10-6           future_1.33.1            
+## [159] clue_0.3-65               ggforce_0.4.1            
+## [161] rsvd_1.0.5                broom_1.0.5              
+## [163] xtable_1.8-4              e1071_1.7-14             
+## [165] rstatix_0.7.2             later_1.3.2              
+## [167] class_7.3-22              FlowSOM_2.10.0           
+## [169] beeswarm_0.4.0            cluster_2.1.4            
+## [171] timechange_0.2.0          globals_0.16.2</code></pre>
+</details>
+
+</div>
+</div>
+<h3>References<a href="references.html#references" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-Bai2021" class="csl-entry">
+Bai, Yunhao, Bokai Zhu, Xavier Rovira-Clave, Han Chen, Maxim Markovic, Chi Ngai Chan, Tung-Hung Su, et al. 2021. <span>“Adjacent Cell Marker Lateral Spillover Compensation and Reinforcement for Multiplexed Images.”</span> <em>Frontiers in Immunology</em> 12.
+</div>
+<div id="ref-Hoch2022" class="csl-entry">
+Hoch, Tobias, Daniel Schulz, Nils Eling, Julia Martínez Gómez, Mitchell P. Levesque, and Bernd Bodenmiller. 2022. <span>“Multiplexed Imaging Mass Cytometry of the Chemokine Milieus in Melanoma Characterizes Features of the Response to Immunotherapy.”</span> <em>Science Immunology</em> 7 (70): eabk1692.
+</div>
+<div id="ref-Jackson2020" class="csl-entry">
+Jackson, Hartland W., Jana R. Fischer, Vito R. T. Zanotelli, H. Raza Ali, Robert Mechera, Savas D. Soysal, Holger Moch, et al. 2020. <span>“The Single-Cell Pathology Landscape of Breast Cancer.”</span> <em>Nature</em> 578: 615–20.
+</div>
+<div id="ref-Levine2015" class="csl-entry">
+Levine, Jacob H., Erin F. Simonds, Sean C. Bendall, Kara L. Davis, El-ad D. Amir, Michelle D. Tadmor, Oren Litvin, et al. 2015. <span>“Data-Driven Phenotypic Dissection of AML Reveals Progenitor-Like Cells That Correlate with Prognosis.”</span> <em>Cell</em> 162: 184–97.
+</div>
+<div id="ref-Schulz2018" class="csl-entry">
+Schulz, Daniel, Vito RT Zanotelli, Rana R Fischer, Denis Schapiro, Stefanie Engler, Xiao-Kang Lun, Hartland W Jackson, and Bernd Bodenmiller. 2018. <span>“Simultaneous Multiplexed Imaging of mRNA and Proteins with Subcellular Resolution in Breast Cancer Tissue Samples by Mass Cytometry.”</span> <em>Cell Systems</em> 6: 25–36.e5.
+</div>
+<div id="ref-Tietscher2022" class="csl-entry">
+Tietscher, Sandra, Johanna Wagner, Tobias Anzeneder, Claus Langwieder, Martin Rees, Bettina Sobottka, Natalie de Souza, and Bernd Bodenmiller. 2022. <span>“A Comprehensive Single-Cell Map of t Cell Exhaustion-Associated Immune Environments in Human Breast Cancer.”</span> <em>Research Square</em>.
+</div>
+<div id="ref-Weber2016" class="csl-entry">
+Weber, Lukas M., and Mark D. Robinson. 2016. <span>“Comparison of Clustering Methods for High-Dimensional Single-Cell Flow and Mass Cytometry Data.”</span> <em>Cytometry Part A</em> 89A: 1084–96.
+</div>
+<div id="ref-Yu2022" class="csl-entry">
+Yu, Lijia, Yue Cao, Jean Y. H. Yang, and Pengyi Yang. 2022. <span>“Benchmarking Clustering Algorithms on Estimating the Number of Cell Types from Single-Cell <span>RNA</span>-Sequencing Data.”</span> <em>Genome Biology</em> 23 (1). <a href="https://doi.org/10.1186/s13059-022-02622-0">https://doi.org/10.1186/s13059-022-02622-0</a>.
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="batch-effects.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="single-cell-visualization.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": true,
+"facebook": false,
+"twitter": true,
+"linkedin": true,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": "https://github.com/BodenmillerGroup/IMCDataAnalysis/blob/master/08-phenotyping.Rmd",
+"text": null
+},
+"download": null,
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "section"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

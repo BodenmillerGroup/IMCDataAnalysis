@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>7 Image and cell-level quality control | Analysis workflow for IMC data</title>
+  <meta name="description" content="This bookdown project highlights possible down-stream analyses performed on imaging mass cytometry data." />
+  <meta name="generator" content="bookdown 0.37 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="7 Image and cell-level quality control | Analysis workflow for IMC data" />
+  <meta property="og:type" content="book" />
+  
+  <meta property="og:description" content="This bookdown project highlights possible down-stream analyses performed on imaging mass cytometry data." />
+  <meta name="github-repo" content="BodenmillerGroup/IMCDataAnalysis" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="7 Image and cell-level quality control | Analysis workflow for IMC data" />
+  
+  <meta name="twitter:description" content="This bookdown project highlights possible down-stream analyses performed on imaging mass cytometry data." />
+  
+
+<meta name="author" content="Authors: Nils Eling 1,2,*, Vito Zanotelli 1,2, Michelle Daniel 1,2, Daniel Schulz 1,2, Jonas Windhager 1,2, Lasse Meyer 1,2" />
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="spillover-correction.html"/>
+<link rel="next" href="batch-effects.html"/>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+<style type="text/css">
+/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Multiplexed imaging data analysis</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> IMC Data Analysis Workflow</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="index.html"><a href="index.html#disclaimer"><i class="fa fa-check"></i><b>1.1</b> Disclaimer</a></li>
+<li class="chapter" data-level="1.2" data-path="index.html"><a href="index.html#update-freeze"><i class="fa fa-check"></i><b>1.2</b> Update freeze</a></li>
+<li class="chapter" data-level="1.3" data-path="index.html"><a href="index.html#feedback-and-contributing"><i class="fa fa-check"></i><b>1.3</b> Feedback and contributing</a></li>
+<li class="chapter" data-level="1.4" data-path="index.html"><a href="index.html#maintainer"><i class="fa fa-check"></i><b>1.4</b> Maintainer</a></li>
+<li class="chapter" data-level="1.5" data-path="index.html"><a href="index.html#contributors"><i class="fa fa-check"></i><b>1.5</b> Contributors</a></li>
+<li class="chapter" data-level="1.6" data-path="index.html"><a href="index.html#citation"><i class="fa fa-check"></i><b>1.6</b> Citation</a></li>
+<li class="chapter" data-level="1.7" data-path="index.html"><a href="index.html#changelog"><i class="fa fa-check"></i><b>1.7</b> Changelog</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="intro.html"><a href="intro.html"><i class="fa fa-check"></i><b>2</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="intro.html"><a href="intro.html#technical-details-of-imc"><i class="fa fa-check"></i><b>2.1</b> Technical details of IMC</a>
+<ul>
+<li class="chapter" data-level="2.1.1" data-path="intro.html"><a href="intro.html#metal-conjugated-antobodies-and-staining"><i class="fa fa-check"></i><b>2.1.1</b> Metal-conjugated antobodies and staining</a></li>
+<li class="chapter" data-level="2.1.2" data-path="intro.html"><a href="intro.html#data-acquisition"><i class="fa fa-check"></i><b>2.1.2</b> Data acquisition</a></li>
+</ul></li>
+<li class="chapter" data-level="2.2" data-path="intro.html"><a href="intro.html#data-format"><i class="fa fa-check"></i><b>2.2</b> IMC data format</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="processing.html"><a href="processing.html"><i class="fa fa-check"></i><b>3</b> Multi-channel image processing</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="processing.html"><a href="processing.html#image-pre-processing-imc-specific"><i class="fa fa-check"></i><b>3.1</b> Image pre-processing (IMC specific)</a></li>
+<li class="chapter" data-level="3.2" data-path="processing.html"><a href="processing.html#image-segmentation"><i class="fa fa-check"></i><b>3.2</b> Image segmentation</a></li>
+<li class="chapter" data-level="3.3" data-path="processing.html"><a href="processing.html#feature-extraction"><i class="fa fa-check"></i><b>3.3</b> Feature extraction</a></li>
+<li class="chapter" data-level="3.4" data-path="processing.html"><a href="processing.html#data-export"><i class="fa fa-check"></i><b>3.4</b> Data export</a></li>
+<li class="chapter" data-level="3.5" data-path="processing.html"><a href="processing.html#data-import-into-r"><i class="fa fa-check"></i><b>3.5</b> Data import into R</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="prerequisites.html"><a href="prerequisites.html"><i class="fa fa-check"></i><b>4</b> Prerequisites</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="prerequisites.html"><a href="prerequisites.html#obtain-the-code"><i class="fa fa-check"></i><b>4.1</b> Obtain the code</a></li>
+<li class="chapter" data-level="4.2" data-path="prerequisites.html"><a href="prerequisites.html#software-requirements"><i class="fa fa-check"></i><b>4.2</b> Software requirements</a>
+<ul>
+<li class="chapter" data-level="4.2.1" data-path="prerequisites.html"><a href="prerequisites.html#docker"><i class="fa fa-check"></i><b>4.2.1</b> Using Docker</a></li>
+<li class="chapter" data-level="4.2.2" data-path="prerequisites.html"><a href="prerequisites.html#manual-install"><i class="fa fa-check"></i><b>4.2.2</b> Manual installation</a></li>
+<li class="chapter" data-level="4.2.3" data-path="prerequisites.html"><a href="prerequisites.html#major-package-versions"><i class="fa fa-check"></i><b>4.2.3</b> Major package versions</a></li>
+</ul></li>
+<li class="chapter" data-level="4.3" data-path="prerequisites.html"><a href="prerequisites.html#image-processing"><i class="fa fa-check"></i><b>4.3</b> Image processing</a></li>
+<li class="chapter" data-level="4.4" data-path="prerequisites.html"><a href="prerequisites.html#download-data"><i class="fa fa-check"></i><b>4.4</b> Download example data</a>
+<ul>
+<li class="chapter" data-level="4.4.1" data-path="prerequisites.html"><a href="prerequisites.html#processed-multiplexed-imaging-data"><i class="fa fa-check"></i><b>4.4.1</b> Processed multiplexed imaging data</a></li>
+<li class="chapter" data-level="4.4.2" data-path="prerequisites.html"><a href="prerequisites.html#files-for-spillover-matrix-estimation"><i class="fa fa-check"></i><b>4.4.2</b> Files for spillover matrix estimation</a></li>
+<li class="chapter" data-level="4.4.3" data-path="prerequisites.html"><a href="prerequisites.html#gated-cells"><i class="fa fa-check"></i><b>4.4.3</b> Gated cells</a></li>
+</ul></li>
+<li class="chapter" data-level="4.5" data-path="prerequisites.html"><a href="prerequisites.html#sessionInfo"><i class="fa fa-check"></i><b>4.5</b> Software versions</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="read-data.html"><a href="read-data.html"><i class="fa fa-check"></i><b>5</b> Read in the data</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="read-data.html"><a href="read-data.html#read-in-single-cell-information"><i class="fa fa-check"></i><b>5.1</b> Read in single-cell information</a>
+<ul>
+<li class="chapter" data-level="5.1.1" data-path="read-data.html"><a href="read-data.html#steinbock-generated-data"><i class="fa fa-check"></i><b>5.1.1</b> steinbock generated data</a></li>
+<li class="chapter" data-level="5.1.2" data-path="read-data.html"><a href="read-data.html#imc-segmentation-pipeline-generated-data"><i class="fa fa-check"></i><b>5.1.2</b> IMC Segmentation Pipeline generated data</a></li>
+<li class="chapter" data-level="5.1.3" data-path="read-data.html"><a href="read-data.html#reading-custom-files"><i class="fa fa-check"></i><b>5.1.3</b> Reading custom files</a></li>
+</ul></li>
+<li class="chapter" data-level="5.2" data-path="read-data.html"><a href="read-data.html#cell-processing"><i class="fa fa-check"></i><b>5.2</b> Single-cell processing</a></li>
+<li class="chapter" data-level="5.3" data-path="read-data.html"><a href="read-data.html#read-images"><i class="fa fa-check"></i><b>5.3</b> Read in images</a></li>
+<li class="chapter" data-level="5.4" data-path="read-data.html"><a href="read-data.html#generate-single-cell-data-from-images"><i class="fa fa-check"></i><b>5.4</b> Generate single-cell data from images</a></li>
+<li class="chapter" data-level="5.5" data-path="read-data.html"><a href="read-data.html#accessing-publicly-available-imc-datasets"><i class="fa fa-check"></i><b>5.5</b> Accessing publicly available IMC datasets</a></li>
+<li class="chapter" data-level="5.6" data-path="read-data.html"><a href="read-data.html#save-objects"><i class="fa fa-check"></i><b>5.6</b> Save objects</a></li>
+<li class="chapter" data-level="5.7" data-path="read-data.html"><a href="read-data.html#session-info"><i class="fa fa-check"></i><b>5.7</b> Session Info</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="spillover-correction.html"><a href="spillover-correction.html"><i class="fa fa-check"></i><b>6</b> Spillover correction</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="spillover-correction.html"><a href="spillover-correction.html#generate-the-spillover-matrix"><i class="fa fa-check"></i><b>6.1</b> Generate the spillover matrix</a>
+<ul>
+<li class="chapter" data-level="6.1.1" data-path="spillover-correction.html"><a href="spillover-correction.html#read-in-the-data"><i class="fa fa-check"></i><b>6.1.1</b> Read in the data</a></li>
+<li class="chapter" data-level="6.1.2" data-path="spillover-correction.html"><a href="spillover-correction.html#quality-control"><i class="fa fa-check"></i><b>6.1.2</b> Quality control</a></li>
+<li class="chapter" data-level="6.1.3" data-path="spillover-correction.html"><a href="spillover-correction.html#pixel_binning"><i class="fa fa-check"></i><b>6.1.3</b> Optional pixel binning</a></li>
+<li class="chapter" data-level="6.1.4" data-path="spillover-correction.html"><a href="spillover-correction.html#filtering-incorrectly-assigned-pixels"><i class="fa fa-check"></i><b>6.1.4</b> Filtering incorrectly assigned pixels</a></li>
+<li class="chapter" data-level="6.1.5" data-path="spillover-correction.html"><a href="spillover-correction.html#compute-spillover-matrix"><i class="fa fa-check"></i><b>6.1.5</b> Compute spillover matrix</a></li>
+</ul></li>
+<li class="chapter" data-level="6.2" data-path="spillover-correction.html"><a href="spillover-correction.html#single-cell-data-compensation"><i class="fa fa-check"></i><b>6.2</b> Single-cell data compensation</a></li>
+<li class="chapter" data-level="6.3" data-path="spillover-correction.html"><a href="spillover-correction.html#image-compensation"><i class="fa fa-check"></i><b>6.3</b> Image compensation</a></li>
+<li class="chapter" data-level="6.4" data-path="spillover-correction.html"><a href="spillover-correction.html#write-out-compensated-images"><i class="fa fa-check"></i><b>6.4</b> Write out compensated images</a></li>
+<li class="chapter" data-level="6.5" data-path="spillover-correction.html"><a href="spillover-correction.html#save-objects-1"><i class="fa fa-check"></i><b>6.5</b> Save objects</a></li>
+<li class="chapter" data-level="6.6" data-path="spillover-correction.html"><a href="spillover-correction.html#session-info-1"><i class="fa fa-check"></i><b>6.6</b> Session Info</a></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="image-and-cell-level-quality-control.html"><a href="image-and-cell-level-quality-control.html"><i class="fa fa-check"></i><b>7</b> Image and cell-level quality control</a>
+<ul>
+<li class="chapter" data-level="7.1" data-path="image-and-cell-level-quality-control.html"><a href="image-and-cell-level-quality-control.html#read-in-the-data-1"><i class="fa fa-check"></i><b>7.1</b> Read in the data</a></li>
+<li class="chapter" data-level="7.2" data-path="image-and-cell-level-quality-control.html"><a href="image-and-cell-level-quality-control.html#seg-quality"><i class="fa fa-check"></i><b>7.2</b> Segmentation quality control</a></li>
+<li class="chapter" data-level="7.3" data-path="image-and-cell-level-quality-control.html"><a href="image-and-cell-level-quality-control.html#image-quality"><i class="fa fa-check"></i><b>7.3</b> Image-level quality control</a></li>
+<li class="chapter" data-level="7.4" data-path="image-and-cell-level-quality-control.html"><a href="image-and-cell-level-quality-control.html#cell-quality"><i class="fa fa-check"></i><b>7.4</b> Cell-level quality control</a></li>
+<li class="chapter" data-level="7.5" data-path="image-and-cell-level-quality-control.html"><a href="image-and-cell-level-quality-control.html#save-objects-2"><i class="fa fa-check"></i><b>7.5</b> Save objects</a></li>
+<li class="chapter" data-level="7.6" data-path="image-and-cell-level-quality-control.html"><a href="image-and-cell-level-quality-control.html#session-info-2"><i class="fa fa-check"></i><b>7.6</b> Session Info</a></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="batch-effects.html"><a href="batch-effects.html"><i class="fa fa-check"></i><b>8</b> Batch effect correction</a>
+<ul>
+<li class="chapter" data-level="8.1" data-path="batch-effects.html"><a href="batch-effects.html#fastmnn-correction"><i class="fa fa-check"></i><b>8.1</b> fastMNN correction</a>
+<ul>
+<li class="chapter" data-level="8.1.1" data-path="batch-effects.html"><a href="batch-effects.html#perform-sample-correction"><i class="fa fa-check"></i><b>8.1.1</b> Perform sample correction</a></li>
+<li class="chapter" data-level="8.1.2" data-path="batch-effects.html"><a href="batch-effects.html#quality-control-of-correction-results"><i class="fa fa-check"></i><b>8.1.2</b> Quality control of correction results</a></li>
+<li class="chapter" data-level="8.1.3" data-path="batch-effects.html"><a href="batch-effects.html#visualization"><i class="fa fa-check"></i><b>8.1.3</b> Visualization</a></li>
+</ul></li>
+<li class="chapter" data-level="8.2" data-path="batch-effects.html"><a href="batch-effects.html#harmony-correction"><i class="fa fa-check"></i><b>8.2</b> harmony correction</a>
+<ul>
+<li class="chapter" data-level="8.2.1" data-path="batch-effects.html"><a href="batch-effects.html#visualization-1"><i class="fa fa-check"></i><b>8.2.1</b> Visualization</a></li>
+</ul></li>
+<li class="chapter" data-level="8.3" data-path="batch-effects.html"><a href="batch-effects.html#seurat-correction"><i class="fa fa-check"></i><b>8.3</b> Seurat correction</a>
+<ul>
+<li class="chapter" data-level="8.3.1" data-path="batch-effects.html"><a href="batch-effects.html#visualization-2"><i class="fa fa-check"></i><b>8.3.1</b> Visualization</a></li>
+</ul></li>
+<li class="chapter" data-level="8.4" data-path="batch-effects.html"><a href="batch-effects.html#save-objects-3"><i class="fa fa-check"></i><b>8.4</b> Save objects</a></li>
+<li class="chapter" data-level="8.5" data-path="batch-effects.html"><a href="batch-effects.html#session-info-3"><i class="fa fa-check"></i><b>8.5</b> Session Info</a></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html"><i class="fa fa-check"></i><b>9</b> Cell phenotyping</a>
+<ul>
+<li class="chapter" data-level="9.1" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#load-data"><i class="fa fa-check"></i><b>9.1</b> Load data</a></li>
+<li class="chapter" data-level="9.2" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#clustering"><i class="fa fa-check"></i><b>9.2</b> Clustering approaches</a>
+<ul>
+<li class="chapter" data-level="9.2.1" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#rphenograph"><i class="fa fa-check"></i><b>9.2.1</b> Rphenograph</a></li>
+<li class="chapter" data-level="9.2.2" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#snn-graph"><i class="fa fa-check"></i><b>9.2.2</b> Shared nearest neighbour graph</a></li>
+<li class="chapter" data-level="9.2.3" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#self-organizing-maps"><i class="fa fa-check"></i><b>9.2.3</b> Self organizing maps</a></li>
+<li class="chapter" data-level="9.2.4" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#compare-between-clustering-approaches"><i class="fa fa-check"></i><b>9.2.4</b> Compare between clustering approaches</a></li>
+<li class="chapter" data-level="9.2.5" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#clustering-notes"><i class="fa fa-check"></i><b>9.2.5</b> Further clustering notes</a></li>
+</ul></li>
+<li class="chapter" data-level="9.3" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#classification"><i class="fa fa-check"></i><b>9.3</b> Classification approach</a>
+<ul>
+<li class="chapter" data-level="9.3.1" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#manual-labeling-of-cells"><i class="fa fa-check"></i><b>9.3.1</b> Manual labeling of cells</a></li>
+<li class="chapter" data-level="9.3.2" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#define-color-vectors"><i class="fa fa-check"></i><b>9.3.2</b> Define color vectors</a></li>
+<li class="chapter" data-level="9.3.3" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#read-in-and-consolidate-labeled-data"><i class="fa fa-check"></i><b>9.3.3</b> Read in and consolidate labeled data</a></li>
+<li class="chapter" data-level="9.3.4" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#train-classifier"><i class="fa fa-check"></i><b>9.3.4</b> Train classifier</a></li>
+<li class="chapter" data-level="9.3.5" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#classifier-performance"><i class="fa fa-check"></i><b>9.3.5</b> Classifier performance</a></li>
+<li class="chapter" data-level="9.3.6" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#classification-of-new-data"><i class="fa fa-check"></i><b>9.3.6</b> Classification of new data</a></li>
+</ul></li>
+<li class="chapter" data-level="9.4" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#session-info-4"><i class="fa fa-check"></i><b>9.4</b> Session Info</a></li>
+</ul></li>
+<li class="chapter" data-level="10" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html"><i class="fa fa-check"></i><b>10</b> Single cell visualization</a>
+<ul>
+<li class="chapter" data-level="10.1" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#load-data-1"><i class="fa fa-check"></i><b>10.1</b> Load data</a></li>
+<li class="chapter" data-level="10.2" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#cell-type-level"><i class="fa fa-check"></i><b>10.2</b> Cell-type level</a>
+<ul>
+<li class="chapter" data-level="10.2.1" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#dimensionality-reduction-visualization"><i class="fa fa-check"></i><b>10.2.1</b> Dimensionality reduction visualization</a></li>
+<li class="chapter" data-level="10.2.2" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#heatmap-visualization"><i class="fa fa-check"></i><b>10.2.2</b> Heatmap visualization</a></li>
+<li class="chapter" data-level="10.2.3" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#violin-plot-visualization"><i class="fa fa-check"></i><b>10.2.3</b> Violin plot visualization</a></li>
+<li class="chapter" data-level="10.2.4" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#scatter-plot-visualization"><i class="fa fa-check"></i><b>10.2.4</b> Scatter plot visualization</a></li>
+<li class="chapter" data-level="10.2.5" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#barplot-visualization"><i class="fa fa-check"></i><b>10.2.5</b> Barplot visualization</a></li>
+<li class="chapter" data-level="10.2.6" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#catalyst-based-visualization"><i class="fa fa-check"></i><b>10.2.6</b> CATALYST-based visualization</a></li>
+</ul></li>
+<li class="chapter" data-level="10.3" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#sample-level"><i class="fa fa-check"></i><b>10.3</b> Sample-level</a>
+<ul>
+<li class="chapter" data-level="10.3.1" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#dimensionality-reduction-visualization-1"><i class="fa fa-check"></i><b>10.3.1</b> Dimensionality reduction visualization</a></li>
+<li class="chapter" data-level="10.3.2" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#heatmap-visualization-1"><i class="fa fa-check"></i><b>10.3.2</b> Heatmap visualization</a></li>
+<li class="chapter" data-level="10.3.3" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#barplot-visualization-1"><i class="fa fa-check"></i><b>10.3.3</b> Barplot visualization</a></li>
+<li class="chapter" data-level="10.3.4" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#catalyst-based-visualization-1"><i class="fa fa-check"></i><b>10.3.4</b> CATALYST-based visualization</a></li>
+</ul></li>
+<li class="chapter" data-level="10.4" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#rich-example"><i class="fa fa-check"></i><b>10.4</b> Further examples</a>
+<ul>
+<li class="chapter" data-level="10.4.1" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#publication-ready-complexheatmap"><i class="fa fa-check"></i><b>10.4.1</b> Publication-ready ComplexHeatmap</a></li>
+<li class="chapter" data-level="10.4.2" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#interactive-visualization"><i class="fa fa-check"></i><b>10.4.2</b> Interactive visualization</a></li>
+</ul></li>
+<li class="chapter" data-level="10.5" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#session-info-5"><i class="fa fa-check"></i><b>10.5</b> Session Info</a></li>
+</ul></li>
+<li class="chapter" data-level="11" data-path="image-visualization.html"><a href="image-visualization.html"><i class="fa fa-check"></i><b>11</b> Image visualization</a>
+<ul>
+<li class="chapter" data-level="11.1" data-path="image-visualization.html"><a href="image-visualization.html#pixel-visualization"><i class="fa fa-check"></i><b>11.1</b> Pixel visualization</a>
+<ul>
+<li class="chapter" data-level="11.1.1" data-path="image-visualization.html"><a href="image-visualization.html#adjusting-colors"><i class="fa fa-check"></i><b>11.1.1</b> Adjusting colors</a></li>
+<li class="chapter" data-level="11.1.2" data-path="image-visualization.html"><a href="image-visualization.html#image-normalization"><i class="fa fa-check"></i><b>11.1.2</b> Image normalization</a></li>
+</ul></li>
+<li class="chapter" data-level="11.2" data-path="image-visualization.html"><a href="image-visualization.html#mask-visualization"><i class="fa fa-check"></i><b>11.2</b> Cell visualization</a>
+<ul>
+<li class="chapter" data-level="11.2.1" data-path="image-visualization.html"><a href="image-visualization.html#visualzing-metadata"><i class="fa fa-check"></i><b>11.2.1</b> Visualzing metadata</a></li>
+<li class="chapter" data-level="11.2.2" data-path="image-visualization.html"><a href="image-visualization.html#visualizating-expression"><i class="fa fa-check"></i><b>11.2.2</b> Visualizating expression</a></li>
+<li class="chapter" data-level="11.2.3" data-path="image-visualization.html"><a href="image-visualization.html#outline-cells"><i class="fa fa-check"></i><b>11.2.3</b> Outlining cells on images</a></li>
+</ul></li>
+<li class="chapter" data-level="11.3" data-path="image-visualization.html"><a href="image-visualization.html#adjusting-plot-annotations"><i class="fa fa-check"></i><b>11.3</b> Adjusting plot annotations</a></li>
+<li class="chapter" data-level="11.4" data-path="image-visualization.html"><a href="image-visualization.html#displaying-individual-images"><i class="fa fa-check"></i><b>11.4</b> Displaying individual images</a></li>
+<li class="chapter" data-level="11.5" data-path="image-visualization.html"><a href="image-visualization.html#saving-and-returning-images"><i class="fa fa-check"></i><b>11.5</b> Saving and returning images</a></li>
+<li class="chapter" data-level="11.6" data-path="image-visualization.html"><a href="image-visualization.html#cytoviewer"><i class="fa fa-check"></i><b>11.6</b> Interactive image visualization</a></li>
+<li class="chapter" data-level="11.7" data-path="image-visualization.html"><a href="image-visualization.html#session-info-6"><i class="fa fa-check"></i><b>11.7</b> Session Info</a></li>
+</ul></li>
+<li class="chapter" data-level="12" data-path="performing-spatial-analysis.html"><a href="performing-spatial-analysis.html"><i class="fa fa-check"></i><b>12</b> Performing spatial analysis</a>
+<ul>
+<li class="chapter" data-level="12.1" data-path="performing-spatial-analysis.html"><a href="performing-spatial-analysis.html#spatial-interaction-graphs"><i class="fa fa-check"></i><b>12.1</b> Spatial interaction graphs</a></li>
+<li class="chapter" data-level="12.2" data-path="performing-spatial-analysis.html"><a href="performing-spatial-analysis.html#spatial-viz"><i class="fa fa-check"></i><b>12.2</b> Spatial visualization</a></li>
+<li class="chapter" data-level="12.3" data-path="performing-spatial-analysis.html"><a href="performing-spatial-analysis.html#spatial-community-analysis"><i class="fa fa-check"></i><b>12.3</b> Spatial community analysis</a></li>
+<li class="chapter" data-level="12.4" data-path="performing-spatial-analysis.html"><a href="performing-spatial-analysis.html#cellular-neighborhood-analysis"><i class="fa fa-check"></i><b>12.4</b> Cellular neighborhood analysis</a></li>
+<li class="chapter" data-level="12.5" data-path="performing-spatial-analysis.html"><a href="performing-spatial-analysis.html#spatial-context-analysis"><i class="fa fa-check"></i><b>12.5</b> Spatial context analysis</a></li>
+<li class="chapter" data-level="12.6" data-path="performing-spatial-analysis.html"><a href="performing-spatial-analysis.html#patch-detection"><i class="fa fa-check"></i><b>12.6</b> Patch detection</a></li>
+<li class="chapter" data-level="12.7" data-path="performing-spatial-analysis.html"><a href="performing-spatial-analysis.html#interaction-analysis"><i class="fa fa-check"></i><b>12.7</b> Interaction analysis</a></li>
+<li class="chapter" data-level="12.8" data-path="performing-spatial-analysis.html"><a href="performing-spatial-analysis.html#session-info-7"><i class="fa fa-check"></i><b>12.8</b> Session Info</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
+<li class="divider"></li>
+<li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Analysis workflow for IMC data</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="image-and-cell-level-quality-control" class="section level1 hasAnchor" number="7">
+<h1><span class="header-section-number">7</span> Image and cell-level quality control<a href="image-and-cell-level-quality-control.html#image-and-cell-level-quality-control" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p>The following section discusses possible quality indicators for data obtained
+by IMC and other highly multiplexed imaging technologies. Here, we will focus
+on describing quality metrics on the single-cell as well as image level.</p>
+<div id="read-in-the-data-1" class="section level2 hasAnchor" number="7.1">
+<h2><span class="header-section-number">7.1</span> Read in the data<a href="image-and-cell-level-quality-control.html#read-in-the-data-1" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>We will first read in the data processed in previous sections:</p>
+<div class="sourceCode" id="cb99"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb99-1"><a href="image-and-cell-level-quality-control.html#cb99-1" tabindex="-1"></a>images <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">&quot;data/images.rds&quot;</span>)</span>
+<span id="cb99-2"><a href="image-and-cell-level-quality-control.html#cb99-2" tabindex="-1"></a>masks <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">&quot;data/masks.rds&quot;</span>)</span>
+<span id="cb99-3"><a href="image-and-cell-level-quality-control.html#cb99-3" tabindex="-1"></a>spe <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">&quot;data/spe.rds&quot;</span>)</span></code></pre></div>
+</div>
+<div id="seg-quality" class="section level2 hasAnchor" number="7.2">
+<h2><span class="header-section-number">7.2</span> Segmentation quality control<a href="image-and-cell-level-quality-control.html#seg-quality" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The first step after image segmentation is to observe its accuracy.
+Without having ground-truth data readily available, a common approach to
+segmentation quality control is to overlay segmentation masks on composite images
+displaying channels that were used for segmentation.
+The <a href="https://www.bioconductor.org/packages/release/bioc/html/cytomapper.html">cytomapper</a>
+package supports exactly this tasks by using the <code>plotPixels</code> function.</p>
+<p>Here, we select 3 random images and perform image- and channel-wise
+normalization (channels are first min-max normalized and scaled to a range of
+0-1 before clipping the maximum intensity to 0.2).</p>
+<div class="sourceCode" id="cb100"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb100-1"><a href="image-and-cell-level-quality-control.html#cb100-1" tabindex="-1"></a><span class="fu">library</span>(cytomapper)</span>
+<span id="cb100-2"><a href="image-and-cell-level-quality-control.html#cb100-2" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">20220118</span>)</span>
+<span id="cb100-3"><a href="image-and-cell-level-quality-control.html#cb100-3" tabindex="-1"></a>img_ids <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="fu">seq_along</span>(images), <span class="dv">3</span>)</span>
+<span id="cb100-4"><a href="image-and-cell-level-quality-control.html#cb100-4" tabindex="-1"></a></span>
+<span id="cb100-5"><a href="image-and-cell-level-quality-control.html#cb100-5" tabindex="-1"></a><span class="co"># Normalize and clip images</span></span>
+<span id="cb100-6"><a href="image-and-cell-level-quality-control.html#cb100-6" tabindex="-1"></a>cur_images <span class="ot">&lt;-</span> images[img_ids]</span>
+<span id="cb100-7"><a href="image-and-cell-level-quality-control.html#cb100-7" tabindex="-1"></a>cur_images <span class="ot">&lt;-</span> cytomapper<span class="sc">::</span><span class="fu">normalize</span>(cur_images, <span class="at">separateImages =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb100-8"><a href="image-and-cell-level-quality-control.html#cb100-8" tabindex="-1"></a>cur_images <span class="ot">&lt;-</span> cytomapper<span class="sc">::</span><span class="fu">normalize</span>(cur_images, <span class="at">inputRange =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.2</span>))</span>
+<span id="cb100-9"><a href="image-and-cell-level-quality-control.html#cb100-9" tabindex="-1"></a></span>
+<span id="cb100-10"><a href="image-and-cell-level-quality-control.html#cb100-10" tabindex="-1"></a><span class="fu">plotPixels</span>(cur_images,</span>
+<span id="cb100-11"><a href="image-and-cell-level-quality-control.html#cb100-11" tabindex="-1"></a>           <span class="at">mask =</span> masks[img_ids],</span>
+<span id="cb100-12"><a href="image-and-cell-level-quality-control.html#cb100-12" tabindex="-1"></a>           <span class="at">img_id =</span> <span class="st">&quot;sample_id&quot;</span>,</span>
+<span id="cb100-13"><a href="image-and-cell-level-quality-control.html#cb100-13" tabindex="-1"></a>           <span class="at">missing_colour =</span> <span class="st">&quot;white&quot;</span>,</span>
+<span id="cb100-14"><a href="image-and-cell-level-quality-control.html#cb100-14" tabindex="-1"></a>           <span class="at">colour_by =</span> <span class="fu">c</span>(<span class="st">&quot;CD163&quot;</span>, <span class="st">&quot;CD20&quot;</span>, <span class="st">&quot;CD3&quot;</span>, <span class="st">&quot;Ecad&quot;</span>, <span class="st">&quot;DNA1&quot;</span>),</span>
+<span id="cb100-15"><a href="image-and-cell-level-quality-control.html#cb100-15" tabindex="-1"></a>           <span class="at">colour =</span> <span class="fu">list</span>(<span class="at">CD163 =</span> <span class="fu">c</span>(<span class="st">&quot;black&quot;</span>, <span class="st">&quot;yellow&quot;</span>),</span>
+<span id="cb100-16"><a href="image-and-cell-level-quality-control.html#cb100-16" tabindex="-1"></a>                         <span class="at">CD20 =</span> <span class="fu">c</span>(<span class="st">&quot;black&quot;</span>, <span class="st">&quot;red&quot;</span>),</span>
+<span id="cb100-17"><a href="image-and-cell-level-quality-control.html#cb100-17" tabindex="-1"></a>                         <span class="at">CD3 =</span> <span class="fu">c</span>(<span class="st">&quot;black&quot;</span>, <span class="st">&quot;green&quot;</span>),</span>
+<span id="cb100-18"><a href="image-and-cell-level-quality-control.html#cb100-18" tabindex="-1"></a>                         <span class="at">Ecad =</span> <span class="fu">c</span>(<span class="st">&quot;black&quot;</span>, <span class="st">&quot;cyan&quot;</span>),</span>
+<span id="cb100-19"><a href="image-and-cell-level-quality-control.html#cb100-19" tabindex="-1"></a>                         <span class="at">DNA1 =</span> <span class="fu">c</span>(<span class="st">&quot;black&quot;</span>, <span class="st">&quot;blue&quot;</span>)),</span>
+<span id="cb100-20"><a href="image-and-cell-level-quality-control.html#cb100-20" tabindex="-1"></a>           <span class="at">image_title =</span> <span class="cn">NULL</span>,</span>
+<span id="cb100-21"><a href="image-and-cell-level-quality-control.html#cb100-21" tabindex="-1"></a>           <span class="at">legend =</span> <span class="fu">list</span>(<span class="at">colour_by.title.cex =</span> <span class="fl">0.7</span>,</span>
+<span id="cb100-22"><a href="image-and-cell-level-quality-control.html#cb100-22" tabindex="-1"></a>                         <span class="at">colour_by.labels.cex =</span> <span class="fl">0.7</span>))</span></code></pre></div>
+<p><img src="06-quality_control_files/figure-html/overlay-masks-1.png" width="672" /></p>
+<p>We can see that nuclei are centered within the segmentation masks and all cell
+types are correctly segmented (note: to zoom into the image you can right click
+and select <code>Open Image in New Tab</code>). A common challenge here is to segment large (e.g.,
+epithelial cells - in cyan) <em>versus</em> small (e.g., B cells - in red). However, the
+segmentation approach here appears to correctly segment cells across different
+sizes.</p>
+<p>An easier and interactive way of observing segmentation quality is to use the
+interactive image viewer provided by the
+<a href="https://github.com/BodenmillerGroup/cytoviewer">cytoviewer</a> R/Bioconductor
+package <span class="citation">(<a href="#ref-Meyer2024">Meyer, Eling, and Bodenmiller 2024</a>)</span>. Under “Image-level” &gt; “Basic controls”, up to six markers
+can be selected for visualization. The contrast of each marker can be adjusted.
+Under “Image-level” &gt; “Advanced controls”, click the “Show cell outlines” box
+to outline segmented cells on the images.</p>
+<div class="sourceCode" id="cb101"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb101-1"><a href="image-and-cell-level-quality-control.html#cb101-1" tabindex="-1"></a><span class="fu">library</span>(cytoviewer)</span>
+<span id="cb101-2"><a href="image-and-cell-level-quality-control.html#cb101-2" tabindex="-1"></a></span>
+<span id="cb101-3"><a href="image-and-cell-level-quality-control.html#cb101-3" tabindex="-1"></a>app <span class="ot">&lt;-</span> <span class="fu">cytoviewer</span>(<span class="at">image =</span> images, </span>
+<span id="cb101-4"><a href="image-and-cell-level-quality-control.html#cb101-4" tabindex="-1"></a>                  <span class="at">mask =</span> masks, </span>
+<span id="cb101-5"><a href="image-and-cell-level-quality-control.html#cb101-5" tabindex="-1"></a>                  <span class="at">object =</span> spe,</span>
+<span id="cb101-6"><a href="image-and-cell-level-quality-control.html#cb101-6" tabindex="-1"></a>                  <span class="at">cell_id =</span> <span class="st">&quot;ObjectNumber&quot;</span>, </span>
+<span id="cb101-7"><a href="image-and-cell-level-quality-control.html#cb101-7" tabindex="-1"></a>                  <span class="at">img_id =</span> <span class="st">&quot;sample_id&quot;</span>)</span>
+<span id="cb101-8"><a href="image-and-cell-level-quality-control.html#cb101-8" tabindex="-1"></a></span>
+<span id="cb101-9"><a href="image-and-cell-level-quality-control.html#cb101-9" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">interactive</span>()) {</span>
+<span id="cb101-10"><a href="image-and-cell-level-quality-control.html#cb101-10" tabindex="-1"></a>    shiny<span class="sc">::</span><span class="fu">runApp</span>(app)</span>
+<span id="cb101-11"><a href="image-and-cell-level-quality-control.html#cb101-11" tabindex="-1"></a>}</span></code></pre></div>
+<p>An additional approach to observe cell segmentation quality and potentially also
+antibody specificity issues is to visualize single-cell expression in form of a
+heatmap. Here, we sub-sample the dataset to 2000 cells for visualization
+purposes and overlay the cancer type from which the cells were extracted.</p>
+<div class="sourceCode" id="cb102"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb102-1"><a href="image-and-cell-level-quality-control.html#cb102-1" tabindex="-1"></a><span class="fu">library</span>(dittoSeq)</span>
+<span id="cb102-2"><a href="image-and-cell-level-quality-control.html#cb102-2" tabindex="-1"></a><span class="fu">library</span>(viridis)</span>
+<span id="cb102-3"><a href="image-and-cell-level-quality-control.html#cb102-3" tabindex="-1"></a>cur_cells <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="fu">seq_len</span>(<span class="fu">ncol</span>(spe)), <span class="dv">2000</span>)</span>
+<span id="cb102-4"><a href="image-and-cell-level-quality-control.html#cb102-4" tabindex="-1"></a></span>
+<span id="cb102-5"><a href="image-and-cell-level-quality-control.html#cb102-5" tabindex="-1"></a><span class="fu">dittoHeatmap</span>(spe[,cur_cells], </span>
+<span id="cb102-6"><a href="image-and-cell-level-quality-control.html#cb102-6" tabindex="-1"></a>             <span class="at">genes =</span> <span class="fu">rownames</span>(spe)[<span class="fu">rowData</span>(spe)<span class="sc">$</span>use_channel],</span>
+<span id="cb102-7"><a href="image-and-cell-level-quality-control.html#cb102-7" tabindex="-1"></a>             <span class="at">assay =</span> <span class="st">&quot;exprs&quot;</span>, </span>
+<span id="cb102-8"><a href="image-and-cell-level-quality-control.html#cb102-8" tabindex="-1"></a>             <span class="at">cluster_cols =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb102-9"><a href="image-and-cell-level-quality-control.html#cb102-9" tabindex="-1"></a>             <span class="at">scale =</span> <span class="st">&quot;none&quot;</span>,</span>
+<span id="cb102-10"><a href="image-and-cell-level-quality-control.html#cb102-10" tabindex="-1"></a>             <span class="at">heatmap.colors =</span> <span class="fu">viridis</span>(<span class="dv">100</span>), </span>
+<span id="cb102-11"><a href="image-and-cell-level-quality-control.html#cb102-11" tabindex="-1"></a>             <span class="at">annot.by =</span> <span class="st">&quot;indication&quot;</span>,</span>
+<span id="cb102-12"><a href="image-and-cell-level-quality-control.html#cb102-12" tabindex="-1"></a>             <span class="at">annotation_colors =</span> <span class="fu">list</span>(<span class="at">indication =</span> <span class="fu">metadata</span>(spe)<span class="sc">$</span>color_vectors<span class="sc">$</span>indication))</span></code></pre></div>
+<p><img src="06-quality_control_files/figure-html/segmentation-heatmap-1.png" width="672" /></p>
+<p>We can differentiate between epithelial cells (Ecad+) and immune cells
+(CD45RO+). Some of the markers are detected in specific cells (e.g., Ki67, CD20,
+Ecad) while others are more broadly expressed across cells (e.g., HLADR, B2M,
+CD4).</p>
+</div>
+<div id="image-quality" class="section level2 hasAnchor" number="7.3">
+<h2><span class="header-section-number">7.3</span> Image-level quality control<a href="image-and-cell-level-quality-control.html#image-quality" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Image-level quality control is often performed using tools that offer a
+graphical user interface such as <a href="https://qupath.github.io/">QuPath</a>,
+<a href="https://imagej.net/software/fiji/">FIJI</a> and the previously mentioned
+<a href="https://github.com/BodenmillerGroup/cytoviewer">cytoviewer</a> package. Viewers
+that were specifically developed for IMC data can be seen
+<a href="https://bodenmillergroup.github.io/IMCWorkflow/viewers.html">here</a>. In this
+section, we will specifically focus on quantitative metrics to assess image
+quality.</p>
+<p>It is often of interest to calculate the signal-to-noise ratio (SNR) for
+individual channels and markers. Here, we define the SNR as:</p>
+<p><span class="math display">\[SNR = I_s/I_n\]</span></p>
+<p>where <span class="math inline">\(I_s\)</span> is the intensity of the signal (mean intensity of pixels with true
+signal) and <span class="math inline">\(I_n\)</span> is the intensity of the noise (mean intensity of pixels
+containing noise). This definition of the SNR is just one of many and other
+measures can be applied. Finding a threshold that separates pixels containing
+signal and pixels containing noise is not trivial and different approaches can
+be chosen. Here, we use the <code>otsu</code> thresholding approach to find pixels of the
+“foreground” (i.e., signal) and “background” (i.e., noise). The SNR is then
+defined as the mean intensity of foreground pixels divided by the mean intensity
+of background pixels. We compute this measure as well as the mean signal
+intensity per image. The plot below shows the average SNR <em>versus</em> the average
+signal intensity across all images.</p>
+<div class="sourceCode" id="cb103"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb103-1"><a href="image-and-cell-level-quality-control.html#cb103-1" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb103-2"><a href="image-and-cell-level-quality-control.html#cb103-2" tabindex="-1"></a><span class="fu">library</span>(ggrepel)</span>
+<span id="cb103-3"><a href="image-and-cell-level-quality-control.html#cb103-3" tabindex="-1"></a><span class="fu">library</span>(EBImage)</span>
+<span id="cb103-4"><a href="image-and-cell-level-quality-control.html#cb103-4" tabindex="-1"></a></span>
+<span id="cb103-5"><a href="image-and-cell-level-quality-control.html#cb103-5" tabindex="-1"></a>cur_snr <span class="ot">&lt;-</span> <span class="fu">lapply</span>(<span class="fu">names</span>(images), <span class="cf">function</span>(x){</span>
+<span id="cb103-6"><a href="image-and-cell-level-quality-control.html#cb103-6" tabindex="-1"></a>    img <span class="ot">&lt;-</span> images[[x]]</span>
+<span id="cb103-7"><a href="image-and-cell-level-quality-control.html#cb103-7" tabindex="-1"></a>    mat <span class="ot">&lt;-</span> <span class="fu">apply</span>(img, <span class="dv">3</span>, <span class="cf">function</span>(ch){</span>
+<span id="cb103-8"><a href="image-and-cell-level-quality-control.html#cb103-8" tabindex="-1"></a>        <span class="co"># Otsu threshold</span></span>
+<span id="cb103-9"><a href="image-and-cell-level-quality-control.html#cb103-9" tabindex="-1"></a>        thres <span class="ot">&lt;-</span> <span class="fu">otsu</span>(ch, <span class="at">range =</span> <span class="fu">c</span>(<span class="fu">min</span>(ch), <span class="fu">max</span>(ch)), <span class="at">levels =</span> <span class="dv">65536</span>)</span>
+<span id="cb103-10"><a href="image-and-cell-level-quality-control.html#cb103-10" tabindex="-1"></a>        <span class="co"># Signal-to-noise ratio</span></span>
+<span id="cb103-11"><a href="image-and-cell-level-quality-control.html#cb103-11" tabindex="-1"></a>        snr <span class="ot">&lt;-</span> <span class="fu">mean</span>(ch[ch <span class="sc">&gt;</span> thres]) <span class="sc">/</span> <span class="fu">mean</span>(ch[ch <span class="sc">&lt;=</span> thres])</span>
+<span id="cb103-12"><a href="image-and-cell-level-quality-control.html#cb103-12" tabindex="-1"></a>        <span class="co"># Signal intensity</span></span>
+<span id="cb103-13"><a href="image-and-cell-level-quality-control.html#cb103-13" tabindex="-1"></a>        ps <span class="ot">&lt;-</span> <span class="fu">mean</span>(ch[ch <span class="sc">&gt;</span> thres])</span>
+<span id="cb103-14"><a href="image-and-cell-level-quality-control.html#cb103-14" tabindex="-1"></a>        </span>
+<span id="cb103-15"><a href="image-and-cell-level-quality-control.html#cb103-15" tabindex="-1"></a>        <span class="fu">return</span>(<span class="fu">c</span>(<span class="at">snr =</span> snr, <span class="at">ps =</span> ps))</span>
+<span id="cb103-16"><a href="image-and-cell-level-quality-control.html#cb103-16" tabindex="-1"></a>    })</span>
+<span id="cb103-17"><a href="image-and-cell-level-quality-control.html#cb103-17" tabindex="-1"></a>    <span class="fu">t</span>(mat) <span class="sc">%&gt;%</span> <span class="fu">as.data.frame</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb103-18"><a href="image-and-cell-level-quality-control.html#cb103-18" tabindex="-1"></a>        <span class="fu">mutate</span>(<span class="at">image =</span> x,</span>
+<span id="cb103-19"><a href="image-and-cell-level-quality-control.html#cb103-19" tabindex="-1"></a>               <span class="at">marker =</span> <span class="fu">colnames</span>(mat)) <span class="sc">%&gt;%</span> </span>
+<span id="cb103-20"><a href="image-and-cell-level-quality-control.html#cb103-20" tabindex="-1"></a>        <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">c</span>(snr, ps))</span>
+<span id="cb103-21"><a href="image-and-cell-level-quality-control.html#cb103-21" tabindex="-1"></a>})</span>
+<span id="cb103-22"><a href="image-and-cell-level-quality-control.html#cb103-22" tabindex="-1"></a></span>
+<span id="cb103-23"><a href="image-and-cell-level-quality-control.html#cb103-23" tabindex="-1"></a>cur_snr <span class="ot">&lt;-</span> <span class="fu">do.call</span>(rbind, cur_snr)</span>
+<span id="cb103-24"><a href="image-and-cell-level-quality-control.html#cb103-24" tabindex="-1"></a></span>
+<span id="cb103-25"><a href="image-and-cell-level-quality-control.html#cb103-25" tabindex="-1"></a>cur_snr <span class="sc">%&gt;%</span> </span>
+<span id="cb103-26"><a href="image-and-cell-level-quality-control.html#cb103-26" tabindex="-1"></a>    <span class="fu">group_by</span>(marker, name) <span class="sc">%&gt;%</span></span>
+<span id="cb103-27"><a href="image-and-cell-level-quality-control.html#cb103-27" tabindex="-1"></a>    <span class="fu">summarize</span>(<span class="at">log_mean =</span> <span class="fu">log2</span>(<span class="fu">mean</span>(value))) <span class="sc">%&gt;%</span></span>
+<span id="cb103-28"><a href="image-and-cell-level-quality-control.html#cb103-28" tabindex="-1"></a>    <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> name, <span class="at">values_from =</span> log_mean) <span class="sc">%&gt;%</span></span>
+<span id="cb103-29"><a href="image-and-cell-level-quality-control.html#cb103-29" tabindex="-1"></a>    <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb103-30"><a href="image-and-cell-level-quality-control.html#cb103-30" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="fu">aes</span>(ps, snr)) <span class="sc">+</span></span>
+<span id="cb103-31"><a href="image-and-cell-level-quality-control.html#cb103-31" tabindex="-1"></a>    <span class="fu">geom_label_repel</span>(<span class="fu">aes</span>(ps, snr, <span class="at">label =</span> marker)) <span class="sc">+</span></span>
+<span id="cb103-32"><a href="image-and-cell-level-quality-control.html#cb103-32" tabindex="-1"></a>    <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">15</span>) <span class="sc">+</span> <span class="fu">ylab</span>(<span class="st">&quot;Signal-to-noise ratio [log2]&quot;</span>) <span class="sc">+</span></span>
+<span id="cb103-33"><a href="image-and-cell-level-quality-control.html#cb103-33" tabindex="-1"></a>    <span class="fu">xlab</span>(<span class="st">&quot;Signal intensity [log2]&quot;</span>)</span></code></pre></div>
+<p><img src="06-quality_control_files/figure-html/image-snr-1.png" width="672" /></p>
+<p>We observe PD1, LAG3 and cleaved PARP to have high SNR but low signal intensity
+meaning that in general these markers are not abundantly expressed. The Iridium
+intercalator (here marked as DNA1 and DNA2) has the highest signal intensity
+but low SNR. This might be due to staining differences between individual nuclei
+where some nuclei are considered as background. We do however observe high
+SNR and sufficient signal intensity for the majority of markers.</p>
+<p>Otsu thesholding and SNR calculation does not perform well if the markers are
+lowly abundant. In the next code chunk, we will remove markers that have
+a positive signal of below 2 per image.</p>
+<div class="sourceCode" id="cb104"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb104-1"><a href="image-and-cell-level-quality-control.html#cb104-1" tabindex="-1"></a>cur_snr <span class="ot">&lt;-</span> cur_snr <span class="sc">%&gt;%</span> </span>
+<span id="cb104-2"><a href="image-and-cell-level-quality-control.html#cb104-2" tabindex="-1"></a>    <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> name, <span class="at">values_from =</span> value) <span class="sc">%&gt;%</span></span>
+<span id="cb104-3"><a href="image-and-cell-level-quality-control.html#cb104-3" tabindex="-1"></a>    <span class="fu">filter</span>(ps <span class="sc">&gt;</span> <span class="dv">2</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb104-4"><a href="image-and-cell-level-quality-control.html#cb104-4" tabindex="-1"></a>    <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">c</span>(snr, ps))</span>
+<span id="cb104-5"><a href="image-and-cell-level-quality-control.html#cb104-5" tabindex="-1"></a></span>
+<span id="cb104-6"><a href="image-and-cell-level-quality-control.html#cb104-6" tabindex="-1"></a>cur_snr <span class="sc">%&gt;%</span> </span>
+<span id="cb104-7"><a href="image-and-cell-level-quality-control.html#cb104-7" tabindex="-1"></a>    <span class="fu">group_by</span>(marker, name) <span class="sc">%&gt;%</span></span>
+<span id="cb104-8"><a href="image-and-cell-level-quality-control.html#cb104-8" tabindex="-1"></a>    <span class="fu">summarize</span>(<span class="at">log_mean =</span> <span class="fu">log2</span>(<span class="fu">mean</span>(value))) <span class="sc">%&gt;%</span></span>
+<span id="cb104-9"><a href="image-and-cell-level-quality-control.html#cb104-9" tabindex="-1"></a>    <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> name, <span class="at">values_from =</span> log_mean) <span class="sc">%&gt;%</span></span>
+<span id="cb104-10"><a href="image-and-cell-level-quality-control.html#cb104-10" tabindex="-1"></a>    <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb104-11"><a href="image-and-cell-level-quality-control.html#cb104-11" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="fu">aes</span>(ps, snr)) <span class="sc">+</span></span>
+<span id="cb104-12"><a href="image-and-cell-level-quality-control.html#cb104-12" tabindex="-1"></a>    <span class="fu">geom_label_repel</span>(<span class="fu">aes</span>(ps, snr, <span class="at">label =</span> marker)) <span class="sc">+</span></span>
+<span id="cb104-13"><a href="image-and-cell-level-quality-control.html#cb104-13" tabindex="-1"></a>    <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">15</span>) <span class="sc">+</span> <span class="fu">ylab</span>(<span class="st">&quot;Signal-to-noise ratio [log2]&quot;</span>) <span class="sc">+</span></span>
+<span id="cb104-14"><a href="image-and-cell-level-quality-control.html#cb104-14" tabindex="-1"></a>    <span class="fu">xlab</span>(<span class="st">&quot;Signal intensity [log2]&quot;</span>)</span></code></pre></div>
+<p><img src="06-quality_control_files/figure-html/snr-adjusted-1.png" width="672" /></p>
+<p>This visualization shows a reduces SNR for PD1, LAG3 and cleaved PARP which was
+previously inflated due to low signal.</p>
+<p>Another quality indicator is the image area covered by cells (or biological
+tissue). This metric identifies ROIs where little cells are present, possibly
+hinting at incorrect selection of the ROI. We can compute the percentage of
+covered image area using the metadata contained in the <code>SpatialExperiment</code>
+object:</p>
+<div class="sourceCode" id="cb105"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb105-1"><a href="image-and-cell-level-quality-control.html#cb105-1" tabindex="-1"></a>cell_density <span class="ot">&lt;-</span> <span class="fu">colData</span>(spe) <span class="sc">%&gt;%</span></span>
+<span id="cb105-2"><a href="image-and-cell-level-quality-control.html#cb105-2" tabindex="-1"></a>    <span class="fu">as.data.frame</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb105-3"><a href="image-and-cell-level-quality-control.html#cb105-3" tabindex="-1"></a>    <span class="fu">group_by</span>(sample_id) <span class="sc">%&gt;%</span></span>
+<span id="cb105-4"><a href="image-and-cell-level-quality-control.html#cb105-4" tabindex="-1"></a>    <span class="co"># Compute the number of pixels covered by cells and </span></span>
+<span id="cb105-5"><a href="image-and-cell-level-quality-control.html#cb105-5" tabindex="-1"></a>    <span class="co"># the total number of pixels</span></span>
+<span id="cb105-6"><a href="image-and-cell-level-quality-control.html#cb105-6" tabindex="-1"></a>    <span class="fu">summarize</span>(<span class="at">cell_area =</span> <span class="fu">sum</span>(area),</span>
+<span id="cb105-7"><a href="image-and-cell-level-quality-control.html#cb105-7" tabindex="-1"></a>              <span class="at">no_pixels =</span> <span class="fu">mean</span>(width_px) <span class="sc">*</span> <span class="fu">mean</span>(height_px)) <span class="sc">%&gt;%</span></span>
+<span id="cb105-8"><a href="image-and-cell-level-quality-control.html#cb105-8" tabindex="-1"></a>    <span class="co"># Divide the total number of pixels </span></span>
+<span id="cb105-9"><a href="image-and-cell-level-quality-control.html#cb105-9" tabindex="-1"></a>    <span class="co"># by the number of pixels covered by cells</span></span>
+<span id="cb105-10"><a href="image-and-cell-level-quality-control.html#cb105-10" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">covered_area =</span> cell_area <span class="sc">/</span> no_pixels)</span>
+<span id="cb105-11"><a href="image-and-cell-level-quality-control.html#cb105-11" tabindex="-1"></a></span>
+<span id="cb105-12"><a href="image-and-cell-level-quality-control.html#cb105-12" tabindex="-1"></a><span class="co"># Visualize the image area covered by cells per image</span></span>
+<span id="cb105-13"><a href="image-and-cell-level-quality-control.html#cb105-13" tabindex="-1"></a><span class="fu">ggplot</span>(cell_density) <span class="sc">+</span></span>
+<span id="cb105-14"><a href="image-and-cell-level-quality-control.html#cb105-14" tabindex="-1"></a>        <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="fu">reorder</span>(sample_id,covered_area), covered_area)) <span class="sc">+</span> </span>
+<span id="cb105-15"><a href="image-and-cell-level-quality-control.html#cb105-15" tabindex="-1"></a>        <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">15</span>) <span class="sc">+</span></span>
+<span id="cb105-16"><a href="image-and-cell-level-quality-control.html#cb105-16" tabindex="-1"></a>        <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">90</span>, <span class="at">hjust =</span> <span class="dv">1</span>, <span class="at">size =</span> <span class="dv">15</span>)) <span class="sc">+</span></span>
+<span id="cb105-17"><a href="image-and-cell-level-quality-control.html#cb105-17" tabindex="-1"></a>        <span class="fu">ylim</span>(<span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>)) <span class="sc">+</span></span>
+<span id="cb105-18"><a href="image-and-cell-level-quality-control.html#cb105-18" tabindex="-1"></a>        <span class="fu">ylab</span>(<span class="st">&quot;% covered area&quot;</span>) <span class="sc">+</span> <span class="fu">xlab</span>(<span class="st">&quot;&quot;</span>)</span></code></pre></div>
+<p><img src="06-quality_control_files/figure-html/cell-density-1.png" width="672" /></p>
+<p>We observe that two of the 14 images show unusually low cell coverage. These
+two images can now be visualized using <code>cytomapper</code>.</p>
+<div class="sourceCode" id="cb106"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb106-1"><a href="image-and-cell-level-quality-control.html#cb106-1" tabindex="-1"></a><span class="co"># Normalize and clip images</span></span>
+<span id="cb106-2"><a href="image-and-cell-level-quality-control.html#cb106-2" tabindex="-1"></a>cur_images <span class="ot">&lt;-</span> images[<span class="fu">c</span>(<span class="st">&quot;Patient4_005&quot;</span>, <span class="st">&quot;Patient4_007&quot;</span>)]</span>
+<span id="cb106-3"><a href="image-and-cell-level-quality-control.html#cb106-3" tabindex="-1"></a>cur_images <span class="ot">&lt;-</span> cytomapper<span class="sc">::</span><span class="fu">normalize</span>(cur_images, <span class="at">separateImages =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb106-4"><a href="image-and-cell-level-quality-control.html#cb106-4" tabindex="-1"></a>cur_images <span class="ot">&lt;-</span> cytomapper<span class="sc">::</span><span class="fu">normalize</span>(cur_images, <span class="at">inputRange =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.2</span>))</span>
+<span id="cb106-5"><a href="image-and-cell-level-quality-control.html#cb106-5" tabindex="-1"></a></span>
+<span id="cb106-6"><a href="image-and-cell-level-quality-control.html#cb106-6" tabindex="-1"></a><span class="fu">plotPixels</span>(cur_images,</span>
+<span id="cb106-7"><a href="image-and-cell-level-quality-control.html#cb106-7" tabindex="-1"></a>           <span class="at">mask =</span> masks[<span class="fu">c</span>(<span class="st">&quot;Patient4_005&quot;</span>, <span class="st">&quot;Patient4_007&quot;</span>)],</span>
+<span id="cb106-8"><a href="image-and-cell-level-quality-control.html#cb106-8" tabindex="-1"></a>           <span class="at">img_id =</span> <span class="st">&quot;sample_id&quot;</span>,</span>
+<span id="cb106-9"><a href="image-and-cell-level-quality-control.html#cb106-9" tabindex="-1"></a>           <span class="at">missing_colour =</span> <span class="st">&quot;white&quot;</span>,</span>
+<span id="cb106-10"><a href="image-and-cell-level-quality-control.html#cb106-10" tabindex="-1"></a>           <span class="at">colour_by =</span> <span class="fu">c</span>(<span class="st">&quot;CD163&quot;</span>, <span class="st">&quot;CD20&quot;</span>, <span class="st">&quot;CD3&quot;</span>, <span class="st">&quot;Ecad&quot;</span>, <span class="st">&quot;DNA1&quot;</span>),</span>
+<span id="cb106-11"><a href="image-and-cell-level-quality-control.html#cb106-11" tabindex="-1"></a>           <span class="at">colour =</span> <span class="fu">list</span>(<span class="at">CD163 =</span> <span class="fu">c</span>(<span class="st">&quot;black&quot;</span>, <span class="st">&quot;yellow&quot;</span>),</span>
+<span id="cb106-12"><a href="image-and-cell-level-quality-control.html#cb106-12" tabindex="-1"></a>                         <span class="at">CD20 =</span> <span class="fu">c</span>(<span class="st">&quot;black&quot;</span>, <span class="st">&quot;red&quot;</span>),</span>
+<span id="cb106-13"><a href="image-and-cell-level-quality-control.html#cb106-13" tabindex="-1"></a>                         <span class="at">CD3 =</span> <span class="fu">c</span>(<span class="st">&quot;black&quot;</span>, <span class="st">&quot;green&quot;</span>),</span>
+<span id="cb106-14"><a href="image-and-cell-level-quality-control.html#cb106-14" tabindex="-1"></a>                         <span class="at">Ecad =</span> <span class="fu">c</span>(<span class="st">&quot;black&quot;</span>, <span class="st">&quot;cyan&quot;</span>),</span>
+<span id="cb106-15"><a href="image-and-cell-level-quality-control.html#cb106-15" tabindex="-1"></a>                         <span class="at">DNA1 =</span> <span class="fu">c</span>(<span class="st">&quot;black&quot;</span>, <span class="st">&quot;blue&quot;</span>)),</span>
+<span id="cb106-16"><a href="image-and-cell-level-quality-control.html#cb106-16" tabindex="-1"></a>           <span class="at">legend =</span> <span class="fu">list</span>(<span class="at">colour_by.title.cex =</span> <span class="fl">0.7</span>,</span>
+<span id="cb106-17"><a href="image-and-cell-level-quality-control.html#cb106-17" tabindex="-1"></a>                         <span class="at">colour_by.labels.cex =</span> <span class="fl">0.7</span>))</span></code></pre></div>
+<p><img src="06-quality_control_files/figure-html/low-density-images-1.png" width="672" /></p>
+<p>These two images display less dense tissue structure but overall the images are
+intact and appear to be segmented correctly.</p>
+<p>Finally, it can be beneficial to visualize the mean marker expression per image
+to identify images with outlying marker expression. This check does not
+indicate image quality <em>per se</em> but can highlight biological differences. Here,
+we will use the <code>aggregateAcrossCells</code> function of the
+<em><a href="https://bioconductor.org/packages/3.18/scuttle">scuttle</a></em> package to compute the mean expression per
+image. For visualization purposes, we again <code>asinh</code> transform the mean expression
+values.</p>
+<div class="sourceCode" id="cb107"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb107-1"><a href="image-and-cell-level-quality-control.html#cb107-1" tabindex="-1"></a><span class="fu">library</span>(scuttle)</span>
+<span id="cb107-2"><a href="image-and-cell-level-quality-control.html#cb107-2" tabindex="-1"></a></span>
+<span id="cb107-3"><a href="image-and-cell-level-quality-control.html#cb107-3" tabindex="-1"></a>image_mean <span class="ot">&lt;-</span> <span class="fu">aggregateAcrossCells</span>(spe, </span>
+<span id="cb107-4"><a href="image-and-cell-level-quality-control.html#cb107-4" tabindex="-1"></a>                                   <span class="at">ids =</span> spe<span class="sc">$</span>sample_id, </span>
+<span id="cb107-5"><a href="image-and-cell-level-quality-control.html#cb107-5" tabindex="-1"></a>                                   <span class="at">statistics=</span><span class="st">&quot;mean&quot;</span>,</span>
+<span id="cb107-6"><a href="image-and-cell-level-quality-control.html#cb107-6" tabindex="-1"></a>                                   <span class="at">use.assay.type =</span> <span class="st">&quot;counts&quot;</span>)</span>
+<span id="cb107-7"><a href="image-and-cell-level-quality-control.html#cb107-7" tabindex="-1"></a><span class="fu">assay</span>(image_mean, <span class="st">&quot;exprs&quot;</span>) <span class="ot">&lt;-</span> <span class="fu">asinh</span>(<span class="fu">counts</span>(image_mean))</span>
+<span id="cb107-8"><a href="image-and-cell-level-quality-control.html#cb107-8" tabindex="-1"></a></span>
+<span id="cb107-9"><a href="image-and-cell-level-quality-control.html#cb107-9" tabindex="-1"></a><span class="fu">dittoHeatmap</span>(image_mean, <span class="at">genes =</span> <span class="fu">rownames</span>(spe)[<span class="fu">rowData</span>(spe)<span class="sc">$</span>use_channel],</span>
+<span id="cb107-10"><a href="image-and-cell-level-quality-control.html#cb107-10" tabindex="-1"></a>             <span class="at">assay =</span> <span class="st">&quot;exprs&quot;</span>, <span class="at">cluster_cols =</span> <span class="cn">TRUE</span>, <span class="at">scale =</span> <span class="st">&quot;none&quot;</span>,</span>
+<span id="cb107-11"><a href="image-and-cell-level-quality-control.html#cb107-11" tabindex="-1"></a>             <span class="at">heatmap.colors =</span> <span class="fu">viridis</span>(<span class="dv">100</span>), </span>
+<span id="cb107-12"><a href="image-and-cell-level-quality-control.html#cb107-12" tabindex="-1"></a>             <span class="at">annot.by =</span> <span class="fu">c</span>(<span class="st">&quot;indication&quot;</span>, <span class="st">&quot;patient_id&quot;</span>, <span class="st">&quot;ROI&quot;</span>),</span>
+<span id="cb107-13"><a href="image-and-cell-level-quality-control.html#cb107-13" tabindex="-1"></a>             <span class="at">annotation_colors =</span> <span class="fu">list</span>(<span class="at">indication =</span> <span class="fu">metadata</span>(spe)<span class="sc">$</span>color_vectors<span class="sc">$</span>indication,</span>
+<span id="cb107-14"><a href="image-and-cell-level-quality-control.html#cb107-14" tabindex="-1"></a>                                      <span class="at">patient_id =</span> <span class="fu">metadata</span>(spe)<span class="sc">$</span>color_vectors<span class="sc">$</span>patient_id,</span>
+<span id="cb107-15"><a href="image-and-cell-level-quality-control.html#cb107-15" tabindex="-1"></a>                                      <span class="at">ROI =</span> <span class="fu">metadata</span>(spe)<span class="sc">$</span>color_vectors<span class="sc">$</span>ROI),</span>
+<span id="cb107-16"><a href="image-and-cell-level-quality-control.html#cb107-16" tabindex="-1"></a>             <span class="at">show_colnames =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<p><img src="06-quality_control_files/figure-html/mean-expression-per-image-1.png" width="672" /></p>
+<p>We observe extensive biological variation across the 14 images specifically for
+some of the cell phenotype markers including the macrophage marker CD206, the B
+cell marker CD20, the neutrophil marker CD15, and the proliferation marker Ki67.
+These differences will be further studied in the following chapters.</p>
+</div>
+<div id="cell-quality" class="section level2 hasAnchor" number="7.4">
+<h2><span class="header-section-number">7.4</span> Cell-level quality control<a href="image-and-cell-level-quality-control.html#cell-quality" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>In the following paragraphs we will look at different metrics and visualization
+approaches to assess data quality (as well as biological differences) on the
+single-cell level.</p>
+<p>Related to the signal-to-noise ratio (SNR) calculated above on the pixel-level,
+a similar measure can be derived on the single-cell level. Here, we will use
+a two component Gaussian mixture model for each marker to find cells
+with positive and negative expression. The SNR is defined as:</p>
+<p><span class="math display">\[SNR = I_s/I_n\]</span></p>
+<p>where <span class="math inline">\(I_s\)</span> is the intensity of the signal (mean intensity of cells with
+positive signal) and <span class="math inline">\(I_n\)</span> is the intensity of the noise (mean intensity of
+cells lacking expression). To define cells with positive and negative marker
+expression, we fit the mixture model across the transformed counts of all cells
+contained in the <code>SpatialExperiment</code> object. Next, for each marker we calculate
+the mean of the non-transformed counts for the positive and the negative cells.
+The SNR is then the ratio between the mean of the positive signal and the mean
+of the negative signal.</p>
+<div class="sourceCode" id="cb108"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb108-1"><a href="image-and-cell-level-quality-control.html#cb108-1" tabindex="-1"></a><span class="fu">library</span>(mclust)</span>
+<span id="cb108-2"><a href="image-and-cell-level-quality-control.html#cb108-2" tabindex="-1"></a></span>
+<span id="cb108-3"><a href="image-and-cell-level-quality-control.html#cb108-3" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">220224</span>)</span>
+<span id="cb108-4"><a href="image-and-cell-level-quality-control.html#cb108-4" tabindex="-1"></a>mat <span class="ot">&lt;-</span> <span class="fu">sapply</span>(<span class="fu">seq_len</span>(<span class="fu">nrow</span>(spe)), <span class="cf">function</span>(x){</span>
+<span id="cb108-5"><a href="image-and-cell-level-quality-control.html#cb108-5" tabindex="-1"></a>    cur_exprs <span class="ot">&lt;-</span> <span class="fu">assay</span>(spe, <span class="st">&quot;exprs&quot;</span>)[x,]</span>
+<span id="cb108-6"><a href="image-and-cell-level-quality-control.html#cb108-6" tabindex="-1"></a>    cur_counts <span class="ot">&lt;-</span> <span class="fu">assay</span>(spe, <span class="st">&quot;counts&quot;</span>)[x,]</span>
+<span id="cb108-7"><a href="image-and-cell-level-quality-control.html#cb108-7" tabindex="-1"></a>    </span>
+<span id="cb108-8"><a href="image-and-cell-level-quality-control.html#cb108-8" tabindex="-1"></a>    cur_model <span class="ot">&lt;-</span> <span class="fu">Mclust</span>(cur_exprs, <span class="at">G =</span> <span class="dv">2</span>)</span>
+<span id="cb108-9"><a href="image-and-cell-level-quality-control.html#cb108-9" tabindex="-1"></a>    mean1 <span class="ot">&lt;-</span> <span class="fu">mean</span>(cur_counts[cur_model<span class="sc">$</span>classification <span class="sc">==</span> <span class="dv">1</span>])</span>
+<span id="cb108-10"><a href="image-and-cell-level-quality-control.html#cb108-10" tabindex="-1"></a>    mean2 <span class="ot">&lt;-</span> <span class="fu">mean</span>(cur_counts[cur_model<span class="sc">$</span>classification <span class="sc">==</span> <span class="dv">2</span>])</span>
+<span id="cb108-11"><a href="image-and-cell-level-quality-control.html#cb108-11" tabindex="-1"></a>    </span>
+<span id="cb108-12"><a href="image-and-cell-level-quality-control.html#cb108-12" tabindex="-1"></a>    signal <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(mean1 <span class="sc">&gt;</span> mean2, mean1, mean2)</span>
+<span id="cb108-13"><a href="image-and-cell-level-quality-control.html#cb108-13" tabindex="-1"></a>    noise <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(mean1 <span class="sc">&gt;</span> mean2, mean2, mean1)</span>
+<span id="cb108-14"><a href="image-and-cell-level-quality-control.html#cb108-14" tabindex="-1"></a>    </span>
+<span id="cb108-15"><a href="image-and-cell-level-quality-control.html#cb108-15" tabindex="-1"></a>    <span class="fu">return</span>(<span class="fu">c</span>(<span class="at">snr =</span> signal<span class="sc">/</span>noise, <span class="at">ps =</span> signal))</span>
+<span id="cb108-16"><a href="image-and-cell-level-quality-control.html#cb108-16" tabindex="-1"></a>})</span>
+<span id="cb108-17"><a href="image-and-cell-level-quality-control.html#cb108-17" tabindex="-1"></a>    </span>
+<span id="cb108-18"><a href="image-and-cell-level-quality-control.html#cb108-18" tabindex="-1"></a>cur_snr <span class="ot">&lt;-</span> <span class="fu">t</span>(mat) <span class="sc">%&gt;%</span> <span class="fu">as.data.frame</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb108-19"><a href="image-and-cell-level-quality-control.html#cb108-19" tabindex="-1"></a>        <span class="fu">mutate</span>(<span class="at">marker =</span> <span class="fu">rownames</span>(spe))</span>
+<span id="cb108-20"><a href="image-and-cell-level-quality-control.html#cb108-20" tabindex="-1"></a></span>
+<span id="cb108-21"><a href="image-and-cell-level-quality-control.html#cb108-21" tabindex="-1"></a>cur_snr <span class="sc">%&gt;%</span> <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb108-22"><a href="image-and-cell-level-quality-control.html#cb108-22" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="fu">log2</span>(ps), <span class="fu">log2</span>(snr))) <span class="sc">+</span></span>
+<span id="cb108-23"><a href="image-and-cell-level-quality-control.html#cb108-23" tabindex="-1"></a>    <span class="fu">geom_label_repel</span>(<span class="fu">aes</span>(<span class="fu">log2</span>(ps), <span class="fu">log2</span>(snr), <span class="at">label =</span> marker)) <span class="sc">+</span></span>
+<span id="cb108-24"><a href="image-and-cell-level-quality-control.html#cb108-24" tabindex="-1"></a>    <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">15</span>) <span class="sc">+</span> <span class="fu">ylab</span>(<span class="st">&quot;Signal-to-noise ratio [log2]&quot;</span>) <span class="sc">+</span></span>
+<span id="cb108-25"><a href="image-and-cell-level-quality-control.html#cb108-25" tabindex="-1"></a>    <span class="fu">xlab</span>(<span class="st">&quot;Signal intensity [log2]&quot;</span>)</span></code></pre></div>
+<p><img src="06-quality_control_files/figure-html/cell-snr-1.png" width="672" /></p>
+<p>Next, we observe the distributions of cell size across the individual images.
+Differences in cell size distributions can indicate segmentation biases due to
+differences in cell density or can indicate biological differences due to cell
+type compositions (tumor cells tend to be larger than immune cells).</p>
+<div class="sourceCode" id="cb109"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb109-1"><a href="image-and-cell-level-quality-control.html#cb109-1" tabindex="-1"></a><span class="fu">dittoPlot</span>(spe, <span class="at">var =</span> <span class="st">&quot;area&quot;</span>, </span>
+<span id="cb109-2"><a href="image-and-cell-level-quality-control.html#cb109-2" tabindex="-1"></a>          <span class="at">group.by =</span> <span class="st">&quot;sample_id&quot;</span>, </span>
+<span id="cb109-3"><a href="image-and-cell-level-quality-control.html#cb109-3" tabindex="-1"></a>          <span class="at">plots =</span> <span class="st">&quot;boxplot&quot;</span>) <span class="sc">+</span></span>
+<span id="cb109-4"><a href="image-and-cell-level-quality-control.html#cb109-4" tabindex="-1"></a>        <span class="fu">ylab</span>(<span class="st">&quot;Cell area&quot;</span>) <span class="sc">+</span> <span class="fu">xlab</span>(<span class="st">&quot;&quot;</span>)</span></code></pre></div>
+<p><img src="06-quality_control_files/figure-html/cell-size-1.png" width="672" /></p>
+<div class="sourceCode" id="cb110"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb110-1"><a href="image-and-cell-level-quality-control.html#cb110-1" tabindex="-1"></a><span class="fu">summary</span>(spe<span class="sc">$</span>area)</span></code></pre></div>
+<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##    3.00   47.00   70.00   76.38   98.00  466.00</code></pre>
+<p>The median cell size is 70 pixels with a median major axis
+length of 11.3. The largest cell
+has an area of 466 pixels which relates to a diameter of
+21.6 pixels assuming a circular shape.
+Overall, the distribution of cell sizes is similar across images with images from
+<code>Patient4_005</code> and <code>Patient4_007</code> showing a reduced average cell size. These
+images contain fewer tumor cells which can explain the smaller average cell size.</p>
+<p>We detect very small cells in the dataset and will remove them.
+The chosen threshold is arbitrary and needs to be adjusted per dataset.</p>
+<div class="sourceCode" id="cb112"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb112-1"><a href="image-and-cell-level-quality-control.html#cb112-1" tabindex="-1"></a><span class="fu">sum</span>(spe<span class="sc">$</span>area <span class="sc">&lt;</span> <span class="dv">5</span>)</span></code></pre></div>
+<pre><code>## [1] 65</code></pre>
+<div class="sourceCode" id="cb114"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb114-1"><a href="image-and-cell-level-quality-control.html#cb114-1" tabindex="-1"></a>spe <span class="ot">&lt;-</span> spe[,spe<span class="sc">$</span>area <span class="sc">&gt;=</span> <span class="dv">5</span>]</span></code></pre></div>
+<p>Another quality indicator can be an absolute measure of cell density often
+reported in cells per mm<span class="math inline">\(^2\)</span>.</p>
+<div class="sourceCode" id="cb115"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb115-1"><a href="image-and-cell-level-quality-control.html#cb115-1" tabindex="-1"></a>cell_density <span class="ot">&lt;-</span> <span class="fu">colData</span>(spe) <span class="sc">%&gt;%</span></span>
+<span id="cb115-2"><a href="image-and-cell-level-quality-control.html#cb115-2" tabindex="-1"></a>    <span class="fu">as.data.frame</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb115-3"><a href="image-and-cell-level-quality-control.html#cb115-3" tabindex="-1"></a>    <span class="fu">group_by</span>(sample_id) <span class="sc">%&gt;%</span></span>
+<span id="cb115-4"><a href="image-and-cell-level-quality-control.html#cb115-4" tabindex="-1"></a>    <span class="fu">summarize</span>(<span class="at">cell_count =</span> <span class="fu">n</span>(),</span>
+<span id="cb115-5"><a href="image-and-cell-level-quality-control.html#cb115-5" tabindex="-1"></a>           <span class="at">no_pixels =</span> <span class="fu">mean</span>(width_px) <span class="sc">*</span> <span class="fu">mean</span>(height_px)) <span class="sc">%&gt;%</span></span>
+<span id="cb115-6"><a href="image-and-cell-level-quality-control.html#cb115-6" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">cells_per_mm2 =</span> cell_count<span class="sc">/</span>(no_pixels<span class="sc">/</span><span class="dv">1000000</span>))</span>
+<span id="cb115-7"><a href="image-and-cell-level-quality-control.html#cb115-7" tabindex="-1"></a></span>
+<span id="cb115-8"><a href="image-and-cell-level-quality-control.html#cb115-8" tabindex="-1"></a><span class="fu">ggplot</span>(cell_density) <span class="sc">+</span></span>
+<span id="cb115-9"><a href="image-and-cell-level-quality-control.html#cb115-9" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="fu">reorder</span>(sample_id,cells_per_mm2), cells_per_mm2)) <span class="sc">+</span> </span>
+<span id="cb115-10"><a href="image-and-cell-level-quality-control.html#cb115-10" tabindex="-1"></a>    <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">15</span>) <span class="sc">+</span> </span>
+<span id="cb115-11"><a href="image-and-cell-level-quality-control.html#cb115-11" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">90</span>, <span class="at">hjust =</span> <span class="dv">1</span>, <span class="at">size =</span> <span class="dv">8</span>)) <span class="sc">+</span></span>
+<span id="cb115-12"><a href="image-and-cell-level-quality-control.html#cb115-12" tabindex="-1"></a>    <span class="fu">ylab</span>(<span class="st">&quot;Cells per mm2&quot;</span>) <span class="sc">+</span> <span class="fu">xlab</span>(<span class="st">&quot;&quot;</span>)</span></code></pre></div>
+<p><img src="06-quality_control_files/figure-html/no-cells-per-image-1.png" width="672" /></p>
+<p>The number of cells per mm<span class="math inline">\(^2\)</span> varies across images which also depends on the
+number of tumor/non-tumor cells. As we can see in the following sections, some
+immune cells appear in cell dense regions while other stromal regions are less
+dense.</p>
+<p>The data presented here originate from samples from different locations with
+potential differences in pre-processing and each sample was stained individually.
+These (and other) technical aspects can induce staining differences between
+samples or batches of samples. Observing potential staining differences can be
+crucial to assess data quality. We will use ridgeline visualizations to check
+differences in staining patterns:</p>
+<div class="sourceCode" id="cb116"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb116-1"><a href="image-and-cell-level-quality-control.html#cb116-1" tabindex="-1"></a><span class="fu">multi_dittoPlot</span>(spe, <span class="at">vars =</span> <span class="fu">rownames</span>(spe)[<span class="fu">rowData</span>(spe)<span class="sc">$</span>use_channel],</span>
+<span id="cb116-2"><a href="image-and-cell-level-quality-control.html#cb116-2" tabindex="-1"></a>               <span class="at">group.by =</span> <span class="st">&quot;patient_id&quot;</span>, <span class="at">plots =</span> <span class="st">&quot;ridgeplot&quot;</span>, </span>
+<span id="cb116-3"><a href="image-and-cell-level-quality-control.html#cb116-3" tabindex="-1"></a>               <span class="at">assay =</span> <span class="st">&quot;exprs&quot;</span>, </span>
+<span id="cb116-4"><a href="image-and-cell-level-quality-control.html#cb116-4" tabindex="-1"></a>               <span class="at">color.panel =</span> <span class="fu">metadata</span>(spe)<span class="sc">$</span>color_vectors<span class="sc">$</span>patient_id)</span></code></pre></div>
+<p><img src="06-quality_control_files/figure-html/ridges-1.png" width="672" /></p>
+<p>We observe variations in the distributions of marker expression across patients.
+These variations may arise partly from different abundances of cells in
+different images (e.g., Patient3 may have higher numbers of CD11c+ and PD1+
+cells) as well as staining differences between samples. While most of the
+selected markers are specifically expressed in immune cell subtypes, we can see
+that E-Cadherin (a marker for epithelial (tumor) cells) shows a similar
+expression range across all patients.</p>
+<p>Finally, we will use non-linear dimensionality reduction methods to project
+cells from a high-dimensional (40) down to a low-dimensional (2) space. For this
+the <em><a href="https://bioconductor.org/packages/3.18/scater">scater</a></em> package provides the <code>runUMAP</code> and
+<code>runTSNE</code> function. To ensure reproducibility, we will need to set a seed;
+however different seeds and different parameter settings (e.g., the <code>perplexity</code>
+parameter in the <code>runTSNE</code> function) need to be tested to avoid
+over-interpretation of visualization artefacts. For dimensionality reduction, we
+will use all channels that show biological variation across the dataset.
+However, marker selection can be performed with different biological questions
+in mind. Here, both the <code>runUMAP</code> and <code>runTSNE</code> function are not deterministic,
+meaning they produce different results across different runs. We therefore
+set a <code>seed</code> in this chunk for reproducibility purposes.</p>
+<div class="sourceCode" id="cb117"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb117-1"><a href="image-and-cell-level-quality-control.html#cb117-1" tabindex="-1"></a><span class="fu">library</span>(scater)</span>
+<span id="cb117-2"><a href="image-and-cell-level-quality-control.html#cb117-2" tabindex="-1"></a></span>
+<span id="cb117-3"><a href="image-and-cell-level-quality-control.html#cb117-3" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">220225</span>)</span>
+<span id="cb117-4"><a href="image-and-cell-level-quality-control.html#cb117-4" tabindex="-1"></a>spe <span class="ot">&lt;-</span> <span class="fu">runUMAP</span>(spe, <span class="at">subset_row =</span> <span class="fu">rowData</span>(spe)<span class="sc">$</span>use_channel, <span class="at">exprs_values =</span> <span class="st">&quot;exprs&quot;</span>) </span>
+<span id="cb117-5"><a href="image-and-cell-level-quality-control.html#cb117-5" tabindex="-1"></a>spe <span class="ot">&lt;-</span> <span class="fu">runTSNE</span>(spe, <span class="at">subset_row =</span> <span class="fu">rowData</span>(spe)<span class="sc">$</span>use_channel, <span class="at">exprs_values =</span> <span class="st">&quot;exprs&quot;</span>) </span></code></pre></div>
+<p>After dimensionality reduction, the low-dimensional embeddings are stored in the
+<code>reducedDim</code> slot.</p>
+<div class="sourceCode" id="cb118"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb118-1"><a href="image-and-cell-level-quality-control.html#cb118-1" tabindex="-1"></a><span class="fu">reducedDims</span>(spe)</span></code></pre></div>
+<pre><code>## List of length 2
+## names(2): UMAP TSNE</code></pre>
+<div class="sourceCode" id="cb120"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb120-1"><a href="image-and-cell-level-quality-control.html#cb120-1" tabindex="-1"></a><span class="fu">head</span>(<span class="fu">reducedDim</span>(spe, <span class="st">&quot;UMAP&quot;</span>))</span></code></pre></div>
+<pre><code>##                    UMAP1     UMAP2
+## Patient1_001_1 -4.810167 -3.777362
+## Patient1_001_2 -4.397347 -3.456036
+## Patient1_001_3 -4.369883 -3.445561
+## Patient1_001_4 -4.081614 -3.162119
+## Patient1_001_5 -6.234012 -2.433976
+## Patient1_001_6 -5.666597 -3.428058</code></pre>
+<p>Visualization of the low-dimensional embedding facilitates assessment of
+potential “batch effects”. The <code>dittoDimPlot</code>
+function allows flexible visualization. It returns <code>ggplot</code> objects which
+can be further modified.</p>
+<div class="sourceCode" id="cb122"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb122-1"><a href="image-and-cell-level-quality-control.html#cb122-1" tabindex="-1"></a><span class="fu">library</span>(patchwork)</span>
+<span id="cb122-2"><a href="image-and-cell-level-quality-control.html#cb122-2" tabindex="-1"></a></span>
+<span id="cb122-3"><a href="image-and-cell-level-quality-control.html#cb122-3" tabindex="-1"></a><span class="co"># visualize patient id </span></span>
+<span id="cb122-4"><a href="image-and-cell-level-quality-control.html#cb122-4" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> <span class="fu">dittoDimPlot</span>(spe, <span class="at">var =</span> <span class="st">&quot;patient_id&quot;</span>, <span class="at">reduction.use =</span> <span class="st">&quot;UMAP&quot;</span>, <span class="at">size =</span> <span class="fl">0.2</span>) <span class="sc">+</span> </span>
+<span id="cb122-5"><a href="image-and-cell-level-quality-control.html#cb122-5" tabindex="-1"></a>    <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">metadata</span>(spe)<span class="sc">$</span>color_vectors<span class="sc">$</span>patient_id) <span class="sc">+</span></span>
+<span id="cb122-6"><a href="image-and-cell-level-quality-control.html#cb122-6" tabindex="-1"></a>    <span class="fu">ggtitle</span>(<span class="st">&quot;Patient ID on UMAP&quot;</span>)</span>
+<span id="cb122-7"><a href="image-and-cell-level-quality-control.html#cb122-7" tabindex="-1"></a>p2 <span class="ot">&lt;-</span> <span class="fu">dittoDimPlot</span>(spe, <span class="at">var =</span> <span class="st">&quot;patient_id&quot;</span>, <span class="at">reduction.use =</span> <span class="st">&quot;TSNE&quot;</span>, <span class="at">size =</span> <span class="fl">0.2</span>) <span class="sc">+</span> </span>
+<span id="cb122-8"><a href="image-and-cell-level-quality-control.html#cb122-8" tabindex="-1"></a>    <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">metadata</span>(spe)<span class="sc">$</span>color_vectors<span class="sc">$</span>patient_id) <span class="sc">+</span></span>
+<span id="cb122-9"><a href="image-and-cell-level-quality-control.html#cb122-9" tabindex="-1"></a>    <span class="fu">ggtitle</span>(<span class="st">&quot;Patient ID on TSNE&quot;</span>)</span>
+<span id="cb122-10"><a href="image-and-cell-level-quality-control.html#cb122-10" tabindex="-1"></a></span>
+<span id="cb122-11"><a href="image-and-cell-level-quality-control.html#cb122-11" tabindex="-1"></a><span class="co"># visualize region of interest id</span></span>
+<span id="cb122-12"><a href="image-and-cell-level-quality-control.html#cb122-12" tabindex="-1"></a>p3 <span class="ot">&lt;-</span> <span class="fu">dittoDimPlot</span>(spe, <span class="at">var =</span> <span class="st">&quot;ROI&quot;</span>, <span class="at">reduction.use =</span> <span class="st">&quot;UMAP&quot;</span>, <span class="at">size =</span> <span class="fl">0.2</span>) <span class="sc">+</span> </span>
+<span id="cb122-13"><a href="image-and-cell-level-quality-control.html#cb122-13" tabindex="-1"></a>    <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">metadata</span>(spe)<span class="sc">$</span>color_vectors<span class="sc">$</span>ROI) <span class="sc">+</span></span>
+<span id="cb122-14"><a href="image-and-cell-level-quality-control.html#cb122-14" tabindex="-1"></a>    <span class="fu">ggtitle</span>(<span class="st">&quot;ROI ID on UMAP&quot;</span>)</span>
+<span id="cb122-15"><a href="image-and-cell-level-quality-control.html#cb122-15" tabindex="-1"></a>p4 <span class="ot">&lt;-</span> <span class="fu">dittoDimPlot</span>(spe, <span class="at">var =</span> <span class="st">&quot;ROI&quot;</span>, <span class="at">reduction.use =</span> <span class="st">&quot;TSNE&quot;</span>, <span class="at">size =</span> <span class="fl">0.2</span>) <span class="sc">+</span> </span>
+<span id="cb122-16"><a href="image-and-cell-level-quality-control.html#cb122-16" tabindex="-1"></a>    <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">metadata</span>(spe)<span class="sc">$</span>color_vectors<span class="sc">$</span>ROI) <span class="sc">+</span></span>
+<span id="cb122-17"><a href="image-and-cell-level-quality-control.html#cb122-17" tabindex="-1"></a>    <span class="fu">ggtitle</span>(<span class="st">&quot;ROI ID on TSNE&quot;</span>)</span>
+<span id="cb122-18"><a href="image-and-cell-level-quality-control.html#cb122-18" tabindex="-1"></a></span>
+<span id="cb122-19"><a href="image-and-cell-level-quality-control.html#cb122-19" tabindex="-1"></a><span class="co"># visualize indication</span></span>
+<span id="cb122-20"><a href="image-and-cell-level-quality-control.html#cb122-20" tabindex="-1"></a>p5 <span class="ot">&lt;-</span> <span class="fu">dittoDimPlot</span>(spe, <span class="at">var =</span> <span class="st">&quot;indication&quot;</span>, <span class="at">reduction.use =</span> <span class="st">&quot;UMAP&quot;</span>, <span class="at">size =</span> <span class="fl">0.2</span>) <span class="sc">+</span> </span>
+<span id="cb122-21"><a href="image-and-cell-level-quality-control.html#cb122-21" tabindex="-1"></a>    <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">metadata</span>(spe)<span class="sc">$</span>color_vectors<span class="sc">$</span>indication) <span class="sc">+</span></span>
+<span id="cb122-22"><a href="image-and-cell-level-quality-control.html#cb122-22" tabindex="-1"></a>    <span class="fu">ggtitle</span>(<span class="st">&quot;Indication on UMAP&quot;</span>)</span>
+<span id="cb122-23"><a href="image-and-cell-level-quality-control.html#cb122-23" tabindex="-1"></a>p6 <span class="ot">&lt;-</span> <span class="fu">dittoDimPlot</span>(spe, <span class="at">var =</span> <span class="st">&quot;indication&quot;</span>, <span class="at">reduction.use =</span> <span class="st">&quot;TSNE&quot;</span>, <span class="at">size =</span> <span class="fl">0.2</span>) <span class="sc">+</span> </span>
+<span id="cb122-24"><a href="image-and-cell-level-quality-control.html#cb122-24" tabindex="-1"></a>    <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">metadata</span>(spe)<span class="sc">$</span>color_vectors<span class="sc">$</span>indication) <span class="sc">+</span></span>
+<span id="cb122-25"><a href="image-and-cell-level-quality-control.html#cb122-25" tabindex="-1"></a>    <span class="fu">ggtitle</span>(<span class="st">&quot;Indication on TSNE&quot;</span>)</span>
+<span id="cb122-26"><a href="image-and-cell-level-quality-control.html#cb122-26" tabindex="-1"></a></span>
+<span id="cb122-27"><a href="image-and-cell-level-quality-control.html#cb122-27" tabindex="-1"></a>(p1 <span class="sc">+</span> p2) <span class="sc">/</span> (p3 <span class="sc">+</span> p4) <span class="sc">/</span> (p5 <span class="sc">+</span> p6)</span></code></pre></div>
+<p><img src="06-quality_control_files/figure-html/visualizing-dimred-1-1.png" width="672" /></p>
+<div class="sourceCode" id="cb123"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb123-1"><a href="image-and-cell-level-quality-control.html#cb123-1" tabindex="-1"></a><span class="co"># visualize marker expression</span></span>
+<span id="cb123-2"><a href="image-and-cell-level-quality-control.html#cb123-2" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> <span class="fu">dittoDimPlot</span>(spe, <span class="at">var =</span> <span class="st">&quot;Ecad&quot;</span>, <span class="at">reduction.use =</span> <span class="st">&quot;UMAP&quot;</span>, </span>
+<span id="cb123-3"><a href="image-and-cell-level-quality-control.html#cb123-3" tabindex="-1"></a>                   <span class="at">assay =</span> <span class="st">&quot;exprs&quot;</span>, <span class="at">size =</span> <span class="fl">0.2</span>) <span class="sc">+</span></span>
+<span id="cb123-4"><a href="image-and-cell-level-quality-control.html#cb123-4" tabindex="-1"></a>    <span class="fu">scale_color_viridis</span>(<span class="at">name =</span> <span class="st">&quot;Ecad&quot;</span>) <span class="sc">+</span></span>
+<span id="cb123-5"><a href="image-and-cell-level-quality-control.html#cb123-5" tabindex="-1"></a>    <span class="fu">ggtitle</span>(<span class="st">&quot;E-Cadherin expression on UMAP&quot;</span>)</span>
+<span id="cb123-6"><a href="image-and-cell-level-quality-control.html#cb123-6" tabindex="-1"></a>p2 <span class="ot">&lt;-</span> <span class="fu">dittoDimPlot</span>(spe, <span class="at">var =</span> <span class="st">&quot;CD45RO&quot;</span>, <span class="at">reduction.use =</span> <span class="st">&quot;UMAP&quot;</span>, </span>
+<span id="cb123-7"><a href="image-and-cell-level-quality-control.html#cb123-7" tabindex="-1"></a>                   <span class="at">assay =</span> <span class="st">&quot;exprs&quot;</span>, <span class="at">size =</span> <span class="fl">0.2</span>) <span class="sc">+</span></span>
+<span id="cb123-8"><a href="image-and-cell-level-quality-control.html#cb123-8" tabindex="-1"></a>    <span class="fu">scale_color_viridis</span>(<span class="at">name =</span> <span class="st">&quot;CD45RO&quot;</span>) <span class="sc">+</span></span>
+<span id="cb123-9"><a href="image-and-cell-level-quality-control.html#cb123-9" tabindex="-1"></a>    <span class="fu">ggtitle</span>(<span class="st">&quot;CD45RO expression on UMAP&quot;</span>)</span>
+<span id="cb123-10"><a href="image-and-cell-level-quality-control.html#cb123-10" tabindex="-1"></a>p3 <span class="ot">&lt;-</span> <span class="fu">dittoDimPlot</span>(spe, <span class="at">var =</span> <span class="st">&quot;Ecad&quot;</span>, <span class="at">reduction.use =</span> <span class="st">&quot;TSNE&quot;</span>, </span>
+<span id="cb123-11"><a href="image-and-cell-level-quality-control.html#cb123-11" tabindex="-1"></a>                   <span class="at">assay =</span> <span class="st">&quot;exprs&quot;</span>, <span class="at">size =</span> <span class="fl">0.2</span>) <span class="sc">+</span></span>
+<span id="cb123-12"><a href="image-and-cell-level-quality-control.html#cb123-12" tabindex="-1"></a>    <span class="fu">scale_color_viridis</span>(<span class="at">name =</span> <span class="st">&quot;Ecad&quot;</span>) <span class="sc">+</span></span>
+<span id="cb123-13"><a href="image-and-cell-level-quality-control.html#cb123-13" tabindex="-1"></a>    <span class="fu">ggtitle</span>(<span class="st">&quot;Ecad expression on TSNE&quot;</span>)</span>
+<span id="cb123-14"><a href="image-and-cell-level-quality-control.html#cb123-14" tabindex="-1"></a>p4 <span class="ot">&lt;-</span> <span class="fu">dittoDimPlot</span>(spe, <span class="at">var =</span> <span class="st">&quot;CD45RO&quot;</span>, <span class="at">reduction.use =</span> <span class="st">&quot;TSNE&quot;</span>, </span>
+<span id="cb123-15"><a href="image-and-cell-level-quality-control.html#cb123-15" tabindex="-1"></a>                   <span class="at">assay =</span> <span class="st">&quot;exprs&quot;</span>, <span class="at">size =</span> <span class="fl">0.2</span>) <span class="sc">+</span></span>
+<span id="cb123-16"><a href="image-and-cell-level-quality-control.html#cb123-16" tabindex="-1"></a>    <span class="fu">scale_color_viridis</span>(<span class="at">name =</span> <span class="st">&quot;CD45RO&quot;</span>) <span class="sc">+</span></span>
+<span id="cb123-17"><a href="image-and-cell-level-quality-control.html#cb123-17" tabindex="-1"></a>    <span class="fu">ggtitle</span>(<span class="st">&quot;CD45RO expression on TSNE&quot;</span>)</span>
+<span id="cb123-18"><a href="image-and-cell-level-quality-control.html#cb123-18" tabindex="-1"></a></span>
+<span id="cb123-19"><a href="image-and-cell-level-quality-control.html#cb123-19" tabindex="-1"></a>(p1 <span class="sc">+</span> p2) <span class="sc">/</span> (p3 <span class="sc">+</span> p4)</span></code></pre></div>
+<p><img src="06-quality_control_files/figure-html/visualizing-dimred-2-1.png" width="672" /></p>
+<p>We observe a strong separation of tumor cells (Ecad+ cells) between the
+patients. Here, each patient was diagnosed with a different tumor type. The
+separation of tumor cells could be of biological origin since tumor cells tend
+to display differences in expression between patients and cancer types and/or of
+technical origin: the panel only contains a single tumor marker (E-Cadherin) and
+therefore slight technical differences in staining causes visible separation
+between cells of different patients. Nevertheless, the immune compartment
+(CD45RO+ cells) mix between patients and we can rule out systematic staining
+differences between patients.</p>
+</div>
+<div id="save-objects-2" class="section level2 hasAnchor" number="7.5">
+<h2><span class="header-section-number">7.5</span> Save objects<a href="image-and-cell-level-quality-control.html#save-objects-2" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The modified <code>SpatialExperiment</code> object is saved for further downstream analysis.</p>
+<div class="sourceCode" id="cb124"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb124-1"><a href="image-and-cell-level-quality-control.html#cb124-1" tabindex="-1"></a><span class="fu">saveRDS</span>(spe, <span class="st">&quot;data/spe.rds&quot;</span>)</span></code></pre></div>
+</div>
+<div id="session-info-2" class="section level2 hasAnchor" number="7.6">
+<h2><span class="header-section-number">7.6</span> Session Info<a href="image-and-cell-level-quality-control.html#session-info-2" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<details>
+<summary>
+SessionInfo
+</summary>
+<pre><code>## R version 4.3.2 (2023-10-31)
+## Platform: x86_64-pc-linux-gnu (64-bit)
+## Running under: Ubuntu 22.04.3 LTS
+## 
+## Matrix products: default
+## BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
+## LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.20.so;  LAPACK version 3.10.0
+## 
+## locale:
+##  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+##  [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+##  [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+##  [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+##  [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+## [11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+## 
+## time zone: Etc/UTC
+## tzcode source: system (glibc)
+## 
+## attached base packages:
+## [1] stats4    stats     graphics  grDevices utils     datasets  methods  
+## [8] base     
+## 
+## other attached packages:
+##  [1] testthat_3.2.1              patchwork_1.1.3            
+##  [3] scater_1.30.1               mclust_6.0.1               
+##  [5] scuttle_1.12.0              ggrepel_0.9.4              
+##  [7] lubridate_1.9.3             forcats_1.0.0              
+##  [9] stringr_1.5.1               dplyr_1.1.4                
+## [11] purrr_1.0.2                 readr_2.1.4                
+## [13] tidyr_1.3.0                 tibble_3.2.1               
+## [15] tidyverse_2.0.0             viridis_0.6.4              
+## [17] viridisLite_0.4.2           dittoSeq_1.14.0            
+## [19] ggplot2_3.4.4               cytoviewer_1.2.0           
+## [21] cytomapper_1.14.0           SingleCellExperiment_1.24.0
+## [23] SummarizedExperiment_1.32.0 Biobase_2.62.0             
+## [25] GenomicRanges_1.54.1        GenomeInfoDb_1.38.5        
+## [27] IRanges_2.36.0              S4Vectors_0.40.2           
+## [29] BiocGenerics_0.48.1         MatrixGenerics_1.14.0      
+## [31] matrixStats_1.2.0           EBImage_4.44.0             
+## 
+## loaded via a namespace (and not attached):
+##   [1] RColorBrewer_1.1-3        jsonlite_1.8.8           
+##   [3] magrittr_2.0.3            ggbeeswarm_0.7.2         
+##   [5] magick_2.8.2              farver_2.1.1             
+##   [7] rmarkdown_2.25            zlibbioc_1.48.0          
+##   [9] vctrs_0.6.5               memoise_2.0.1            
+##  [11] DelayedMatrixStats_1.24.0 RCurl_1.98-1.13          
+##  [13] terra_1.7-65              svgPanZoom_0.3.4         
+##  [15] htmltools_0.5.7           S4Arrays_1.2.0           
+##  [17] BiocNeighbors_1.20.1      raster_3.6-26            
+##  [19] Rhdf5lib_1.24.1           SparseArray_1.2.3        
+##  [21] rhdf5_2.46.1              sass_0.4.8               
+##  [23] bslib_0.6.1               desc_1.4.3               
+##  [25] htmlwidgets_1.6.4         fontawesome_0.5.2        
+##  [27] cachem_1.0.8              mime_0.12                
+##  [29] lifecycle_1.0.4           pkgconfig_2.0.3          
+##  [31] rsvd_1.0.5                colourpicker_1.3.0       
+##  [33] Matrix_1.6-4              R6_2.5.1                 
+##  [35] fastmap_1.1.1             GenomeInfoDbData_1.2.11  
+##  [37] shiny_1.8.0               digest_0.6.33            
+##  [39] colorspace_2.1-0          shinycssloaders_1.0.0    
+##  [41] rprojroot_2.0.4           irlba_2.3.5.1            
+##  [43] pkgload_1.3.3             beachmat_2.18.0          
+##  [45] labeling_0.4.3            fansi_1.0.6              
+##  [47] nnls_1.5                  timechange_0.2.0         
+##  [49] abind_1.4-5               compiler_4.3.2           
+##  [51] withr_2.5.2               tiff_0.1-12              
+##  [53] BiocParallel_1.36.0       highr_0.10               
+##  [55] HDF5Array_1.30.0          DelayedArray_0.28.0      
+##  [57] rjson_0.2.21              tools_4.3.2              
+##  [59] vipor_0.4.7               beeswarm_0.4.0           
+##  [61] httpuv_1.6.13             glue_1.6.2               
+##  [63] rhdf5filters_1.14.1       promises_1.2.1           
+##  [65] grid_4.3.2                Rtsne_0.17               
+##  [67] generics_0.1.3            gtable_0.3.4             
+##  [69] tzdb_0.4.0                hms_1.1.3                
+##  [71] ScaledMatrix_1.10.0       BiocSingular_1.18.0      
+##  [73] sp_2.1-2                  utf8_1.2.4               
+##  [75] XVector_0.42.0            RcppAnnoy_0.0.21         
+##  [77] pillar_1.9.0              later_1.3.2              
+##  [79] lattice_0.21-9            tidyselect_1.2.0         
+##  [81] locfit_1.5-9.8            miniUI_0.1.1.1           
+##  [83] knitr_1.45                gridExtra_2.3            
+##  [85] bookdown_0.37             svglite_2.1.3            
+##  [87] xfun_0.41                 shinydashboard_0.7.2     
+##  [89] brio_1.1.4                pheatmap_1.0.12          
+##  [91] stringi_1.8.3             fftwtools_0.9-11         
+##  [93] yaml_2.3.8                evaluate_0.23            
+##  [95] codetools_0.2-19          archive_1.1.7            
+##  [97] BiocManager_1.30.22       cli_3.6.2                
+##  [99] uwot_0.1.16               xtable_1.8-4             
+## [101] systemfonts_1.0.5         munsell_0.5.0            
+## [103] jquerylib_0.1.4           Rcpp_1.0.11              
+## [105] png_0.1-8                 parallel_4.3.2           
+## [107] ellipsis_0.3.2            jpeg_0.1-10              
+## [109] sparseMatrixStats_1.14.0  bitops_1.0-7             
+## [111] SpatialExperiment_1.12.0  scales_1.3.0             
+## [113] ggridges_0.5.5            crayon_1.5.2             
+## [115] BiocStyle_2.30.0          rlang_1.1.2              
+## [117] cowplot_1.1.2</code></pre>
+</details>
+
+</div>
+</div>
+<h3>References<a href="references.html#references" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-Meyer2024" class="csl-entry">
+Meyer, Lasse, Nils Eling, and Bernd Bodenmiller. 2024. <span>“Cytoviewer: An r/Bioconductor Package for Interactive Visualization and Exploration of Highly Multiplexed Imaging Data.”</span> <em>BMC Bioinformatics</em> 25 (1).
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="spillover-correction.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="batch-effects.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": true,
+"facebook": false,
+"twitter": true,
+"linkedin": true,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": "https://github.com/BodenmillerGroup/IMCDataAnalysis/blob/master/06-quality_control.Rmd",
+"text": null
+},
+"download": null,
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "section"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

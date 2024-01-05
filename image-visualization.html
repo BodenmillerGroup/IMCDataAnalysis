@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>11 Image visualization | Analysis workflow for IMC data</title>
+  <meta name="description" content="This bookdown project highlights possible down-stream analyses performed on imaging mass cytometry data." />
+  <meta name="generator" content="bookdown 0.37 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="11 Image visualization | Analysis workflow for IMC data" />
+  <meta property="og:type" content="book" />
+  
+  <meta property="og:description" content="This bookdown project highlights possible down-stream analyses performed on imaging mass cytometry data." />
+  <meta name="github-repo" content="BodenmillerGroup/IMCDataAnalysis" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="11 Image visualization | Analysis workflow for IMC data" />
+  
+  <meta name="twitter:description" content="This bookdown project highlights possible down-stream analyses performed on imaging mass cytometry data." />
+  
+
+<meta name="author" content="Authors: Nils Eling 1,2,*, Vito Zanotelli 1,2, Michelle Daniel 1,2, Daniel Schulz 1,2, Jonas Windhager 1,2, Lasse Meyer 1,2" />
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="single-cell-visualization.html"/>
+<link rel="next" href="performing-spatial-analysis.html"/>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+<style type="text/css">
+/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Multiplexed imaging data analysis</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> IMC Data Analysis Workflow</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="index.html"><a href="index.html#disclaimer"><i class="fa fa-check"></i><b>1.1</b> Disclaimer</a></li>
+<li class="chapter" data-level="1.2" data-path="index.html"><a href="index.html#update-freeze"><i class="fa fa-check"></i><b>1.2</b> Update freeze</a></li>
+<li class="chapter" data-level="1.3" data-path="index.html"><a href="index.html#feedback-and-contributing"><i class="fa fa-check"></i><b>1.3</b> Feedback and contributing</a></li>
+<li class="chapter" data-level="1.4" data-path="index.html"><a href="index.html#maintainer"><i class="fa fa-check"></i><b>1.4</b> Maintainer</a></li>
+<li class="chapter" data-level="1.5" data-path="index.html"><a href="index.html#contributors"><i class="fa fa-check"></i><b>1.5</b> Contributors</a></li>
+<li class="chapter" data-level="1.6" data-path="index.html"><a href="index.html#citation"><i class="fa fa-check"></i><b>1.6</b> Citation</a></li>
+<li class="chapter" data-level="1.7" data-path="index.html"><a href="index.html#changelog"><i class="fa fa-check"></i><b>1.7</b> Changelog</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="intro.html"><a href="intro.html"><i class="fa fa-check"></i><b>2</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="intro.html"><a href="intro.html#technical-details-of-imc"><i class="fa fa-check"></i><b>2.1</b> Technical details of IMC</a>
+<ul>
+<li class="chapter" data-level="2.1.1" data-path="intro.html"><a href="intro.html#metal-conjugated-antobodies-and-staining"><i class="fa fa-check"></i><b>2.1.1</b> Metal-conjugated antobodies and staining</a></li>
+<li class="chapter" data-level="2.1.2" data-path="intro.html"><a href="intro.html#data-acquisition"><i class="fa fa-check"></i><b>2.1.2</b> Data acquisition</a></li>
+</ul></li>
+<li class="chapter" data-level="2.2" data-path="intro.html"><a href="intro.html#data-format"><i class="fa fa-check"></i><b>2.2</b> IMC data format</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="processing.html"><a href="processing.html"><i class="fa fa-check"></i><b>3</b> Multi-channel image processing</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="processing.html"><a href="processing.html#image-pre-processing-imc-specific"><i class="fa fa-check"></i><b>3.1</b> Image pre-processing (IMC specific)</a></li>
+<li class="chapter" data-level="3.2" data-path="processing.html"><a href="processing.html#image-segmentation"><i class="fa fa-check"></i><b>3.2</b> Image segmentation</a></li>
+<li class="chapter" data-level="3.3" data-path="processing.html"><a href="processing.html#feature-extraction"><i class="fa fa-check"></i><b>3.3</b> Feature extraction</a></li>
+<li class="chapter" data-level="3.4" data-path="processing.html"><a href="processing.html#data-export"><i class="fa fa-check"></i><b>3.4</b> Data export</a></li>
+<li class="chapter" data-level="3.5" data-path="processing.html"><a href="processing.html#data-import-into-r"><i class="fa fa-check"></i><b>3.5</b> Data import into R</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="prerequisites.html"><a href="prerequisites.html"><i class="fa fa-check"></i><b>4</b> Prerequisites</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="prerequisites.html"><a href="prerequisites.html#obtain-the-code"><i class="fa fa-check"></i><b>4.1</b> Obtain the code</a></li>
+<li class="chapter" data-level="4.2" data-path="prerequisites.html"><a href="prerequisites.html#software-requirements"><i class="fa fa-check"></i><b>4.2</b> Software requirements</a>
+<ul>
+<li class="chapter" data-level="4.2.1" data-path="prerequisites.html"><a href="prerequisites.html#docker"><i class="fa fa-check"></i><b>4.2.1</b> Using Docker</a></li>
+<li class="chapter" data-level="4.2.2" data-path="prerequisites.html"><a href="prerequisites.html#manual-install"><i class="fa fa-check"></i><b>4.2.2</b> Manual installation</a></li>
+<li class="chapter" data-level="4.2.3" data-path="prerequisites.html"><a href="prerequisites.html#major-package-versions"><i class="fa fa-check"></i><b>4.2.3</b> Major package versions</a></li>
+</ul></li>
+<li class="chapter" data-level="4.3" data-path="prerequisites.html"><a href="prerequisites.html#image-processing"><i class="fa fa-check"></i><b>4.3</b> Image processing</a></li>
+<li class="chapter" data-level="4.4" data-path="prerequisites.html"><a href="prerequisites.html#download-data"><i class="fa fa-check"></i><b>4.4</b> Download example data</a>
+<ul>
+<li class="chapter" data-level="4.4.1" data-path="prerequisites.html"><a href="prerequisites.html#processed-multiplexed-imaging-data"><i class="fa fa-check"></i><b>4.4.1</b> Processed multiplexed imaging data</a></li>
+<li class="chapter" data-level="4.4.2" data-path="prerequisites.html"><a href="prerequisites.html#files-for-spillover-matrix-estimation"><i class="fa fa-check"></i><b>4.4.2</b> Files for spillover matrix estimation</a></li>
+<li class="chapter" data-level="4.4.3" data-path="prerequisites.html"><a href="prerequisites.html#gated-cells"><i class="fa fa-check"></i><b>4.4.3</b> Gated cells</a></li>
+</ul></li>
+<li class="chapter" data-level="4.5" data-path="prerequisites.html"><a href="prerequisites.html#sessionInfo"><i class="fa fa-check"></i><b>4.5</b> Software versions</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="read-data.html"><a href="read-data.html"><i class="fa fa-check"></i><b>5</b> Read in the data</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="read-data.html"><a href="read-data.html#read-in-single-cell-information"><i class="fa fa-check"></i><b>5.1</b> Read in single-cell information</a>
+<ul>
+<li class="chapter" data-level="5.1.1" data-path="read-data.html"><a href="read-data.html#steinbock-generated-data"><i class="fa fa-check"></i><b>5.1.1</b> steinbock generated data</a></li>
+<li class="chapter" data-level="5.1.2" data-path="read-data.html"><a href="read-data.html#imc-segmentation-pipeline-generated-data"><i class="fa fa-check"></i><b>5.1.2</b> IMC Segmentation Pipeline generated data</a></li>
+<li class="chapter" data-level="5.1.3" data-path="read-data.html"><a href="read-data.html#reading-custom-files"><i class="fa fa-check"></i><b>5.1.3</b> Reading custom files</a></li>
+</ul></li>
+<li class="chapter" data-level="5.2" data-path="read-data.html"><a href="read-data.html#cell-processing"><i class="fa fa-check"></i><b>5.2</b> Single-cell processing</a></li>
+<li class="chapter" data-level="5.3" data-path="read-data.html"><a href="read-data.html#read-images"><i class="fa fa-check"></i><b>5.3</b> Read in images</a></li>
+<li class="chapter" data-level="5.4" data-path="read-data.html"><a href="read-data.html#generate-single-cell-data-from-images"><i class="fa fa-check"></i><b>5.4</b> Generate single-cell data from images</a></li>
+<li class="chapter" data-level="5.5" data-path="read-data.html"><a href="read-data.html#accessing-publicly-available-imc-datasets"><i class="fa fa-check"></i><b>5.5</b> Accessing publicly available IMC datasets</a></li>
+<li class="chapter" data-level="5.6" data-path="read-data.html"><a href="read-data.html#save-objects"><i class="fa fa-check"></i><b>5.6</b> Save objects</a></li>
+<li class="chapter" data-level="5.7" data-path="read-data.html"><a href="read-data.html#session-info"><i class="fa fa-check"></i><b>5.7</b> Session Info</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="spillover-correction.html"><a href="spillover-correction.html"><i class="fa fa-check"></i><b>6</b> Spillover correction</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="spillover-correction.html"><a href="spillover-correction.html#generate-the-spillover-matrix"><i class="fa fa-check"></i><b>6.1</b> Generate the spillover matrix</a>
+<ul>
+<li class="chapter" data-level="6.1.1" data-path="spillover-correction.html"><a href="spillover-correction.html#read-in-the-data"><i class="fa fa-check"></i><b>6.1.1</b> Read in the data</a></li>
+<li class="chapter" data-level="6.1.2" data-path="spillover-correction.html"><a href="spillover-correction.html#quality-control"><i class="fa fa-check"></i><b>6.1.2</b> Quality control</a></li>
+<li class="chapter" data-level="6.1.3" data-path="spillover-correction.html"><a href="spillover-correction.html#pixel_binning"><i class="fa fa-check"></i><b>6.1.3</b> Optional pixel binning</a></li>
+<li class="chapter" data-level="6.1.4" data-path="spillover-correction.html"><a href="spillover-correction.html#filtering-incorrectly-assigned-pixels"><i class="fa fa-check"></i><b>6.1.4</b> Filtering incorrectly assigned pixels</a></li>
+<li class="chapter" data-level="6.1.5" data-path="spillover-correction.html"><a href="spillover-correction.html#compute-spillover-matrix"><i class="fa fa-check"></i><b>6.1.5</b> Compute spillover matrix</a></li>
+</ul></li>
+<li class="chapter" data-level="6.2" data-path="spillover-correction.html"><a href="spillover-correction.html#single-cell-data-compensation"><i class="fa fa-check"></i><b>6.2</b> Single-cell data compensation</a></li>
+<li class="chapter" data-level="6.3" data-path="spillover-correction.html"><a href="spillover-correction.html#image-compensation"><i class="fa fa-check"></i><b>6.3</b> Image compensation</a></li>
+<li class="chapter" data-level="6.4" data-path="spillover-correction.html"><a href="spillover-correction.html#write-out-compensated-images"><i class="fa fa-check"></i><b>6.4</b> Write out compensated images</a></li>
+<li class="chapter" data-level="6.5" data-path="spillover-correction.html"><a href="spillover-correction.html#save-objects-1"><i class="fa fa-check"></i><b>6.5</b> Save objects</a></li>
+<li class="chapter" data-level="6.6" data-path="spillover-correction.html"><a href="spillover-correction.html#session-info-1"><i class="fa fa-check"></i><b>6.6</b> Session Info</a></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="image-and-cell-level-quality-control.html"><a href="image-and-cell-level-quality-control.html"><i class="fa fa-check"></i><b>7</b> Image and cell-level quality control</a>
+<ul>
+<li class="chapter" data-level="7.1" data-path="image-and-cell-level-quality-control.html"><a href="image-and-cell-level-quality-control.html#read-in-the-data-1"><i class="fa fa-check"></i><b>7.1</b> Read in the data</a></li>
+<li class="chapter" data-level="7.2" data-path="image-and-cell-level-quality-control.html"><a href="image-and-cell-level-quality-control.html#seg-quality"><i class="fa fa-check"></i><b>7.2</b> Segmentation quality control</a></li>
+<li class="chapter" data-level="7.3" data-path="image-and-cell-level-quality-control.html"><a href="image-and-cell-level-quality-control.html#image-quality"><i class="fa fa-check"></i><b>7.3</b> Image-level quality control</a></li>
+<li class="chapter" data-level="7.4" data-path="image-and-cell-level-quality-control.html"><a href="image-and-cell-level-quality-control.html#cell-quality"><i class="fa fa-check"></i><b>7.4</b> Cell-level quality control</a></li>
+<li class="chapter" data-level="7.5" data-path="image-and-cell-level-quality-control.html"><a href="image-and-cell-level-quality-control.html#save-objects-2"><i class="fa fa-check"></i><b>7.5</b> Save objects</a></li>
+<li class="chapter" data-level="7.6" data-path="image-and-cell-level-quality-control.html"><a href="image-and-cell-level-quality-control.html#session-info-2"><i class="fa fa-check"></i><b>7.6</b> Session Info</a></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="batch-effects.html"><a href="batch-effects.html"><i class="fa fa-check"></i><b>8</b> Batch effect correction</a>
+<ul>
+<li class="chapter" data-level="8.1" data-path="batch-effects.html"><a href="batch-effects.html#fastmnn-correction"><i class="fa fa-check"></i><b>8.1</b> fastMNN correction</a>
+<ul>
+<li class="chapter" data-level="8.1.1" data-path="batch-effects.html"><a href="batch-effects.html#perform-sample-correction"><i class="fa fa-check"></i><b>8.1.1</b> Perform sample correction</a></li>
+<li class="chapter" data-level="8.1.2" data-path="batch-effects.html"><a href="batch-effects.html#quality-control-of-correction-results"><i class="fa fa-check"></i><b>8.1.2</b> Quality control of correction results</a></li>
+<li class="chapter" data-level="8.1.3" data-path="batch-effects.html"><a href="batch-effects.html#visualization"><i class="fa fa-check"></i><b>8.1.3</b> Visualization</a></li>
+</ul></li>
+<li class="chapter" data-level="8.2" data-path="batch-effects.html"><a href="batch-effects.html#harmony-correction"><i class="fa fa-check"></i><b>8.2</b> harmony correction</a>
+<ul>
+<li class="chapter" data-level="8.2.1" data-path="batch-effects.html"><a href="batch-effects.html#visualization-1"><i class="fa fa-check"></i><b>8.2.1</b> Visualization</a></li>
+</ul></li>
+<li class="chapter" data-level="8.3" data-path="batch-effects.html"><a href="batch-effects.html#seurat-correction"><i class="fa fa-check"></i><b>8.3</b> Seurat correction</a>
+<ul>
+<li class="chapter" data-level="8.3.1" data-path="batch-effects.html"><a href="batch-effects.html#visualization-2"><i class="fa fa-check"></i><b>8.3.1</b> Visualization</a></li>
+</ul></li>
+<li class="chapter" data-level="8.4" data-path="batch-effects.html"><a href="batch-effects.html#save-objects-3"><i class="fa fa-check"></i><b>8.4</b> Save objects</a></li>
+<li class="chapter" data-level="8.5" data-path="batch-effects.html"><a href="batch-effects.html#session-info-3"><i class="fa fa-check"></i><b>8.5</b> Session Info</a></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html"><i class="fa fa-check"></i><b>9</b> Cell phenotyping</a>
+<ul>
+<li class="chapter" data-level="9.1" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#load-data"><i class="fa fa-check"></i><b>9.1</b> Load data</a></li>
+<li class="chapter" data-level="9.2" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#clustering"><i class="fa fa-check"></i><b>9.2</b> Clustering approaches</a>
+<ul>
+<li class="chapter" data-level="9.2.1" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#rphenograph"><i class="fa fa-check"></i><b>9.2.1</b> Rphenograph</a></li>
+<li class="chapter" data-level="9.2.2" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#snn-graph"><i class="fa fa-check"></i><b>9.2.2</b> Shared nearest neighbour graph</a></li>
+<li class="chapter" data-level="9.2.3" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#self-organizing-maps"><i class="fa fa-check"></i><b>9.2.3</b> Self organizing maps</a></li>
+<li class="chapter" data-level="9.2.4" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#compare-between-clustering-approaches"><i class="fa fa-check"></i><b>9.2.4</b> Compare between clustering approaches</a></li>
+<li class="chapter" data-level="9.2.5" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#clustering-notes"><i class="fa fa-check"></i><b>9.2.5</b> Further clustering notes</a></li>
+</ul></li>
+<li class="chapter" data-level="9.3" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#classification"><i class="fa fa-check"></i><b>9.3</b> Classification approach</a>
+<ul>
+<li class="chapter" data-level="9.3.1" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#manual-labeling-of-cells"><i class="fa fa-check"></i><b>9.3.1</b> Manual labeling of cells</a></li>
+<li class="chapter" data-level="9.3.2" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#define-color-vectors"><i class="fa fa-check"></i><b>9.3.2</b> Define color vectors</a></li>
+<li class="chapter" data-level="9.3.3" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#read-in-and-consolidate-labeled-data"><i class="fa fa-check"></i><b>9.3.3</b> Read in and consolidate labeled data</a></li>
+<li class="chapter" data-level="9.3.4" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#train-classifier"><i class="fa fa-check"></i><b>9.3.4</b> Train classifier</a></li>
+<li class="chapter" data-level="9.3.5" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#classifier-performance"><i class="fa fa-check"></i><b>9.3.5</b> Classifier performance</a></li>
+<li class="chapter" data-level="9.3.6" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#classification-of-new-data"><i class="fa fa-check"></i><b>9.3.6</b> Classification of new data</a></li>
+</ul></li>
+<li class="chapter" data-level="9.4" data-path="cell-phenotyping.html"><a href="cell-phenotyping.html#session-info-4"><i class="fa fa-check"></i><b>9.4</b> Session Info</a></li>
+</ul></li>
+<li class="chapter" data-level="10" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html"><i class="fa fa-check"></i><b>10</b> Single cell visualization</a>
+<ul>
+<li class="chapter" data-level="10.1" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#load-data-1"><i class="fa fa-check"></i><b>10.1</b> Load data</a></li>
+<li class="chapter" data-level="10.2" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#cell-type-level"><i class="fa fa-check"></i><b>10.2</b> Cell-type level</a>
+<ul>
+<li class="chapter" data-level="10.2.1" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#dimensionality-reduction-visualization"><i class="fa fa-check"></i><b>10.2.1</b> Dimensionality reduction visualization</a></li>
+<li class="chapter" data-level="10.2.2" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#heatmap-visualization"><i class="fa fa-check"></i><b>10.2.2</b> Heatmap visualization</a></li>
+<li class="chapter" data-level="10.2.3" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#violin-plot-visualization"><i class="fa fa-check"></i><b>10.2.3</b> Violin plot visualization</a></li>
+<li class="chapter" data-level="10.2.4" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#scatter-plot-visualization"><i class="fa fa-check"></i><b>10.2.4</b> Scatter plot visualization</a></li>
+<li class="chapter" data-level="10.2.5" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#barplot-visualization"><i class="fa fa-check"></i><b>10.2.5</b> Barplot visualization</a></li>
+<li class="chapter" data-level="10.2.6" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#catalyst-based-visualization"><i class="fa fa-check"></i><b>10.2.6</b> CATALYST-based visualization</a></li>
+</ul></li>
+<li class="chapter" data-level="10.3" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#sample-level"><i class="fa fa-check"></i><b>10.3</b> Sample-level</a>
+<ul>
+<li class="chapter" data-level="10.3.1" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#dimensionality-reduction-visualization-1"><i class="fa fa-check"></i><b>10.3.1</b> Dimensionality reduction visualization</a></li>
+<li class="chapter" data-level="10.3.2" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#heatmap-visualization-1"><i class="fa fa-check"></i><b>10.3.2</b> Heatmap visualization</a></li>
+<li class="chapter" data-level="10.3.3" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#barplot-visualization-1"><i class="fa fa-check"></i><b>10.3.3</b> Barplot visualization</a></li>
+<li class="chapter" data-level="10.3.4" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#catalyst-based-visualization-1"><i class="fa fa-check"></i><b>10.3.4</b> CATALYST-based visualization</a></li>
+</ul></li>
+<li class="chapter" data-level="10.4" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#rich-example"><i class="fa fa-check"></i><b>10.4</b> Further examples</a>
+<ul>
+<li class="chapter" data-level="10.4.1" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#publication-ready-complexheatmap"><i class="fa fa-check"></i><b>10.4.1</b> Publication-ready ComplexHeatmap</a></li>
+<li class="chapter" data-level="10.4.2" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#interactive-visualization"><i class="fa fa-check"></i><b>10.4.2</b> Interactive visualization</a></li>
+</ul></li>
+<li class="chapter" data-level="10.5" data-path="single-cell-visualization.html"><a href="single-cell-visualization.html#session-info-5"><i class="fa fa-check"></i><b>10.5</b> Session Info</a></li>
+</ul></li>
+<li class="chapter" data-level="11" data-path="image-visualization.html"><a href="image-visualization.html"><i class="fa fa-check"></i><b>11</b> Image visualization</a>
+<ul>
+<li class="chapter" data-level="11.1" data-path="image-visualization.html"><a href="image-visualization.html#pixel-visualization"><i class="fa fa-check"></i><b>11.1</b> Pixel visualization</a>
+<ul>
+<li class="chapter" data-level="11.1.1" data-path="image-visualization.html"><a href="image-visualization.html#adjusting-colors"><i class="fa fa-check"></i><b>11.1.1</b> Adjusting colors</a></li>
+<li class="chapter" data-level="11.1.2" data-path="image-visualization.html"><a href="image-visualization.html#image-normalization"><i class="fa fa-check"></i><b>11.1.2</b> Image normalization</a></li>
+</ul></li>
+<li class="chapter" data-level="11.2" data-path="image-visualization.html"><a href="image-visualization.html#mask-visualization"><i class="fa fa-check"></i><b>11.2</b> Cell visualization</a>
+<ul>
+<li class="chapter" data-level="11.2.1" data-path="image-visualization.html"><a href="image-visualization.html#visualzing-metadata"><i class="fa fa-check"></i><b>11.2.1</b> Visualzing metadata</a></li>
+<li class="chapter" data-level="11.2.2" data-path="image-visualization.html"><a href="image-visualization.html#visualizating-expression"><i class="fa fa-check"></i><b>11.2.2</b> Visualizating expression</a></li>
+<li class="chapter" data-level="11.2.3" data-path="image-visualization.html"><a href="image-visualization.html#outline-cells"><i class="fa fa-check"></i><b>11.2.3</b> Outlining cells on images</a></li>
+</ul></li>
+<li class="chapter" data-level="11.3" data-path="image-visualization.html"><a href="image-visualization.html#adjusting-plot-annotations"><i class="fa fa-check"></i><b>11.3</b> Adjusting plot annotations</a></li>
+<li class="chapter" data-level="11.4" data-path="image-visualization.html"><a href="image-visualization.html#displaying-individual-images"><i class="fa fa-check"></i><b>11.4</b> Displaying individual images</a></li>
+<li class="chapter" data-level="11.5" data-path="image-visualization.html"><a href="image-visualization.html#saving-and-returning-images"><i class="fa fa-check"></i><b>11.5</b> Saving and returning images</a></li>
+<li class="chapter" data-level="11.6" data-path="image-visualization.html"><a href="image-visualization.html#cytoviewer"><i class="fa fa-check"></i><b>11.6</b> Interactive image visualization</a></li>
+<li class="chapter" data-level="11.7" data-path="image-visualization.html"><a href="image-visualization.html#session-info-6"><i class="fa fa-check"></i><b>11.7</b> Session Info</a></li>
+</ul></li>
+<li class="chapter" data-level="12" data-path="performing-spatial-analysis.html"><a href="performing-spatial-analysis.html"><i class="fa fa-check"></i><b>12</b> Performing spatial analysis</a>
+<ul>
+<li class="chapter" data-level="12.1" data-path="performing-spatial-analysis.html"><a href="performing-spatial-analysis.html#spatial-interaction-graphs"><i class="fa fa-check"></i><b>12.1</b> Spatial interaction graphs</a></li>
+<li class="chapter" data-level="12.2" data-path="performing-spatial-analysis.html"><a href="performing-spatial-analysis.html#spatial-viz"><i class="fa fa-check"></i><b>12.2</b> Spatial visualization</a></li>
+<li class="chapter" data-level="12.3" data-path="performing-spatial-analysis.html"><a href="performing-spatial-analysis.html#spatial-community-analysis"><i class="fa fa-check"></i><b>12.3</b> Spatial community analysis</a></li>
+<li class="chapter" data-level="12.4" data-path="performing-spatial-analysis.html"><a href="performing-spatial-analysis.html#cellular-neighborhood-analysis"><i class="fa fa-check"></i><b>12.4</b> Cellular neighborhood analysis</a></li>
+<li class="chapter" data-level="12.5" data-path="performing-spatial-analysis.html"><a href="performing-spatial-analysis.html#spatial-context-analysis"><i class="fa fa-check"></i><b>12.5</b> Spatial context analysis</a></li>
+<li class="chapter" data-level="12.6" data-path="performing-spatial-analysis.html"><a href="performing-spatial-analysis.html#patch-detection"><i class="fa fa-check"></i><b>12.6</b> Patch detection</a></li>
+<li class="chapter" data-level="12.7" data-path="performing-spatial-analysis.html"><a href="performing-spatial-analysis.html#interaction-analysis"><i class="fa fa-check"></i><b>12.7</b> Interaction analysis</a></li>
+<li class="chapter" data-level="12.8" data-path="performing-spatial-analysis.html"><a href="performing-spatial-analysis.html#session-info-7"><i class="fa fa-check"></i><b>12.8</b> Session Info</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
+<li class="divider"></li>
+<li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Analysis workflow for IMC data</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="image-visualization" class="section level1 hasAnchor" number="11">
+<h1><span class="header-section-number">11</span> Image visualization<a href="image-visualization.html#image-visualization" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p>The following section describes how to visualize the abundance of
+biomolecules (e.g., protein or RNA) as well as cell-specific metadata on
+images. Section <a href="image-visualization.html#pixel-visualization">11.1</a> focuses on visualizing
+pixel-level information including the generation of pseudo-color
+composite images. Section <a href="image-visualization.html#mask-visualization">11.2</a> highlights the
+visualization of cell metadata (e.g., cell phenotype) as well as
+summarized pixel intensities on cell segmentation masks. Section
+<a href="image-visualization.html#cytoviewer">11.6</a> showcases interactive pixel- and
+cell-level visualization with the
+<a href="https://bioconductor.org/packages/release/bioc/html/cytoviewer.html">cytoviewer</a>
+R/Bioconductor package <span class="citation">(<a href="#ref-Meyer2024">Meyer, Eling, and Bodenmiller 2024</a>)</span>.</p>
+<p>The
+<a href="https://www.bioconductor.org/packages/release/bioc/html/cytomapper.html">cytomapper</a>
+R/Bioconductor package was developed to support the handling and
+visualization of multiple multi-channel images and segmentation masks
+<span class="citation">(<a href="#ref-Eling2020">Eling et al. 2020</a>)</span>. The main data object for image handling is the
+<a href="https://www.bioconductor.org/packages/release/bioc/vignettes/cytomapper/inst/doc/cytomapper.html#5_The_CytoImageList_object">CytoImageList</a>
+container which we used in Section <a href="read-data.html#read-data">5</a> to store
+multi-channel images and segmentation masks.</p>
+<p>We will first read in the previously processed data and randomly select
+3 images for visualization purposes.</p>
+<div class="sourceCode" id="cb238"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb238-1"><a href="image-visualization.html#cb238-1" tabindex="-1"></a><span class="fu">library</span>(SpatialExperiment)</span>
+<span id="cb238-2"><a href="image-visualization.html#cb238-2" tabindex="-1"></a><span class="fu">library</span>(cytomapper)</span>
+<span id="cb238-3"><a href="image-visualization.html#cb238-3" tabindex="-1"></a>spe <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">&quot;data/spe.rds&quot;</span>)</span>
+<span id="cb238-4"><a href="image-visualization.html#cb238-4" tabindex="-1"></a>images <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">&quot;data/images.rds&quot;</span>)</span>
+<span id="cb238-5"><a href="image-visualization.html#cb238-5" tabindex="-1"></a>masks <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">&quot;data/masks.rds&quot;</span>)</span>
+<span id="cb238-6"><a href="image-visualization.html#cb238-6" tabindex="-1"></a></span>
+<span id="cb238-7"><a href="image-visualization.html#cb238-7" tabindex="-1"></a><span class="co"># Sample images</span></span>
+<span id="cb238-8"><a href="image-visualization.html#cb238-8" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">220517</span>)</span>
+<span id="cb238-9"><a href="image-visualization.html#cb238-9" tabindex="-1"></a>cur_id <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="fu">unique</span>(spe<span class="sc">$</span>sample_id), <span class="dv">3</span>)</span>
+<span id="cb238-10"><a href="image-visualization.html#cb238-10" tabindex="-1"></a>cur_images <span class="ot">&lt;-</span> images[<span class="fu">names</span>(images) <span class="sc">%in%</span> cur_id]</span>
+<span id="cb238-11"><a href="image-visualization.html#cb238-11" tabindex="-1"></a>cur_masks <span class="ot">&lt;-</span> masks[<span class="fu">names</span>(masks) <span class="sc">%in%</span> cur_id]</span></code></pre></div>
+<div id="pixel-visualization" class="section level2 hasAnchor" number="11.1">
+<h2><span class="header-section-number">11.1</span> Pixel visualization<a href="image-visualization.html#pixel-visualization" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The following section gives examples for visualizing individual channels
+or multiple channels as pseudo-color composite images. For this the
+<code>cytomapper</code> package exports the <code>plotPixels</code> function which expects a
+<code>CytoImageList</code> object storing one or multiple multi-channel images. In
+the simplest use case, a single channel can be visualized as follows:</p>
+<div class="sourceCode" id="cb239"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb239-1"><a href="image-visualization.html#cb239-1" tabindex="-1"></a><span class="fu">plotPixels</span>(cur_images, </span>
+<span id="cb239-2"><a href="image-visualization.html#cb239-2" tabindex="-1"></a>           <span class="at">colour_by =</span> <span class="st">&quot;Ecad&quot;</span>,</span>
+<span id="cb239-3"><a href="image-visualization.html#cb239-3" tabindex="-1"></a>           <span class="at">bcg =</span> <span class="fu">list</span>(<span class="at">Ecad =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">5</span>, <span class="dv">1</span>)))</span></code></pre></div>
+<p><img src="10-image_visualization_files/figure-html/single-channel-1.png" width="672" /></p>
+<p>The plot above shows the tissue expression of the epithelial tumor
+marker E-cadherin on the 3 selected images. The <code>bcg</code> parameter (default
+<code>c(0, 1, 1)</code>) stands for “background”, “contrast”, “gamma” and controls
+these attributes of the image. This parameter takes a named list where
+each entry specifies these attributes per channel. The first value of
+the numeric vector will be added to the pixel intensities (background);
+pixel intensities will be multiplied by the second entry of the vector
+(contrast); pixel intensities will be exponentiated by the third entry
+of the vector (gamma). In most cases, it is sufficient to adjust the
+second (contrast) entry of the vector.</p>
+<p>The following example highlights the visualization of 6 markers (maximum
+allowed number of markers) at once per image. The markers indicate the
+spatial distribution of tumor cells (E-cadherin), T cells (CD3), B cells
+(CD20), CD8+ T cells (CD8a), plasma cells (CD38) and proliferating cells
+(Ki67).</p>
+<div class="sourceCode" id="cb240"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb240-1"><a href="image-visualization.html#cb240-1" tabindex="-1"></a><span class="fu">plotPixels</span>(cur_images, </span>
+<span id="cb240-2"><a href="image-visualization.html#cb240-2" tabindex="-1"></a>           <span class="at">colour_by =</span> <span class="fu">c</span>(<span class="st">&quot;Ecad&quot;</span>, <span class="st">&quot;CD3&quot;</span>, <span class="st">&quot;CD20&quot;</span>, <span class="st">&quot;CD8a&quot;</span>, <span class="st">&quot;CD38&quot;</span>, <span class="st">&quot;Ki67&quot;</span>),</span>
+<span id="cb240-3"><a href="image-visualization.html#cb240-3" tabindex="-1"></a>           <span class="at">bcg =</span> <span class="fu">list</span>(<span class="at">Ecad =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">5</span>, <span class="dv">1</span>),</span>
+<span id="cb240-4"><a href="image-visualization.html#cb240-4" tabindex="-1"></a>                      <span class="at">CD3 =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">5</span>, <span class="dv">1</span>),</span>
+<span id="cb240-5"><a href="image-visualization.html#cb240-5" tabindex="-1"></a>                      <span class="at">CD20 =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">5</span>, <span class="dv">1</span>),</span>
+<span id="cb240-6"><a href="image-visualization.html#cb240-6" tabindex="-1"></a>                      <span class="at">CD8a =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">5</span>, <span class="dv">1</span>),</span>
+<span id="cb240-7"><a href="image-visualization.html#cb240-7" tabindex="-1"></a>                      <span class="at">CD38 =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">8</span>, <span class="dv">1</span>),</span>
+<span id="cb240-8"><a href="image-visualization.html#cb240-8" tabindex="-1"></a>                      <span class="at">Ki67 =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">5</span>, <span class="dv">1</span>)))</span></code></pre></div>
+<p><img src="10-image_visualization_files/figure-html/6-channel-1.png" width="672" /></p>
+<div id="adjusting-colors" class="section level3 hasAnchor" number="11.1.1">
+<h3><span class="header-section-number">11.1.1</span> Adjusting colors<a href="image-visualization.html#adjusting-colors" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>The default colors for visualization are chosen by the additive RGB
+(red, green, blue) color model. For six markers the default colors are:
+red, green, blue, cyan (green + blue), magenta (red + blue), yellow
+(green + red). These colors are the easiest to distinguish by eye.
+However, you can select other colors for each channel by setting the
+<code>colour</code> parameter:</p>
+<div class="sourceCode" id="cb241"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb241-1"><a href="image-visualization.html#cb241-1" tabindex="-1"></a><span class="fu">plotPixels</span>(cur_images, </span>
+<span id="cb241-2"><a href="image-visualization.html#cb241-2" tabindex="-1"></a>           <span class="at">colour_by =</span> <span class="fu">c</span>(<span class="st">&quot;Ecad&quot;</span>, <span class="st">&quot;CD3&quot;</span>, <span class="st">&quot;CD20&quot;</span>),</span>
+<span id="cb241-3"><a href="image-visualization.html#cb241-3" tabindex="-1"></a>           <span class="at">bcg =</span> <span class="fu">list</span>(<span class="at">Ecad =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">5</span>, <span class="dv">1</span>),</span>
+<span id="cb241-4"><a href="image-visualization.html#cb241-4" tabindex="-1"></a>                      <span class="at">CD3 =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">5</span>, <span class="dv">1</span>),</span>
+<span id="cb241-5"><a href="image-visualization.html#cb241-5" tabindex="-1"></a>                      <span class="at">CD20 =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">5</span>, <span class="dv">1</span>)),</span>
+<span id="cb241-6"><a href="image-visualization.html#cb241-6" tabindex="-1"></a>           <span class="at">colour =</span> <span class="fu">list</span>(<span class="at">Ecad =</span> <span class="fu">c</span>(<span class="st">&quot;black&quot;</span>, <span class="st">&quot;burlywood1&quot;</span>),</span>
+<span id="cb241-7"><a href="image-visualization.html#cb241-7" tabindex="-1"></a>                         <span class="at">CD3 =</span> <span class="fu">c</span>(<span class="st">&quot;black&quot;</span>, <span class="st">&quot;cyan2&quot;</span>),</span>
+<span id="cb241-8"><a href="image-visualization.html#cb241-8" tabindex="-1"></a>                         <span class="at">CD20 =</span> <span class="fu">c</span>(<span class="st">&quot;black&quot;</span>, <span class="st">&quot;firebrick1&quot;</span>)))</span></code></pre></div>
+<p><img src="10-image_visualization_files/figure-html/setting-colors-1.png" width="672" /></p>
+<p>The <code>colour</code> parameter takes a named list in which each entry specifies
+the colors from which a color gradient is constructed via
+<code>colorRampPalette</code>. These are usually vectors of length 2 in which the
+first entry is <code>"black"</code> and the second entry specifies the color of
+choice. Although not recommended, you can also specify more than two
+colors to generate a more complex color gradient.</p>
+</div>
+<div id="image-normalization" class="section level3 hasAnchor" number="11.1.2">
+<h3><span class="header-section-number">11.1.2</span> Image normalization<a href="image-visualization.html#image-normalization" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>As an alternative to setting the <code>bcg</code> parameter, images can first be
+normalized. Normalization here means to scale the pixel intensities per
+channel between 0 and 1 (or a range specified by the <code>ft</code> parameter in
+the <code>normalize</code> function). By default, the <code>normalize</code> function scales
+pixel intensities across <strong>all</strong> images contained in the <code>CytoImageList</code>
+object (<code>separateImages = FALSE</code>). Each individual channel is scaled
+independently (<code>separateChannels = TRUE</code>).</p>
+<p>After 0-1 normalization, maximum pixel intensities can be clipped to
+enhance the contrast of the image (setting the <code>inputRange</code> parameter).
+In the following example, the clipping to 0 and 0.2 is the same as
+multiplying the pixel intensities by a factor of 5.</p>
+<div class="sourceCode" id="cb242"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb242-1"><a href="image-visualization.html#cb242-1" tabindex="-1"></a><span class="co"># 0 - 1 channel scaling across all images</span></span>
+<span id="cb242-2"><a href="image-visualization.html#cb242-2" tabindex="-1"></a>norm_images <span class="ot">&lt;-</span> cytomapper<span class="sc">::</span><span class="fu">normalize</span>(cur_images)</span>
+<span id="cb242-3"><a href="image-visualization.html#cb242-3" tabindex="-1"></a></span>
+<span id="cb242-4"><a href="image-visualization.html#cb242-4" tabindex="-1"></a><span class="co"># Clip channel at 0.2</span></span>
+<span id="cb242-5"><a href="image-visualization.html#cb242-5" tabindex="-1"></a>norm_images <span class="ot">&lt;-</span> cytomapper<span class="sc">::</span><span class="fu">normalize</span>(norm_images, <span class="at">inputRange =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.2</span>))</span>
+<span id="cb242-6"><a href="image-visualization.html#cb242-6" tabindex="-1"></a></span>
+<span id="cb242-7"><a href="image-visualization.html#cb242-7" tabindex="-1"></a><span class="fu">plotPixels</span>(norm_images, </span>
+<span id="cb242-8"><a href="image-visualization.html#cb242-8" tabindex="-1"></a>           <span class="at">colour_by =</span> <span class="fu">c</span>(<span class="st">&quot;Ecad&quot;</span>, <span class="st">&quot;CD3&quot;</span>, <span class="st">&quot;CD20&quot;</span>, <span class="st">&quot;CD8a&quot;</span>, <span class="st">&quot;CD38&quot;</span>, <span class="st">&quot;Ki67&quot;</span>))</span></code></pre></div>
+<p><img src="10-image_visualization_files/figure-html/default-normalization-1.png" width="672" /></p>
+<p>The default setting of scaling pixel intensities across all images
+ensures comparable intensity levels across images. Pixel intensities can
+also be scaled <strong>per image</strong> therefore correcting for
+staining/expression differences between images:</p>
+<div class="sourceCode" id="cb243"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb243-1"><a href="image-visualization.html#cb243-1" tabindex="-1"></a><span class="co"># 0 - 1 channel scaling per image</span></span>
+<span id="cb243-2"><a href="image-visualization.html#cb243-2" tabindex="-1"></a>norm_images <span class="ot">&lt;-</span> cytomapper<span class="sc">::</span><span class="fu">normalize</span>(cur_images, <span class="at">separateImages =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb243-3"><a href="image-visualization.html#cb243-3" tabindex="-1"></a></span>
+<span id="cb243-4"><a href="image-visualization.html#cb243-4" tabindex="-1"></a><span class="co"># Clip channel at 0.2</span></span>
+<span id="cb243-5"><a href="image-visualization.html#cb243-5" tabindex="-1"></a>norm_images <span class="ot">&lt;-</span> cytomapper<span class="sc">::</span><span class="fu">normalize</span>(norm_images, <span class="at">inputRange =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.2</span>))</span>
+<span id="cb243-6"><a href="image-visualization.html#cb243-6" tabindex="-1"></a></span>
+<span id="cb243-7"><a href="image-visualization.html#cb243-7" tabindex="-1"></a><span class="fu">plotPixels</span>(norm_images, </span>
+<span id="cb243-8"><a href="image-visualization.html#cb243-8" tabindex="-1"></a>           <span class="at">colour_by =</span> <span class="fu">c</span>(<span class="st">&quot;Ecad&quot;</span>, <span class="st">&quot;CD3&quot;</span>, <span class="st">&quot;CD20&quot;</span>, <span class="st">&quot;CD8a&quot;</span>, <span class="st">&quot;CD38&quot;</span>, <span class="st">&quot;Ki67&quot;</span>))</span></code></pre></div>
+<p><img src="10-image_visualization_files/figure-html/individual-normalization-1.png" width="672" /></p>
+<p>As we can see, the marker Ki67 appears brighter on image 2 and 3 in
+comparison to scaling the channel across all images.</p>
+<p>Finally, the <code>normalize</code> function also accepts a named list input for
+the <code>inputRange</code> argument. In this list, the clipping range per channel
+can be set individually:</p>
+<div class="sourceCode" id="cb244"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb244-1"><a href="image-visualization.html#cb244-1" tabindex="-1"></a><span class="co"># 0 - 1 channel scaling per image</span></span>
+<span id="cb244-2"><a href="image-visualization.html#cb244-2" tabindex="-1"></a>norm_images <span class="ot">&lt;-</span> cytomapper<span class="sc">::</span><span class="fu">normalize</span>(cur_images, </span>
+<span id="cb244-3"><a href="image-visualization.html#cb244-3" tabindex="-1"></a>                         <span class="at">separateImages =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb244-4"><a href="image-visualization.html#cb244-4" tabindex="-1"></a>                         <span class="at">inputRange =</span> <span class="fu">list</span>(<span class="at">Ecad =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">50</span>), </span>
+<span id="cb244-5"><a href="image-visualization.html#cb244-5" tabindex="-1"></a>                                           <span class="at">CD3 =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">30</span>),</span>
+<span id="cb244-6"><a href="image-visualization.html#cb244-6" tabindex="-1"></a>                                           <span class="at">CD20 =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">40</span>),</span>
+<span id="cb244-7"><a href="image-visualization.html#cb244-7" tabindex="-1"></a>                                           <span class="at">CD8a =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">50</span>),</span>
+<span id="cb244-8"><a href="image-visualization.html#cb244-8" tabindex="-1"></a>                                           <span class="at">CD38 =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">10</span>),</span>
+<span id="cb244-9"><a href="image-visualization.html#cb244-9" tabindex="-1"></a>                                           <span class="at">Ki67 =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">70</span>)))</span>
+<span id="cb244-10"><a href="image-visualization.html#cb244-10" tabindex="-1"></a></span>
+<span id="cb244-11"><a href="image-visualization.html#cb244-11" tabindex="-1"></a><span class="fu">plotPixels</span>(norm_images, </span>
+<span id="cb244-12"><a href="image-visualization.html#cb244-12" tabindex="-1"></a>           <span class="at">colour_by =</span> <span class="fu">c</span>(<span class="st">&quot;Ecad&quot;</span>, <span class="st">&quot;CD3&quot;</span>, <span class="st">&quot;CD20&quot;</span>, <span class="st">&quot;CD8a&quot;</span>, <span class="st">&quot;CD38&quot;</span>, <span class="st">&quot;Ki67&quot;</span>))</span></code></pre></div>
+<p><img src="10-image_visualization_files/figure-html/setting-inputRange-1.png" width="672" /></p>
+</div>
+</div>
+<div id="mask-visualization" class="section level2 hasAnchor" number="11.2">
+<h2><span class="header-section-number">11.2</span> Cell visualization<a href="image-visualization.html#mask-visualization" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>In the following section, we will show examples on how to visualize
+single cells either as segmentation masks or outlined on composite
+images. This type of visualization allows to observe the spatial
+distribution of cell phenotypes, the visual assessment of morphological
+features and quality control in terms of cell segmentation and
+phenotyping.</p>
+<div id="visualzing-metadata" class="section level3 hasAnchor" number="11.2.1">
+<h3><span class="header-section-number">11.2.1</span> Visualzing metadata<a href="image-visualization.html#visualzing-metadata" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>The <code>cytomapper</code> package provides the <code>plotCells</code> function that accepts
+a <code>CytoImageList</code> object containing segmentation masks. These are
+defined as single channel images where sets of pixels with the same
+integer ID identify individual cells. This integer ID can be found as an
+entry in the <code>colData(spe)</code> slot and as pixel information in the
+segmentation masks. The entry in <code>colData(spe)</code> needs to be specified
+via the <code>cell_id</code> argument to the <code>plotCells</code> function. In that way,
+data contained in the <code>SpatialExperiment</code> object can be mapped to
+segmentation masks. For the current dataset, the cell IDs are stored in
+<code>colData(spe)$ObjectNumber</code>.</p>
+<p>As cell IDs are only unique within a single image, <code>plotCells</code> also
+requires the <code>img_id</code> argument. This argument specifies the
+<code>colData(spe)</code> as well as the <code>mcols(masks)</code> entry that stores the
+unique image name from which each cell was extracted. In the current
+dataset the unique image names are stored in <code>colData(spe)$sample_id</code>
+and <code>mcols(masks)$sample_id</code>.</p>
+<p>Providing these two entries that allow mapping between the
+<code>SpatialExperiment</code> object and segmentation masks, we can now color
+individual cells based on their cell type:</p>
+<div class="sourceCode" id="cb245"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb245-1"><a href="image-visualization.html#cb245-1" tabindex="-1"></a><span class="fu">plotCells</span>(cur_masks,</span>
+<span id="cb245-2"><a href="image-visualization.html#cb245-2" tabindex="-1"></a>          <span class="at">object =</span> spe, </span>
+<span id="cb245-3"><a href="image-visualization.html#cb245-3" tabindex="-1"></a>          <span class="at">cell_id =</span> <span class="st">&quot;ObjectNumber&quot;</span>, </span>
+<span id="cb245-4"><a href="image-visualization.html#cb245-4" tabindex="-1"></a>          <span class="at">img_id =</span> <span class="st">&quot;sample_id&quot;</span>,</span>
+<span id="cb245-5"><a href="image-visualization.html#cb245-5" tabindex="-1"></a>          <span class="at">colour_by =</span> <span class="st">&quot;celltype&quot;</span>)</span></code></pre></div>
+<p><img src="10-image_visualization_files/figure-html/celltype-1.png" width="672" /></p>
+<p>For consistent visualization, the <code>plotCells</code> function takes a named
+list as <code>color</code> argument. The entry name must match the <code>colour_by</code>
+argument.</p>
+<div class="sourceCode" id="cb246"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb246-1"><a href="image-visualization.html#cb246-1" tabindex="-1"></a><span class="fu">plotCells</span>(cur_masks,</span>
+<span id="cb246-2"><a href="image-visualization.html#cb246-2" tabindex="-1"></a>          <span class="at">object =</span> spe, </span>
+<span id="cb246-3"><a href="image-visualization.html#cb246-3" tabindex="-1"></a>          <span class="at">cell_id =</span> <span class="st">&quot;ObjectNumber&quot;</span>, </span>
+<span id="cb246-4"><a href="image-visualization.html#cb246-4" tabindex="-1"></a>          <span class="at">img_id =</span> <span class="st">&quot;sample_id&quot;</span>,</span>
+<span id="cb246-5"><a href="image-visualization.html#cb246-5" tabindex="-1"></a>          <span class="at">colour_by =</span> <span class="st">&quot;celltype&quot;</span>,</span>
+<span id="cb246-6"><a href="image-visualization.html#cb246-6" tabindex="-1"></a>          <span class="at">colour =</span> <span class="fu">list</span>(<span class="at">celltype =</span> <span class="fu">metadata</span>(spe)<span class="sc">$</span>color_vectors<span class="sc">$</span>celltype))</span></code></pre></div>
+<p><img src="10-image_visualization_files/figure-html/setting-celltype-colors-1.png" width="672" /></p>
+<p>If only individual cell types should be visualized, the
+<code>SpatialExperiment</code> object can be subsetted (e.g., to only contain CD8+
+T cells). In the following example CD8+ T cells are colored in red and
+all other cells that are not contained in the dataset are colored in
+white (as set by the <code>missing_color</code> argument).</p>
+<div class="sourceCode" id="cb247"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb247-1"><a href="image-visualization.html#cb247-1" tabindex="-1"></a>CD8 <span class="ot">&lt;-</span> spe[,spe<span class="sc">$</span>celltype <span class="sc">==</span> <span class="st">&quot;CD8&quot;</span>]</span>
+<span id="cb247-2"><a href="image-visualization.html#cb247-2" tabindex="-1"></a></span>
+<span id="cb247-3"><a href="image-visualization.html#cb247-3" tabindex="-1"></a><span class="fu">plotCells</span>(cur_masks,</span>
+<span id="cb247-4"><a href="image-visualization.html#cb247-4" tabindex="-1"></a>          <span class="at">object =</span> CD8, </span>
+<span id="cb247-5"><a href="image-visualization.html#cb247-5" tabindex="-1"></a>          <span class="at">cell_id =</span> <span class="st">&quot;ObjectNumber&quot;</span>, </span>
+<span id="cb247-6"><a href="image-visualization.html#cb247-6" tabindex="-1"></a>          <span class="at">img_id =</span> <span class="st">&quot;sample_id&quot;</span>,</span>
+<span id="cb247-7"><a href="image-visualization.html#cb247-7" tabindex="-1"></a>          <span class="at">colour_by =</span> <span class="st">&quot;celltype&quot;</span>,</span>
+<span id="cb247-8"><a href="image-visualization.html#cb247-8" tabindex="-1"></a>          <span class="at">colour =</span> <span class="fu">list</span>(<span class="at">celltype =</span> <span class="fu">c</span>(<span class="at">CD8 =</span> <span class="st">&quot;red&quot;</span>)),</span>
+<span id="cb247-9"><a href="image-visualization.html#cb247-9" tabindex="-1"></a>          <span class="at">missing_colour =</span> <span class="st">&quot;white&quot;</span>)</span></code></pre></div>
+<p><img src="10-image_visualization_files/figure-html/selective-visualization-1.png" width="672" /></p>
+<p>In terms of visualizing metadata, any entry in the <code>colData(spe)</code> slot
+can be visualized. The <code>plotCells</code> function automatically detects if the
+entry is continuous or discrete. In this fashion, we can now visualize
+the area of each cell:</p>
+<div class="sourceCode" id="cb248"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb248-1"><a href="image-visualization.html#cb248-1" tabindex="-1"></a><span class="fu">plotCells</span>(cur_masks,</span>
+<span id="cb248-2"><a href="image-visualization.html#cb248-2" tabindex="-1"></a>          <span class="at">object =</span> spe, </span>
+<span id="cb248-3"><a href="image-visualization.html#cb248-3" tabindex="-1"></a>          <span class="at">cell_id =</span> <span class="st">&quot;ObjectNumber&quot;</span>, </span>
+<span id="cb248-4"><a href="image-visualization.html#cb248-4" tabindex="-1"></a>          <span class="at">img_id =</span> <span class="st">&quot;sample_id&quot;</span>,</span>
+<span id="cb248-5"><a href="image-visualization.html#cb248-5" tabindex="-1"></a>          <span class="at">colour_by =</span> <span class="st">&quot;area&quot;</span>)</span></code></pre></div>
+<p><img src="10-image_visualization_files/figure-html/area-1.png" width="672" /></p>
+</div>
+<div id="visualizating-expression" class="section level3 hasAnchor" number="11.2.2">
+<h3><span class="header-section-number">11.2.2</span> Visualizating expression<a href="image-visualization.html#visualizating-expression" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Similar to visualizing single-cell metadata on segmentation masks, we
+can use the <code>plotCells</code> function to visualize the aggregated pixel
+intensities per cell. In the current dataset pixel intensities were
+aggregated by computing the mean pixel intensity per cell and per
+channel. The <code>plotCells</code> function accepts the <code>exprs_values</code> argument
+(default <code>counts</code>) that allows selecting the assay which stores the
+expression values that should be visualized.</p>
+<p>In the following example, we visualize the asinh-transformed mean pixel
+intensities of the epithelial marker E-cadherin on segmentation masks.</p>
+<div class="sourceCode" id="cb249"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb249-1"><a href="image-visualization.html#cb249-1" tabindex="-1"></a><span class="fu">plotCells</span>(cur_masks,</span>
+<span id="cb249-2"><a href="image-visualization.html#cb249-2" tabindex="-1"></a>          <span class="at">object =</span> spe, </span>
+<span id="cb249-3"><a href="image-visualization.html#cb249-3" tabindex="-1"></a>          <span class="at">cell_id =</span> <span class="st">&quot;ObjectNumber&quot;</span>, </span>
+<span id="cb249-4"><a href="image-visualization.html#cb249-4" tabindex="-1"></a>          <span class="at">img_id =</span> <span class="st">&quot;sample_id&quot;</span>,</span>
+<span id="cb249-5"><a href="image-visualization.html#cb249-5" tabindex="-1"></a>          <span class="at">colour_by =</span> <span class="st">&quot;Ecad&quot;</span>,</span>
+<span id="cb249-6"><a href="image-visualization.html#cb249-6" tabindex="-1"></a>          <span class="at">exprs_values =</span> <span class="st">&quot;exprs&quot;</span>)</span></code></pre></div>
+<p><img src="10-image_visualization_files/figure-html/Ecad-expression-1.png" width="672" /></p>
+<p>We will now visualize the maximum number of allowed markers as
+composites on the segmentation masks. As above the markers indicate the
+spatial distribution of tumor cells (E-cadherin), T cells (CD3), B cells
+(CD20), CD8+ T cells (CD8a), plasma cells (CD38) and proliferating cells
+(Ki67).</p>
+<div class="sourceCode" id="cb250"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb250-1"><a href="image-visualization.html#cb250-1" tabindex="-1"></a><span class="fu">plotCells</span>(cur_masks,</span>
+<span id="cb250-2"><a href="image-visualization.html#cb250-2" tabindex="-1"></a>          <span class="at">object =</span> spe, </span>
+<span id="cb250-3"><a href="image-visualization.html#cb250-3" tabindex="-1"></a>          <span class="at">cell_id =</span> <span class="st">&quot;ObjectNumber&quot;</span>, </span>
+<span id="cb250-4"><a href="image-visualization.html#cb250-4" tabindex="-1"></a>          <span class="at">img_id =</span> <span class="st">&quot;sample_id&quot;</span>,</span>
+<span id="cb250-5"><a href="image-visualization.html#cb250-5" tabindex="-1"></a>          <span class="at">colour_by =</span> <span class="fu">c</span>(<span class="st">&quot;Ecad&quot;</span>, <span class="st">&quot;CD3&quot;</span>, <span class="st">&quot;CD20&quot;</span>, <span class="st">&quot;CD8a&quot;</span>, <span class="st">&quot;CD38&quot;</span>, <span class="st">&quot;Ki67&quot;</span>),</span>
+<span id="cb250-6"><a href="image-visualization.html#cb250-6" tabindex="-1"></a>          <span class="at">exprs_values =</span> <span class="st">&quot;exprs&quot;</span>)</span></code></pre></div>
+<p><img src="10-image_visualization_files/figure-html/6-channel-expression-1.png" width="672" /></p>
+<p>While visualizing 6 markers on the pixel-level may still allow the
+distinction of different tissue structures, observing single-cell
+expression levels is difficult when visualizing many markers
+simultaneously due to often overlapping expression.</p>
+<p>Similarly to adjusting marker colors when visualizing pixel intensities,
+we can change the color gradients per marker by setting the <code>color</code>
+argument:</p>
+<div class="sourceCode" id="cb251"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb251-1"><a href="image-visualization.html#cb251-1" tabindex="-1"></a><span class="fu">plotCells</span>(cur_masks,</span>
+<span id="cb251-2"><a href="image-visualization.html#cb251-2" tabindex="-1"></a>          <span class="at">object =</span> spe, </span>
+<span id="cb251-3"><a href="image-visualization.html#cb251-3" tabindex="-1"></a>          <span class="at">cell_id =</span> <span class="st">&quot;ObjectNumber&quot;</span>, </span>
+<span id="cb251-4"><a href="image-visualization.html#cb251-4" tabindex="-1"></a>          <span class="at">img_id =</span> <span class="st">&quot;sample_id&quot;</span>,</span>
+<span id="cb251-5"><a href="image-visualization.html#cb251-5" tabindex="-1"></a>          <span class="at">colour_by =</span> <span class="fu">c</span>(<span class="st">&quot;Ecad&quot;</span>, <span class="st">&quot;CD3&quot;</span>, <span class="st">&quot;CD20&quot;</span>),</span>
+<span id="cb251-6"><a href="image-visualization.html#cb251-6" tabindex="-1"></a>          <span class="at">exprs_values =</span> <span class="st">&quot;exprs&quot;</span>,</span>
+<span id="cb251-7"><a href="image-visualization.html#cb251-7" tabindex="-1"></a>          <span class="at">colour =</span> <span class="fu">list</span>(<span class="at">Ecad =</span> <span class="fu">c</span>(<span class="st">&quot;black&quot;</span>, <span class="st">&quot;burlywood1&quot;</span>),</span>
+<span id="cb251-8"><a href="image-visualization.html#cb251-8" tabindex="-1"></a>                        <span class="at">CD3 =</span> <span class="fu">c</span>(<span class="st">&quot;black&quot;</span>, <span class="st">&quot;cyan2&quot;</span>),</span>
+<span id="cb251-9"><a href="image-visualization.html#cb251-9" tabindex="-1"></a>                        <span class="at">CD20 =</span> <span class="fu">c</span>(<span class="st">&quot;black&quot;</span>, <span class="st">&quot;firebrick1&quot;</span>)))</span></code></pre></div>
+<p><img src="10-image_visualization_files/figure-html/setting-expression-colors-1.png" width="672" /></p>
+</div>
+<div id="outline-cells" class="section level3 hasAnchor" number="11.2.3">
+<h3><span class="header-section-number">11.2.3</span> Outlining cells on images<a href="image-visualization.html#outline-cells" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>The following section highlights the combined visualization of pixel-
+and cell-level information at once. For this, besides the
+<code>SpatialExperiment</code> object, the <code>plotPixels</code> function accepts two
+<code>CytoImageList</code> objects. One for the multi-channel images and one for
+the segmentation masks. By specifying the <code>outline_by</code> parameter, the
+outlines of cells can now be colored based on their metadata.</p>
+<p>The following example first generates a 3-channel composite images
+displaying the expression of E-cadherin, CD3 and CD20 before coloring
+the cells’ outlines by their cell phenotype.</p>
+<div class="sourceCode" id="cb252"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb252-1"><a href="image-visualization.html#cb252-1" tabindex="-1"></a><span class="fu">plotPixels</span>(<span class="at">image =</span> cur_images,</span>
+<span id="cb252-2"><a href="image-visualization.html#cb252-2" tabindex="-1"></a>           <span class="at">mask =</span> cur_masks,</span>
+<span id="cb252-3"><a href="image-visualization.html#cb252-3" tabindex="-1"></a>           <span class="at">object =</span> spe, </span>
+<span id="cb252-4"><a href="image-visualization.html#cb252-4" tabindex="-1"></a>           <span class="at">cell_id =</span> <span class="st">&quot;ObjectNumber&quot;</span>, </span>
+<span id="cb252-5"><a href="image-visualization.html#cb252-5" tabindex="-1"></a>           <span class="at">img_id =</span> <span class="st">&quot;sample_id&quot;</span>,</span>
+<span id="cb252-6"><a href="image-visualization.html#cb252-6" tabindex="-1"></a>           <span class="at">colour_by =</span> <span class="fu">c</span>(<span class="st">&quot;Ecad&quot;</span>, <span class="st">&quot;CD3&quot;</span>, <span class="st">&quot;CD20&quot;</span>),</span>
+<span id="cb252-7"><a href="image-visualization.html#cb252-7" tabindex="-1"></a>           <span class="at">outline_by =</span> <span class="st">&quot;celltype&quot;</span>,</span>
+<span id="cb252-8"><a href="image-visualization.html#cb252-8" tabindex="-1"></a>           <span class="at">bcg =</span> <span class="fu">list</span>(<span class="at">Ecad =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">5</span>, <span class="dv">1</span>),</span>
+<span id="cb252-9"><a href="image-visualization.html#cb252-9" tabindex="-1"></a>                      <span class="at">CD3 =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">5</span>, <span class="dv">1</span>),</span>
+<span id="cb252-10"><a href="image-visualization.html#cb252-10" tabindex="-1"></a>                      <span class="at">CD20 =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">5</span>, <span class="dv">1</span>)),</span>
+<span id="cb252-11"><a href="image-visualization.html#cb252-11" tabindex="-1"></a>           <span class="at">colour =</span> <span class="fu">list</span>(<span class="at">celltype =</span> <span class="fu">metadata</span>(spe)<span class="sc">$</span>color_vectors<span class="sc">$</span>celltype),</span>
+<span id="cb252-12"><a href="image-visualization.html#cb252-12" tabindex="-1"></a>           <span class="at">thick =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<p><img src="10-image_visualization_files/figure-html/outlining-all-cells-1.png" width="672" /></p>
+<p>Distinguishing individual cell phenotypes is nearly impossible in the
+images above.</p>
+<p>However, the <code>SpatialExperiment</code> object can be subsetted to only contain
+cells of a single or few phenotypes. This allows the selective
+visualization of cell outlines on composite images.</p>
+<p>Here, we select all CD8+ T cells from the dataset and outline them on a
+2-channel composite image displaying the expression of CD3 and CD8a.</p>
+<div class="sourceCode" id="cb253"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb253-1"><a href="image-visualization.html#cb253-1" tabindex="-1"></a>CD8 <span class="ot">&lt;-</span> spe[,spe<span class="sc">$</span>celltype <span class="sc">==</span> <span class="st">&quot;CD8&quot;</span>]</span>
+<span id="cb253-2"><a href="image-visualization.html#cb253-2" tabindex="-1"></a></span>
+<span id="cb253-3"><a href="image-visualization.html#cb253-3" tabindex="-1"></a><span class="fu">plotPixels</span>(<span class="at">image =</span> cur_images,</span>
+<span id="cb253-4"><a href="image-visualization.html#cb253-4" tabindex="-1"></a>           <span class="at">mask =</span> cur_masks,</span>
+<span id="cb253-5"><a href="image-visualization.html#cb253-5" tabindex="-1"></a>           <span class="at">object =</span> CD8, </span>
+<span id="cb253-6"><a href="image-visualization.html#cb253-6" tabindex="-1"></a>           <span class="at">cell_id =</span> <span class="st">&quot;ObjectNumber&quot;</span>, <span class="at">img_id =</span> <span class="st">&quot;sample_id&quot;</span>,</span>
+<span id="cb253-7"><a href="image-visualization.html#cb253-7" tabindex="-1"></a>           <span class="at">colour_by =</span> <span class="fu">c</span>(<span class="st">&quot;CD3&quot;</span>, <span class="st">&quot;CD8a&quot;</span>),</span>
+<span id="cb253-8"><a href="image-visualization.html#cb253-8" tabindex="-1"></a>           <span class="at">outline_by =</span> <span class="st">&quot;celltype&quot;</span>,</span>
+<span id="cb253-9"><a href="image-visualization.html#cb253-9" tabindex="-1"></a>           <span class="at">bcg =</span> <span class="fu">list</span>(<span class="at">CD3 =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">5</span>, <span class="dv">1</span>),</span>
+<span id="cb253-10"><a href="image-visualization.html#cb253-10" tabindex="-1"></a>                      <span class="at">CD8a =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">5</span>, <span class="dv">1</span>)),</span>
+<span id="cb253-11"><a href="image-visualization.html#cb253-11" tabindex="-1"></a>           <span class="at">colour =</span> <span class="fu">list</span>(<span class="at">celltype =</span> <span class="fu">c</span>(<span class="st">&quot;CD8&quot;</span> <span class="ot">=</span> <span class="st">&quot;white&quot;</span>)),</span>
+<span id="cb253-12"><a href="image-visualization.html#cb253-12" tabindex="-1"></a>           <span class="at">thick =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<p><img src="10-image_visualization_files/figure-html/outlining-CD8-1.png" width="672" /></p>
+<p>This type of visualization allows the quality control of two things: 1.
+segmentation quality of individual cell types can be checked and 2. cell
+phenotyping accuracy can be visually assessed against expected marker
+expression.</p>
+</div>
+</div>
+<div id="adjusting-plot-annotations" class="section level2 hasAnchor" number="11.3">
+<h2><span class="header-section-number">11.3</span> Adjusting plot annotations<a href="image-visualization.html#adjusting-plot-annotations" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The <code>cytomapper</code> package provides a number of function arguments to
+adjust the visual appearance of figures that are shared between the
+<code>plotPixels</code> and <code>plotCells</code> function.</p>
+<p>For a full overview of the arguments please refer to <code>?plotting-param</code>.</p>
+<p>We use the following example to highlight how to adjust the scale bar,
+the image title, the legend appearance and the margin between images.</p>
+<div class="sourceCode" id="cb254"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb254-1"><a href="image-visualization.html#cb254-1" tabindex="-1"></a><span class="fu">plotPixels</span>(cur_images, </span>
+<span id="cb254-2"><a href="image-visualization.html#cb254-2" tabindex="-1"></a>           <span class="at">colour_by =</span> <span class="fu">c</span>(<span class="st">&quot;Ecad&quot;</span>, <span class="st">&quot;CD3&quot;</span>, <span class="st">&quot;CD20&quot;</span>, <span class="st">&quot;CD8a&quot;</span>, <span class="st">&quot;CD38&quot;</span>, <span class="st">&quot;Ki67&quot;</span>),</span>
+<span id="cb254-3"><a href="image-visualization.html#cb254-3" tabindex="-1"></a>           <span class="at">bcg =</span> <span class="fu">list</span>(<span class="at">Ecad =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">5</span>, <span class="dv">1</span>),</span>
+<span id="cb254-4"><a href="image-visualization.html#cb254-4" tabindex="-1"></a>                      <span class="at">CD3 =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">5</span>, <span class="dv">1</span>),</span>
+<span id="cb254-5"><a href="image-visualization.html#cb254-5" tabindex="-1"></a>                      <span class="at">CD20 =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">5</span>, <span class="dv">1</span>),</span>
+<span id="cb254-6"><a href="image-visualization.html#cb254-6" tabindex="-1"></a>                      <span class="at">CD8a =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">5</span>, <span class="dv">1</span>),</span>
+<span id="cb254-7"><a href="image-visualization.html#cb254-7" tabindex="-1"></a>                      <span class="at">CD38 =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">8</span>, <span class="dv">1</span>),</span>
+<span id="cb254-8"><a href="image-visualization.html#cb254-8" tabindex="-1"></a>                      <span class="at">Ki67 =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">5</span>, <span class="dv">1</span>)),</span>
+<span id="cb254-9"><a href="image-visualization.html#cb254-9" tabindex="-1"></a>           <span class="at">scale_bar =</span> <span class="fu">list</span>(<span class="at">length =</span> <span class="dv">100</span>,</span>
+<span id="cb254-10"><a href="image-visualization.html#cb254-10" tabindex="-1"></a>                            <span class="at">label =</span> <span class="fu">expression</span>(<span class="st">&quot;100 &quot;</span> <span class="sc">~</span> mu <span class="sc">*</span> <span class="st">&quot;m&quot;</span>),</span>
+<span id="cb254-11"><a href="image-visualization.html#cb254-11" tabindex="-1"></a>                            <span class="at">cex =</span> <span class="fl">0.7</span>, </span>
+<span id="cb254-12"><a href="image-visualization.html#cb254-12" tabindex="-1"></a>                            <span class="at">lwidth =</span> <span class="dv">10</span>,</span>
+<span id="cb254-13"><a href="image-visualization.html#cb254-13" tabindex="-1"></a>                            <span class="at">colour =</span> <span class="st">&quot;grey&quot;</span>,</span>
+<span id="cb254-14"><a href="image-visualization.html#cb254-14" tabindex="-1"></a>                            <span class="at">position =</span> <span class="st">&quot;bottomleft&quot;</span>,</span>
+<span id="cb254-15"><a href="image-visualization.html#cb254-15" tabindex="-1"></a>                            <span class="at">margin =</span> <span class="fu">c</span>(<span class="dv">5</span>,<span class="dv">5</span>),</span>
+<span id="cb254-16"><a href="image-visualization.html#cb254-16" tabindex="-1"></a>                            <span class="at">frame =</span> <span class="dv">3</span>),</span>
+<span id="cb254-17"><a href="image-visualization.html#cb254-17" tabindex="-1"></a>           <span class="at">image_title =</span> <span class="fu">list</span>(<span class="at">text =</span> <span class="fu">mcols</span>(cur_images)<span class="sc">$</span>indication,</span>
+<span id="cb254-18"><a href="image-visualization.html#cb254-18" tabindex="-1"></a>                              <span class="at">position =</span> <span class="st">&quot;topright&quot;</span>,</span>
+<span id="cb254-19"><a href="image-visualization.html#cb254-19" tabindex="-1"></a>                              <span class="at">colour =</span> <span class="st">&quot;grey&quot;</span>,</span>
+<span id="cb254-20"><a href="image-visualization.html#cb254-20" tabindex="-1"></a>                              <span class="at">margin =</span> <span class="fu">c</span>(<span class="dv">5</span>,<span class="dv">5</span>),</span>
+<span id="cb254-21"><a href="image-visualization.html#cb254-21" tabindex="-1"></a>                              <span class="at">font =</span> <span class="dv">2</span>,</span>
+<span id="cb254-22"><a href="image-visualization.html#cb254-22" tabindex="-1"></a>                              <span class="at">cex =</span> <span class="dv">2</span>),</span>
+<span id="cb254-23"><a href="image-visualization.html#cb254-23" tabindex="-1"></a>           <span class="at">legend =</span> <span class="fu">list</span>(<span class="at">colour_by.title.cex =</span> <span class="fl">0.7</span>,</span>
+<span id="cb254-24"><a href="image-visualization.html#cb254-24" tabindex="-1"></a>                         <span class="at">margin =</span> <span class="dv">10</span>),</span>
+<span id="cb254-25"><a href="image-visualization.html#cb254-25" tabindex="-1"></a>           <span class="at">margin =</span> <span class="dv">40</span>)</span></code></pre></div>
+<p><img src="10-image_visualization_files/figure-html/adjusting-parameters-1.png" width="672" /></p>
+</div>
+<div id="displaying-individual-images" class="section level2 hasAnchor" number="11.4">
+<h2><span class="header-section-number">11.4</span> Displaying individual images<a href="image-visualization.html#displaying-individual-images" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>By default, all images are displayed on the same graphics device. This
+can be useful when saving all images at once (see next section) to zoom
+into the individual images instead of opening each image individually.
+However, when displaying images in a markdown document these are more
+accessible when visualized individually. For this, the <code>plotPixels</code> and
+<code>plotCells</code> function accepts the <code>display</code> parameter that when set to
+<code>"single"</code> displays each resulting image in its own graphics device:</p>
+<div class="sourceCode" id="cb255"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb255-1"><a href="image-visualization.html#cb255-1" tabindex="-1"></a><span class="fu">plotCells</span>(cur_masks,</span>
+<span id="cb255-2"><a href="image-visualization.html#cb255-2" tabindex="-1"></a>          <span class="at">object =</span> spe, </span>
+<span id="cb255-3"><a href="image-visualization.html#cb255-3" tabindex="-1"></a>          <span class="at">cell_id =</span> <span class="st">&quot;ObjectNumber&quot;</span>, </span>
+<span id="cb255-4"><a href="image-visualization.html#cb255-4" tabindex="-1"></a>          <span class="at">img_id =</span> <span class="st">&quot;sample_id&quot;</span>,</span>
+<span id="cb255-5"><a href="image-visualization.html#cb255-5" tabindex="-1"></a>          <span class="at">colour_by =</span> <span class="st">&quot;celltype&quot;</span>,</span>
+<span id="cb255-6"><a href="image-visualization.html#cb255-6" tabindex="-1"></a>          <span class="at">colour =</span> <span class="fu">list</span>(<span class="at">celltype =</span> <span class="fu">metadata</span>(spe)<span class="sc">$</span>color_vectors<span class="sc">$</span>celltype),</span>
+<span id="cb255-7"><a href="image-visualization.html#cb255-7" tabindex="-1"></a>          <span class="at">display =</span> <span class="st">&quot;single&quot;</span>,</span>
+<span id="cb255-8"><a href="image-visualization.html#cb255-8" tabindex="-1"></a>          <span class="at">legend =</span> <span class="cn">NULL</span>)</span></code></pre></div>
+<p><img src="10-image_visualization_files/figure-html/individual-images-1.png" width="672" /><img src="10-image_visualization_files/figure-html/individual-images-2.png" width="672" /><img src="10-image_visualization_files/figure-html/individual-images-3.png" width="672" /></p>
+</div>
+<div id="saving-and-returning-images" class="section level2 hasAnchor" number="11.5">
+<h2><span class="header-section-number">11.5</span> Saving and returning images<a href="image-visualization.html#saving-and-returning-images" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The final section addresses how to save composite images and how to
+return them for integration with other plots.</p>
+<p>The <code>plotPixels</code> and <code>plotCells</code> functions accept the <code>save_plot</code>
+argument which takes a named list of the following entries: <code>filename</code>
+indicates the location and file type of the image saved to disk; <code>scale</code>
+adjusts the resolution of the saved image (this only needs to be
+adjusted for small images).</p>
+<div class="sourceCode" id="cb256"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb256-1"><a href="image-visualization.html#cb256-1" tabindex="-1"></a><span class="fu">plotCells</span>(cur_masks,</span>
+<span id="cb256-2"><a href="image-visualization.html#cb256-2" tabindex="-1"></a>          <span class="at">object =</span> spe, </span>
+<span id="cb256-3"><a href="image-visualization.html#cb256-3" tabindex="-1"></a>          <span class="at">cell_id =</span> <span class="st">&quot;ObjectNumber&quot;</span>, </span>
+<span id="cb256-4"><a href="image-visualization.html#cb256-4" tabindex="-1"></a>          <span class="at">img_id =</span> <span class="st">&quot;sample_id&quot;</span>,</span>
+<span id="cb256-5"><a href="image-visualization.html#cb256-5" tabindex="-1"></a>          <span class="at">colour_by =</span> <span class="st">&quot;celltype&quot;</span>,</span>
+<span id="cb256-6"><a href="image-visualization.html#cb256-6" tabindex="-1"></a>          <span class="at">colour =</span> <span class="fu">list</span>(<span class="at">celltype =</span> <span class="fu">metadata</span>(spe)<span class="sc">$</span>color_vectors<span class="sc">$</span>celltype),</span>
+<span id="cb256-7"><a href="image-visualization.html#cb256-7" tabindex="-1"></a>          <span class="at">save_plot =</span> <span class="fu">list</span>(<span class="at">filename =</span> <span class="st">&quot;data/celltype_image.png&quot;</span>))</span></code></pre></div>
+<p>The composite images (together with their annotation) can also be
+returned. In the following code chunk we save two example plots to
+variables (<code>out1</code> and <code>out2</code>).</p>
+<div class="sourceCode" id="cb257"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb257-1"><a href="image-visualization.html#cb257-1" tabindex="-1"></a>out1 <span class="ot">&lt;-</span> <span class="fu">plotCells</span>(cur_masks,</span>
+<span id="cb257-2"><a href="image-visualization.html#cb257-2" tabindex="-1"></a>                  <span class="at">object =</span> spe, </span>
+<span id="cb257-3"><a href="image-visualization.html#cb257-3" tabindex="-1"></a>                  <span class="at">cell_id =</span> <span class="st">&quot;ObjectNumber&quot;</span>, </span>
+<span id="cb257-4"><a href="image-visualization.html#cb257-4" tabindex="-1"></a>                  <span class="at">img_id =</span> <span class="st">&quot;sample_id&quot;</span>,</span>
+<span id="cb257-5"><a href="image-visualization.html#cb257-5" tabindex="-1"></a>                  <span class="at">colour_by =</span> <span class="st">&quot;celltype&quot;</span>,</span>
+<span id="cb257-6"><a href="image-visualization.html#cb257-6" tabindex="-1"></a>                  <span class="at">colour =</span> <span class="fu">list</span>(<span class="at">celltype =</span> <span class="fu">metadata</span>(spe)<span class="sc">$</span>color_vectors<span class="sc">$</span>celltype),</span>
+<span id="cb257-7"><a href="image-visualization.html#cb257-7" tabindex="-1"></a>                  <span class="at">return_plot =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb258"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb258-1"><a href="image-visualization.html#cb258-1" tabindex="-1"></a>out2 <span class="ot">&lt;-</span> <span class="fu">plotCells</span>(cur_masks,</span>
+<span id="cb258-2"><a href="image-visualization.html#cb258-2" tabindex="-1"></a>                  <span class="at">object =</span> spe, </span>
+<span id="cb258-3"><a href="image-visualization.html#cb258-3" tabindex="-1"></a>                  <span class="at">cell_id =</span> <span class="st">&quot;ObjectNumber&quot;</span>, </span>
+<span id="cb258-4"><a href="image-visualization.html#cb258-4" tabindex="-1"></a>                  <span class="at">img_id =</span> <span class="st">&quot;sample_id&quot;</span>,</span>
+<span id="cb258-5"><a href="image-visualization.html#cb258-5" tabindex="-1"></a>                  <span class="at">colour_by =</span> <span class="fu">c</span>(<span class="st">&quot;Ecad&quot;</span>, <span class="st">&quot;CD3&quot;</span>, <span class="st">&quot;CD20&quot;</span>),</span>
+<span id="cb258-6"><a href="image-visualization.html#cb258-6" tabindex="-1"></a>                  <span class="at">exprs_values =</span> <span class="st">&quot;exprs&quot;</span>,</span>
+<span id="cb258-7"><a href="image-visualization.html#cb258-7" tabindex="-1"></a>                  <span class="at">return_plot =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<p>The composite images are stored in <code>out1$plot</code> and <code>out2$plot</code> and can
+be converted into a graph object recognized by the
+<a href="https://cran.r-project.org/web/packages/cowplot/vignettes/introduction.html">cowplot</a>
+package.</p>
+<p>The final function call of the following chunk plots both object next to
+each other.</p>
+<div class="sourceCode" id="cb259"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb259-1"><a href="image-visualization.html#cb259-1" tabindex="-1"></a><span class="fu">library</span>(cowplot)</span>
+<span id="cb259-2"><a href="image-visualization.html#cb259-2" tabindex="-1"></a><span class="fu">library</span>(gridGraphics)</span>
+<span id="cb259-3"><a href="image-visualization.html#cb259-3" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> <span class="fu">ggdraw</span>(out1<span class="sc">$</span>plot, <span class="at">clip =</span> <span class="st">&quot;on&quot;</span>)</span>
+<span id="cb259-4"><a href="image-visualization.html#cb259-4" tabindex="-1"></a>p2 <span class="ot">&lt;-</span> <span class="fu">ggdraw</span>(out2<span class="sc">$</span>plot, <span class="at">clip =</span> <span class="st">&quot;on&quot;</span>)</span>
+<span id="cb259-5"><a href="image-visualization.html#cb259-5" tabindex="-1"></a></span>
+<span id="cb259-6"><a href="image-visualization.html#cb259-6" tabindex="-1"></a><span class="fu">plot_grid</span>(p1, p2)</span></code></pre></div>
+<p><img src="10-image_visualization_files/figure-html/side-by-side-plot-1.png" width="672" /></p>
+</div>
+<div id="cytoviewer" class="section level2 hasAnchor" number="11.6">
+<h2><span class="header-section-number">11.6</span> Interactive image visualization<a href="image-visualization.html#cytoviewer" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The
+<a href="https://bioconductor.org/packages/release/bioc/html/cytoviewer.html">cytoviewer</a>
+R/Bioconductor package <span class="citation">(<a href="#ref-Meyer2024">Meyer, Eling, and Bodenmiller 2024</a>)</span> extends the static visualization
+abilities from <code>cytomapper</code> via an interactive and user-friendly <code>shiny</code>
+application.</p>
+<p>It supports flexible generation of image composites, allows side-by-side
+visualization of single channels, and facilitates the spatial
+visualization of single-cell data in the form of segmentation masks.
+Rapid and publication-quality image downloads are also supported. For a
+full introduction to the package, please refer to
+<a href="https://bioconductor.org/packages/release/bioc/vignettes/cytoviewer/inst/doc/cytoviewer.html">the vignette</a>.</p>
+<div class="sourceCode" id="cb260"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb260-1"><a href="image-visualization.html#cb260-1" tabindex="-1"></a><span class="fu">library</span>(cytoviewer)</span>
+<span id="cb260-2"><a href="image-visualization.html#cb260-2" tabindex="-1"></a></span>
+<span id="cb260-3"><a href="image-visualization.html#cb260-3" tabindex="-1"></a>app <span class="ot">&lt;-</span> <span class="fu">cytoviewer</span>(<span class="at">image =</span> images,</span>
+<span id="cb260-4"><a href="image-visualization.html#cb260-4" tabindex="-1"></a>                  <span class="at">mask =</span> masks,</span>
+<span id="cb260-5"><a href="image-visualization.html#cb260-5" tabindex="-1"></a>                  <span class="at">object =</span> spe,</span>
+<span id="cb260-6"><a href="image-visualization.html#cb260-6" tabindex="-1"></a>                  <span class="at">cell_id =</span> <span class="st">&quot;ObjectNumber&quot;</span>,</span>
+<span id="cb260-7"><a href="image-visualization.html#cb260-7" tabindex="-1"></a>                  <span class="at">img_id =</span> <span class="st">&quot;sample_id&quot;</span>)</span>
+<span id="cb260-8"><a href="image-visualization.html#cb260-8" tabindex="-1"></a></span>
+<span id="cb260-9"><a href="image-visualization.html#cb260-9" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">interactive</span>()) {</span>
+<span id="cb260-10"><a href="image-visualization.html#cb260-10" tabindex="-1"></a>    shiny<span class="sc">::</span><span class="fu">runApp</span>(app)</span>
+<span id="cb260-11"><a href="image-visualization.html#cb260-11" tabindex="-1"></a>}</span></code></pre></div>
+</div>
+<div id="session-info-6" class="section level2 hasAnchor" number="11.7">
+<h2><span class="header-section-number">11.7</span> Session Info<a href="image-visualization.html#session-info-6" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<details>
+<summary>
+SessionInfo
+</summary>
+<pre><code>## R version 4.3.2 (2023-10-31)
+## Platform: x86_64-pc-linux-gnu (64-bit)
+## Running under: Ubuntu 22.04.3 LTS
+## 
+## Matrix products: default
+## BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
+## LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.20.so;  LAPACK version 3.10.0
+## 
+## locale:
+##  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+##  [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+##  [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+##  [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+##  [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+## [11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+## 
+## time zone: Etc/UTC
+## tzcode source: system (glibc)
+## 
+## attached base packages:
+## [1] grid      stats4    stats     graphics  grDevices utils     datasets 
+## [8] methods   base     
+## 
+## other attached packages:
+##  [1] cytoviewer_1.2.0            gridGraphics_0.5-1         
+##  [3] cowplot_1.1.2               cytomapper_1.14.0          
+##  [5] EBImage_4.44.0              SpatialExperiment_1.12.0   
+##  [7] SingleCellExperiment_1.24.0 SummarizedExperiment_1.32.0
+##  [9] Biobase_2.62.0              GenomicRanges_1.54.1       
+## [11] GenomeInfoDb_1.38.5         IRanges_2.36.0             
+## [13] S4Vectors_0.40.2            BiocGenerics_0.48.1        
+## [15] MatrixGenerics_1.14.0       matrixStats_1.2.0          
+## 
+## loaded via a namespace (and not attached):
+##   [1] splines_4.3.2               later_1.3.2                
+##   [3] bitops_1.0-7                tibble_3.2.1               
+##   [5] svgPanZoom_0.3.4            polyclip_1.10-6            
+##   [7] XML_3.99-0.16               lifecycle_1.0.4            
+##   [9] rstatix_0.7.2               doParallel_1.0.17          
+##  [11] lattice_0.21-9              MASS_7.3-60                
+##  [13] backports_1.4.1             magrittr_2.0.3             
+##  [15] sass_0.4.8                  rmarkdown_2.25             
+##  [17] jquerylib_0.1.4             yaml_2.3.8                 
+##  [19] plotrix_3.8-4               httpuv_1.6.13              
+##  [21] sp_2.1-2                    RColorBrewer_1.1-3         
+##  [23] ConsensusClusterPlus_1.66.0 multcomp_1.4-25            
+##  [25] abind_1.4-5                 zlibbioc_1.48.0            
+##  [27] Rtsne_0.17                  purrr_1.0.2                
+##  [29] RCurl_1.98-1.13             TH.data_1.1-2              
+##  [31] tweenr_2.0.2                sandwich_3.1-0             
+##  [33] circlize_0.4.15             GenomeInfoDbData_1.2.11    
+##  [35] ggrepel_0.9.4               irlba_2.3.5.1              
+##  [37] CATALYST_1.26.0             terra_1.7-65               
+##  [39] svglite_2.1.3               DelayedMatrixStats_1.24.0  
+##  [41] codetools_0.2-19            DelayedArray_0.28.0        
+##  [43] scuttle_1.12.0              ggforce_0.4.1              
+##  [45] tidyselect_1.2.0            shape_1.4.6                
+##  [47] raster_3.6-26               farver_2.1.1               
+##  [49] ScaledMatrix_1.10.0         viridis_0.6.4              
+##  [51] jsonlite_1.8.8              BiocNeighbors_1.20.1       
+##  [53] GetoptLong_1.0.5            ellipsis_0.3.2             
+##  [55] ggridges_0.5.5              survival_3.5-7             
+##  [57] scater_1.30.1               iterators_1.0.14           
+##  [59] systemfonts_1.0.5           foreach_1.5.2              
+##  [61] tools_4.3.2                 ggnewscale_0.4.9           
+##  [63] Rcpp_1.0.11                 glue_1.6.2                 
+##  [65] gridExtra_2.3               SparseArray_1.2.3          
+##  [67] xfun_0.41                   dplyr_1.1.4                
+##  [69] HDF5Array_1.30.0            shinydashboard_0.7.2       
+##  [71] withr_2.5.2                 fastmap_1.1.1              
+##  [73] rhdf5filters_1.14.1         fansi_1.0.6                
+##  [75] rsvd_1.0.5                  digest_0.6.33              
+##  [77] R6_2.5.1                    mime_0.12                  
+##  [79] colorspace_2.1-0            gtools_3.9.5               
+##  [81] jpeg_0.1-10                 utf8_1.2.4                 
+##  [83] tidyr_1.3.0                 generics_0.1.3             
+##  [85] data.table_1.14.10          htmlwidgets_1.6.4          
+##  [87] S4Arrays_1.2.0              pkgconfig_2.0.3            
+##  [89] gtable_0.3.4                ComplexHeatmap_2.18.0      
+##  [91] RProtoBufLib_2.14.0         XVector_0.42.0             
+##  [93] htmltools_0.5.7             carData_3.0-5              
+##  [95] bookdown_0.37               fftwtools_0.9-11           
+##  [97] clue_0.3-65                 scales_1.3.0               
+##  [99] png_0.1-8                   colorRamps_2.3.1           
+## [101] knitr_1.45                  reshape2_1.4.4             
+## [103] rjson_0.2.21                cachem_1.0.8               
+## [105] zoo_1.8-12                  rhdf5_2.46.1               
+## [107] GlobalOptions_0.1.2         stringr_1.5.1              
+## [109] shinycssloaders_1.0.0       miniUI_0.1.1.1             
+## [111] parallel_4.3.2              vipor_0.4.7                
+## [113] pillar_1.9.0                vctrs_0.6.5                
+## [115] promises_1.2.1              ggpubr_0.6.0               
+## [117] BiocSingular_1.18.0         car_3.1-2                  
+## [119] cytolib_2.14.0              beachmat_2.18.0            
+## [121] xtable_1.8-4                cluster_2.1.4              
+## [123] archive_1.1.7               beeswarm_0.4.0             
+## [125] evaluate_0.23               magick_2.8.2               
+## [127] mvtnorm_1.2-4               cli_3.6.2                  
+## [129] locfit_1.5-9.8              compiler_4.3.2             
+## [131] rlang_1.1.2                 crayon_1.5.2               
+## [133] ggsignif_0.6.4              FlowSOM_2.10.0             
+## [135] flowCore_2.14.0             plyr_1.8.9                 
+## [137] ggbeeswarm_0.7.2            stringi_1.8.3              
+## [139] viridisLite_0.4.2           BiocParallel_1.36.0        
+## [141] nnls_1.5                    munsell_0.5.0              
+## [143] tiff_0.1-12                 colourpicker_1.3.0         
+## [145] Matrix_1.6-4                sparseMatrixStats_1.14.0   
+## [147] ggplot2_3.4.4               Rhdf5lib_1.24.1            
+## [149] shiny_1.8.0                 highr_0.10                 
+## [151] fontawesome_0.5.2           drc_3.0-1                  
+## [153] memoise_2.0.1               igraph_1.6.0               
+## [155] broom_1.0.5                 bslib_0.6.1</code></pre>
+</details>
+
+</div>
+</div>
+<h3>References<a href="references.html#references" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-Eling2020" class="csl-entry">
+Eling, Nils, Nicolas Damond, Tobias Hoch, and Bernd Bodenmiller. 2020. <span>“Cytomapper: An r/Bioconductor Package for Visualization of Highly Multiplexed Imaging Data.”</span> <em>Bioinformatics</em> 36 (24): 5706--5708.
+</div>
+<div id="ref-Meyer2024" class="csl-entry">
+Meyer, Lasse, Nils Eling, and Bernd Bodenmiller. 2024. <span>“Cytoviewer: An r/Bioconductor Package for Interactive Visualization and Exploration of Highly Multiplexed Imaging Data.”</span> <em>BMC Bioinformatics</em> 25 (1).
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="single-cell-visualization.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="performing-spatial-analysis.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": true,
+"facebook": false,
+"twitter": true,
+"linkedin": true,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": "https://github.com/BodenmillerGroup/IMCDataAnalysis/blob/master/10-image_visualization.Rmd",
+"text": null
+},
+"download": null,
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "section"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>
