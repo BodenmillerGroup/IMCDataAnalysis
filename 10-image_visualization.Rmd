@@ -7,7 +7,7 @@ pixel-level information including the generation of pseudo-color
 composite images. Section \@ref(mask-visualization) highlights the
 visualization of cell metadata (e.g., cell phenotype) as well as
 summarized pixel intensities on cell segmentation masks. Section
-\@ref(interactive-visualization) showcases interactive pixel- and
+\@ref(cytoviewer) showcases interactive pixel- and
 cell-level visualization with the
 [cytoviewer](https://bioconductor.org/packages/release/bioc/html/cytoviewer.html)
 R/Bioconductor package [@Meyer2024].
@@ -492,7 +492,7 @@ p2 <- ggdraw(out2$plot, clip = "on")
 plot_grid(p1, p2)
 ```
 
-## Interactive image visualization {#interactive-visualization}
+## Interactive image visualization {#cytoviewer}
 
 The
 [cytoviewer](https://bioconductor.org/packages/release/bioc/html/cytoviewer.html)
