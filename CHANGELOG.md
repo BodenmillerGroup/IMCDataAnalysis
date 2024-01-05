@@ -10,3 +10,7 @@
 
 - Added developers documentation
 - Added more ways to visualize cell type composition per CN
+
+**Version 1.0.3** [2024-01-05]
+
+- Updated cytoviewer citation and corresponding text

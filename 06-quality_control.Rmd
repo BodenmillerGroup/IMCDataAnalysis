@@ -62,7 +62,7 @@ sizes.
 An easier and interactive way of observing segmentation quality is to use the
 interactive image viewer provided by the
 [cytoviewer](https://github.com/BodenmillerGroup/cytoviewer) R/Bioconductor
-package [@Meyer2023]. Under "Image-level" > "Basic controls", up to six markers
+package [@Meyer2024]. Under "Image-level" > "Basic controls", up to six markers
 can be selected for visualization. The contrast of each marker can be adjusted.
 Under "Image-level" > "Advanced controls", click the "Show cell outlines" box
 to outline segmented cells on the images.
@@ -72,11 +72,12 @@ library(cytoviewer)
 
 app <- cytoviewer(image = images, 
                   mask = masks, 
+                  object = spe,
                   cell_id = "ObjectNumber", 
                   img_id = "sample_id")
 
 if (interactive()) {
-    shiny::runApp(app, launch.browser = TRUE)
+    shiny::runApp(app)
 }
 ```
 
@@ -395,7 +396,7 @@ samples or batches of samples. Observing potential staining differences can be
 crucial to assess data quality. We will use ridgeline visualizations to check
 differences in staining patterns:
 
-```{r ridges, message=FALSE, fig.width=7, fig.height=25}
+```{r ridges, message=FALSE, warning = FALSE, fig.width=7, fig.height=25}
 multi_dittoPlot(spe, vars = rownames(spe)[rowData(spe)$use_channel],
                group.by = "patient_id", plots = "ridgeplot", 
                assay = "exprs", 
