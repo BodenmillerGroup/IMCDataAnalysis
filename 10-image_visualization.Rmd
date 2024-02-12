@@ -31,7 +31,7 @@ spe <- readRDS("data/spe.rds")
 images <- readRDS("data/images.rds")
 masks <- readRDS("data/masks.rds")
 
-# Sample images
+# Sample images and masks
 set.seed(220517)
 cur_id <- sample(unique(spe$sample_id), 3)
 cur_images <- images[names(images) %in% cur_id]
@@ -180,7 +180,7 @@ distribution of cell phenotypes, the visual assessment of morphological
 features and quality control in terms of cell segmentation and
 phenotyping.
 
-### Visualzing metadata
+### Visualizing metadata
 
 The `cytomapper` package provides the `plotCells` function that accepts
 a `CytoImageList` object containing segmentation masks. These are
@@ -245,18 +245,22 @@ plotCells(cur_masks,
 
 In terms of visualizing metadata, any entry in the `colData(spe)` slot
 can be visualized. The `plotCells` function automatically detects if the
-entry is continuous or discrete. In this fashion, we can now visualize
-the area of each cell:
+entry is continuous or discrete. For continuous features, `cytomapper` scales 
+across the whole `SpatialExperiment` object. Therefore, we will subset the 
+object to only contain the 3 visualized images. In this fashion, we can now 
+visualize the area of each cell:
 
 ```{r area}
+cur_spe <- spe[,spe$sample_id %in% cur_id]
+               
 plotCells(cur_masks,
-          object = spe, 
+          object = cur_spe, 
           cell_id = "ObjectNumber", 
           img_id = "sample_id",
           colour_by = "area")
 ```
 
-### Visualizating expression
+### Visualizing expression
 
 Similar to visualizing single-cell metadata on segmentation masks, we
 can use the `plotCells` function to visualize the aggregated pixel
@@ -264,14 +268,17 @@ intensities per cell. In the current dataset pixel intensities were
 aggregated by computing the mean pixel intensity per cell and per
 channel. The `plotCells` function accepts the `exprs_values` argument
 (default `counts`) that allows selecting the assay which stores the
-expression values that should be visualized.
+expression values that should be visualized. Similar to continuous 
+`colData(spe)` features, `cytomapper` scales the expression values across 
+the whole `SpatialExperiment` object. We will again subset the object 
+to only contain the 3 visualized images.
 
 In the following example, we visualize the asinh-transformed mean pixel
 intensities of the epithelial marker E-cadherin on segmentation masks.
 
 ```{r Ecad-expression}
 plotCells(cur_masks,
-          object = spe, 
+          object = cur_spe, 
           cell_id = "ObjectNumber", 
           img_id = "sample_id",
           colour_by = "Ecad",
@@ -286,7 +293,7 @@ spatial distribution of tumor cells (E-cadherin), T cells (CD3), B cells
 
 ```{r 6-channel-expression}
 plotCells(cur_masks,
-          object = spe, 
+          object = cur_spe, 
           cell_id = "ObjectNumber", 
           img_id = "sample_id",
           colour_by = c("Ecad", "CD3", "CD20", "CD8a", "CD38", "Ki67"),
@@ -304,7 +311,7 @@ argument:
 
 ```{r setting-expression-colors}
 plotCells(cur_masks,
-          object = spe, 
+          object = cur_spe, 
           cell_id = "ObjectNumber", 
           img_id = "sample_id",
           colour_by = c("Ecad", "CD3", "CD20"),
@@ -330,7 +337,7 @@ the cells' outlines by their cell phenotype.
 ```{r outlining-all-cells}
 plotPixels(image = cur_images,
            mask = cur_masks,
-           object = spe, 
+           object = cur_spe, 
            cell_id = "ObjectNumber", 
            img_id = "sample_id",
            colour_by = c("Ecad", "CD3", "CD20"),
@@ -338,14 +345,14 @@ plotPixels(image = cur_images,
            bcg = list(Ecad = c(0, 5, 1),
                       CD3 = c(0, 5, 1),
                       CD20 = c(0, 5, 1)),
-           colour = list(celltype = metadata(spe)$color_vectors$celltype),
+           colour = list(celltype = metadata(cur_spe)$color_vectors$celltype),
            thick = TRUE)
 ```
 
 Distinguishing individual cell phenotypes is nearly impossible in the
 images above.
 
-However, the `SpatialExperiment` object can be subsetted to only contain
+However, the `SpatialExperiment` object can be further subsetted to only contain
 cells of a single or few phenotypes. This allows the selective
 visualization of cell outlines on composite images.
 
@@ -353,7 +360,7 @@ Here, we select all CD8+ T cells from the dataset and outline them on a
 2-channel composite image displaying the expression of CD3 and CD8a.
 
 ```{r outlining-CD8}
-CD8 <- spe[,spe$celltype == "CD8"]
+CD8 <- cur_spe[,cur_spe$celltype == "CD8"]
 
 plotPixels(image = cur_images,
            mask = cur_masks,
@@ -467,7 +474,7 @@ out1 <- plotCells(cur_masks,
                   return_plot = TRUE)
 
 out2 <- plotCells(cur_masks,
-                  object = spe, 
+                  object = cur_spe, 
                   cell_id = "ObjectNumber", 
                   img_id = "sample_id",
                   colour_by = c("Ecad", "CD3", "CD20"),
