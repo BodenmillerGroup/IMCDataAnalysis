@@ -17,4 +17,4 @@
 
 **Version 1.0.4** [2024-02-12]
 
-- Updated cell-level visualization with subsetted object
+- Updated cell-level visualization with subsetted object - re-trigger actions
