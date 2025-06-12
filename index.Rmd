@@ -72,7 +72,7 @@ issues. Have a look at the source code at:
 
 ## Contributors
 
-[Nils Eling](https://github.com/nilseling)
+[Nils Eling](https://github.com/nilseling)  
 [Vito Zanotelli](https://github.com/votti)  
 [Daniel Schulz](https://github.com/SchulzDan)  
 [Jonas Windhager](https://github.com/jwindhager)   
