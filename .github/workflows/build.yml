@@ -5,6 +5,7 @@ on:
     branches: [ main ]
   schedule:
     - cron: '0 8 1 * *'
+  workflow_dispatch:
 
 name: build
 
@@ -18,15 +19,15 @@ jobs:
       
     steps:
     - name: Checkout the repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       
     - name: set NOW
       id: now
       run: |
-        echo "::set-output name=NOW::$(date +'%Y-%m-%d')"
+        echo "NOW=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
 
     - name: Login to GitHub Container registry
-      uses: docker/login-action@v1
+      uses: docker/login-action@v3
       env:
         GITHUB_USER: ${{ github.actor }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -36,7 +37,7 @@ jobs:
         password: ${{ secrets.GITHUB_TOKEN }}
         
     - name: Check Dockerfile
-      uses: dorny/paths-filter@v2
+      uses: dorny/paths-filter@v3
       id: filter
       with:
         filters: |
@@ -45,13 +46,13 @@ jobs:
         
     - name: Build and Push Docker Image
       if: steps.filter.outputs.docker == 'true' || github.event_name == 'schedule'
-      uses: docker/build-push-action@v3
+      uses: docker/build-push-action@v6
       with:
         context: .
         file: ./Dockerfile
         push: true
         tags: |
-          ghcr.io/bodenmillergroup/imcdataanalysis:${{ steps.now.outputs.NOW }}
+          ghcr.io/bodenmillergroup/imcdataanalysis:${{ env.NOW }}
           ghcr.io/bodenmillergroup/imcdataanalysis:latest
 
   bookdown:
@@ -64,13 +65,13 @@ jobs:
     
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       
       - name: Render Book
         run: Rscript -e 'bookdown::render_book("index.Rmd", new_session = TRUE)'
         
       - name: Upload artifact    
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: docs
           path: docs/
@@ -80,14 +81,14 @@ jobs:
     needs: bookdown
     steps:
       - name: Checkout
-        uses: actions/checkout@master
+        uses: actions/checkout@v4
       - name: Download artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: docs # optional
           path: docs # optional
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+        uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: docs/
