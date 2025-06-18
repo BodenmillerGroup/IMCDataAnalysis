@@ -883,12 +883,12 @@ saveRDS(spe, "data/spe.rds")
 library(testthat)
 
 expect_equal(table(spe$tumor_stroma),
-             structure(c(Stroma = 31164L, Tumor = 16630L), dim = 2L, dimnames = structure(list(
+             structure(c(Stroma = 31169L, Tumor = 16625L), dim = 2L, dimnames = structure(list(
     c("Stroma", "Tumor")), names = ""), class = "table"))
 
 expect_equal(table(spe$cn_celltypes),
-             structure(c(`1` = 11948L, `2` = 5318L, `3` = 3359L, `4` = 7770L, 
-`5` = 10039L, `6` = 9360L), dim = 6L, dimnames = structure(list(
+             structure(c(`1` = 11968L, `2` = 5268L, `3` = 3360L, `4` = 7820L, 
+`5` = 10048L, `6` = 9330L), dim = 6L, dimnames = structure(list(
     c("1", "2", "3", "4", "5", "6")), names = ""), class = "table"))
 
 expect_equal(table(spe$cn_expression),
@@ -897,24 +897,24 @@ expect_equal(table(spe$cn_expression),
     c("1", "2", "3", "4", "5", "6")), names = ""), class = "table"))
 
 expect_equal(table(spe$region),
-             structure(c(region_1 = 4918L, region_2 = 7112L, region_3 = 2715L, 
-region_4 = 16577L, region_5 = 4469L, region_6 = 12003L), dim = 6L, dimnames = structure(list(
+             structure(c(region_1 = 4928L, region_2 = 7094L, region_3 = 2729L, 
+region_4 = 16574L, region_5 = 4529L, region_6 = 11940L), dim = 6L, dimnames = structure(list(
     c("region_1", "region_2", "region_3", "region_4", "region_5", 
     "region_6")), names = ""), class = "table"))
 
 expect_equal(table(spe$spatial_context),
-             structure(c(`1` = 6001L, `1_2` = 20L, `1_2_3_5` = 1L, `1_2_3_5_6` = 2L, 
-`1_2_3_6` = 3L, `1_2_4` = 4L, `1_2_4_5` = 3L, `1_2_4_5_6` = 12L, 
-`1_2_4_6` = 184L, `1_2_5` = 26L, `1_2_5_6` = 206L, `1_2_6` = 1548L, 
-`1_3` = 3L, `1_3_4_5_6` = 8L, `1_3_4_6` = 6L, `1_3_5_6` = 72L, 
-`1_3_6` = 326L, `1_4_5` = 5L, `1_4_5_6` = 487L, `1_4_6` = 1093L, 
-`1_5` = 40L, `1_5_6` = 2063L, `1_6` = 7791L, `2` = 1655L, `2_3` = 227L, 
-`2_3_4` = 94L, `2_3_4_5` = 55L, `2_3_5` = 174L, `2_3_5_6` = 46L, 
-`2_3_6` = 13L, `2_4` = 2675L, `2_4_5` = 866L, `2_4_5_6` = 130L, 
-`2_4_6` = 736L, `2_5` = 521L, `2_5_6` = 292L, `2_6` = 817L, `3` = 1588L, 
-`3_4` = 181L, `3_4_5` = 551L, `3_4_5_6` = 48L, `3_4_6` = 8L, 
-`3_5` = 1882L, `3_5_6` = 315L, `3_6` = 281L, `4` = 1619L, `4_5` = 4909L, 
-`4_5_6` = 1549L, `4_6` = 1504L, `5` = 3029L, `5_6` = 1410L, `6` = 715L
+             structure(c(`1` = 6009L, `1_2` = 20L, `1_2_3_5` = 1L, `1_2_3_5_6` = 2L, 
+`1_2_3_6` = 3L, `1_2_4` = 4L, `1_2_4_5` = 3L, `1_2_4_5_6` = 18L, 
+`1_2_4_6` = 199L, `1_2_5` = 26L, `1_2_5_6` = 207L, `1_2_6` = 1514L, 
+`1_3` = 3L, `1_3_4_5_6` = 8L, `1_3_4_6` = 7L, `1_3_5_6` = 72L, 
+`1_3_6` = 329L, `1_4_5` = 5L, `1_4_5_6` = 479L, `1_4_6` = 1121L, 
+`1_5` = 40L, `1_5_6` = 2060L, `1_6` = 7806L, `2` = 1646L, `2_3` = 227L, 
+`2_3_4` = 92L, `2_3_4_5` = 59L, `2_3_5` = 183L, `2_3_5_6` = 38L, 
+`2_3_6` = 11L, `2_4` = 2669L, `2_4_5` = 906L, `2_4_5_6` = 131L, 
+`2_4_6` = 780L, `2_5` = 512L, `2_5_6` = 294L, `2_6` = 761L, `3` = 1586L, 
+`3_4` = 193L, `3_4_5` = 556L, `3_4_5_6` = 49L, `3_4_6` = 8L, 
+`3_5` = 1885L, `3_5_6` = 321L, `3_6` = 271L, `4` = 1602L, `4_5` = 4914L, 
+`4_5_6` = 1546L, `4_6` = 1484L, `5` = 3013L, `5_6` = 1424L, `6` = 697L
 ), dim = 52L, dimnames = structure(list(c("1", "1_2", "1_2_3_5", 
 "1_2_3_5_6", "1_2_3_6", "1_2_4", "1_2_4_5", "1_2_4_5_6", "1_2_4_6", 
 "1_2_5", "1_2_5_6", "1_2_6", "1_3", "1_3_4_5_6", "1_3_4_6", "1_3_5_6", 
@@ -925,7 +925,7 @@ expect_equal(table(spe$spatial_context),
 "4_5", "4_5_6", "4_6", "5", "5_6", "6")), names = ""), class = "table"))
 
 
-expect_equal(length(unique(spe$patch_id)),77L)
+expect_equal(length(unique(spe$patch_id)),76L)
 
 
 expect_equal(spe$aggregatedNeighborhood[1000:1050,],
