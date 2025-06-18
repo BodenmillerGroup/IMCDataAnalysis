@@ -33,6 +33,7 @@ First, we will read in the previously generated `SpatialExperiment`
 object.
 
 ```{r read-data-scviz, message=FALSE}
+library(SpatialExperiment)
 spe <- readRDS("data/spe.rds")
 ```
 
