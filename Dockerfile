@@ -15,3 +15,4 @@ RUN R -e 'BiocManager::install(c("CATALYST", "scuttle", "scater", "dittoSeq", "t
                                  "scran", "lisaClust", "spicyR", "iSEE", "imcRtools", "cytomapper", "imcdatasets", "cytoviewer"))'
 RUN R -e 'devtools::install_github(c("i-cyto/Rphenograph"))'
 
+# Trigger new image build
