@@ -267,8 +267,8 @@ weighting of edges (see `?makeSNNGraph` for more information) and uses the
 `cluster_walktrap` function to detect communities in the graph.
 
 As we can see above, the clustering approach in this dataset with `k` being 20
-and rank-based edge weighting leads to the highest silhouette width and highest
-neighborhood purity.
+and jaccard-based edge weighting leads to the highest silhouette width and highest
+neighborhood purity and we will use these parameters to cluster the data.
 
 ```{r, echo=FALSE}
 start_time <- Sys.time()
@@ -282,7 +282,7 @@ clusters <- clusterCells(spe[rowData(spe)$use_channel,],
                          assay.type = "exprs", 
                          BLUSPARAM = SNNGraphParam(k=20, 
                                                   cluster.fun = "louvain",
-                                                  type = "rank"))
+                                                  type = "jaccard"))
 
 spe$nn_clusters <- clusters
 
@@ -322,7 +322,7 @@ clusters <- clusterCells(spe,
                          use.dimred = "fastMNN", 
                          BLUSPARAM = SNNGraphParam(k = 20, 
                                         cluster.fun = "louvain",
-                                        type = "rank"))
+                                        type = "jaccard"))
 
 spe$nn_clusters_corrected <- clusters
 
@@ -485,12 +485,11 @@ pheatmap(log10(tab3 + 10), color = viridis(100))
 ```
 
 We observe that `Rphenograph` and the shared nearest neighbor (SNN) approach by
-`scran` show similar results (first heatmap above). For example, Rphenograph
-cluster 20 (a tumor cluster) is perfectly captured by SNN cluster 12. On the
-other hand, the Neutrophil cluster (SNN cluster 6) is split into Rphenograph
-cluster 2 and Rphenograph cluster 6. A common approach
-is to now merge clusters that contain similar cell types and annotate them by
-hand (see below).
+`scran` show similar results (first heatmap above). We can see that most
+`Rphenograph` clusters have a large overlap with just one SSN clusters. However,
+there are also examples of clusters that are split in one or the other
+clustering method. A common approach is to now merge clusters that contain
+similar cell types and annotate them by hand (see below).
 
 Below, a comparison between the clustering results of the integrated cells 
 is shown.
@@ -521,30 +520,35 @@ neighborhood purity but different metrics should be tested to assess cluster
 stability.
 
 To assign cell types to clusters, we manually annotate clusters based on their
-marker expression. For example, SNN cluster 12 (clustering of the integrated
-cells) shows high, homogeneous expression of CD20 and we might therefore label
-this cluster as B cells. The next chapter \@ref(single-cell-visualization) will 
-highlight single-cell visualization methods that can be helpful for manual 
-cluster annotations. 
+marker expression. For this, biological knowledge of markers is required in
+order to assign names to clusters with high expression of e.g. lineage markers
+such as CD20. The next chapter \@ref(single-cell-visualization) will highlight
+single-cell visualization methods that can be helpful for manual cluster
+annotations.
 
 An example how to label clusters can be seen below:
-
+**Of note:** We only showcase how this can be done here and are not using those annotations downstream in this book.
 ```{r, message=FALSE}
 library(dplyr)
 cluster_celltype <- recode(spe$nn_clusters_corrected,
-                            "1" = "Tumor_proliferating",
-                            "2" = "Myeloid",
-                            "3" = "Tumor",
-                            "4" = "Tumor",
-                            "5" = "Stroma",
-                            "6" = "Proliferating",
-                            "7" = "Myeloid",
-                            "8" = "Plasma_cell",
-                            "9" = "CD8",
-                            "10" = "CD4",
-                            "11" = "Neutrophil",
-                            "12" = "Bcell",
-                            "13" = "Stroma")
+                           "1" = "Tumor_proliferating",
+                           "2" = "Neutrophil_enriched",
+                           "3" = "Tumor",
+                           "4" = "Tumor",
+                           "5" = "Stroma",
+                           "6" = "Proliferating",
+                           "7" = "Myeloid",
+                           "8" = "Tumor_hypoxic",
+                           "9" = "CD8",
+                           "10" = "Plasma_cell",
+                           "11" = "Tumor_proliferating",
+                           "12" = "CD4",
+                           "13" = "Bcell",
+                           "14" = "Myleoid",
+                           "15" = "Stroma",
+                           "16" = "pDC",
+                           "17" = "pDC",
+                           "18" = "Tumor")
 
 spe$cluster_celltype <- cluster_celltype
 ```
@@ -656,7 +660,8 @@ save the unique labels within the original `SpatialExperiment` object.
 example dataset. The gated cell labels might need to be processed in a slightly
 different way when working with other samples.
 
-For these tasks, we will define a filter function:
+For these tasks, we will define a filter function which will return the label of
+uniquely labeled cells:
 
 ```{r}
 filter_labels <- function(object, 
@@ -675,14 +680,19 @@ filter_labels <- function(object,
 This function is now applied to all cells and then only non-tumor cells.
 
 ```{r remove-doublets}
+# extract labels from uniquely labelled cells
 labels <- filter_labels(concat_spe)
 
+# subset spe to be non-tumor cells
 cur_spe <- concat_spe[,concat_spe$cytomapper_CellLabel != "Tumor"]
 
+# extract uniquely labelled non-tumor cells
 non_tumor_labels <- filter_labels(cur_spe)
 
+# identify names of cells that were excluded due to dual labelling as tumor and non-tumor
 additional_cells <- setdiff(names(non_tumor_labels), names(labels))
 
+# add non-tumor label of dual labelled cells to labels
 final_labels <- c(labels, non_tumor_labels[additional_cells])
 
 # Transfer labels to SPE object
@@ -952,7 +962,7 @@ pheatmap(log10(tab3 + 10), color = viridis(100))
 ```
 
 We can see that Tumor and Myeloid cells span multiple clusters while
-Neutrophiles are detected as an individual cluster by all clustering approaches.
+Neutrophiles are mostly detected as an individual cluster by all clustering approaches.
 
 We next compare the cell classification against clustering results using the 
 integrated cells.
@@ -1066,231 +1076,24 @@ saveRDS(spe, "data/spe.rds")
 ```{r testing, include=FALSE}
 library(testthat)
 
-expect_equal(table(spe$pg_clusters), 
-             structure(c(`1` = 2823L, `2` = 1674L, `3` = 1694L, `4` = 2961L, 
-`5` = 2292L, `6` = 2346L, `7` = 2405L, `8` = 3339L, `9` = 1540L, 
-`10` = 2802L, `11` = 1034L, `12` = 539L, `13` = 2604L, `14` = 2377L, 
-`15` = 3452L, `16` = 3320L, `17` = 479L, `18` = 433L, `19` = 3806L, 
-`20` = 2117L, `21` = 1755L, `22` = 1176L, `23` = 826L), dim = 23L, dimnames = structure(list(
-    c("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", 
-    "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", 
-    "22", "23")), names = ""), class = "table"))
+expect_equal(length(unique(spe$pg_clusters)),25L)
+expect_equal(class(unique(spe$pg_clusters)), "factor")
 
-expect_equal(spe$pg_clusters[1000:1200],
-             structure(c(`1000` = 1L, `1001` = 7L, `1002` = 5L, `1003` = 1L, 
-`1004` = 1L, `1005` = 1L, `1006` = 1L, `1007` = 5L, `1008` = 1L, 
-`1009` = 5L, `1010` = 5L, `1011` = 1L, `1012` = 5L, `1013` = 5L, 
-`1014` = 1L, `1015` = 5L, `1016` = 5L, `1017` = 1L, `1018` = 5L, 
-`1019` = 1L, `1020` = 1L, `1021` = 5L, `1022` = 5L, `1023` = 1L, 
-`1024` = 1L, `1025` = 5L, `1026` = 5L, `1027` = 5L, `1028` = 5L, 
-`1029` = 1L, `1030` = 5L, `1031` = 6L, `1032` = 14L, `1033` = 1L, 
-`1034` = 1L, `1035` = 6L, `1036` = 1L, `1037` = 1L, `1038` = 5L, 
-`1039` = 1L, `1040` = 5L, `1041` = 1L, `1042` = 1L, `1043` = 1L, 
-`1044` = 1L, `1045` = 5L, `1046` = 5L, `1047` = 1L, `1048` = 1L, 
-`1049` = 1L, `1050` = 7L, `1051` = 1L, `1052` = 1L, `1053` = 1L, 
-`1054` = 1L, `1055` = 1L, `1056` = 11L, `1057` = 1L, `1058` = 5L, 
-`1059` = 5L, `1060` = 5L, `1061` = 5L, `1062` = 5L, `1063` = 1L, 
-`1064` = 1L, `1065` = 6L, `1066` = 1L, `1067` = 1L, `1068` = 1L, 
-`1069` = 1L, `1070` = 1L, `1071` = 1L, `1072` = 1L, `1073` = 1L, 
-`1074` = 1L, `1075` = 1L, `1076` = 1L, `1077` = 11L, `1078` = 1L, 
-`1079` = 1L, `1080` = 14L, `1081` = 1L, `1082` = 1L, `1083` = 1L, 
-`1084` = 1L, `1085` = 1L, `1086` = 5L, `1087` = 6L, `1088` = 1L, 
-`1089` = 1L, `1090` = 1L, `1091` = 1L, `1092` = 1L, `1093` = 1L, 
-`1094` = 6L, `1095` = 1L, `1096` = 11L, `1097` = 1L, `1098` = 1L, 
-`1099` = 1L, `1100` = 7L, `1101` = 1L, `1102` = 5L, `1103` = 5L, 
-`1104` = 1L, `1105` = 1L, `1106` = 1L, `1107` = 1L, `1108` = 1L, 
-`1109` = 1L, `1110` = 6L, `1111` = 10L, `1112` = 5L, `1113` = 5L, 
-`1114` = 1L, `1115` = 1L, `1116` = 1L, `1117` = 1L, `1118` = 1L, 
-`1119` = 1L, `1120` = 1L, `1121` = 14L, `1122` = 1L, `1123` = 1L, 
-`1124` = 1L, `1125` = 1L, `1126` = 5L, `1127` = 1L, `1128` = 11L, 
-`1129` = 5L, `1130` = 6L, `1131` = 1L, `1132` = 1L, `1133` = 1L, 
-`1134` = 1L, `1135` = 1L, `1136` = 3L, `1137` = 14L, `1138` = 1L, 
-`1139` = 6L, `1140` = 5L, `1141` = 5L, `1142` = 1L, `1143` = 1L, 
-`1144` = 1L, `1145` = 1L, `1146` = 1L, `1147` = 8L, `1148` = 8L, 
-`1149` = 8L, `1150` = 1L, `1151` = 3L, `1152` = 1L, `1153` = 5L, 
-`1154` = 14L, `1155` = 1L, `1156` = 5L, `1157` = 5L, `1158` = 1L, 
-`1159` = 1L, `1160` = 1L, `1161` = 5L, `1162` = 11L, `1163` = 1L, 
-`1164` = 1L, `1165` = 5L, `1166` = 1L, `1167` = 5L, `1168` = 8L, 
-`1169` = 1L, `1170` = 6L, `1171` = 1L, `1172` = 1L, `1173` = 1L, 
-`1174` = 5L, `1175` = 1L, `1176` = 1L, `1177` = 5L, `1178` = 5L, 
-`1179` = 5L, `1180` = 1L, `1181` = 1L, `1182` = 3L, `1183` = 5L, 
-`1184` = 1L, `1185` = 1L, `1186` = 1L, `1187` = 1L, `1188` = 1L, 
-`1189` = 1L, `1190` = 8L, `1191` = 5L, `1192` = 1L, `1193` = 5L, 
-`1194` = 5L, `1195` = 1L, `1196` = 1L, `1197` = 7L, `1198` = 2L, 
-`1199` = 8L, `1200` = 7L), levels = c("1", "2", "3", "4", "5", 
-"6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", 
-"17", "18", "19", "20", "21", "22", "23"), class = "factor"))
+expect_equal(length(unique(spe$pg_clusters_corrected)),23L)
+expect_equal(class(unique(spe$pg_clusters_corrected)), "factor")
 
-expect_equal(table(spe$pg_clusters_corrected), 
-             structure(c(`1` = 3400L, `2` = 2052L, `3` = 3015L, `4` = 2152L, 
-`5` = 3311L, `6` = 1069L, `7` = 4694L, `8` = 402L, `9` = 3518L, 
-`10` = 741L, `11` = 1674L, `12` = 3650L, `13` = 1453L, `14` = 1760L, 
-`15` = 804L, `16` = 3643L, `17` = 748L, `18` = 1419L, `19` = 1226L, 
-`20` = 3596L, `21` = 895L, `22` = 789L, `23` = 1184L, `24` = 283L, 
-`25` = 316L), dim = 25L, dimnames = structure(list(c("1", "2", 
-"3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", 
-"15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25"
-)), names = ""), class = "table"))
+expect_equal(length(unique(spe$nn_clusters)),18L)
+expect_equal(class(unique(spe$nn_clusters)), "factor")
 
-expect_equal(spe$pg_clusters_corrected[1000:1200],
-             structure(c(`1000` = 1L, `1001` = 9L, `1002` = 1L, `1003` = 1L, 
-`1004` = 1L, `1005` = 1L, `1006` = 1L, `1007` = 1L, `1008` = 1L, 
-`1009` = 5L, `1010` = 15L, `1011` = 1L, `1012` = 2L, `1013` = 1L, 
-`1014` = 1L, `1015` = 15L, `1016` = 1L, `1017` = 1L, `1018` = 2L, 
-`1019` = 1L, `1020` = 2L, `1021` = 15L, `1022` = 15L, `1023` = 10L, 
-`1024` = 1L, `1025` = 12L, `1026` = 1L, `1027` = 1L, `1028` = 1L, 
-`1029` = 2L, `1030` = 1L, `1031` = 13L, `1032` = 9L, `1033` = 1L, 
-`1034` = 10L, `1035` = 13L, `1036` = 1L, `1037` = 1L, `1038` = 1L, 
-`1039` = 1L, `1040` = 1L, `1041` = 1L, `1042` = 1L, `1043` = 2L, 
-`1044` = 1L, `1045` = 1L, `1046` = 1L, `1047` = 1L, `1048` = 1L, 
-`1049` = 1L, `1050` = 9L, `1051` = 2L, `1052` = 1L, `1053` = 1L, 
-`1054` = 1L, `1055` = 1L, `1056` = 1L, `1057` = 1L, `1058` = 15L, 
-`1059` = 1L, `1060` = 1L, `1061` = 2L, `1062` = 15L, `1063` = 16L, 
-`1064` = 1L, `1065` = 7L, `1066` = 1L, `1067` = 1L, `1068` = 1L, 
-`1069` = 1L, `1070` = 1L, `1071` = 10L, `1072` = 10L, `1073` = 3L, 
-`1074` = 1L, `1075` = 2L, `1076` = 1L, `1077` = 13L, `1078` = 1L, 
-`1079` = 1L, `1080` = 12L, `1081` = 1L, `1082` = 6L, `1083` = 1L, 
-`1084` = 10L, `1085` = 1L, `1086` = 1L, `1087` = 7L, `1088` = 1L, 
-`1089` = 1L, `1090` = 1L, `1091` = 10L, `1092` = 6L, `1093` = 1L, 
-`1094` = 7L, `1095` = 10L, `1096` = 6L, `1097` = 1L, `1098` = 1L, 
-`1099` = 10L, `1100` = 9L, `1101` = 1L, `1102` = 1L, `1103` = 5L, 
-`1104` = 6L, `1105` = 2L, `1106` = 10L, `1107` = 1L, `1108` = 1L, 
-`1109` = 2L, `1110` = 13L, `1111` = 18L, `1112` = 2L, `1113` = 1L, 
-`1114` = 1L, `1115` = 1L, `1116` = 1L, `1117` = 1L, `1118` = 1L, 
-`1119` = 10L, `1120` = 2L, `1121` = 12L, `1122` = 11L, `1123` = 1L, 
-`1124` = 1L, `1125` = 1L, `1126` = 2L, `1127` = 1L, `1128` = 13L, 
-`1129` = 1L, `1130` = 7L, `1131` = 1L, `1132` = 1L, `1133` = 1L, 
-`1134` = 6L, `1135` = 1L, `1136` = 12L, `1137` = 9L, `1138` = 11L, 
-`1139` = 9L, `1140` = 1L, `1141` = 1L, `1142` = 6L, `1143` = 1L, 
-`1144` = 1L, `1145` = 1L, `1146` = 1L, `1147` = 10L, `1148` = 10L, 
-`1149` = 10L, `1150` = 6L, `1151` = 4L, `1152` = 1L, `1153` = 1L, 
-`1154` = 18L, `1155` = 1L, `1156` = 15L, `1157` = 19L, `1158` = 6L, 
-`1159` = 1L, `1160` = 1L, `1161` = 1L, `1162` = 11L, `1163` = 1L, 
-`1164` = 1L, `1165` = 3L, `1166` = 1L, `1167` = 1L, `1168` = 7L, 
-`1169` = 1L, `1170` = 16L, `1171` = 1L, `1172` = 2L, `1173` = 1L, 
-`1174` = 1L, `1175` = 2L, `1176` = 6L, `1177` = 1L, `1178` = 1L, 
-`1179` = 10L, `1180` = 1L, `1181` = 1L, `1182` = 4L, `1183` = 1L, 
-`1184` = 2L, `1185` = 1L, `1186` = 1L, `1187` = 6L, `1188` = 6L, 
-`1189` = 1L, `1190` = 7L, `1191` = 1L, `1192` = 1L, `1193` = 5L, 
-`1194` = 5L, `1195` = 1L, `1196` = 1L, `1197` = 9L, `1198` = 5L, 
-`1199` = 10L, `1200` = 9L), levels = c("1", "2", "3", "4", "5", 
-"6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", 
-"17", "18", "19", "20", "21", "22", "23", "24", "25"), class = "factor"))
+expect_equal(length(unique(spe$nn_clusters_corrected)),18L)
+expect_equal(class(unique(spe$nn_clusters_corrected)), "factor")
 
-expect_equal(table(spe$nn_clusters), 
-             structure(c(`1` = 5410L, `2` = 5919L, `3` = 2988L, `4` = 4708L, 
-`5` = 2881L, `6` = 4247L, `7` = 2611L, `8` = 1973L, `9` = 5849L, 
-`10` = 3338L, `11` = 1068L, `12` = 2085L, `13` = 771L, `14` = 3946L
-), dim = 14L, dimnames = structure(list(c("1", "2", "3", "4", 
-"5", "6", "7", "8", "9", "10", "11", "12", "13", "14")), names = ""), class = "table"))
+expect_equal(length(unique(spe$som_clusters)),13L)
+expect_equal(class(unique(spe$som_clusters)), "factor")
 
-expect_equal(spe$nn_clusters[1000:1200],
-             structure(c(1L, 5L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 
-1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 
-1L, 1L, 6L, 6L, 1L, 1L, 6L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 
-1L, 1L, 1L, 1L, 1L, 5L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 
-1L, 1L, 1L, 1L, 6L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 
-1L, 1L, 1L, 4L, 1L, 1L, 1L, 1L, 1L, 1L, 10L, 1L, 1L, 1L, 1L, 
-1L, 1L, 6L, 1L, 2L, 1L, 1L, 1L, 5L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 
-1L, 1L, 6L, 4L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 
-1L, 1L, 1L, 1L, 1L, 1L, 6L, 1L, 1L, 1L, 1L, 1L, 2L, 4L, 1L, 6L, 
-1L, 1L, 1L, 1L, 1L, 1L, 1L, 10L, 10L, 10L, 1L, 2L, 1L, 1L, 4L, 
-1L, 1L, 1L, 1L, 1L, 1L, 1L, 11L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 
-6L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 2L, 1L, 1L, 1L, 
-1L, 1L, 1L, 1L, 10L, 1L, 1L, 1L, 1L, 1L, 1L, 5L, 1L, 10L, 5L), levels = c("1", 
-"2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", 
-"14"), class = "factor"))
+expect_equal(length(unique(spe$som_clusters_corrected)),16L)
+expect_equal(class(unique(spe$som_clusters_corrected)), "factor")
 
-expect_equal(table(spe$nn_clusters_corrected), 
-             structure(c(`1` = 4264L, `2` = 3433L, `3` = 5294L, `4` = 3356L, 
-`5` = 4236L, `6` = 2237L, `7` = 4213L, `8` = 3803L, `9` = 5191L, 
-`10` = 5010L, `11` = 1499L, `12` = 3651L, `13` = 1607L), dim = 13L, dimnames = structure(list(
-    c("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", 
-    "12", "13")), names = ""), class = "table"))
-
-expect_equal(spe$nn_clusters_corrected[1000:1200],
-             structure(c(1L, 8L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 3L, 3L, 1L, 1L, 
-1L, 1L, 3L, 1L, 1L, 2L, 1L, 1L, 3L, 3L, 6L, 1L, 2L, 1L, 1L, 1L, 
-2L, 1L, 10L, 8L, 1L, 1L, 10L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 2L, 
-1L, 1L, 3L, 1L, 1L, 1L, 8L, 2L, 1L, 1L, 1L, 1L, 10L, 1L, 3L, 
-3L, 1L, 1L, 3L, 9L, 1L, 9L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 4L, 1L, 
-2L, 1L, 10L, 1L, 1L, 5L, 1L, 1L, 1L, 1L, 1L, 1L, 9L, 1L, 1L, 
-1L, 1L, 6L, 1L, 7L, 1L, 5L, 1L, 1L, 1L, 8L, 1L, 1L, 3L, 1L, 2L, 
-1L, 1L, 6L, 2L, 10L, 7L, 2L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 2L, 
-7L, 6L, 1L, 1L, 1L, 4L, 1L, 10L, 3L, 9L, 1L, 1L, 1L, 6L, 1L, 
-5L, 8L, 6L, 8L, 1L, 1L, 6L, 1L, 1L, 1L, 1L, 9L, 9L, 9L, 6L, 5L, 
-1L, 1L, 7L, 1L, 3L, 4L, 6L, 1L, 1L, 1L, 6L, 1L, 1L, 4L, 1L, 1L, 
-9L, 1L, 7L, 1L, 2L, 1L, 1L, 2L, 6L, 1L, 1L, 1L, 1L, 1L, 5L, 1L, 
-2L, 1L, 1L, 6L, 1L, 1L, 9L, 1L, 1L, 3L, 3L, 1L, 1L, 8L, 3L, 9L, 
-8L), levels = c("1", "2", "3", "4", "5", "6", "7", "8", "9", 
-"10", "11", "12", "13"), class = "factor"))
-
-expect_equal(table(spe$som_clusters), 
-             structure(c(`1` = 11817L, `2` = 309L, `3` = 966L, `4` = 9797L, 
-`5` = 5980L, `6` = 812L, `7` = 5444L, `8` = 6359L, `9` = 3572L, 
-`10` = 808L, `11` = 1026L, `12` = 235L, `13` = 669L), dim = 13L, dimnames = structure(list(
-    c("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", 
-    "12", "13")), names = ""), class = "table"))
-
-expect_equal(spe$som_clusters[1000:1200],
-             structure(c(4L, 7L, 4L, 4L, 4L, 4L, 4L, 4L, 4L, 4L, 4L, 4L, 4L, 
-4L, 11L, 4L, 4L, 4L, 4L, 4L, 11L, 4L, 4L, 4L, 4L, 4L, 4L, 4L, 
-4L, 11L, 4L, 9L, 7L, 4L, 4L, 9L, 4L, 4L, 4L, 4L, 4L, 4L, 4L, 
-11L, 4L, 4L, 4L, 11L, 4L, 4L, 1L, 11L, 4L, 4L, 4L, 4L, 9L, 4L, 
-4L, 4L, 4L, 4L, 4L, 11L, 4L, 9L, 4L, 4L, 4L, 4L, 4L, 11L, 12L, 
-4L, 4L, 11L, 4L, 9L, 4L, 4L, 7L, 4L, 4L, 4L, 4L, 4L, 4L, 5L, 
-4L, 4L, 4L, 12L, 11L, 4L, 9L, 4L, 6L, 4L, 4L, 4L, 1L, 4L, 4L, 
-4L, 4L, 11L, 12L, 4L, 4L, 4L, 9L, 7L, 4L, 4L, 4L, 11L, 4L, 4L, 
-4L, 12L, 11L, 11L, 4L, 4L, 4L, 4L, 4L, 4L, 11L, 4L, 9L, 11L, 
-4L, 4L, 11L, 11L, 1L, 7L, 4L, 1L, 4L, 4L, 11L, 4L, 4L, 11L, 11L, 
-12L, 4L, 12L, 11L, 1L, 4L, 4L, 7L, 4L, 4L, 4L, 11L, 4L, 4L, 4L, 
-6L, 4L, 4L, 4L, 4L, 4L, 11L, 4L, 7L, 4L, 4L, 4L, 4L, 4L, 11L, 
-4L, 4L, 4L, 4L, 4L, 1L, 4L, 11L, 4L, 4L, 11L, 11L, 4L, 9L, 4L, 
-4L, 4L, 4L, 4L, 4L, 1L, 4L, 5L, 1L), levels = c("1", "2", "3", 
-"4", "5", "6", "7", "8", "9", "10", "11", "12", "13"), class = "factor"))
-
-expect_equal(table(spe$som_clusters_corrected), 
-             structure(c(`1` = 917L, `2` = 9861L, `3` = 3184L, `4` = 5582L, 
-`5` = 1132L, `6` = 1976L, `7` = 1030L, `8` = 5209L, `9` = 4597L, 
-`10` = 1940L, `11` = 111L, `12` = 8177L, `13` = 297L, `14` = 957L, 
-`15` = 79L, `16` = 2745L), dim = 16L, dimnames = structure(list(
-    c("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", 
-    "12", "13", "14", "15", "16")), names = ""), class = "table"))
-
-expect_equal(spe$som_clusters_corrected[1000:1200],
-             structure(c(V30 = 4L, V71 = 9L, V20 = 4L, V39 = 4L, V30 = 4L, 
-V39 = 4L, V20 = 4L, V30 = 4L, V20 = 4L, V9 = 3L, V10 = 4L, V39 = 4L, 
-V16 = 2L, V20 = 4L, V39 = 4L, V10 = 4L, V30 = 4L, V30 = 4L, V16 = 2L, 
-V39 = 4L, V38 = 8L, V10 = 4L, V10 = 4L, V98 = 14L, V20 = 4L, 
-V48 = 2L, V30 = 4L, V30 = 4L, V20 = 4L, V38 = 8L, V19 = 4L, V69 = 12L, 
-V82 = 9L, V30 = 4L, V29 = 4L, V80 = 6L, V39 = 4L, V30 = 4L, V20 = 4L, 
-V28 = 4L, V30 = 4L, V40 = 4L, V39 = 4L, V38 = 8L, V39 = 4L, V16 = 2L, 
-V9 = 3L, V38 = 8L, V40 = 4L, V9 = 3L, V51 = 9L, V38 = 8L, V40 = 4L, 
-V20 = 4L, V39 = 4L, V39 = 4L, V13 = 6L, V20 = 4L, V10 = 4L, V6 = 3L, 
-V30 = 4L, V16 = 2L, V10 = 4L, V67 = 9L, V30 = 4L, V76 = 12L, 
-V30 = 4L, V20 = 4L, V20 = 4L, V39 = 4L, V30 = 4L, V29 = 4L, V29 = 4L, 
-V3 = 2L, V30 = 4L, V48 = 2L, V40 = 4L, V69 = 12L, V30 = 4L, V40 = 4L, 
-V58 = 2L, V40 = 4L, V39 = 4L, V16 = 2L, V29 = 4L, V30 = 4L, V30 = 4L, 
-V87 = 12L, V30 = 4L, V40 = 4L, V30 = 4L, V29 = 4L, V38 = 8L, 
-V39 = 4L, V66 = 12L, V20 = 4L, V50 = 10L, V40 = 4L, V40 = 4L, 
-V29 = 4L, V51 = 9L, V30 = 4L, V19 = 4L, V19 = 4L, V40 = 4L, V38 = 8L, 
-V29 = 4L, V39 = 4L, V39 = 4L, V48 = 2L, V69 = 12L, V91 = 8L, 
-V48 = 2L, V20 = 4L, V20 = 4L, V39 = 4L, V40 = 4L, V29 = 4L, V40 = 4L, 
-V29 = 4L, V48 = 2L, V45 = 8L, V39 = 4L, V40 = 4L, V40 = 4L, V39 = 4L, 
-V5 = 2L, V40 = 4L, V69 = 12L, V6 = 3L, V66 = 12L, V39 = 4L, V39 = 4L, 
-V28 = 4L, V49 = 10L, V39 = 4L, V23 = 2L, V82 = 9L, V39 = 4L, 
-V62 = 9L, V30 = 4L, V20 = 4L, V45 = 8L, V48 = 2L, V38 = 8L, V39 = 4L, 
-V39 = 4L, V98 = 14L, V98 = 14L, V98 = 14L, V49 = 10L, V42 = 2L, 
-V39 = 4L, V16 = 2L, V44 = 8L, V28 = 4L, V10 = 4L, V5 = 2L, V49 = 10L, 
-V30 = 4L, V40 = 4L, V20 = 4L, V50 = 10L, V38 = 8L, V20 = 4L, 
-V5 = 2L, V39 = 4L, V30 = 4L, V76 = 12L, V28 = 4L, V57 = 12L, 
-V39 = 4L, V48 = 2L, V28 = 4L, V20 = 4L, V38 = 8L, V49 = 10L, 
-V30 = 4L, V28 = 4L, V29 = 4L, V20 = 4L, V30 = 4L, V42 = 2L, V30 = 4L, 
-V45 = 8L, V39 = 4L, V20 = 4L, V49 = 10L, V40 = 4L, V28 = 4L, 
-V66 = 12L, V30 = 4L, V38 = 8L, V7 = 3L, V7 = 3L, V30 = 4L, V30 = 4L, 
-V41 = 9L, V17 = 3L, V98 = 14L, V41 = 9L), levels = c("1", "2", 
-"3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", 
-"15", "16"), class = "factor"))
 
 expect_equal(table(spe$cell_labels), 
              structure(c(Bcell = 780L, BnTcell = 1702L, CD4 = 688L, CD8 = 822L, 

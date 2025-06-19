@@ -611,7 +611,7 @@ expect_equal(names(colData(spe2)), c("sample_id", "ObjectNumber", "AreaShape_Are
 "AreaShape_MeanRadius", "ImageNumber", "Metadata_acname", "Metadata_acid", 
 "Metadata_description"))
 
-expect_equal(colData(spe2)[1:5, ], new("DFrame", rownames = NULL, nrows = 5L, elementType = "ANY", 
+expect_equal(colData(spe2)[1:5, ], new("DFrame", rownames = c("1_1","1_2","1_3","1_4","1_5"), nrows = 5L, elementType = "ANY", 
     elementMetadata = NULL, metadata = list(), listData = list(
         sample_id = c("1", "1", "1", "1", "1"), ObjectNumber = c(1, 
         2, 3, 4, 5), AreaShape_Area = c(61, 40, 27, 48, 34), 
