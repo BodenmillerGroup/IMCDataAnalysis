@@ -1,3 +1,8 @@
+---
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
 # Performing spatial analysis
 
 Highly multiplexed imaging technologies measure the spatial distributions of
@@ -743,16 +748,16 @@ ggplot(as.data.frame(patch_size)) +
 ```
 
 The
-[minDistToCells](https://bodenmillergroup.github.io/imcRtools/reference/minDistToCells.html)
-function can be used to calculate the minimum distance between each cell and a
+[distToCells](https://bodenmillergroup.github.io/imcRtools/reference/distToCells.html)
+function can be used to calculate the minimum, maximum, mean and median distance between each cell and a
 cell set of interest. Here, we highlight its use to calculate the minimum
 distance of all cells to the detected tumor patches. Negative values indicate
 the minimum distance of each tumor patch cell to a non-tumor patch cell.
 
-```{r minDistCells, fig.height=12, fig.width=12}
-spe <- minDistToCells(spe, 
-                      x_cells = !is.na(spe$patch_id), 
-                      img_id = "sample_id")
+```{r distToCells, fig.height=12, fig.width=12}
+spe <- distToCells(spe, 
+                   x_cells = !is.na(spe$patch_id), 
+                   img_id = "sample_id")
 
 plotSpatial(spe, 
             node_color_by = "distToCells", 
@@ -833,6 +838,37 @@ avoidance with other cell types. As expected, B cells interact with BnT cells;
 regulatory T cells interact with CD4+ T cells and CD8+ T cells. Most cell types
 show self interactions indicating spatial clustering. 
 
+Moreover, the interaction results contained in the returned `DataFrame` can be 
+visualized as a graph, where each node corresponds to a cell type and edges 
+represent interactions between cell types. The `imcRtools` package provides the [plotInteractions](https://bodenmillergroup.github.io/imcRtools/reference/plotInteractions.html) 
+to create such visualizations.
+
+Using `plotInteractions`, the interaction patterns summarized in the heatmap 
+above can be represented as a graph object, with edges colored to indicate whether 
+cell type pairs are significantly interacting or avoiding each other based on the 
+sum of the `sigval` entries across all images.
+
+```{r plotInteractions-1, message=FALSE}
+library(ggraph)
+
+out <- out %>% as.data.frame() %>%
+  group_by(from_label, to_label) %>%
+  mutate(sum_sigval = sum(sigval, na.rm = TRUE) > 1)
+
+edge_color <- c("FALSE" = "blue", "TRUE" = "red")
+
+plotInteractions(out,
+                 spe,
+                 label = "celltype",
+                 group_by = "sample_id",
+                 node_color_by = "name",
+                 node_label_color_by = "name",
+                 node_size_by = "n_cells",
+                 edge_color_by = "sum_sigval",
+                 graph_layout = "chord") +
+    scale_edge_colour_manual(values = edge_color)
+```
+
 The `imcRtools` package further implements an interaction testing strategy
 proposed by [@Schulz2018] where the hypothesis is tested if at least n cells of
 a certain type are located around a target cell type (`from_cell`). This type of
@@ -861,6 +897,25 @@ These results are comparable to the interaction testing presented above. The
 main difference comes from the lack of symmetry. We can now for example see that
 3 or more myeloid cells sit around CD4$^+$ T cells while this interaction is not
 as strong when considering CD4$^+$ T cells sitting around myeloid cells.
+
+Similarly as above, the difference of interaction count between CD4$^+$ T cells
+and myeloid cells interactions can be visualized as a graph where the edge width 
+is scaled by the interaction count calculated in the interaction testing which
+is averaged over all images per cell type pair.
+
+```{r plotInteractions-2, message=FALSE}
+out_sub <- out %>% as.data.frame() %>%
+    filter(from_label %in% c("CD4", "Myeloid") & to_label %in% c("CD4", "Myeloid"))
+
+plotInteractions(out_sub,
+                 spe,
+                 label = "celltype",
+                 group_by = "sample_id",
+                 node_color_by = "name",
+                 node_label_color_by = "name",
+                 node_size_by = "n_cells",
+                 edge_width_by = "ct")
+```
 
 Finally, we save the updated `SpatialExperiment` object.
 
