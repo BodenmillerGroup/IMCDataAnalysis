@@ -754,16 +754,19 @@ ggplot(as.data.frame(patch_size)) +
 ## Distance between sets of cells
 
 The
-[minDistToCells](https://bodenmillergroup.github.io/imcRtools/reference/minDistToCells.html)
-function can be used to calculate the minimum distance between each cell and a
-cell set of interest. Here, we highlight its use to calculate the minimum
-distance of all cells to the detected tumor patches. Negative values indicate
-the minimum distance of each tumor patch cell to a non-tumor patch cell.
+[distToCells](https://bodenmillergroup.github.io/imcRtools/reference/distToCells.html)
+function is a generalized version of the previous `minDistToCells` function and
+replaces it. It is a  can be used to calculate desired statistics between each
+cell and a cell set of interest (either min, max, mean, or median). Here, we
+highlight its use to calculate the minimum distance of all cells to the detected
+tumor patches. Negative values indicate the minimum distance of each tumor patch
+cell to a non-tumor patch cell.
 
 ```{r minDistCells, fig.height=12, fig.width=12}
-spe <- minDistToCells(spe, 
-                      x_cells = !is.na(spe$patch_id), 
-                      img_id = "sample_id")
+spe <- distToCells(spe,
+                   statistics = "min",
+                   x_cells = !is.na(spe$patch_id), 
+                   img_id = "sample_id")
 
 plotSpatial(spe, 
             node_color_by = "distToCells", 
