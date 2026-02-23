@@ -182,4 +182,41 @@ file.
 We refer to this data as raw data and the further
 processing of this data is described in Section \@ref(processing).
 
+### IMC instrument generations
+
+In 2023 Standard BioTools<sup><font size="1">TM</font></sup> release the latest
+version of IMC machines - the Xti. Compared to the previous generation -
+Hyperion - this new generation obtained an extensive makeover. While the
+principle of IMC remains the same for this latest generation of machines, many
+technical parts have been changed. While this enabled some noteworthy updates,
+XTis do not produce TXT files any more. TXT files have previously been used as
+recovery files for corrupt mcd files during processing with `steinbock`, and
+importantly for spillover correction. To account for this, section
+\@ref(spillover_XTi) now contains a paragraph on spillover correction
+with data from XTis. The biggest novelty is measurement speed and throughput.
+XTis measure at 800 Hz and 1 mm$^2$ is ablated in approximately 25 min. The XTi
+has comparable or slightly higher sensitivity compared to a machine of the
+previous generation. Of note, laser energy optimization is more important on the
+XTi because ablation with too much laser energy can lead to excessive presence
+of hot pixels.
+Additionally, the process of panorama generation is much faster and whole-slide
+panoramas are now recorded in 15-20 minutes. To allow for higher throughput, a
+slideloader is commercially available from Standard BioTools<sup><font
+size="1">TM</font></sup> enabling batch processing of up to 40 slides. These two
+updates now enable throughput of dozens of slides per day thereby allowing
+researchers to tackle projects for which no tissue microarrays are available or
+feasible.
+
+Besides speed and throughput, XTis also have two additional measurement modes:
+1) Pixel-skipping and 2) tissue-mode. Pixel-skipping performs, as the name
+implies, lateral and vertical pixel-skipping and in standard settings measures 1
+out of 25 pixels in X and Y directions. This enables the generation of
+whole-slide images in about 20-30 minutes at low resolution for the purpose of
+region of interest selection or pixel clustering or other, relatively unexplored
+research questions. In tissue-mode, laser focus and energy are changed and
+approximately 5 µm$^2$ spots are ablated. In this mode whole-slide images are
+generated in approximately 1-2 hours and they provide better detail than
+pixel-skipped data. As of January 2026, no publications are available that made
+use of either of these two approaches and it remains to be seen how useful these
+measurement modes are.
 
