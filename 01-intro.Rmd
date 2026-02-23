@@ -194,7 +194,11 @@ recovery files for corrupt mcd files during processing with `steinbock`, and
 importantly for spillover correction. To account for this, section
 \@ref(spillover_XTi) now contains a paragraph on spillover correction
 with data from XTis. The biggest novelty is measurement speed and throughput.
-XTis measure at 800 Hz and 1 mm$^2$ is ablated in approximately 25 min.
+XTis measure at 800 Hz and 1 mm$^2$ is ablated in approximately 25 min. The XTi
+has comparable or slightly higher sensitivity compared to a machine of the
+previous generation. Of note, laser energy optimization is more important on the
+XTi because ablation with too much laser energy can lead to excessive presence
+of hot pixels.
 Additionally, the process of panorama generation is much faster and whole-slide
 panoramas are now recorded in 15-20 minutes. To allow for higher throughput, a
 slideloader is commercially available from Standard BioTools<sup><font
