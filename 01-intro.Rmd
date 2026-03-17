@@ -182,22 +182,24 @@ file.
 We refer to this data as raw data and the further
 processing of this data is described in Section \@ref(processing).
 
-### IMC instrument generations
+## IMC instruments and acquisition types
+
+### Instrumentation
 
 In 2023 Standard BioTools<sup><font size="1">TM</font></sup> release the latest
-version of IMC machines - the Xti. Compared to the previous generation -
-Hyperion - this new generation obtained an extensive makeover. While the
-principle of IMC remains the same for this latest generation of machines, many
+version of IMC machines - the XTi. Compared to the previous generation -
+Hyperion - this new generation obtained an extensive makeover. The
+principle of IMC remains the same for this latest generation of machines but under the hood many
 technical parts have been changed. While this enabled some noteworthy updates,
 XTis do not produce TXT files any more. TXT files have previously been used as
 recovery files for corrupt mcd files during processing with `steinbock`, and
 importantly for spillover correction. To account for this, section
 \@ref(spillover_XTi) now contains a paragraph on spillover correction
-with data from XTis. The biggest novelty is measurement speed and throughput.
+with data from XTis. The biggest improvement of XTis is measurement speed and throughput.
 XTis measure at 800 Hz and 1 mm$^2$ is ablated in approximately 25 min. The XTi
 has comparable or slightly higher sensitivity compared to a machine of the
 previous generation. Of note, laser energy optimization is more important on the
-XTi because ablation with too much laser energy can lead to excessive presence
+XTis because ablation with too much laser energy can lead to excessive presence
 of hot pixels.
 Additionally, the process of panorama generation is much faster and whole-slide
 panoramas are now recorded in 15-20 minutes. To allow for higher throughput, a
@@ -207,6 +209,7 @@ updates now enable throughput of dozens of slides per day thereby allowing
 researchers to tackle projects for which no tissue microarrays are available or
 feasible.
 
+### Acquisition types
 Besides speed and throughput, XTis also have two additional measurement modes:
 1) Pixel-skipping and 2) tissue-mode. Pixel-skipping performs, as the name
 implies, lateral and vertical pixel-skipping and in standard settings measures 1
@@ -219,4 +222,27 @@ generated in approximately 1-2 hours and they provide better detail than
 pixel-skipped data. As of January 2026, no publications are available that made
 use of either of these two approaches and it remains to be seen how useful these
 measurement modes are.
+
+### High-resolution IMC (HR-IMC)
+To improve the limited resolution of 1 µm in IMC a study used oversampling
+coupled with deconvolution to achieve a resolution of up to 333 nm
+[@Bollhagen&Whipman2025]. This approach can reveal subcellular structures and is
+particularly suited to address questions that require resolution beyond the
+single-cell level. On the downside, HR-IMC comes with a significant decrease in
+acquisition speed (~10-fold) and due to oversampling and less material being
+ablated there is also a decrease in sensitivity compared with 1 µm resolution.
+Compared with classic IMC only few adaptations need to be made. Firstly, the
+user needs to identify the optimal laser energy to allow oversampling and
+determine the inflection point at which 50% of the original signal are detected
+which is needed for downstream deconvolution. Once the optimal laser energy has
+been determined, the user needs to change the step size from 1 µm to the desired
+step size (e.g. 0.333 µm) for the acquisition of the desired ROIs.
+Once the data is acquired, preprocessing is performed using `steinbock` as for
+regular IMC data, which is described below \@ref(processing). The preprocessed
+images are then deconvolved using a custom python script and thereafter are
+ready to bes used as described throughout this book. Importantly, the
+--pixelsize parameter must be adjusted accordingly for segmentation. For
+detailed descriptions and instructions, please see
+[here](https://github.com/BodenmillerGroup/HR_IMC).
+
 
