@@ -14,3 +14,9 @@
 **Version 1.0.3** [2024-01-05]
 
 - Updated cytoviewer citation and corresponding text
+
+**Version 1.0.4** [2026-01-06]
+
+- Updated Introduction about new generation of IMC instruments
+- Brief introduction to HR-IMC
+- updated spatial analysis

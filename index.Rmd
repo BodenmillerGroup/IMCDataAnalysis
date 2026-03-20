@@ -1,6 +1,6 @@
 --- 
 title: "Analysis workflow for IMC data"
-author: "**Authors:** Nils Eling [<sup>1</sup>](#DQBM)<sup>,</sup>[<sup>2</sup>](#IMHS)<sup>,</sup>[<sup>*</sup>](#email), Vito Zanotelli [<sup>1</sup>](#DQBM)<sup>,</sup>[<sup>2</sup>](#IMHS), Michelle Daniel [<sup>1</sup>](#DQBM)<sup>,</sup>[<sup>2</sup>](#IMHS), Daniel Schulz [<sup>1</sup>](#DQBM)<sup>,</sup>[<sup>2</sup>](#IMHS), Jonas Windhager [<sup>1</sup>](#DQBM)<sup>,</sup>[<sup>2</sup>](#IMHS), Lasse Meyer [<sup>1</sup>](#DQBM)<sup>,</sup>[<sup>2</sup>](#IMHS)"
+author: "**Authors:** Nils Eling [<sup>1</sup>](#DQBM)<sup>,</sup>[<sup>2</sup>](#IMHS)<sup>, Vito Zanotelli [<sup>1</sup>](#DQBM)<sup>,</sup>[<sup>2</sup>](#IMHS), Michelle Daniel [<sup>1</sup>](#DQBM)<sup>,</sup>[<sup>2</sup>](#IMHS), Daniel Schulz [<sup>1</sup>](#DQBM)<sup>,</sup>[<sup>2</sup>](#IMHS),</sup>[<sup>*</sup>](#email), Jonas Windhager [<sup>1</sup>](#DQBM)<sup>,</sup>[<sup>2</sup>](#IMHS), Lasse Meyer [<sup>1</sup>](#DQBM)<sup>,</sup>[<sup>2</sup>](#IMHS)"
 date: "**Compiled:** `r Sys.Date()`"
 site: bookdown::bookdown_site
 github-repo: "BodenmillerGroup/IMCDataAnalysis"
@@ -45,12 +45,14 @@ spatial analysis and the user will need to become familiar with the general
 framework to efficiently analyse data obtained from multiplexed imaging
 technologies.
 
-## Update freeze
+## Updates
 
-This workflow has been actively developed until December 2023. At that time
-we used the most recent (`v.0.16.0`) version of `steinbock` to process the 
-example data. If you are having issues when using newer versions of `steinbock`
-please open an issue [here](https://github.com/BodenmillerGroup/IMCDataAnalysis/issues).
+This workflow has been actively developed until December 2023 and is regularly
+updated. For updates, please see the changelog \@ref(changelog). At that time we
+used the most recent (`v.0.16.0`) version of `steinbock` to process the example
+data. If you are having issues when using newer versions of `steinbock` please
+open an issue
+[here](https://github.com/BodenmillerGroup/IMCDataAnalysis/issues).
 
 ## Feedback and contributing
 
@@ -90,7 +92,7 @@ Windhager, J., Zanotelli, V.R.T., Schulz, D. et al. An end-to-end workflow for m
     Nat Protoc (2023). 
 ```
 
-## Changelog
+## Changelog (#changelog)
 
 ```{r echo=FALSE}
 htmltools::includeMarkdown('CHANGELOG.md')
@@ -98,6 +100,6 @@ htmltools::includeMarkdown('CHANGELOG.md')
 
 ---
 
-<a name="email"><sup>*</sup></a> nils.eling@uzh.ch  
+<a name="email"><sup>*</sup></a>daniel.schulz@uzh.ch  
 <a name="DQBM">1:</a> Department for Quantitative Biomedicine, University of Zurich  
 <a name="IMHS">2:</a> Institute for Molecular Health Sciences, ETH Zurich  
